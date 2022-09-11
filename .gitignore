@@ -1,2 +1,8 @@
-
 elm-stuff
+elm.js
+node_modules
+.vscode
+.cache
+dist
+temp
+.parcel-cache
