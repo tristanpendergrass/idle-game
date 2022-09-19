@@ -2,8 +2,9 @@ module Frontend exposing (..)
 
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
-import Html
-import Html.Attributes as Attr
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import IdleGame.Views.Main
 import Lamdera
 import Types exposing (..)
 import Url
@@ -65,15 +66,15 @@ updateFromBackend msg model =
 
 view : Model -> Browser.Document FrontendMsg
 view model =
-    { title = ""
-    , body =
-        [ Html.div [ Attr.style "text-align" "center", Attr.style "padding-top" "40px" ]
-            [ Html.img [ Attr.src "https://lamdera.app/lamdera-logo-black.png", Attr.width 150 ] []
-            , Html.div
-                [ Attr.style "font-family" "sans-serif"
-                , Attr.style "padding-top" "40px"
-                ]
-                [ Html.text model.message ]
+    let
+        css =
+            -- There's an experimental technique to include styles in header instead of body https://dashboard.lamdera.app/docs/html-head
+            -- We're not using it for now because it's experimental but might be useful if we want to eliminate the flicker from the css loading in
+            [ node "link" [ rel "stylesheet", href "/output.css" ] []
             ]
-        ]
+    in
+    { title = "Shipgame"
+    , body =
+        css
+            ++ [ IdleGame.Views.Main.renderMain ]
     }
