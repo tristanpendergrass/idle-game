@@ -3,7 +3,7 @@
 You must download [Lamdera](https://dashboard.lamdera.app/docs/download).
 
 ```
-$ npm run build-css -- --watch
+$ npm run build:css -- --watch
 ```
 
 And in a different tab:
