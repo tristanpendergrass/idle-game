@@ -70,7 +70,7 @@ view model =
         css =
             -- There's an experimental technique to include styles in header instead of body https://dashboard.lamdera.app/docs/html-head
             -- We're not using it for now because it's experimental but might be useful if we want to eliminate the flicker from the css loading in
-            [ node "link" [ rel "stylesheet", href "/output.css" ] []
+            [ node "link" [ rel "stylesheet", href "/tailwind.css" ] []
             ]
     in
     { title = "Shipgame"
