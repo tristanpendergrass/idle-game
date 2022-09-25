@@ -73,7 +73,7 @@ view model =
             [ node "link" [ rel "stylesheet", href "/tailwind.css" ] []
             ]
     in
-    { title = "Shipgame"
+    { title = "Idle Game"
     , body =
         css
             ++ [ IdleGame.Views.Main.renderMain ]

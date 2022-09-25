@@ -1,8 +1,10 @@
 {
   "devDependencies": {
+    "daisyui": "^2.31.0",
     "tailwindcss": "^3.1.8"
   },
   "scripts": {
-    "build:css": "npx tailwindcss -i ./src/IdleGame/Views/index.css -o ./public/tailwind.css"
+    "build:css": "npx tailwindcss -i ./src/IdleGame/Views/index.css -o ./public/tailwind.css",
+    "build:css:watch": "npm run build:css -- --watch"
   }
 }
