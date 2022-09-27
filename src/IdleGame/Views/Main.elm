@@ -20,6 +20,7 @@ renderDrawer =
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
+            -- title row
             [ div [ class "bg-base-200 sticky top-0 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center gap-2" ]
                     [ div [ class "flex-0 px-2" ]
@@ -35,12 +36,66 @@ renderDrawer =
                     ]
 
                 -- Close drawer button
-                -- , div [class "lg:hidden btn btn-circle"]
-                --     []
                 , label [ for "drawer", class "btn btn-square btn-ghost drawer-button lg:hidden" ]
                     [ FeatherIcons.x
                         |> FeatherIcons.withSize 20
                         |> FeatherIcons.toHtml []
+                    ]
+                ]
+            , div [ class "h-4" ] []
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.box
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Inventory" ]
+                        ]
+                    ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.lifeBuoy
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Mining" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.paperclip
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Smithing" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.sunrise
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Meditation" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.gitlab
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Combat" ]
+                        ]
                     ]
                 ]
             ]
