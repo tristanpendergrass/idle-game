@@ -2149,6 +2149,12 @@ html {
   bottom: auto;
 }
 
+.btm-nav>*:where(.active) {
+  border-top-width: 2px;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity));
+}
+
 .btm-nav>* .label {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -2620,6 +2626,14 @@ body[dir="rtl"] .checkbox:checked,
   }
 }
 
+.table tr.active th, 
+    .table tr.active td, 
+    .table tr.active:nth-child(even) th, 
+    .table tr.active:nth-child(even) td {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+}
+
 @keyframes toast-pop {
   0% {
     transform: scale(0.9);
@@ -2674,6 +2688,22 @@ body[dir="rtl"] .checkbox:checked,
   left: 50%;
   right: auto;
   bottom: auto;
+}
+
+.btm-nav-xs>*:where(.active) {
+  border-top-width: 1px;
+}
+
+.btm-nav-sm>*:where(.active) {
+  border-top-width: 2px;
+}
+
+.btm-nav-md>*:where(.active) {
+  border-top-width: 2px;
+}
+
+.btm-nav-lg>*:where(.active) {
+  border-top-width: 4px;
 }
 
 .btn-square:where(.btn-xs) {

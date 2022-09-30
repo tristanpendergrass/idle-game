@@ -4,7 +4,8 @@ import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import IdleGame.Views.Main
+import IdleGame.Main
+import IdleGame.Types
 import Lamdera
 import Types exposing (..)
 import Url
@@ -30,6 +31,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , message = "Welcome to Lamdera! You're looking at the auto-generated base implementation. Check out src/Frontend.elm to start coding!"
+      , idleGame = IdleGame.Main.init
       }
     , Cmd.none
     )
@@ -56,12 +58,27 @@ update msg model =
         NoOpFrontendMsg ->
             ( model, Cmd.none )
 
+        UpdateIdleGame idleGameMsg ->
+            let
+                ( newIdleGame, idleGameCmd ) =
+                    IdleGame.Main.update idleGameMsg model.idleGame
+            in
+            ( { model | idleGame = newIdleGame }
+            , Cmd.map UpdateIdleGame idleGameCmd
+            )
+
 
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
         NoOpToFrontend ->
             ( model, Cmd.none )
+
+
+testModel : IdleGame.Types.Model
+testModel =
+    { activeTab = IdleGame.Types.Inventory
+    }
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -76,5 +93,5 @@ view model =
     { title = "Idle Game"
     , body =
         css
-            ++ [ IdleGame.Views.Main.renderMain ]
+            ++ [ IdleGame.Main.view testModel ]
     }
