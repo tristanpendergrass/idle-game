@@ -43,40 +43,31 @@ renderDrawer model =
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
                             ]
-                        , span [ class "flex-1" ] [ text "Inventory" ]
+                        , span [ class "flex-1" ] [ text "Bag" ]
                         ]
                     ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Extracurricular" ] ]
                 , li []
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
-                            [ FeatherIcons.lifeBuoy
+                            [ FeatherIcons.dollarSign
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
                             ]
-                        , span [ class "flex-1" ] [ text "Mining" ]
+                        , span [ class "flex-1" ] [ text "Odd Jobs" ]
                         ]
                     ]
                 , li []
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
-                            [ FeatherIcons.paperclip
+                            [ FeatherIcons.eye
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
                             ]
-                        , span [ class "flex-1" ] [ text "Smithing" ]
-                        ]
-                    ]
-                , li []
-                    [ span [ class "flex gap-4" ]
-                        [ span [ class "flex-none" ]
-                            [ FeatherIcons.sunrise
-                                |> FeatherIcons.withSize 24
-                                |> FeatherIcons.toHtml []
-                            ]
-                        , span [ class "flex-1" ] [ text "Meditation" ]
+                        , span [ class "flex-1" ] [ text "Exploration" ]
                         ]
                     ]
                 , li []
@@ -86,7 +77,61 @@ renderDrawer model =
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
                             ]
-                        , span [ class "flex-1" ] [ text "Combat" ]
+                        , span [ class "flex-1" ] [ text "Dueling" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.target
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Mischief" ]
+                        ]
+                    ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.cloudDrizzle
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Botany" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.water
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Potionmaking" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.zap
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Hexes" ]
+                        ]
+                    ]
+                , li []
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.zapOff
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Wards" ]
                         ]
                     ]
                 ]
