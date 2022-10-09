@@ -107,7 +107,7 @@ renderDrawer model =
                 , li []
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
-                            [ FeatherIcons.water
+                            [ FeatherIcons.droplet
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
                             ]
