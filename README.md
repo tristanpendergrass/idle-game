@@ -1,15 +1,10 @@
 # Development
 
-You must download [Lamdera](https://dashboard.lamdera.app/docs/download).
+You need to install Elm itself separately, in whatever way you prefer (installer, npm, elm-tooling).
 
 ```
-$ npm run build:css -- --watch
-```
-
-And in a different tab:
-
-```
-$ lamdera live
+$ npm install
+$ npm start
 ```
 
 # Deployment
