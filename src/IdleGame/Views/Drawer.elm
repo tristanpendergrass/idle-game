@@ -94,7 +94,7 @@ renderDrawer model =
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li []
+                , li [ class "disabled" ]
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
                             [ FeatherIcons.cloudDrizzle
@@ -104,7 +104,7 @@ renderDrawer model =
                         , span [ class "flex-1" ] [ text "Botany" ]
                         ]
                     ]
-                , li []
+                , li [ class "disabled" ]
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
                             [ FeatherIcons.droplet
@@ -114,7 +114,7 @@ renderDrawer model =
                         , span [ class "flex-1" ] [ text "Potionmaking" ]
                         ]
                     ]
-                , li []
+                , li [ class "disabled" ]
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
                             [ FeatherIcons.zap
@@ -124,7 +124,7 @@ renderDrawer model =
                         , span [ class "flex-1" ] [ text "Hexes" ]
                         ]
                     ]
-                , li []
+                , li [ class "disabled" ]
                     [ span [ class "flex gap-4" ]
                         [ span [ class "flex-none" ]
                             [ FeatherIcons.zapOff
@@ -132,6 +132,30 @@ renderDrawer model =
                                 |> FeatherIcons.toHtml []
                             ]
                         , span [ class "flex-1" ] [ text "Wards" ]
+                        ]
+                    ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ span [ class "text-error text-opacity-50" ] [ text "Dark Arts" ] ] ]
+                , li [ class "disabled" ]
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.alertTriangle
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Off limits" ]
+                        ]
+                    ]
+                , li [ class "disabled" ]
+                    [ span [ class "flex gap-4" ]
+                        [ span [ class "flex-none" ]
+                            [ FeatherIcons.alertTriangle
+                                |> FeatherIcons.withSize 24
+                                |> FeatherIcons.toHtml []
+                            ]
+                        , span [ class "flex-1" ] [ text "Off limits" ]
                         ]
                     ]
                 ]
