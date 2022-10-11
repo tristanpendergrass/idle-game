@@ -1,18 +1,21 @@
 module IdleGame.Types exposing (..)
 
+import FeatherIcons
+import IdleGame.Tabs exposing (Tabs)
+
+
+
 -- Model
 
 
-type Tab
-    = Inventory
-    | Mining
-    | Smithing
-    | Meditation
-    | Combat
+type alias Tab =
+    { title : String
+    , icon : FeatherIcons.Icon
+    }
 
 
 type alias Model =
-    { activeTab : Tab
+    { tabs : Tabs
     }
 
 

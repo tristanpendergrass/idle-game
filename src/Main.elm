@@ -4,9 +4,11 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Tabs
 import IdleGame.Types exposing (Model, Msg)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import List.Selection
 
 
 main : Program () Model Msg
@@ -16,7 +18,7 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { activeTab = IdleGame.Types.Inventory
+    ( { tabs = IdleGame.Tabs.initialTabs
       }
     , Cmd.none
     )
@@ -32,7 +34,7 @@ subscriptions _ =
     Sub.none
 
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     let
         css =
