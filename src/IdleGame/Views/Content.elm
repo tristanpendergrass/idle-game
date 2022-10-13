@@ -74,7 +74,7 @@ renderContent model =
                     , div [ class "relative card-body" ]
                         [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
                             -- Chore title
-                            [ h2 [ class "card-title text-sm" ] [ text "Clean Stables" ]
+                            [ h2 [ class "card-title text-lg h-[3rem]" ] [ text "Clean Stables" ]
                             , div [ class "" ] [ text "+5 gold" ]
 
                             -- Chore XP rewards
@@ -103,7 +103,7 @@ renderContent model =
                     , div [ class "relative card-body" ]
                         [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
                             -- Chore title
-                            [ h2 [ class "card-title text-sm" ] [ text "Clean Big Bubba's Stall" ]
+                            [ h2 [ class "card-title text-lg h-[3rem]" ] [ text "Clean Big Bubba's Stall" ]
                             , div [ class "" ] [ text "+15 gold" ]
 
                             -- Chore XP rewards
@@ -135,13 +135,10 @@ renderContent model =
                             [ FeatherIcons.lock
                                 |> FeatherIcons.withSize 24
                                 |> FeatherIcons.toHtml []
-                            , div [ class "" ] [ text "Level 50" ]
+                            , div [ class "text-lg font-semibold" ] [ text "Level 50" ]
                             ]
                         ]
                     ]
-                , div [ class "h-64 bg-base-200 rounded" ] []
-                , div [ class "h-64 bg-base-200 rounded" ] []
-                , div [ class "h-64 bg-base-200 rounded" ] []
                 ]
             ]
         ]
