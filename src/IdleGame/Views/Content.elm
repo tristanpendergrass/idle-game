@@ -46,9 +46,9 @@ renderContent model =
                         , div [ class "text-2xs" ] [ text "40 / 83 XP" ]
                         ]
                     , div [ class "w-full flex items-center gap-2" ]
-                        [ div [ class "text-2xs font-bold p-1 bg-primary text-primary-content rounded text-center w-8" ] [ text "42" ]
+                        [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ] [ text "1" ]
                         , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                            [ div [ class "bg-primary h-1.5 rounded-full", attribute "style" "width:45%" ] []
+                            [ div [ class "bg-primary h-2 rounded-full", attribute "style" "width:45%" ] []
                             ]
                         ]
                     , div [ class "w-full flex items-center justify-between" ]
@@ -67,7 +67,7 @@ renderContent model =
 
             -- Chore grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
-                [ div [ class "card card-compact bg-base-100 shadow-xl cursor-pointer" ]
+                [ div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer clickable" ]
                     -- Chore image
                     [ figure []
                         [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
@@ -96,7 +96,7 @@ renderContent model =
                         , div [ class "absolute z-10 h-full bg-base-content opacity-20 top-0 left-0 animate-progress-bar" ] []
                         ]
                     ]
-                , div [ class "card card-compact bg-base-100 shadow-xl cursor-pointer" ]
+                , div [ class "card card-compact border-t-2 border-orange-900 bg-base-100 shadow-xl cursor-pointer clickable" ]
                     -- Chore image
                     [ figure []
                         [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
