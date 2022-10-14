@@ -14,8 +14,22 @@ type alias Tab =
     }
 
 
+type alias ChoreData =
+    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGraned : Int, masteryXp : Int }
+
+
+type Chore
+    = LockedChore
+    | UnlockedChore ChoreData { isActive : Bool }
+
+
 type alias Model =
     { tabs : Tabs
+
+    -- Chores tab
+    , skillXp : Int
+    , masteryXp : Int
+    , chores : List Chore
     }
 
 

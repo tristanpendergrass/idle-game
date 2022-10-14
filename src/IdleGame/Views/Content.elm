@@ -9,7 +9,7 @@ import IdleGame.Views.Placeholder
 
 
 renderContent : Model -> Html msg
-renderContent model =
+renderContent { idleGame } =
     div [ class "drawer-content flex flex-col items-center", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
             -- TOP NAV
