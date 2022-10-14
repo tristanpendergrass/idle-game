@@ -1,6 +1,7 @@
 module IdleGame.Types exposing (..)
 
 import FeatherIcons
+import IdleGame.Chores exposing (Chore)
 import IdleGame.Tabs exposing (Tabs)
 
 
@@ -12,15 +13,6 @@ type alias Tab =
     { title : String
     , icon : FeatherIcons.Icon
     }
-
-
-type alias ChoreData =
-    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGraned : Int, masteryXp : Int }
-
-
-type Chore
-    = LockedChore
-    | UnlockedChore ChoreData { isActive : Bool }
 
 
 type alias Model =

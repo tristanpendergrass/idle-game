@@ -4,6 +4,7 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Chores exposing (..)
 import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
@@ -19,14 +20,14 @@ main =
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { tabs = IdleGame.Tabs.initialTabs
-      , skillXp = 43
-      , masteryXp = 100
+      , skillXp = 444
+      , masteryXp = 100000
       , chores =
-            [ UnlockedChore
-                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGraned = 1, masteryXp = 0 }
+            [ Chore
+                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235 }
                 { isActive = True }
-            , UnlockedChore
-                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGraned = 1, masteryXp = 0 }
+            , Chore
+                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGranted = 1, masteryXp = 0 }
                 { isActive = False }
             ]
       }
