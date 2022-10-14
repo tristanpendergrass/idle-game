@@ -55,7 +55,13 @@ renderCategory withTopLine category =
         maybeTitle =
             case category.title of
                 Just title ->
-                    [ li [ class "menu-title" ] [ span [] [ text title ] ] ]
+                    [ li [ class "menu-title" ]
+                        [ span []
+                            [ span [ classList [ ( "text-error text-opacity-40", category.forbidden ) ] ]
+                                [ text title ]
+                            ]
+                        ]
+                    ]
 
                 Nothing ->
                     []

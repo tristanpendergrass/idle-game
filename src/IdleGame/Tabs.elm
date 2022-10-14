@@ -10,6 +10,7 @@ type Tabs
 type alias Category =
     { title : Maybe String
     , items : List Tab
+    , forbidden : Bool
     }
 
 
@@ -29,6 +30,7 @@ initialTabs : Tabs
 initialTabs =
     Tabs
         [ { title = Nothing
+          , forbidden = False
           , items =
                 [ { title = "Bag"
                   , icon = FeatherIcons.box
@@ -41,6 +43,7 @@ initialTabs =
                 ]
           }
         , { title = Just "Extracurricular"
+          , forbidden = False
           , items =
                 [ { title = "Chores"
                   , icon = FeatherIcons.tool
@@ -61,6 +64,7 @@ initialTabs =
                 ]
           }
         , { title = Just "Classes"
+          , forbidden = False
           , items =
                 [ { title = "Botany"
                   , icon = FeatherIcons.cloudDrizzle
@@ -81,6 +85,7 @@ initialTabs =
                 ]
           }
         , { title = Just "Dark Arts"
+          , forbidden = True
           , items =
                 [ { title = "Forbidden knowledge"
                   , icon = FeatherIcons.alertTriangle

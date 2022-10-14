@@ -10,7 +10,7 @@ module.exports = {
     keyframes: {
       fill: {
         '0%': {width: '0%'},
-        '95%': {width: '100%'},
+        '98%': {width: '100%'},
         '100%': {width: '100%'}
       }
     }
