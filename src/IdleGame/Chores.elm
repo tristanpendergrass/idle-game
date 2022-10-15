@@ -2,11 +2,15 @@ module IdleGame.Chores exposing (..)
 
 
 type Chore
-    = Chore ChoreData { isActive : Bool }
+    = Chore Id ChoreData
+
+
+type alias Id =
+    Int
 
 
 type alias ChoreData =
-    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int }
+    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int, isActive : Bool }
 
 
 skillLevelFromXp : Int -> Int
@@ -29,3 +33,16 @@ masteryLevelPercentFromXp : Int -> Float
 masteryLevelPercentFromXp xp =
     remainderBy 100 xp
         |> toFloat
+
+
+toggleActiveChore : Id -> List Chore -> List Chore
+toggleActiveChore toggleId chores =
+    chores
+        |> List.map
+            (\(Chore id choreData) ->
+                if id == toggleId then
+                    Chore id { choreData | isActive = not choreData.isActive }
+
+                else
+                    Chore id { choreData | isActive = False }
+            )

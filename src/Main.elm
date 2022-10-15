@@ -23,12 +23,10 @@ init () =
       , skillXp = 444
       , masteryXp = 100000
       , chores =
-            [ Chore
-                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235 }
-                { isActive = True }
-            , Chore
-                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGranted = 1, masteryXp = 0 }
-                { isActive = False }
+            [ Chore 0
+                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235, isActive = False }
+            , Chore 1
+                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGranted = 1, masteryXp = 0, isActive = False }
             ]
       }
     , Cmd.none
@@ -37,7 +35,12 @@ init () =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        NoOp ->
+            ( model, Cmd.none )
+
+        ToggleActiveChore toggleId ->
+            ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId model.chores }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

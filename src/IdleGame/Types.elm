@@ -31,3 +31,5 @@ type alias Model =
 
 type Msg
     = NoOp
+      -- Chores
+    | ToggleActiveChore IdleGame.Chores.Id

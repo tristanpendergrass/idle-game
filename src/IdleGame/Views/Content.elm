@@ -5,12 +5,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chores exposing (Chore(..))
-import IdleGame.Types exposing (Model)
+import IdleGame.Types exposing (Model, Msg)
 import IdleGame.Views.Placeholder
 import Round
 
 
-renderContent : Model -> Html msg
+renderContent : Model -> Html Msg
 renderContent model =
     let
         skillLevel =
@@ -88,30 +88,17 @@ renderContent model =
 
             -- Chore grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
-                (List.map renderChore model.chores
-                    ++ [ div [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-not-allowed" ]
-                            -- Chore image
-                            [ figure []
-                                [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
-                            , div [ class "relative card-body" ]
-                                [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
-                                    -- Chore title
-                                    [ FeatherIcons.lock
-                                        |> FeatherIcons.withSize 24
-                                        |> FeatherIcons.toHtml []
-                                    , div [ class "text-lg font-semibold" ] [ text "Level 50" ]
-                                    ]
-                                ]
-                            ]
-                       ]
+                ([]
+                    ++ List.map renderChore model.chores
+                    ++ [ renderLockedChore ]
                 )
             ]
         ]
 
 
-renderChore : Chore -> Html msg
-renderChore (Chore choreData { isActive }) =
-    div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer clickable" ]
+renderChore : Chore -> Html Msg
+renderChore (Chore id choreData) =
+    div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop", onClick <| IdleGame.Types.ToggleActiveChore id ]
         -- Chore image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
@@ -139,8 +126,26 @@ renderChore (Chore choreData { isActive }) =
             -- Chore progress bar
             , div
                 [ class "absolute z-10 h-full bg-base-content opacity-20 top-0 left-0 animate-progress-bar"
-                , classList [ ( "invisible", not isActive ) ]
+                , classList [ ( "invisible", not choreData.isActive ) ]
                 ]
                 []
+            ]
+        ]
+
+
+renderLockedChore : Html Msg
+renderLockedChore =
+    div [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake" ]
+        -- Chore image
+        [ figure []
+            [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
+        , div [ class "relative card-body" ]
+            [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
+                -- Chore title
+                [ FeatherIcons.lock
+                    |> FeatherIcons.withSize 24
+                    |> FeatherIcons.toHtml []
+                , div [ class "text-lg font-semibold" ] [ text "Level 50" ]
+                ]
             ]
         ]
