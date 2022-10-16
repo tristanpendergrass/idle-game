@@ -3,6 +3,7 @@ module IdleGame.Types exposing (..)
 import FeatherIcons
 import IdleGame.Chores exposing (Chore)
 import IdleGame.Tabs exposing (Tabs)
+import Time
 
 
 
@@ -31,5 +32,7 @@ type alias Model =
 
 type Msg
     = NoOp
+    | WithTime (Time.Posix -> Msg)
+    | HandleAnimationFrame Time.Posix
       -- Chores
-    | ToggleActiveChore IdleGame.Chores.Id
+    | ToggleActiveChore IdleGame.Chores.Id Time.Posix

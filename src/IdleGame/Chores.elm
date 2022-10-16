@@ -1,8 +1,30 @@
-module IdleGame.Chores exposing (..)
+module IdleGame.Chores exposing
+    ( Chore
+    , ChoreData
+    , Id
+    , create
+    , getActivityProgress
+    , getChoreData
+    , getId
+    , handleAnimationFrame
+    , isActive
+    , masteryLevelFromXp
+    , masteryLevelPercentFromXp
+    , skillLevelFromXp
+    , skillLevelPercentFromXp
+    , toggleActiveChore
+    )
+
+import IdleGame.Timer
+import Time
 
 
 type Chore
-    = Chore Id ChoreData
+    = Chore Id ChoreData ActivityStatus
+
+
+type alias ActivityStatus =
+    Maybe IdleGame.Timer.Timer
 
 
 type alias Id =
@@ -10,7 +32,12 @@ type alias Id =
 
 
 type alias ChoreData =
-    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int, isActive : Bool }
+    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int }
+
+
+create : Id -> ChoreData -> Chore
+create id choreData =
+    Chore id choreData Nothing
 
 
 skillLevelFromXp : Int -> Int
@@ -26,23 +53,73 @@ skillLevelPercentFromXp xp =
 
 masteryLevelFromXp : Int -> Int
 masteryLevelFromXp xp =
-    xp // 100 + 1
+    xp // 10 + 1
 
 
 masteryLevelPercentFromXp : Int -> Float
 masteryLevelPercentFromXp xp =
-    remainderBy 100 xp
+    remainderBy 10 xp
         |> toFloat
 
 
-toggleActiveChore : Id -> List Chore -> List Chore
-toggleActiveChore toggleId chores =
+toggleActiveChore : Id -> Time.Posix -> List Chore -> List Chore
+toggleActiveChore toggleId now chores =
     chores
         |> List.map
-            (\(Chore id choreData) ->
+            (\(Chore id choreData activityStatus) ->
                 if id == toggleId then
-                    Chore id { choreData | isActive = not choreData.isActive }
+                    let
+                        newActivityStatus =
+                            case activityStatus of
+                                Nothing ->
+                                    Just (IdleGame.Timer.create now 1000)
+
+                                Just _ ->
+                                    Nothing
+                    in
+                    Chore id choreData newActivityStatus
 
                 else
-                    Chore id { choreData | isActive = False }
+                    Chore id choreData Nothing
             )
+
+
+isActive : Chore -> Bool
+isActive (Chore _ _ activityStatus) =
+    not (activityStatus == Nothing)
+
+
+getActivityProgress : Chore -> Maybe Float
+getActivityProgress (Chore _ _ activityStatus) =
+    activityStatus
+        |> Maybe.map
+            (\timer ->
+                IdleGame.Timer.percentComplete timer
+            )
+
+
+getId : Chore -> Id
+getId (Chore id _ _) =
+    id
+
+
+getChoreData : Chore -> ChoreData
+getChoreData (Chore _ choreData _) =
+    choreData
+
+
+handleAnimationFrame : Time.Posix -> Chore -> Chore
+handleAnimationFrame newCurrentTime (Chore id choreData maybeActivityTimer) =
+    case maybeActivityTimer of
+        Nothing ->
+            Chore id choreData maybeActivityTimer
+
+        Just timer ->
+            let
+                ( newTimer, timesCompleted ) =
+                    IdleGame.Timer.updateCurrentTime newCurrentTime timer
+
+                newChoreData =
+                    { choreData | masteryXp = choreData.masteryXp + timesCompleted * choreData.masteryXpGranted }
+            in
+            Chore id choreData (Just newTimer)

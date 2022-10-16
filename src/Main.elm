@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Events
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -10,6 +11,8 @@ import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import List.Selection
+import Task
+import Time
 
 
 main : Program () Model Msg
@@ -23,10 +26,10 @@ init () =
       , skillXp = 444
       , masteryXp = 100000
       , chores =
-            [ Chore 0
-                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235, isActive = False }
-            , Chore 1
-                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGranted = 1, masteryXp = 0, isActive = False }
+            [ IdleGame.Chores.create 0
+                { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235 }
+            , IdleGame.Chores.create 1
+                { title = "Clean Big Bubba's Stall", rewardText = "+15 gold", skillXpGranted = 10, masteryXpGranted = 1, masteryXp = 0 }
             ]
       }
     , Cmd.none
@@ -39,13 +42,21 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        ToggleActiveChore toggleId ->
-            ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId model.chores }, Cmd.none )
+        WithTime getMsg ->
+            ( model, Cmd.batch [ Task.perform getMsg Time.now ] )
+
+        ToggleActiveChore toggleId now ->
+            ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId now model.chores }, Cmd.none )
+
+        HandleAnimationFrame newTime ->
+            ( { model | chores = List.map (IdleGame.Chores.handleAnimationFrame newTime) model.chores }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.batch
+        [ Browser.Events.onAnimationFrame HandleAnimationFrame
+        ]
 
 
 view : Model -> Html Msg

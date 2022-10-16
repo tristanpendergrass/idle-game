@@ -97,8 +97,19 @@ renderContent model =
 
 
 renderChore : Chore -> Html Msg
-renderChore (Chore id choreData) =
-    div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop", onClick <| IdleGame.Types.ToggleActiveChore id ]
+renderChore chore =
+    let
+        id =
+            IdleGame.Chores.getId chore
+
+        choreData =
+            IdleGame.Chores.getChoreData chore
+
+        handleClick =
+            IdleGame.Types.ToggleActiveChore id
+                |> IdleGame.Types.WithTime
+    in
+    div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop", onClick handleClick ]
         -- Chore image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
@@ -124,11 +135,16 @@ renderChore (Chore id choreData) =
                 ]
 
             -- Chore progress bar
-            , div
-                [ class "absolute z-10 h-full bg-base-content opacity-20 top-0 left-0 animate-progress-bar"
-                , classList [ ( "invisible", not choreData.isActive ) ]
-                ]
-                []
+            , case IdleGame.Chores.getActivityProgress chore of
+                Nothing ->
+                    div [] []
+
+                Just percentComplete ->
+                    div
+                        [ class "absolute z-10 h-full bg-base-content opacity-20 top-0 left-0 "
+                        , attribute "style" ("width:" ++ String.fromFloat percentComplete ++ "%")
+                        ]
+                        []
             ]
         ]
 
