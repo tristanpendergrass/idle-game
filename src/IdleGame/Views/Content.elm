@@ -96,6 +96,11 @@ renderContent model =
         ]
 
 
+choreHeight : String
+choreHeight =
+    "h-[324px]"
+
+
 renderChore : Chore -> Html Msg
 renderChore chore =
     let
@@ -109,7 +114,11 @@ renderChore chore =
             IdleGame.Types.ToggleActiveChore id
                 |> IdleGame.Types.WithTime
     in
-    div [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop", onClick handleClick ]
+    div
+        [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
+        , class choreHeight
+        , onClick handleClick
+        ]
         -- Chore image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
@@ -151,7 +160,10 @@ renderChore chore =
 
 renderLockedChore : Html Msg
 renderLockedChore =
-    div [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake" ]
+    div
+        [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake"
+        , class choreHeight
+        ]
         -- Chore image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
