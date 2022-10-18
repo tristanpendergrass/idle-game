@@ -48,14 +48,19 @@ update msg model =
         ToggleActiveChore toggleId now ->
             ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId now model.chores }, Cmd.none )
 
-        HandleAnimationFrame newTime ->
-            ( { model | chores = List.map (IdleGame.Chores.handleAnimationFrame newTime) model.chores }, Cmd.none )
+        HandleAnimationFrameDelta newTime ->
+            let
+                -- handle chores
+                ( newChores, skillXpGained ) =
+                    IdleGame.Chores.handleAnimationFrame newTime model.chores
+            in
+            ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Browser.Events.onAnimationFrame HandleAnimationFrame
+        [ Browser.Events.onAnimationFrameDelta HandleAnimationFrameDelta
         ]
 
 

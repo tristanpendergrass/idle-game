@@ -72,7 +72,7 @@ toggleActiveChore toggleId now chores =
                         newActivityStatus =
                             case activityStatus of
                                 Nothing ->
-                                    Just (IdleGame.Timer.create now 1000)
+                                    Just (IdleGame.Timer.create 2500)
 
                                 Just _ ->
                                     Nothing
@@ -108,18 +108,38 @@ getChoreData (Chore _ choreData _) =
     choreData
 
 
-handleAnimationFrame : Time.Posix -> Chore -> Chore
-handleAnimationFrame newCurrentTime (Chore id choreData maybeActivityTimer) =
+handleAnimationFrameHelper : Float -> Chore -> ( Chore, Int )
+handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
     case maybeActivityTimer of
         Nothing ->
-            Chore id choreData maybeActivityTimer
+            ( Chore id choreData maybeActivityTimer, 0 )
 
         Just timer ->
             let
                 ( newTimer, timesCompleted ) =
-                    IdleGame.Timer.updateCurrentTime newCurrentTime timer
+                    IdleGame.Timer.increment delta timer
 
                 newChoreData =
                     { choreData | masteryXp = choreData.masteryXp + timesCompleted * choreData.masteryXpGranted }
+
+                skillXpGranted =
+                    choreData.skillXpGranted * timesCompleted
             in
-            Chore id choreData (Just newTimer)
+            ( Chore id choreData (Just newTimer), skillXpGranted )
+
+
+handleAnimationFrame : Float -> List Chore -> ( List Chore, Int )
+handleAnimationFrame delta chores =
+    List.foldr
+        (\chore accum ->
+            let
+                ( newChore, skillXp ) =
+                    handleAnimationFrameHelper delta chore
+
+                ( accumChores, accumSkillXp ) =
+                    accum
+            in
+            ( newChore :: accumChores, skillXp + accumSkillXp )
+        )
+        ( [], 0 )
+        chores

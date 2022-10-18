@@ -1,8 +1,8 @@
 module IdleGame.Timer exposing
     ( Timer
     , create
+    , increment
     , percentComplete
-    , updateCurrentTime
     )
 
 import Time
@@ -14,38 +14,45 @@ import Time
 
 type Timer
     = Timer
-        { startTime : Time.Posix
-        , currentTime : Time.Posix
-        , length : Int
+        { current : Float
+        , length : Float
         }
 
 
-create : Time.Posix -> Int -> Timer
-create startTime length =
-    Timer { startTime = startTime, currentTime = startTime, length = length }
+create : Float -> Timer
+create length =
+    Timer { current = 0, length = length }
 
 
 percentComplete : Timer -> Float
-percentComplete (Timer { startTime, currentTime, length }) =
-    (Time.posixToMillis currentTime - Time.posixToMillis startTime)
-        -- obtain progress through a timer that might have completed more than once and looped around
-        |> remainderBy length
-        -- calculate completion
-        |> (\timeElapsed -> toFloat timeElapsed / toFloat length)
-        -- convert to percent
-        |> (*) 100
+percentComplete (Timer { current, length }) =
+    current / length * 100.0
 
 
-updateCurrentTime : Time.Posix -> Timer -> ( Timer, Int )
-updateCurrentTime newCurrentTime (Timer data) =
+recursiveSubtract : Float -> Float -> { fullSubtractions : Int, remainder : Float }
+recursiveSubtract subtrahend minuend =
     let
-        millisElapsed =
-            Time.posixToMillis newCurrentTime - Time.posixToMillis data.currentTime
-
-        timesCompleted =
-            millisElapsed // data.length
-
-        newAnimation =
-            Timer { data | currentTime = newCurrentTime }
+        difference =
+            minuend - subtrahend
     in
-    ( newAnimation, timesCompleted )
+    if difference > subtrahend then
+        let
+            { remainder, fullSubtractions } =
+                recursiveSubtract subtrahend difference
+        in
+        { remainder = remainder, fullSubtractions = fullSubtractions + 1 }
+
+    else
+        { remainder = difference, fullSubtractions = 0 }
+
+
+increment : Float -> Timer -> ( Timer, Int )
+increment delta (Timer data) =
+    let
+        sum =
+            data.current + delta
+
+        { fullSubtractions, remainder } =
+            recursiveSubtract data.length sum
+    in
+    ( Timer { data | current = remainder }, fullSubtractions )

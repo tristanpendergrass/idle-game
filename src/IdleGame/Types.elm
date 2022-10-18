@@ -33,6 +33,6 @@ type alias Model =
 type Msg
     = NoOp
     | WithTime (Time.Posix -> Msg)
-    | HandleAnimationFrame Time.Posix
+    | HandleAnimationFrameDelta Float
       -- Chores
     | ToggleActiveChore IdleGame.Chores.Id Time.Posix
