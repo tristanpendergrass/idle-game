@@ -17,17 +17,19 @@
             "feathericons/elm-feather": "1.5.0",
             "lamdera/codecs": "1.0.0",
             "lamdera/core": "1.0.0",
-            "myrho/elm-round": "1.0.4"
+            "myrho/elm-round": "1.0.4",
+            "elm-explorations/test": "2.0.1"
         },
         "indirect": {
             "elm/bytes": "1.0.8",
             "elm/file": "1.0.5",
             "elm/http": "2.0.0",
-            "elm/virtual-dom": "1.0.3"
+            "elm/virtual-dom": "1.0.3",
+            "elm/random": "1.0.0"
         }
     },
     "test-dependencies": {
-        "direct": {},
-        "indirect": {}
+        "direct": { },
+        "indirect": { }
     }
 }

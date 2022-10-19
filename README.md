@@ -1,18 +1,26 @@
 # Development
 
-You need to install Elm itself separately, in whatever way you prefer (installer, npm, elm-tooling).
-
+1. [Install Elm](https://guide.elm-lang.org/install/elm.html)
+2. 
 ```
 $ npm install
 $ npm start
 ```
 
+# Testing
+
+```
+$ npm test
+```
+
+or
+
+```
+$ npm test -- --watch
+```
+
 # Deployment
 
 ```
-$ npm run build-css
-$ lamdera check
-$ lamdera deploy
+$ npm run build
 ```
-
-Read more about deploying Lamdera [here](https://dashboard.lamdera.app/docs/deploying).
