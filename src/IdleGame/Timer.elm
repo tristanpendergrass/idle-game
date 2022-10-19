@@ -29,30 +29,22 @@ percentComplete (Timer { current, length }) =
     current / length * 100.0
 
 
-recursiveSubtract : Float -> Float -> { fullSubtractions : Int, remainder : Float }
-recursiveSubtract subtrahend minuend =
-    let
-        difference =
-            minuend - subtrahend
-    in
-    if difference > subtrahend then
-        let
-            { remainder, fullSubtractions } =
-                recursiveSubtract subtrahend difference
-        in
-        { remainder = remainder, fullSubtractions = fullSubtractions + 1 }
-
-    else
-        { remainder = difference, fullSubtractions = 0 }
-
-
 increment : Float -> Timer -> ( Timer, Int )
-increment delta (Timer data) =
+increment delta timer =
     let
+        (Timer data) =
+            timer
+
         sum =
             data.current + delta
-
-        { fullSubtractions, remainder } =
-            recursiveSubtract data.length sum
     in
-    ( Timer { data | current = remainder }, fullSubtractions )
+    if sum > data.length then
+        -- In this case the timer has reached completion and we should loop it around to the beginning. This may happen more than once, hence the recursion
+        let
+            ( incrementedTimer, completions ) =
+                increment (delta - data.length) timer
+        in
+        ( incrementedTimer, 1 + completions )
+
+    else
+        ( Timer { data | current = sum }, 0 )

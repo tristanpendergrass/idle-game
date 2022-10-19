@@ -11,6 +11,6 @@
   "scripts": {
     "build": "npx parcel build src/index.html",
     "start": "npx parcel src/index.html",
-    "test": "npx elm-test \"src/**/*_Test.elm\""
+    "test": "npx elm-test \"src/**/*_test.elm\""
   }
 }
