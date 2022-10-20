@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Browser
-import Browser.Events
+import Browser.Events exposing (onVisibilityChange)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -10,6 +10,7 @@ import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import IdleGame.Views.WelcomeBackModal
 import List.Selection
 import Task
 import Time
@@ -23,6 +24,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { tabs = IdleGame.Tabs.initialTabs
+      , showWelcomeBackModal = False
       , skillXp = 444
       , masteryXp = 100000
       , chores =
@@ -38,9 +40,13 @@ init () =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        noOp =
+            ( model, Cmd.none )
+    in
     case msg of
         NoOp ->
-            ( model, Cmd.none )
+            noOp
 
         WithTime getMsg ->
             ( model, Cmd.batch [ Task.perform getMsg Time.now ] )
@@ -56,11 +62,22 @@ update msg model =
             in
             ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained }, Cmd.none )
 
+        HandleVisibilityChange visibility ->
+            if visibility == Browser.Events.Visible then
+                ( { model | showWelcomeBackModal = True }, Cmd.none )
+
+            else
+                noOp
+
+        CloseWelcomeBackModal ->
+            ( { model | showWelcomeBackModal = False }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrameDelta HandleAnimationFrameDelta
+        , Browser.Events.onVisibilityChange HandleVisibilityChange
         ]
 
 
@@ -81,4 +98,11 @@ view model =
                     , IdleGame.Views.Drawer.renderDrawer model
                     ]
                ]
+            ++ (if model.showWelcomeBackModal then
+                    [ IdleGame.Views.WelcomeBackModal.render model
+                    ]
+
+                else
+                    []
+               )
         )

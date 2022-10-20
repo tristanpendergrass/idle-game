@@ -1,5 +1,6 @@
 module IdleGame.Types exposing (..)
 
+import Browser.Events
 import FeatherIcons
 import IdleGame.Chores exposing (Chore)
 import IdleGame.Tabs exposing (Tabs)
@@ -18,6 +19,7 @@ type alias Tab =
 
 type alias Model =
     { tabs : Tabs
+    , showWelcomeBackModal : Bool
 
     -- Chores tab
     , skillXp : Int
@@ -34,5 +36,7 @@ type Msg
     = NoOp
     | WithTime (Time.Posix -> Msg)
     | HandleAnimationFrameDelta Float
+    | HandleVisibilityChange Browser.Events.Visibility
+    | CloseWelcomeBackModal
       -- Chores
     | ToggleActiveChore IdleGame.Chores.Id Time.Posix
