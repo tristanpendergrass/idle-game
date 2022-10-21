@@ -57,10 +57,10 @@ update msg model =
         HandleAnimationFrameDelta newTime ->
             let
                 -- handle chores
-                ( newChores, skillXpGained ) =
+                ( newChores, { skillXpGained, masteryXpGained } ) =
                     IdleGame.Chores.handleAnimationFrame newTime model.chores
             in
-            ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained }, Cmd.none )
+            ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained, masteryXp = model.masteryXp + masteryXpGained }, Cmd.none )
 
         HandleVisibilityChange visibility ->
             if visibility == Browser.Events.Visible then

@@ -108,11 +108,11 @@ getChoreData (Chore _ choreData _) =
     choreData
 
 
-handleAnimationFrameHelper : Float -> Chore -> ( Chore, Int )
+handleAnimationFrameHelper : Float -> Chore -> ( Chore, { skillXp : Int, masteryXp : Int } )
 handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
     case maybeActivityTimer of
         Nothing ->
-            ( Chore id choreData maybeActivityTimer, 0 )
+            ( Chore id choreData maybeActivityTimer, { skillXp = 0, masteryXp = 0 } )
 
         Just timer ->
             let
@@ -124,22 +124,25 @@ handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
 
                 skillXpGranted =
                     choreData.skillXpGranted * timesCompleted
+
+                masteryXpGranted =
+                    choreData.masteryXpGranted * timesCompleted
             in
-            ( Chore id choreData (Just newTimer), skillXpGranted )
+            ( Chore id choreData (Just newTimer), { skillXp = skillXpGranted, masteryXp = masteryXpGranted } )
 
 
-handleAnimationFrame : Float -> List Chore -> ( List Chore, Int )
+handleAnimationFrame : Float -> List Chore -> ( List Chore, { skillXpGained : Int, masteryXpGained : Int } )
 handleAnimationFrame delta chores =
     List.foldr
         (\chore accum ->
             let
-                ( newChore, skillXp ) =
+                ( newChore, { skillXp, masteryXp } ) =
                     handleAnimationFrameHelper delta chore
 
-                ( accumChores, accumSkillXp ) =
+                ( accumChores, accumXps ) =
                     accum
             in
-            ( newChore :: accumChores, skillXp + accumSkillXp )
+            ( newChore :: accumChores, { skillXpGained = skillXp + accumXps.skillXpGained, masteryXpGained = masteryXp + accumXps.masteryXpGained } )
         )
-        ( [], 0 )
+        ( [], { skillXpGained = 0, masteryXpGained = 0 } )
         chores
