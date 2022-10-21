@@ -62,7 +62,7 @@ masteryLevelPercentFromXp xp =
         |> toFloat
 
 
-toggleActiveChore : Id -> Time.Posix -> List Chore -> List Chore
+toggleActiveChore : Id -> Int -> List Chore -> List Chore
 toggleActiveChore toggleId now chores =
     chores
         |> List.map
@@ -72,7 +72,7 @@ toggleActiveChore toggleId now chores =
                         newActivityStatus =
                             case activityStatus of
                                 Nothing ->
-                                    Just (IdleGame.Timer.create 2500)
+                                    Just (IdleGame.Timer.create now 2500)
 
                                 Just _ ->
                                     Nothing
@@ -89,12 +89,12 @@ isActive (Chore _ _ activityStatus) =
     not (activityStatus == Nothing)
 
 
-getActivityProgress : Chore -> Maybe Float
-getActivityProgress (Chore _ _ activityStatus) =
+getActivityProgress : Int -> Chore -> Maybe Float
+getActivityProgress now (Chore _ _ activityStatus) =
     activityStatus
         |> Maybe.map
             (\timer ->
-                IdleGame.Timer.percentComplete timer
+                IdleGame.Timer.percentComplete now timer
             )
 
 
@@ -108,8 +108,8 @@ getChoreData (Chore _ choreData _) =
     choreData
 
 
-handleAnimationFrameHelper : Float -> Chore -> ( Chore, { skillXp : Int, masteryXp : Int } )
-handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
+handleAnimationFrameHelper : Int -> Chore -> ( Chore, { skillXp : Int, masteryXp : Int } )
+handleAnimationFrameHelper now (Chore id choreData maybeActivityTimer) =
     case maybeActivityTimer of
         Nothing ->
             ( Chore id choreData maybeActivityTimer, { skillXp = 0, masteryXp = 0 } )
@@ -117,7 +117,7 @@ handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
         Just timer ->
             let
                 ( newTimer, timesCompleted ) =
-                    IdleGame.Timer.increment delta timer
+                    IdleGame.Timer.update now timer
 
                 newChoreData =
                     { choreData | masteryXp = choreData.masteryXp + timesCompleted * choreData.masteryXpGranted }
@@ -131,13 +131,13 @@ handleAnimationFrameHelper delta (Chore id choreData maybeActivityTimer) =
             ( Chore id choreData (Just newTimer), { skillXp = skillXpGranted, masteryXp = masteryXpGranted } )
 
 
-handleAnimationFrame : Float -> List Chore -> ( List Chore, { skillXpGained : Int, masteryXpGained : Int } )
-handleAnimationFrame delta chores =
+handleAnimationFrame : Int -> List Chore -> ( List Chore, { skillXpGained : Int, masteryXpGained : Int } )
+handleAnimationFrame now chores =
     List.foldr
         (\chore accum ->
             let
                 ( newChore, { skillXp, masteryXp } ) =
-                    handleAnimationFrameHelper delta chore
+                    handleAnimationFrameHelper now chore
 
                 ( accumChores, accumXps ) =
                     accum

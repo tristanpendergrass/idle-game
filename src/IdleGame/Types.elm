@@ -20,6 +20,7 @@ type alias Tab =
 type alias Model =
     { tabs : Tabs
     , showWelcomeBackModal : Bool
+    , now : Int
 
     -- Chores tab
     , skillXp : Int
@@ -35,7 +36,7 @@ type alias Model =
 type Msg
     = NoOp
     | WithTime (Time.Posix -> Msg)
-    | HandleAnimationFrameDelta Float
+    | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseWelcomeBackModal
       -- Chores

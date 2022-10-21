@@ -25,6 +25,7 @@ init : () -> ( Model, Cmd Msg )
 init () =
     ( { tabs = IdleGame.Tabs.initialTabs
       , showWelcomeBackModal = False
+      , now = 0
       , skillXp = 444
       , masteryXp = 100000
       , chores =
@@ -52,15 +53,18 @@ update msg model =
             ( model, Cmd.batch [ Task.perform getMsg Time.now ] )
 
         ToggleActiveChore toggleId now ->
-            ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId now model.chores }, Cmd.none )
+            ( { model | chores = IdleGame.Chores.toggleActiveChore toggleId (Time.posixToMillis now) model.chores }, Cmd.none )
 
-        HandleAnimationFrameDelta newTime ->
+        HandleAnimationFrame nowPosix ->
             let
+                now =
+                    Time.posixToMillis nowPosix
+
                 -- handle chores
                 ( newChores, { skillXpGained, masteryXpGained } ) =
-                    IdleGame.Chores.handleAnimationFrame newTime model.chores
+                    IdleGame.Chores.handleAnimationFrame now model.chores
             in
-            ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained, masteryXp = model.masteryXp + masteryXpGained }, Cmd.none )
+            ( { model | chores = newChores, skillXp = model.skillXp + skillXpGained, masteryXp = model.masteryXp + masteryXpGained, now = now }, Cmd.none )
 
         HandleVisibilityChange visibility ->
             if visibility == Browser.Events.Visible then
@@ -76,7 +80,7 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Browser.Events.onAnimationFrameDelta HandleAnimationFrameDelta
+        [ Browser.Events.onAnimationFrame HandleAnimationFrame
         , Browser.Events.onVisibilityChange HandleVisibilityChange
         ]
 

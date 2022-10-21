@@ -1,50 +1,48 @@
 module IdleGame.Timer exposing
     ( Timer
     , create
-    , increment
     , percentComplete
+    , update
     )
-
-import Time
-
-
 
 -- An animation should know when it started, what percentage it is through, be able to update, do something on reaching end, know whether to repeat
 
 
 type Timer
     = Timer
-        { current : Float
-        , length : Float
+        { start : Int
+        , length : Int
+        , lastRecorded : Int
         }
 
 
-create : Float -> Timer
-create length =
-    Timer { current = 0, length = length }
+create : Int -> Int -> Timer
+create start length =
+    Timer { start = start, length = length, lastRecorded = start }
 
 
-percentComplete : Timer -> Float
-percentComplete (Timer { current, length }) =
-    current / length * 100.0
-
-
-increment : Float -> Timer -> ( Timer, Int )
-increment delta timer =
+percentComplete : Int -> Timer -> Float
+percentComplete current (Timer { start, length }) =
     let
-        (Timer data) =
-            timer
+        progress =
+            remainderBy length (current - start)
 
-        sum =
-            data.current + delta
+        total =
+            length
     in
-    if sum > data.length then
-        -- In this case the timer has reached completion and we should loop it around to the beginning. This may happen more than once, hence the recursion
-        let
-            ( incrementedTimer, completions ) =
-                increment (delta - data.length) timer
-        in
-        ( incrementedTimer, 1 + completions )
+    toFloat progress / toFloat total * 100
 
-    else
-        ( Timer { data | current = sum }, 0 )
+
+update : Int -> Timer -> ( Timer, Int )
+update now (Timer { start, length, lastRecorded }) =
+    let
+        oldCompletions =
+            (lastRecorded - start) // length
+
+        newCompletions =
+            (now - start) // length
+
+        newTimer =
+            Timer { start = start, length = length, lastRecorded = now }
+    in
+    ( newTimer, newCompletions - oldCompletions )

@@ -89,7 +89,7 @@ renderContent model =
             -- Chore grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
                 ([]
-                    ++ List.map renderChore model.chores
+                    ++ List.map (renderChore model) model.chores
                     ++ [ renderLockedChore ]
                 )
             ]
@@ -101,8 +101,8 @@ choreHeight =
     "h-[324px]"
 
 
-renderChore : Chore -> Html Msg
-renderChore chore =
+renderChore : Model -> Chore -> Html Msg
+renderChore model chore =
     let
         id =
             IdleGame.Chores.getId chore
@@ -144,7 +144,7 @@ renderChore chore =
                 ]
 
             -- Chore progress bar
-            , case IdleGame.Chores.getActivityProgress chore of
+            , case IdleGame.Chores.getActivityProgress model.now chore of
                 Nothing ->
                     div [] []
 
