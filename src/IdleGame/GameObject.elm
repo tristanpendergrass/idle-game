@@ -28,7 +28,7 @@ getTimeOfNextTick =
 tick : GameObject -> GameObject
 tick gameObject =
     gameObject
-        |> IdleGame.Chores.tick
+        |> IdleGame.Woodcuttings.tick
 
 
 update : Posix -> GameObject -> GameObject

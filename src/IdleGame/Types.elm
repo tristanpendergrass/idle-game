@@ -3,6 +3,7 @@ module IdleGame.Types exposing (..)
 import Browser.Events
 import FeatherIcons
 import IdleGame.Tabs exposing (Tabs)
+import IdleGame.Timer
 import Time exposing (Posix)
 
 
@@ -30,10 +31,10 @@ type alias Model =
     , showWelcomeBackModal : Bool
     , gameObject : GameObject
 
-    -- Chores tab
+    -- Woodcutting tab
     -- , skillXp : Int
     -- , masteryXp : Int
-    -- , chores : List Chore
+    , woodcutting : List Woodcutting --
     }
 
 
@@ -47,9 +48,25 @@ type Msg
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseWelcomeBackModal
-      -- Chores
-    | ToggleActiveChore Int Time.Posix
+      -- Woodcutting
+    | ToggleActiveTree Int Time.Posix
 
 
 
--- Chores
+-- Woodcutting
+
+
+type Woodcutting
+    = Woodcutting Id WoodcuttingData ActivityStatus
+
+
+type alias ActivityStatus =
+    Maybe IdleGame.Timer.Timer
+
+
+type alias Id =
+    Int
+
+
+type alias WoodcuttingData =
+    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int }

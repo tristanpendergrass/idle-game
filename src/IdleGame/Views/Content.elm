@@ -4,10 +4,31 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Chores exposing (Chore(..))
 import IdleGame.Types exposing (Model, Msg)
 import IdleGame.Views.Placeholder
 import Round
+
+
+skillLevelFromXp : Int -> Int
+skillLevelFromXp xp =
+    xp // 100 + 1
+
+
+skillLevelPercentFromXp : Int -> Float
+skillLevelPercentFromXp xp =
+    remainderBy 100 xp
+        |> toFloat
+
+
+masteryLevelFromXp : Int -> Int
+masteryLevelFromXp xp =
+    xp // 10 + 1
+
+
+masteryLevelPercentFromXp : Int -> Float
+masteryLevelPercentFromXp xp =
+    remainderBy 10 xp
+        |> toFloat
 
 
 renderContent : Model -> Html Msg
@@ -15,11 +36,11 @@ renderContent model =
     let
         skillLevel =
             model.skillXp
-                |> IdleGame.Chores.skillLevelFromXp
+                |> skillLevelFromXp
                 |> String.fromInt
 
         skillPercent =
-            IdleGame.Chores.skillLevelPercentFromXp model.skillXp
+            skillLevelPercentFromXp model.skillXp
 
         masteryPercent =
             toFloat model.masteryXp
@@ -49,7 +70,7 @@ renderContent model =
                         [ FeatherIcons.tool
                             |> FeatherIcons.withSize 24
                             |> FeatherIcons.toHtml []
-                        , span [] [ text "Chores" ]
+                        , span [] [ text "Woodcuttings" ]
                         ]
 
                     -- Right side stuff
@@ -86,65 +107,65 @@ renderContent model =
                     ]
                 ]
 
-            -- Chore grid
+            -- Woodcutting grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
                 ([]
-                    ++ List.map (renderChore model) model.chores
-                    ++ [ renderLockedChore ]
+                    ++ List.map (renderWoodcutting model) model.woodcuttings
+                    ++ [ renderLockedWoodcutting ]
                 )
             ]
         ]
 
 
-choreHeight : String
-choreHeight =
+woodcuttingHeight : String
+woodcuttingHeight =
     "h-[324px]"
 
 
-renderChore : Model -> Chore -> Html Msg
-renderChore model chore =
+renderWoodcutting : Model -> Woodcutting -> Html Msg
+renderWoodcutting model woodcutting =
     let
         id =
-            IdleGame.Chores.getId chore
+            IdleGame.Woodcutting.getId woodcutting
 
-        choreData =
-            IdleGame.Chores.getChoreData chore
+        woodcuttingData =
+            IdleGame.Woodcutting.getWoodcuttingData woodcutting
 
         handleClick =
-            IdleGame.Types.ToggleActiveChore id
+            IdleGame.Types.ToggleActiveTree id
                 |> IdleGame.Types.WithTime
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
-        , class choreHeight
+        , class woodcuttingHeight
         , onClick handleClick
         ]
-        -- Chore image
+        -- Woodcutting image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
         , div [ class "relative card-body" ]
             [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
-                -- Chore title
-                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text choreData.title ]
-                , div [ class "" ] [ text choreData.rewardText ]
+                -- Woodcutting title
+                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text woodcuttingData.title ]
+                , div [ class "" ] [ text woodcuttingData.rewardText ]
 
-                -- Chore XP rewards
+                -- Woodcutting XP rewards
                 , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt choreData.skillXpGranted ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt woodcuttingData.skillXpGranted ]
                     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt choreData.masteryXpGranted ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt woodcuttingData.masteryXpGranted ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.Chores.masteryLevelFromXp choreData.masteryXp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.Woodcutting.masteryLevelFromXp woodcuttingData.masteryXp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.Chores.masteryLevelPercentFromXp choreData.masteryXp) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.Woodcutting.masteryLevelPercentFromXp woodcuttingData.masteryXp) ++ "%") ] []
                         ]
                     ]
                 ]
 
-            -- Chore progress bar
-            , case IdleGame.Chores.getActivityProgress model.now chore of
+            -- Woodcutting progress bar
+            , case IdleGame.Woodcutting.getActivityProgress model.now woodcutting of
                 Nothing ->
                     div [] []
 
@@ -158,18 +179,18 @@ renderChore model chore =
         ]
 
 
-renderLockedChore : Html Msg
-renderLockedChore =
+renderLockedWoodcutting : Html Msg
+renderLockedWoodcutting =
     div
         [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake"
-        , class choreHeight
+        , class woodcuttingHeight
         ]
-        -- Chore image
+        -- Woodcutting image
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
         , div [ class "relative card-body" ]
             [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
-                -- Chore title
+                -- Woodcutting title
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
