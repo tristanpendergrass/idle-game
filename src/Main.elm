@@ -6,12 +6,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chores exposing (..)
+import IdleGame.GameObject
 import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.WelcomeBackModal
-import List.Selection
 import Task
 import Time
 
@@ -25,9 +25,7 @@ init : () -> ( Model, Cmd Msg )
 init () =
     ( { tabs = IdleGame.Tabs.initialTabs
       , showWelcomeBackModal = False
-      , now = 0
-      , skillXp = 444
-      , masteryXp = 100000
+      , gameObject = IdleGame.GameObject.init
       , chores =
             [ IdleGame.Chores.create 0
                 { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235 }

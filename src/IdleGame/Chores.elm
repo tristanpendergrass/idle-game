@@ -146,3 +146,24 @@ handleAnimationFrame now chores =
         )
         ( [], { skillXpGained = 0, masteryXpGained = 0 } )
         chores
+
+
+tick : GameObject -> GameObject
+tick gameObject =
+    let
+        ( newChores, { skillXpGained, masteryXpGained } ) =
+            List.foldr
+                (\chore accum ->
+                    let
+                        ( newChore, { skillXp, masteryXp } ) =
+                            handleAnimationFrameHelper now chore
+
+                        ( accumChores, accumXps ) =
+                            accum
+                    in
+                    ( newChore :: accumChores, { skillXpGained = skillXp + accumXps.skillXpGained, masteryXpGained = masteryXp + accumXps.masteryXpGained } )
+                )
+                ( [], { skillXpGained = 0, masteryXpGained = 0 } )
+                gameObject.chores
+    in
+    Debug.todo "Implement tick"

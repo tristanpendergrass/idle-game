@@ -2,9 +2,8 @@ module IdleGame.Types exposing (..)
 
 import Browser.Events
 import FeatherIcons
-import IdleGame.Chores exposing (Chore)
 import IdleGame.Tabs exposing (Tabs)
-import Time
+import Time exposing (Posix)
 
 
 
@@ -17,15 +16,24 @@ type alias Tab =
     }
 
 
+type alias GameObject =
+    { currentTime : Posix
+    , wood : Int
+    , boatLevel : Int
+    , woodcuttingXp : Int
+    , boatBuildingXp : Int
+    }
+
+
 type alias Model =
     { tabs : Tabs
     , showWelcomeBackModal : Bool
-    , now : Int
+    , gameObject : GameObject
 
     -- Chores tab
-    , skillXp : Int
-    , masteryXp : Int
-    , chores : List Chore
+    -- , skillXp : Int
+    -- , masteryXp : Int
+    -- , chores : List Chore
     }
 
 
@@ -35,9 +43,13 @@ type alias Model =
 
 type Msg
     = NoOp
-    | WithTime (Time.Posix -> Msg)
+    | WithTime (Posix -> Msg)
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseWelcomeBackModal
       -- Chores
-    | ToggleActiveChore IdleGame.Chores.Id Time.Posix
+    | ToggleActiveChore Int Time.Posix
+
+
+
+-- Chores
