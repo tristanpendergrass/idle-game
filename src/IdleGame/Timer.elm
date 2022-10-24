@@ -5,27 +5,31 @@ module IdleGame.Timer exposing
     , update
     )
 
+import Time exposing (Posix)
+
+
+
 -- An animation should know when it started, what percentage it is through, be able to update, do something on reaching end, know whether to repeat
 
 
 type Timer
     = Timer
-        { start : Int
+        { start : Posix
         , length : Int
-        , lastRecorded : Int
+        , lastRecorded : Posix
         }
 
 
-create : Int -> Int -> Timer
+create : Posix -> Int -> Timer
 create start length =
     Timer { start = start, length = length, lastRecorded = start }
 
 
-percentComplete : Int -> Timer -> Float
+percentComplete : Posix -> Timer -> Float
 percentComplete current (Timer { start, length }) =
     let
         progress =
-            remainderBy length (current - start)
+            remainderBy length (Time.posixToMillis current - Time.posixToMillis start)
 
         total =
             length
@@ -33,14 +37,14 @@ percentComplete current (Timer { start, length }) =
     toFloat progress / toFloat total * 100
 
 
-update : Int -> Timer -> ( Timer, Int )
+update : Posix -> Timer -> ( Timer, Int )
 update now (Timer { start, length, lastRecorded }) =
     let
         oldCompletions =
-            (lastRecorded - start) // length
+            (Time.posixToMillis lastRecorded - Time.posixToMillis start) // length
 
         newCompletions =
-            (now - start) // length
+            (Time.posixToMillis now - Time.posixToMillis start) // length
 
         newTimer =
             Timer { start = start, length = length, lastRecorded = now }

@@ -34,7 +34,7 @@ type alias Model =
     -- Woodcutting tab
     -- , skillXp : Int
     -- , masteryXp : Int
-    , woodcutting : List Woodcutting --
+    -- , woodcutting : List Woodcutting --
     }
 
 

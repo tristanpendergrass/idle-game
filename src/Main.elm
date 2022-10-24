@@ -5,7 +5,6 @@ import Browser.Events exposing (onVisibilityChange)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.GameObject
 import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
@@ -24,7 +23,13 @@ init : () -> ( Model, Cmd Msg )
 init () =
     ( { tabs = IdleGame.Tabs.initialTabs
       , showWelcomeBackModal = False
-      , gameObject = IdleGame.GameObject.init
+      , gameObject =
+            { currentTime = Time.posixFromMillis 0
+            , wood = 0
+            , boatLevel = 0
+            , woodcuttingXp = 0
+            , boatbuildingXp = 0
+            }
       , woodcuttings =
             [ IdleGame.Woodcutting.create 0
                 { title = "Clean Stables", rewardText = "+5 gold", skillXpGranted = 5, masteryXpGranted = 15, masteryXp = 235 }
@@ -141,15 +146,6 @@ isActive (Woodcutting _ _ activityStatus) =
     not (activityStatus == Nothing)
 
 
-getActivityProgress : Int -> Woodcutting -> Maybe Float
-getActivityProgress now (Woodcutting _ _ activityStatus) =
-    activityStatus
-        |> Maybe.map
-            (\timer ->
-                IdleGame.Timer.percentComplete now timer
-            )
-
-
 getId : Woodcutting -> Id
 getId (Woodcutting id _ _) =
     id
@@ -219,3 +215,53 @@ tick gameObject =
                 gameObject.woodcuttings
     in
     Debug.todo "Implement tick"
+
+
+
+-- GameObject stuff
+
+
+getTimeOfNextTick : GameObject -> Posix
+getTimeOfNextTick =
+    .currentTime >> Time.Extra.add Time.Extra.Millisecond 20 Time.utc
+
+
+tick : GameObject -> GameObject
+tick gameObject =
+    gameObject
+        |> IdleGame.Woodcuttings.tick
+
+
+updateGameObject : Posix -> GameObject -> GameObject
+updateGameObject now gameObject =
+    if getTimeOfNextTick gameObject <= now then
+        gameObject
+            |> tick
+            |> updateGameObject now
+
+    else
+        gameObject
+
+
+
+-- Diff stuff
+
+
+type Gain
+    = XpGain
+    | ResourceGain
+
+
+type Loss
+    = ResourceLoss
+
+
+type alias GameObjectDiff =
+    { gains : List Gain
+    , losses : List Loss
+    }
+
+
+diff : GameObject -> GameObject -> GameObjectDiff
+diff gameObject1 gameObject2 =
+    Debug.todo "Implement diff"

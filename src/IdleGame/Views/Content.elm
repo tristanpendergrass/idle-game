@@ -4,9 +4,11 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Types exposing (Model, Msg)
+import IdleGame.Timer
+import IdleGame.Types exposing (..)
 import IdleGame.Views.Placeholder
 import Round
+import Time exposing (Posix)
 
 
 skillLevelFromXp : Int -> Int
@@ -31,6 +33,15 @@ masteryLevelPercentFromXp xp =
         |> toFloat
 
 
+getActivityProgress : Posix -> ActivityStatus -> Maybe Float
+getActivityProgress now activityStatus =
+    activityStatus
+        |> Maybe.map
+            (\timer ->
+                IdleGame.Timer.percentComplete now timer
+            )
+
+
 renderContent : Model -> Html Msg
 renderContent model =
     let
@@ -40,7 +51,7 @@ renderContent model =
                 |> String.fromInt
 
         skillPercent =
-            skillLevelPercentFromXp model.skillXp
+            skillLevelPercentFromXp model.gameObject.sk
 
         masteryPercent =
             toFloat model.masteryXp
@@ -123,14 +134,8 @@ woodcuttingHeight =
 
 
 renderWoodcutting : Model -> Woodcutting -> Html Msg
-renderWoodcutting model woodcutting =
+renderWoodcutting model (Woodcutting id woodcuttingData activityStatus) =
     let
-        id =
-            IdleGame.Woodcutting.getId woodcutting
-
-        woodcuttingData =
-            IdleGame.Woodcutting.getWoodcuttingData woodcutting
-
         handleClick =
             IdleGame.Types.ToggleActiveTree id
                 |> IdleGame.Types.WithTime
@@ -157,15 +162,15 @@ renderWoodcutting model woodcutting =
                     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt woodcuttingData.masteryXpGranted ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.Woodcutting.masteryLevelFromXp woodcuttingData.masteryXp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp woodcuttingData.masteryXp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.Woodcutting.masteryLevelPercentFromXp woodcuttingData.masteryXp) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp woodcuttingData.masteryXp) ++ "%") ] []
                         ]
                     ]
                 ]
 
             -- Woodcutting progress bar
-            , case IdleGame.Woodcutting.getActivityProgress model.now woodcutting of
+            , case getActivityProgress model.gameObject.currentTime activityStatus of
                 Nothing ->
                     div [] []
 
