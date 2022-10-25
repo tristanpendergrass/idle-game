@@ -34,6 +34,73 @@ updateGameObject now gameObject =
 -- Private
 
 
+type Skill
+    = Woodcutting
+    | BoatBuilding
+
+
+type Reward
+    = SkillXp { skill : Skill, baseAmount : Float, percentIncrease : Float }
+    | MasteryXp { skill : Skill, baseAmount : Float, percentIncrease : Float }
+
+
+type Modifier
+    = ModifyBase
+    | ModifyPercent
+    | ModifyFlatAmount
+
+
+type Tag reward
+    = CanMultiply (Float -> reward -> reward)
+    | CanAddBase (Float -> reward -> reward)
+    | CanAddFlatAmount (Float -> reward -> reward)
+    | HasDoubling (Float -> reward -> reward)
+    | Skill Skill
+    | IsSkillXp
+    | IsMasteryXp
+
+
+type alias BaseReward reward =
+    { reward : reward
+    , tags : List (Tag reward)
+    }
+
+
+type alias FloatTag =
+    Tag { a | quantity : Float }
+
+
+float =
+    { canMultiply = CanMultiply (\multiplier { quantity } -> { quantity = multiplier * quantity })
+    , canAddBase = CanAddBase (\addend { quantity } -> { quantity = quantity + addend })
+    , canAddFlatAmount = CanAddFlatAmount (\addend { quantity } -> { quantity = quantity + addend })
+    , hasDoubling = HasDoubling (\chance { quantity } -> { quantity = quantity * 2 })
+    }
+
+
+woodcuttingXpReward : BaseReward { quantity : Float }
+woodcuttingXpReward =
+    { reward = { xp = 5 }
+    , tags =
+        [ Skill Woodcutting
+        , IsSkillXp
+        , float.canMultiply
+        , float.canAddBase
+        , float.canAddFlatAmount
+        ]
+    }
+
+
+type Tag
+    = Unique
+    | Unique
+
+
+gainSomething : RewardBase -> Game -> RewardFinal
+gainSomething rewardBase game =
+    Debug.todo "Implement gainSomething"
+
+
 tick : Game -> Game
 tick game =
     Debug.todo "Implement tick"
