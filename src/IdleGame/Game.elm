@@ -34,69 +34,38 @@ updateGameObject now gameObject =
 -- Private
 
 
-type Skill
-    = Woodcutting
-    | BoatBuilding
-
-
-type Reward
-    = SkillXp { skill : Skill, baseAmount : Float, percentIncrease : Float }
-    | MasteryXp { skill : Skill, baseAmount : Float, percentIncrease : Float }
-
-
-type Modifier
-    = ModifyBase
-    | ModifyPercent
-    | ModifyFlatAmount
-
-
-type Tag reward
-    = CanMultiply (Float -> reward -> reward)
-    | CanAddBase (Float -> reward -> reward)
-    | CanAddFlatAmount (Float -> reward -> reward)
-    | HasDoubling (Float -> reward -> reward)
-    | Skill Skill
-    | IsSkillXp
-    | IsMasteryXp
-
-
-type alias BaseReward reward =
-    { reward : reward
-    , tags : List (Tag reward)
+type alias Reward v =
+    { value : v
+    , tags : List Tag
+    , apply : v -> model -> model
     }
 
 
-type alias FloatTag =
-    Tag { a | quantity : Float }
+type V
+    = FloatV Float
+    | IntV Int
 
 
-float =
-    { canMultiply = CanMultiply (\multiplier { quantity } -> { quantity = multiplier * quantity })
-    , canAddBase = CanAddBase (\addend { quantity } -> { quantity = quantity + addend })
-    , canAddFlatAmount = CanAddFlatAmount (\addend { quantity } -> { quantity = quantity + addend })
-    , hasDoubling = HasDoubling (\chance { quantity } -> { quantity = quantity * 2 })
-    }
-
-
-woodcuttingXpReward : BaseReward { quantity : Float }
+woodcuttingXpReward : Reward Float
 woodcuttingXpReward =
-    { reward = { xp = 5 }
+    { value = 5.0
     , tags =
-        [ Skill Woodcutting
-        , IsSkillXp
-        , float.canMultiply
-        , float.canAddBase
-        , float.canAddFlatAmount
+        [ Woodcutting
+        , SkillXp
         ]
+    , apply =
+        \finalValue model -> model
     }
 
 
 type Tag
-    = Unique
-    | Unique
+    = Woodcutting
+    | BoatBuilding
+    | SkillXp
+    | MasteryXp
 
 
-gainSomething : RewardBase -> Game -> RewardFinal
+gainSomething : Reward -> Game -> RewardFinal
 gainSomething rewardBase game =
     Debug.todo "Implement gainSomething"
 
