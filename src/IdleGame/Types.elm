@@ -2,6 +2,7 @@ module IdleGame.Types exposing (..)
 
 import Browser.Events
 import FeatherIcons
+import IdleGame.Game exposing (Game)
 import IdleGame.Tabs exposing (Tabs)
 import IdleGame.Timer
 import Time exposing (Posix)
@@ -17,24 +18,10 @@ type alias Tab =
     }
 
 
-type alias GameObject =
-    { currentTime : Posix
-    , wood : Int
-    , boatLevel : Int
-    , woodcuttingXp : Int
-    , boatBuildingXp : Int
-    }
-
-
 type alias Model =
     { tabs : Tabs
     , showWelcomeBackModal : Bool
-    , gameObject : GameObject
-
-    -- Woodcutting tab
-    -- , skillXp : Int
-    -- , masteryXp : Int
-    -- , woodcutting : List Woodcutting --
+    , game : Game
     }
 
 
@@ -50,23 +37,3 @@ type Msg
     | CloseWelcomeBackModal
       -- Woodcutting
     | ToggleActiveTree Int Time.Posix
-
-
-
--- Woodcutting
-
-
-type Woodcutting
-    = Woodcutting Id WoodcuttingData ActivityStatus
-
-
-type alias ActivityStatus =
-    Maybe IdleGame.Timer.Timer
-
-
-type alias Id =
-    Int
-
-
-type alias WoodcuttingData =
-    { title : String, rewardText : String, skillXpGranted : Int, masteryXpGranted : Int, masteryXp : Int }

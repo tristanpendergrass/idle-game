@@ -4,6 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Game
 import IdleGame.Timer
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Placeholder
@@ -11,29 +12,33 @@ import Round
 import Time exposing (Posix)
 
 
-skillLevelFromXp : Int -> Int
+skillLevelFromXp : Float -> Int
 skillLevelFromXp xp =
-    xp // 100 + 1
+    floor xp // 100 + 1
 
 
-skillLevelPercentFromXp : Int -> Float
+skillLevelPercentFromXp : Float -> Float
 skillLevelPercentFromXp xp =
-    remainderBy 100 xp
+    xp
+        |> floor
+        |> remainderBy 100
         |> toFloat
 
 
-masteryLevelFromXp : Int -> Int
+masteryLevelFromXp : Float -> Int
 masteryLevelFromXp xp =
-    xp // 10 + 1
+    floor xp // 10 + 1
 
 
-masteryLevelPercentFromXp : Int -> Float
+masteryLevelPercentFromXp : Float -> Float
 masteryLevelPercentFromXp xp =
-    remainderBy 10 xp
+    xp
+        |> floor
+        |> remainderBy 10
         |> toFloat
 
 
-getActivityProgress : Posix -> ActivityStatus -> Maybe Float
+getActivityProgress : Posix -> IdleGame.Game.ActivityStatus -> Maybe Float
 getActivityProgress now activityStatus =
     activityStatus
         |> Maybe.map
@@ -45,22 +50,24 @@ getActivityProgress now activityStatus =
 renderContent : Model -> Html Msg
 renderContent model =
     let
+        game =
+            model.game
+
         skillLevel =
-            model.skillXp
+            game.woodcuttingXp
                 |> skillLevelFromXp
                 |> String.fromInt
 
         skillPercent =
-            skillLevelPercentFromXp model.gameObject.sk
+            skillLevelPercentFromXp game.woodcuttingXp
 
         masteryPercent =
-            toFloat model.masteryXp
+            game.woodcuttingMxp
                 / 4500000
                 * 100
 
-        masteryPercentRounded =
-            masteryPercent
-                |> Round.round 2
+        masteryPercentLabel =
+            Round.round 2 masteryPercent
     in
     div [ class "drawer-content flex flex-col items-center", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
@@ -81,7 +88,7 @@ renderContent model =
                         [ FeatherIcons.tool
                             |> FeatherIcons.withSize 24
                             |> FeatherIcons.toHtml []
-                        , span [] [ text "Woodcuttings" ]
+                        , span [] [ text "Woodcutting" ]
                         ]
 
                     -- Right side stuff
@@ -95,7 +102,7 @@ renderContent model =
                 [ div [ class "w-full flex flex-col gap-2" ]
                     [ div [ class "w-full flex items-center justify-between" ]
                         [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
-                        , div [ class "text-2xs" ] [ text <| String.fromInt model.skillXp ]
+                        , div [ class "text-2xs" ] [ text <| String.fromInt (floor game.woodcuttingXp) ]
                         ]
                     , div [ class "w-full flex items-center gap-2" ]
                         [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
@@ -106,7 +113,7 @@ renderContent model =
                         ]
                     , div [ class "w-full flex items-center justify-between" ]
                         [ div [ class "text-2xs font-bold" ] [ text "Mastery" ]
-                        , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt model.masteryXp ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentRounded ++ "%)" ] ]
+                        , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor game.woodcuttingMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
                         ]
                     , div [ class "w-full flex items-center gap-2" ]
                         [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
@@ -121,7 +128,7 @@ renderContent model =
             -- Woodcutting grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
                 ([]
-                    ++ List.map (renderWoodcutting model) model.woodcuttings
+                    ++ List.map (renderWoodcutting model) game.trees
                     ++ [ renderLockedWoodcutting ]
                 )
             ]
@@ -133,9 +140,12 @@ woodcuttingHeight =
     "h-[324px]"
 
 
-renderWoodcutting : Model -> Woodcutting -> Html Msg
-renderWoodcutting model (Woodcutting id woodcuttingData activityStatus) =
+renderWoodcutting : Model -> IdleGame.Game.Tree -> Html Msg
+renderWoodcutting model (IdleGame.Game.Tree id treeData activityStatus) =
     let
+        game =
+            model.game
+
         handleClick =
             IdleGame.Types.ToggleActiveTree id
                 |> IdleGame.Types.WithTime
@@ -151,26 +161,26 @@ renderWoodcutting model (Woodcutting id woodcuttingData activityStatus) =
         , div [ class "relative card-body" ]
             [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
                 -- Woodcutting title
-                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text woodcuttingData.title ]
-                , div [ class "" ] [ text woodcuttingData.rewardText ]
+                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text treeData.title ]
+                , div [ class "" ] [ text treeData.rewardText ]
 
                 -- Woodcutting XP rewards
                 , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt woodcuttingData.skillXpGranted ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor treeData.xpGranted) ]
                     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt woodcuttingData.masteryXpGranted ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor treeData.mxpGranted) ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp woodcuttingData.masteryXp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp treeData.mxp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp woodcuttingData.masteryXp) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp treeData.mxp) ++ "%") ] []
                         ]
                     ]
                 ]
 
             -- Woodcutting progress bar
-            , case getActivityProgress model.gameObject.currentTime activityStatus of
+            , case getActivityProgress game.currentTime activityStatus of
                 Nothing ->
                     div [] []
 
