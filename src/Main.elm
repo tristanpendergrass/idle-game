@@ -28,6 +28,7 @@ init nowMillis =
             Time.millisToPosix nowMillis
     in
     ( { tabs = IdleGame.Tabs.initialTabs
+      , isVisible = True
       , showWelcomeBackModal = False
       , game = IdleGame.Game.create now
       }
@@ -48,16 +49,19 @@ update msg model =
         ToggleActiveTree toggleId ->
             ( { model | game = IdleGame.Game.toggleActiveTree toggleId model.game }, Cmd.none )
 
-        -- ( { model | woodcutting = IdleGame.Woodcutting.toggleActiveWoodcutting toggleId (Time.posixToMillis now) model.woodcutting }, Cmd.none )
         HandleAnimationFrame now ->
-            ( { model | game = IdleGame.Game.updateGameToTime now model.game }, Cmd.none )
-
-        HandleVisibilityChange visibility ->
-            if visibility == Browser.Events.Visible then
-                ( { model | showWelcomeBackModal = True }, Cmd.none )
+            if model.isVisible then
+                ( { model | game = IdleGame.Game.updateGameToTime now model.game }, Cmd.none )
 
             else
                 noOp
+
+        HandleVisibilityChange visibility ->
+            if visibility == Browser.Events.Visible then
+                ( { model | showWelcomeBackModal = True, isVisible = True }, Cmd.none )
+
+            else
+                ( { model | isVisible = False }, Cmd.none )
 
         CloseWelcomeBackModal ->
             ( { model | showWelcomeBackModal = False }, Cmd.none )

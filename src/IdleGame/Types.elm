@@ -20,6 +20,7 @@ type alias Tab =
 
 type alias Model =
     { tabs : Tabs
+    , isVisible : Bool
     , showWelcomeBackModal : Bool
     , game : Game
     }
