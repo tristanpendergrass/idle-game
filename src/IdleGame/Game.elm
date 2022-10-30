@@ -189,9 +189,9 @@ updateGameToTime now game =
             Time.posixToMillis now >= Time.posixToMillis (timeOfNextTick game)
     in
     if shouldTick then
-        game
-            |> tick
-            |> updateGameToTime now
+        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
+        -- Additional reading: https://jfmengels.net/tail-call-optimization/
+        updateGameToTime now (tick game)
 
     else
         game
