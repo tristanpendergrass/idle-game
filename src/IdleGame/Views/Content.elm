@@ -38,13 +38,10 @@ masteryLevelPercentFromXp xp =
         |> toFloat
 
 
-getActivityProgress : Posix -> IdleGame.Game.ActivityStatus -> Maybe Float
-getActivityProgress now activityStatus =
+getActivityProgress : IdleGame.Game.ActivityStatus -> Maybe Float
+getActivityProgress activityStatus =
     activityStatus
-        |> Maybe.map
-            (\timer ->
-                IdleGame.Timer.percentComplete now timer
-            )
+        |> Maybe.map IdleGame.Timer.percentComplete
 
 
 renderContent : Model -> Html Msg
@@ -128,7 +125,7 @@ renderContent model =
             -- Woodcutting grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
                 ([]
-                    ++ List.map (renderWoodcutting model) game.trees
+                    ++ List.map (renderTree model) game.trees
                     ++ [ renderLockedWoodcutting ]
                 )
             ]
@@ -140,15 +137,11 @@ woodcuttingHeight =
     "h-[324px]"
 
 
-renderWoodcutting : Model -> IdleGame.Game.Tree -> Html Msg
-renderWoodcutting model (IdleGame.Game.Tree id treeData activityStatus) =
+renderTree : Model -> IdleGame.Game.Tree -> Html Msg
+renderTree model (IdleGame.Game.Tree id treeData activityStatus) =
     let
-        game =
-            model.game
-
         handleClick =
             IdleGame.Types.ToggleActiveTree id
-                |> IdleGame.Types.WithTime
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
@@ -180,7 +173,7 @@ renderWoodcutting model (IdleGame.Game.Tree id treeData activityStatus) =
                 ]
 
             -- Woodcutting progress bar
-            , case getActivityProgress game.currentTime activityStatus of
+            , case Maybe.map IdleGame.Timer.percentComplete activityStatus of
                 Nothing ->
                     div [] []
 

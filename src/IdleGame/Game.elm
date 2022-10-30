@@ -65,15 +65,6 @@ type Tag
     | MasteryXp
 
 
-
--- gainSomething : Reward -> Game -> RewardFinal
--- gainSomething rewardBase game =
---     Debug.todo "Implement gainSomething"
--- tick : Game -> Game
--- tick game =
---     Debug.todo "Implement tick"
-
-
 getTimeOfNextTick : Game -> Posix
 getTimeOfNextTick =
     .currentTime >> Time.Extra.add Time.Extra.Millisecond 20 Time.utc
@@ -104,6 +95,27 @@ isActive (Tree _ _ activityStatus) =
     not (activityStatus == Nothing)
 
 
+toggleActiveTree : Id -> Game -> Game
+toggleActiveTree toggleId game =
+    let
+        newTrees =
+            game.trees
+                |> List.map
+                    (\tree ->
+                        let
+                            (Tree id treeData activityStatus) =
+                                tree
+                        in
+                        if id == toggleId && activityStatus == Nothing then
+                            Tree id treeData (Just <| IdleGame.Timer.create 2000)
+
+                        else
+                            Tree id treeData Nothing
+                    )
+    in
+    { game | trees = newTrees }
+
+
 getId : Tree -> Id
 getId (Tree id _ _) =
     id
@@ -114,70 +126,77 @@ getWoodcuttingData (Tree _ treeData _) =
     treeData
 
 
+tickTree : Tree -> ( Tree, { xp : Float, mxp : Float } )
+tickTree (Tree id treeData maybeActivityTimer) =
+    case maybeActivityTimer of
+        Nothing ->
+            ( Tree id treeData maybeActivityTimer, { xp = 0, mxp = 0 } )
 
--- handleAnimationFrameHelper : Posix -> Tree -> ( Tree, { xp : Int, mxp : Int } )
--- handleAnimationFrameHelper now (Tree id treeData maybeActivityTimer) =
---     case maybeActivityTimer of
---         Nothing ->
---             ( Tree id treeData maybeActivityTimer, { xp = 0, mxp = 0 } )
---         Just timer ->
---             let
---                 ( newTimer, timesCompleted ) =
---                     IdleGame.Timer.update now timer
---                 newTreeData =
---                     { treeData | mxp = treeData.mxp + timesCompleted * treeData.mxpGranted }
---                 xpGranted =
---                     treeData.xpGranted * timesCompleted
---                 mxpGranted =
---                     treeData.mxpGranted * timesCompleted
---             in
---             ( Tree id newTreeData (Just newTimer), { xp = xpGranted, mxp = mxpGranted } )
--- handleAnimationFrame : Int -> List Tree -> ( List Tree, { skillXpGained : Int, masteryXpGained : Int } )
--- handleAnimationFrame now woodcuttings =
---     List.foldr
---         (\woodcutting accum ->
---             let
---                 ( newWoodcutting, { skillXp, masteryXp } ) =
---                     handleAnimationFrameHelper now woodcutting
---                 ( accumWoodcuttings, accumXps ) =
---                     accum
---             in
---             ( newWoodcutting :: accumWoodcuttings, { skillXpGained = skillXp + accumXps.skillXpGained, masteryXpGained = masteryXp + accumXps.masteryXpGained } )
---         )
---         ( [], { skillXpGained = 0, masteryXpGained = 0 } )
---         woodcuttings
--- tick : Game -> Game
--- tick game =
---     let
---         ( newTrees, { xp, mxp } ) =
---             List.foldr
---                 (\woodcutting accum ->
---                     let
---                         ( newWoodcutting, { xp, mxp } ) =
---                             handleAnimationFrameHelper game.currentTime woodcutting
---                         ( accumWoodcuttings, accumXps ) =
---                             accum
---                     in
---                     ( newWoodcutting :: accumWoodcuttings, { xp = skillXp + accumXps.skillXpGained, masteryXpGained = masteryXp + accumXps.masteryXpGained } )
---                 )
---                 ( [], { skillXpGained = 0, masteryXpGained = 0 } )
---                 game.trees
---     in
---     { game | woodcuttingXp = game.woodcuttingXp + xp, woodcuttingMxp = game.woodcuttingMxp + mxp }
--- GameObject stuff
--- getTimeOfNextTick : Game -> Posix
--- getTimeOfNextTick game =
---     game.currentTime
---         |> Time.Extra.add Time.Extra.Millisecond 20 Time.utc
--- tick : Game -> Game
--- tick gameObject =
---     gameObject
---         |> IdleGame.Woodcuttings.tick
--- updateGameObject : Posix -> GameObject -> GameObject
--- updateGameObject now gameObject =
---     if getTimeOfNextTick gameObject <= now then
---         gameObject
---             |> tick
---             |> updateGameObject now
---     else
---         gameObject
+        Just timer ->
+            let
+                ( newTimer, timesCompleted ) =
+                    IdleGame.Timer.tick timer
+
+                newTreeData =
+                    { treeData | mxp = treeData.mxp + toFloat timesCompleted * treeData.mxpGranted }
+
+                xpGranted =
+                    treeData.xpGranted * toFloat timesCompleted
+
+                mxpGranted =
+                    treeData.mxpGranted * toFloat timesCompleted
+            in
+            ( Tree id newTreeData (Just newTimer), { xp = xpGranted, mxp = mxpGranted } )
+
+
+timeOfNextTick : Game -> Posix
+timeOfNextTick game =
+    game
+        |> .currentTime
+        |> Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc
+
+
+tick : Game -> Game
+tick game =
+    let
+        ( newTrees, { xp, mxp } ) =
+            game.trees
+                |> List.foldr
+                    (\tree accum ->
+                        let
+                            ( accumTrees, accumXps ) =
+                                accum
+
+                            ( newTree, gainedXps ) =
+                                tickTree tree
+                        in
+                        ( newTree :: accumTrees, { xp = accumXps.xp + gainedXps.xp, mxp = accumXps.mxp + gainedXps.mxp } )
+                    )
+                    ( [], { xp = 0, mxp = 0 } )
+    in
+    { game
+        | currentTime = timeOfNextTick game
+        , trees = newTrees
+        , woodcuttingXp = game.woodcuttingXp + xp
+        , woodcuttingMxp = game.woodcuttingMxp + mxp
+    }
+
+
+updateGameToTime : Posix -> Game -> Game
+updateGameToTime now game =
+    let
+        shouldTick =
+            Time.posixToMillis now >= Time.posixToMillis (timeOfNextTick game)
+    in
+    if shouldTick then
+        game
+            |> tick
+            |> updateGameToTime now
+
+    else
+        game
+
+
+updateCurrentTime : Posix -> Game -> Game
+updateCurrentTime now game =
+    { game | currentTime = now }

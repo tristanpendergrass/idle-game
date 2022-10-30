@@ -21,21 +21,21 @@ suite =
         , test "reports zero completions correctly" <|
             \_ ->
                 Timer.create 0 100
-                    |> Timer.update 10
+                    |> Timer.tick 10
                     |> (\( _, timesCompleted ) -> timesCompleted)
                     |> Expect.equal 0
         , test "reports one completion correctly" <|
             \_ ->
                 Timer.create 0 100
-                    |> Timer.update 110
+                    |> Timer.tick 110
                     |> (\( _, timesCompleted ) -> timesCompleted)
                     |> Expect.equal 1
         , test "reports two completions correctly" <|
             \_ ->
                 Timer.create 0 100
-                    |> Timer.update 250
+                    |> Timer.tick 250
                     |> (\( timer, _ ) -> timer)
-                    |> Timer.update 450
+                    |> Timer.tick 450
                     |> (\( _, timesCompleted ) -> timesCompleted)
                     |> Expect.equal 2
         ]

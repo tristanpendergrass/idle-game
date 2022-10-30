@@ -15,17 +15,17 @@ import Task
 import Time
 
 
-main : Program () Model Msg
+main : Program Int Model Msg
 main =
     Browser.element { init = init, update = update, view = view, subscriptions = subscriptions }
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
+init : Int -> ( Model, Cmd Msg )
+init nowMillis =
     let
         -- TODO: replace with actual current time
         now =
-            Time.millisToPosix 0
+            Time.millisToPosix nowMillis
     in
     ( { tabs = IdleGame.Tabs.initialTabs
       , showWelcomeBackModal = False
@@ -45,24 +45,13 @@ update msg model =
         NoOp ->
             noOp
 
-        WithTime getMsg ->
-            ( model, Cmd.batch [ Task.perform getMsg Time.now ] )
-
-        ToggleActiveTree toggleId now ->
-            noOp
+        ToggleActiveTree toggleId ->
+            ( { model | game = IdleGame.Game.toggleActiveTree toggleId model.game }, Cmd.none )
 
         -- ( { model | woodcutting = IdleGame.Woodcutting.toggleActiveWoodcutting toggleId (Time.posixToMillis now) model.woodcutting }, Cmd.none )
-        HandleAnimationFrame nowPosix ->
-            noOp
+        HandleAnimationFrame now ->
+            ( { model | game = IdleGame.Game.updateGameToTime now model.game }, Cmd.none )
 
-        -- let
-        --     now =
-        --         Time.posixToMillis nowPosix
-        --     -- handle woodcutting
-        --     ( newWoodcutting, { skillXpGained, masteryXpGained } ) =
-        --         IdleGame.Woodcutting.handleAnimationFrame now model.woodcutting
-        -- in
-        -- ( { model | woodcutting = newWoodcutting, skillXp = model.skillXp + skillXpGained, masteryXp = model.masteryXp + masteryXpGained, now = now }, Cmd.none )
         HandleVisibilityChange visibility ->
             if visibility == Browser.Events.Visible then
                 ( { model | showWelcomeBackModal = True }, Cmd.none )

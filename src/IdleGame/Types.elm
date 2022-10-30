@@ -31,9 +31,8 @@ type alias Model =
 
 type Msg
     = NoOp
-    | WithTime (Posix -> Msg)
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseWelcomeBackModal
       -- Woodcutting
-    | ToggleActiveTree Int Time.Posix
+    | ToggleActiveTree Int
