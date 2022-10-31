@@ -200,3 +200,24 @@ updateGameToTime now game =
 updateCurrentTime : Posix -> Game -> Game
 updateCurrentTime now game =
     { game | currentTime = now }
+
+
+
+-- Time passes logic
+
+
+type alias TimePassesGain =
+    { amount : Int
+    , title : String
+    }
+
+
+type alias TimePassesData =
+    { timePassed : Int
+    , gains : List TimePassesGain
+    }
+
+
+getTimePassesData : Game -> Game -> TimePassesData
+getTimePassesData oldGame newGame =
+    Debug.todo "Implement"

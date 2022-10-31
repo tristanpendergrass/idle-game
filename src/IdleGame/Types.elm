@@ -21,7 +21,7 @@ type alias Tab =
 type alias Model =
     { tabs : Tabs
     , isVisible : Bool
-    , showWelcomeBackModal : Bool
+    , timePassesData : Maybe IdleGame.Game.TimePassesData
     , game : Game
     }
 
@@ -32,8 +32,9 @@ type alias Model =
 
 type Msg
     = NoOp
+    | WithTime (Posix -> Msg)
     | HandleAnimationFrame Time.Posix
-    | HandleVisibilityChange Browser.Events.Visibility
-    | CloseWelcomeBackModal
+    | HandleVisibilityChange Browser.Events.Visibility Posix
+    | CloseTimePassesModal
       -- Woodcutting
     | ToggleActiveTree Int

@@ -10,7 +10,7 @@ import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
-import IdleGame.Views.WelcomeBackModal
+import IdleGame.Views.TimePasses
 import Task
 import Time
 
@@ -29,7 +29,7 @@ init nowMillis =
     in
     ( { tabs = IdleGame.Tabs.initialTabs
       , isVisible = True
-      , showWelcomeBackModal = False
+      , timePassesData = Nothing
       , game = IdleGame.Game.create now
       }
     , Cmd.none
@@ -46,6 +46,9 @@ update msg model =
         NoOp ->
             noOp
 
+        WithTime msgWithTime ->
+            ( model, Task.perform msgWithTime Time.now )
+
         ToggleActiveTree toggleId ->
             ( { model | game = IdleGame.Game.toggleActiveTree toggleId model.game }, Cmd.none )
 
@@ -56,22 +59,30 @@ update msg model =
             else
                 noOp
 
-        HandleVisibilityChange visibility ->
+        HandleVisibilityChange visibility now ->
             if visibility == Browser.Events.Visible then
-                ( { model | showWelcomeBackModal = True, isVisible = True }, Cmd.none )
+                let
+                    newGame =
+                        IdleGame.Game.updateGameToTime now model.game
+
+                    timePassesData : IdleGame.Game.TimePassesData
+                    timePassesData =
+                        IdleGame.Game.getTimePassesData model.game newGame
+                in
+                ( { model | timePassesData = Just timePassesData, isVisible = True }, Cmd.none )
 
             else
                 ( { model | isVisible = False }, Cmd.none )
 
-        CloseWelcomeBackModal ->
-            ( { model | showWelcomeBackModal = False }, Cmd.none )
+        CloseTimePassesModal ->
+            ( { model | timePassesData = Nothing }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame HandleAnimationFrame
-        , Browser.Events.onVisibilityChange HandleVisibilityChange
+        , Browser.Events.onVisibilityChange (HandleVisibilityChange >> WithTime)
         ]
 
 
@@ -92,12 +103,13 @@ view model =
                     , IdleGame.Views.Drawer.renderDrawer model
                     ]
                ]
-            ++ (if model.showWelcomeBackModal then
-                    [ IdleGame.Views.WelcomeBackModal.render model
-                    ]
+            ++ (case model.timePassesData of
+                    Just timePassesData ->
+                        [ IdleGame.Views.TimePasses.render timePassesData
+                        ]
 
-                else
-                    []
+                    Nothing ->
+                        []
                )
         )
 
