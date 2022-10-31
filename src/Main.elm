@@ -23,7 +23,6 @@ main =
 init : Int -> ( Model, Cmd Msg )
 init nowMillis =
     let
-        -- TODO: replace with actual current time
         now =
             Time.millisToPosix nowMillis
     in
