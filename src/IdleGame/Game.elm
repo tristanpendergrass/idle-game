@@ -1,5 +1,6 @@
 module IdleGame.Game exposing (..)
 
+import FeatherIcons
 import IdleGame.Timer
 import Set exposing (Set)
 import Time exposing (Posix)
@@ -206,7 +207,21 @@ updateCurrentTime now game =
 -- Time passes logic
 
 
-type alias TimePassesGain =
+type alias TimePassesItemGain =
+    { amount : Int
+    , title : String
+    , icon : FeatherIcons.Icon
+    }
+
+
+type alias TimePassesItemLoss =
+    { amount : Int
+    , title : String
+    , icon : FeatherIcons.Icon
+    }
+
+
+type alias TimePassesXpGain =
     { amount : Int
     , title : String
     }
@@ -214,10 +229,20 @@ type alias TimePassesGain =
 
 type alias TimePassesData =
     { timePassed : Int
-    , gains : List TimePassesGain
+    , xpGains : List TimePassesXpGain
+    , itemGains : List TimePassesItemGain
+    , itemLosses : List TimePassesItemLoss
     }
 
 
 getTimePassesData : Game -> Game -> TimePassesData
 getTimePassesData oldGame newGame =
-    Debug.todo "Implement"
+    { timePassed = Time.posixToMillis newGame.currentTime - Time.posixToMillis oldGame.currentTime
+    , xpGains =
+        [ { title = "Woodchopping XP"
+          , amount = floor newGame.woodcuttingXp - floor oldGame.woodcuttingXp
+          }
+        ]
+    , itemGains = []
+    , itemLosses = []
+    }
