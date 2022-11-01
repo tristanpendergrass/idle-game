@@ -114,24 +114,6 @@ view model =
 
 
 
--- toggleActiveWoodcutting : Id -> Int -> List Woodcutting -> List Woodcutting
--- toggleActiveWoodcutting toggleId now woodcuttings =
---     woodcuttings
---         |> List.map
---             (\(Woodcutting id woodcuttingData activityStatus) ->
---                 if id == toggleId then
---                     let
---                         newActivityStatus =
---                             case activityStatus of
---                                 Nothing ->
---                                     Just (IdleGame.Timer.create now 2500)
---                                 Just _ ->
---                                     Nothing
---                     in
---                     Woodcutting id woodcuttingData newActivityStatus
---                 else
---                     Woodcutting id woodcuttingData Nothing
---             )
 -- Diff stuff
 
 

@@ -45,7 +45,7 @@ initialTabs =
         , { title = Just "Extracurricular"
           , forbidden = False
           , items =
-                [ { title = "Woodcuttings"
+                [ { title = "Woodcutting"
                   , icon = FeatherIcons.tool
                   , disabled = False
                   }
