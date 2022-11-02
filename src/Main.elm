@@ -10,7 +10,9 @@ import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
+import Json.Decode
 import Task
 import Time
 
@@ -28,7 +30,7 @@ init nowMillis =
     in
     ( { tabs = IdleGame.Tabs.initialTabs
       , isVisible = True
-      , timePassesData = Nothing
+      , activeModal = Nothing
       , game = IdleGame.Game.create now
       }
     , Cmd.none
@@ -68,13 +70,13 @@ update msg model =
                     timePassesData =
                         IdleGame.Game.getTimePassesData model.game newGame
                 in
-                ( { model | timePassesData = Just timePassesData, isVisible = True }, Cmd.none )
+                ( { model | activeModal = Just (TimePassesModal timePassesData), isVisible = True }, Cmd.none )
 
             else
                 ( { model | isVisible = False }, Cmd.none )
 
         CloseTimePassesModal ->
-            ( { model | timePassesData = Nothing }, Cmd.none )
+            ( { model | activeModal = Nothing }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -102,12 +104,17 @@ view model =
                     , IdleGame.Views.Drawer.renderDrawer model
                     ]
                ]
-            ++ (case model.timePassesData of
-                    Just timePassesData ->
-                        [ IdleGame.Views.TimePasses.render timePassesData
+            ++ (case model.activeModal of
+                    Nothing ->
+                        []
+
+                    Just (TimePassesModal timePassesData) ->
+                        [ IdleGame.Views.ModalWrapper.render
+                            [ IdleGame.Views.TimePasses.render model.game timePassesData
+                            ]
                         ]
 
-                    Nothing ->
+                    Just WoodcuttingMasteryCheckpointsModal ->
                         []
                )
         )

@@ -18,10 +18,15 @@ type alias Tab =
     }
 
 
+type Modal
+    = TimePassesModal IdleGame.Game.TimePassesData
+    | WoodcuttingMasteryCheckpointsModal
+
+
 type alias Model =
     { tabs : Tabs
     , isVisible : Bool
-    , timePassesData : Maybe IdleGame.Game.TimePassesData
+    , activeModal : Maybe Modal
     , game : Game
     }
 

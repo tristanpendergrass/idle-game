@@ -113,59 +113,53 @@ getDurationStringHelp millis =
         []
 
 
-render : IdleGame.Game.TimePassesData -> Html Msg
-render { timePassed, xpGains, itemGains, itemLosses } =
-    div [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 z-10 flex justify-center items-center cursor-pointer", onClick CloseTimePassesModal ]
-        [ div
-            [ class "bg-base-100 rounded-xl w-[512px] max-w-[90%] max-h-[90%] cursor-auto overflow-x-hidden overflow-y-auto shadow-xl p-8 animate-pop-in"
-            , class "flex flex-col justify-center items-center gap-4"
-            , custom "click" (Json.Decode.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
+render : IdleGame.Game.Game -> IdleGame.Game.TimePassesData -> Html Msg
+render game { timePassed, xpGains, itemGains, itemLosses } =
+    div [ class "flex flex-col justify-center items-center gap-4" ]
+        [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
+        , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString timePassed ++ ")" ]
+        , div [ classList [ ( "hidden", List.isEmpty itemLosses ) ] ]
+            [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
+            , ul [ class "font-semibold flex flex-col items-center" ]
+                (itemLosses
+                    |> List.map
+                        (\{ title, amount, icon } ->
+                            li [ class "flex items-center gap-2" ]
+                                [ span [ class "text-error" ] [ text <| String.fromInt amount ]
+                                , icon
+                                    |> FeatherIcons.withClass "inline-block"
+                                    |> FeatherIcons.toHtml []
+                                , span [] [ text title ]
+                                ]
+                        )
+                )
             ]
-            [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
-            , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString timePassed ++ ")" ]
-            , div [ classList [ ( "hidden", List.isEmpty itemLosses ) ] ]
-                [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
-                , ul [ class "font-semibold flex flex-col items-center" ]
-                    (itemLosses
+        , div [ classList [ ( "hidden", List.isEmpty itemGains && List.isEmpty xpGains ) ] ]
+            [ h3 [ class "text-xl font-bold" ] [ text "You gained" ]
+            , ul [ class "font-semibold flex flex-col items-center" ]
+                (List.concat
+                    [ xpGains
+                        |> List.map
+                            (\{ title, amount } ->
+                                li [ class "flex items-center gap-2" ]
+                                    [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                                    , span [] [ text title ]
+                                    ]
+                            )
+                    , itemGains
                         |> List.map
                             (\{ title, amount, icon } ->
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-error" ] [ text <| String.fromInt amount ]
+                                    [ span [ class "text-success" ] [ text <| String.fromInt amount ]
                                     , icon
                                         |> FeatherIcons.withClass "inline-block"
                                         |> FeatherIcons.toHtml []
                                     , span [] [ text title ]
                                     ]
                             )
-                    )
-                ]
-            , div [ classList [ ( "hidden", List.isEmpty itemGains && List.isEmpty xpGains ) ] ]
-                [ h3 [ class "text-xl font-bold" ] [ text "You gained" ]
-                , ul [ class "font-semibold flex flex-col items-center" ]
-                    (List.concat
-                        [ xpGains
-                            |> List.map
-                                (\{ title, amount } ->
-                                    li [ class "flex items-center gap-2" ]
-                                        [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                                        , span [] [ text title ]
-                                        ]
-                                )
-                        , itemGains
-                            |> List.map
-                                (\{ title, amount, icon } ->
-                                    li [ class "flex items-center gap-2" ]
-                                        [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                                        , icon
-                                            |> FeatherIcons.withClass "inline-block"
-                                            |> FeatherIcons.toHtml []
-                                        , span [] [ text title ]
-                                        ]
-                                )
-                        ]
-                    )
-                ]
-            , button [ class "btn btn-primary", onClick CloseTimePassesModal ]
-                [ text "Done" ]
+                    ]
+                )
             ]
+        , button [ class "btn btn-primary", onClick CloseTimePassesModal ]
+            [ text "Done" ]
         ]
