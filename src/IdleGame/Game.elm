@@ -2,6 +2,7 @@ module IdleGame.Game exposing (..)
 
 import FeatherIcons
 import IdleGame.Timer
+import IdleGame.XpFormulas
 import Set exposing (Set)
 import Time exposing (Posix)
 import Time.Extra
@@ -39,12 +40,34 @@ type WoodcuttingListItem
     | WoodcuttingTree TreeType
 
 
-getWoodcuttingListItems : Game -> List WoodcuttingListItem
-getWoodcuttingListItems _ =
-    [ WoodcuttingTree Elm
-    , WoodcuttingTree Oak
-    , WoodcuttingLockedItem 50
+treeUnlockRequirements =
+    [ ( Elm, 1 )
+    , ( Oak, 2 )
+    , ( Willow, 3 )
     ]
+
+
+getWoodcuttingListItems : Game -> List WoodcuttingListItem
+getWoodcuttingListItems { woodcuttingXp } =
+    let
+        skillLevel =
+            IdleGame.XpFormulas.skillLevel woodcuttingXp
+
+        unlockedTreeTypes =
+            treeUnlockRequirements
+                |> List.filter (\( _, treeLevel ) -> treeLevel <= skillLevel)
+                |> List.map (\( type_, _ ) -> WoodcuttingTree type_)
+
+        maybeNextUnlock =
+            treeUnlockRequirements
+                |> List.filter (\( _, treeLevel ) -> treeLevel > skillLevel)
+                |> List.sortBy Tuple.second
+                |> List.head
+                |> Maybe.map (\( _, level ) -> WoodcuttingLockedItem level)
+                |> Maybe.map List.singleton
+                |> Maybe.withDefault []
+    in
+    unlockedTreeTypes ++ maybeNextUnlock
 
 
 

@@ -123,8 +123,8 @@ renderWoodcuttingListItem game item =
         IdleGame.Game.WoodcuttingTree type_ ->
             renderTree game (IdleGame.Game.getTree type_)
 
-        IdleGame.Game.WoodcuttingLockedItem _ ->
-            renderLockedWoodcutting
+        IdleGame.Game.WoodcuttingLockedItem level ->
+            renderLockedWoodcutting level
 
 
 woodcuttingHeight : String
@@ -197,8 +197,8 @@ renderTree game { type_, title, xpGranted, rewardText } =
         ]
 
 
-renderLockedWoodcutting : Html Msg
-renderLockedWoodcutting =
+renderLockedWoodcutting : Int -> Html Msg
+renderLockedWoodcutting level =
     div
         [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake"
         , class woodcuttingHeight
@@ -212,7 +212,7 @@ renderLockedWoodcutting =
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
-                , div [ class "text-lg font-semibold" ] [ text "Level 50" ]
+                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ String.fromInt level ]
                 ]
             ]
         ]
