@@ -3,12 +3,16 @@ module IdleGame.XpFormulas exposing (..)
 import Array exposing (Array)
 
 
+
+-- The nth member of this array is the amount of xp required to reach level n + 1
+
+
 xpRequirements : Array Int
 xpRequirements =
     Array.fromList
         [ 0 -- level 1 requirement
-        , 83 -- level 2
-        , 174
+        , 83 -- level 2 requirement
+        , 174 -- etc.
         , 276
         , 388
         , 512
@@ -25,7 +29,7 @@ xpRequirements =
         , 3115
         , 3523
         , 3973
-        , 4470
+        , 4470 -- level 20; more than this and you are still level 20.
         ]
 
 
