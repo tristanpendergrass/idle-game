@@ -15,7 +15,8 @@ type alias Game =
     { currentTime : Posix
     , woodcuttingXp : Float
     , woodcuttingMxp : Float
-    , trees : List Tree
+    , activeTree : Maybe ( TreeType, IdleGame.Timer.Timer )
+    , treeData : TreeData
     }
 
 
@@ -24,15 +25,26 @@ create now =
     { currentTime = now
     , woodcuttingXp = 10
     , woodcuttingMxp = 10
-    , trees =
-        [ Tree 0
-            { title = "Elm", rewardText = "+5 gold", xpGranted = 5, mxpGranted = 15, mxp = 235 }
-            Nothing
-        , Tree 1
-            { title = "Maple", rewardText = "+15 gold", xpGranted = 10, mxpGranted = 1, mxp = 0 }
-            Nothing
-        ]
+    , activeTree = Nothing
+    , treeData =
+        { elm = { mxp = 0 }
+        , oak = { mxp = 0 }
+        , willow = { mxp = 0 }
+        }
     }
+
+
+type WoodcuttingListItem
+    = WoodcuttingLockedItem Int
+    | WoodcuttingTree TreeType
+
+
+getWoodcuttingListItems : Game -> List WoodcuttingListItem
+getWoodcuttingListItems _ =
+    [ WoodcuttingTree Elm
+    , WoodcuttingTree Oak
+    , WoodcuttingLockedItem 50
+    ]
 
 
 
@@ -75,79 +87,105 @@ getTimeOfNextTick =
 -- Woodcutting
 
 
-type Tree
-    = Tree Id TreeData ActivityStatus
+type alias Tree =
+    { type_ : TreeType
+    , title : String
+    , rewardText : String
+    , xpGranted : Float
+    }
+
+
+getTree : TreeType -> Tree
+getTree type_ =
+    case type_ of
+        Elm ->
+            { type_ = Elm
+            , title = "Elm"
+            , rewardText = "N/A"
+            , xpGranted = 5.0
+            }
+
+        Oak ->
+            { type_ = Oak
+            , title = "Oak"
+            , rewardText = "N/A"
+            , xpGranted = 10.0
+            }
+
+        Willow ->
+            { type_ = Willow
+            , title = "Elm"
+            , rewardText = "N/A"
+            , xpGranted = 5.0
+            }
+
+
+type alias TreeData =
+    { elm : { mxp : Float }
+    , oak : { mxp : Float }
+    , willow : { mxp : Float }
+    }
+
+
+getMxp : TreeType -> TreeData -> Float
+getMxp type_ treeData =
+    case type_ of
+        Elm ->
+            treeData.elm.mxp
+
+        Oak ->
+            treeData.oak.mxp
+
+        Willow ->
+            treeData.willow.mxp
 
 
 type alias ActivityStatus =
     Maybe IdleGame.Timer.Timer
 
 
-type alias Id =
-    Int
+type TreeType
+    = Elm
+    | Oak
+    | Willow
 
 
-type alias TreeData =
-    { title : String, rewardText : String, xpGranted : Float, mxpGranted : Float, mxp : Float }
-
-
-isActive : Tree -> Bool
-isActive (Tree _ _ activityStatus) =
-    not (activityStatus == Nothing)
-
-
-toggleActiveTree : Id -> Game -> Game
-toggleActiveTree toggleId game =
+toggleActiveTree : TreeType -> Game -> Game
+toggleActiveTree toggleType game =
     let
-        newTrees =
-            game.trees
-                |> List.map
-                    (\tree ->
-                        let
-                            (Tree id treeData activityStatus) =
-                                tree
-                        in
-                        if id == toggleId && activityStatus == Nothing then
-                            Tree id treeData (Just <| IdleGame.Timer.create 2000)
+        newActiveTree =
+            case game.activeTree of
+                Just ( type_, _ ) ->
+                    if type_ == toggleType then
+                        Nothing
 
-                        else
-                            Tree id treeData Nothing
-                    )
+                    else
+                        Just ( toggleType, IdleGame.Timer.create 5000 )
+
+                Nothing ->
+                    Just ( toggleType, IdleGame.Timer.create 5000 )
     in
-    { game | trees = newTrees }
+    { game | activeTree = newActiveTree }
 
 
-getId : Tree -> Id
-getId (Tree id _ _) =
-    id
 
-
-getWoodcuttingData : Tree -> TreeData
-getWoodcuttingData (Tree _ treeData _) =
-    treeData
-
-
-tickTree : Tree -> ( Tree, { xp : Float, mxp : Float } )
-tickTree (Tree id treeData maybeActivityTimer) =
-    case maybeActivityTimer of
-        Nothing ->
-            ( Tree id treeData maybeActivityTimer, { xp = 0, mxp = 0 } )
-
-        Just timer ->
-            let
-                ( newTimer, timesCompleted ) =
-                    IdleGame.Timer.tick timer
-
-                newTreeData =
-                    { treeData | mxp = treeData.mxp + toFloat timesCompleted * treeData.mxpGranted }
-
-                xpGranted =
-                    treeData.xpGranted * toFloat timesCompleted
-
-                mxpGranted =
-                    treeData.mxpGranted * toFloat timesCompleted
-            in
-            ( Tree id newTreeData (Just newTimer), { xp = xpGranted, mxp = mxpGranted } )
+-- tickTree : TreeType -> ( Tree, { xp : Float, mxp : Float } )
+-- tickTree (Tree id treeData maybeActivityTimer) =
+--     case maybeActivityTimer of
+--         Nothing ->
+--             ( Tree id treeData maybeActivityTimer, { xp = 0, mxp = 0 } )
+--         Just timer ->
+--             let
+--                 ( newTimer, timesCompleted ) =
+--                     IdleGame.Timer.tick timer
+--                 newTreeData =
+--                     { treeData | mxp = treeData.mxp + toFloat timesCompleted * treeData.mxpGranted }
+--                 xpGranted =
+--                     treeData.xpGranted * toFloat timesCompleted
+--                 mxpGranted =
+--                     treeData.mxpGranted * toFloat timesCompleted
+--             in
+--             ( Tree id newTreeData (Just newTimer), { xp = xpGranted, mxp = mxpGranted } )
 
 
 timeOfNextTick : Game -> Posix
@@ -160,24 +198,24 @@ timeOfNextTick game =
 tick : Game -> Game
 tick game =
     let
-        ( newTrees, { xp, mxp } ) =
-            game.trees
-                |> List.foldr
-                    (\tree accum ->
-                        let
-                            ( accumTrees, accumXps ) =
-                                accum
+        ( newActiveTree, { xp, mxp } ) =
+            case game.activeTree of
+                Nothing ->
+                    ( game.activeTree, { xp = 0.0, mxp = 0.0 } )
 
-                            ( newTree, gainedXps ) =
-                                tickTree tree
-                        in
-                        ( newTree :: accumTrees, { xp = accumXps.xp + gainedXps.xp, mxp = accumXps.mxp + gainedXps.mxp } )
-                    )
-                    ( [], { xp = 0, mxp = 0 } )
+                Just ( treeType, timer ) ->
+                    let
+                        ( newTimer, completions ) =
+                            IdleGame.Timer.tick timer
+
+                        tree =
+                            getTree treeType
+                    in
+                    ( Just ( treeType, newTimer ), { xp = tree.xpGranted * toFloat completions, mxp = 1.0 * toFloat completions } )
     in
     { game
         | currentTime = timeOfNextTick game
-        , trees = newTrees
+        , activeTree = newActiveTree
         , woodcuttingXp = game.woodcuttingXp + xp
         , woodcuttingMxp = game.woodcuttingMxp + mxp
     }

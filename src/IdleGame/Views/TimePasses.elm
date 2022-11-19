@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game
 import IdleGame.Types exposing (..)
+import IdleGame.Views.ModalWrapper
 import Json.Decode
 
 
@@ -20,7 +21,7 @@ getDurationString : Int -> String
 getDurationString millis =
     let
         parts =
-            getDurationStringHelp millis
+            getDurationStringParts millis
     in
     case parts of
         [] ->
@@ -50,8 +51,8 @@ day =
     24 * hour
 
 
-getDurationStringHelp : Int -> List String
-getDurationStringHelp millis =
+getDurationStringParts : Int -> List String
+getDurationStringParts millis =
     let
         wholeDays =
             millis // day
@@ -74,7 +75,7 @@ getDurationStringHelp millis =
                 else
                     "day"
         in
-        (String.fromInt wholeDays ++ " " ++ displayUnit) :: getDurationStringHelp (millis - ((millis // day) * day))
+        (String.fromInt wholeDays ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // day) * day))
 
     else if wholeHours > 0 then
         let
@@ -85,7 +86,7 @@ getDurationStringHelp millis =
                 else
                     "hour"
         in
-        (String.fromInt wholeHours ++ " " ++ displayUnit) :: getDurationStringHelp (millis - ((millis // hour) * hour))
+        (String.fromInt wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
 
     else if wholeMinutes > 0 then
         let
@@ -96,7 +97,7 @@ getDurationStringHelp millis =
                 else
                     "minute"
         in
-        (String.fromInt wholeMinutes ++ " " ++ displayUnit) :: getDurationStringHelp (millis - ((millis // minute) * minute))
+        (String.fromInt wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
 
     else if wholeSeconds > 0 then
         let
@@ -160,6 +161,5 @@ render game { timePassed, xpGains, itemGains, itemLosses } =
                     ]
                 )
             ]
-        , button [ class "btn btn-primary", onClick CloseTimePassesModal ]
-            [ text "Done" ]
+        , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

@@ -40,6 +40,6 @@ type Msg
     | WithTime (Posix -> Msg)
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility Posix
-    | CloseTimePassesModal
+    | CloseModal
       -- Woodcutting
-    | ToggleActiveTree Int
+    | ToggleActiveTree IdleGame.Game.TreeType

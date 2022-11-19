@@ -75,7 +75,7 @@ update msg model =
             else
                 ( { model | isVisible = False }, Cmd.none )
 
-        CloseTimePassesModal ->
+        CloseModal ->
             ( { model | activeModal = Nothing }, Cmd.none )
 
 
@@ -109,7 +109,7 @@ view model =
                         []
 
                     Just (TimePassesModal timePassesData) ->
-                        [ IdleGame.Views.ModalWrapper.render
+                        [ IdleGame.Views.ModalWrapper.renderModal
                             [ IdleGame.Views.TimePasses.render model.game timePassesData
                             ]
                         ]

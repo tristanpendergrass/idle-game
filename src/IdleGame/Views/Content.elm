@@ -4,7 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game
+import IdleGame.Game exposing (Game)
 import IdleGame.Timer
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Placeholder
@@ -124,12 +124,19 @@ renderContent model =
 
             -- Woodcutting grid
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
-                ([]
-                    ++ List.map (renderTree model) game.trees
-                    ++ [ renderLockedWoodcutting ]
-                )
+                (List.map (renderWoodcuttingListItem game) (IdleGame.Game.getWoodcuttingListItems game))
             ]
         ]
+
+
+renderWoodcuttingListItem : Game -> IdleGame.Game.WoodcuttingListItem -> Html Msg
+renderWoodcuttingListItem game item =
+    case item of
+        IdleGame.Game.WoodcuttingTree type_ ->
+            renderTree game (IdleGame.Game.getTree type_)
+
+        IdleGame.Game.WoodcuttingLockedItem _ ->
+            renderLockedWoodcutting
 
 
 woodcuttingHeight : String
@@ -137,11 +144,26 @@ woodcuttingHeight =
     "h-[324px]"
 
 
-renderTree : Model -> IdleGame.Game.Tree -> Html Msg
-renderTree model (IdleGame.Game.Tree id treeData activityStatus) =
+renderTree : Game -> IdleGame.Game.Tree -> Html Msg
+renderTree game { type_, title, xpGranted, rewardText } =
     let
         handleClick =
-            IdleGame.Types.ToggleActiveTree id
+            IdleGame.Types.ToggleActiveTree type_
+
+        mxp =
+            IdleGame.Game.getMxp type_ game.treeData
+
+        maybeTimer =
+            case game.activeTree of
+                Just ( activeType, timer ) ->
+                    if type_ == activeType then
+                        Just timer
+
+                    else
+                        Nothing
+
+                Nothing ->
+                    Nothing
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
@@ -154,26 +176,26 @@ renderTree model (IdleGame.Game.Tree id treeData activityStatus) =
         , div [ class "relative card-body" ]
             [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
                 -- Woodcutting title
-                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text treeData.title ]
-                , div [ class "" ] [ text treeData.rewardText ]
+                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text title ]
+                , div [ class "" ] [ text rewardText ]
 
                 -- Woodcutting XP rewards
                 , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor treeData.xpGranted) ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor xpGranted) ]
                     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor treeData.mxpGranted) ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor 1.0) ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp treeData.mxp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp mxp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp treeData.mxp) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp mxp) ++ "%") ] []
                         ]
                     ]
                 ]
 
             -- Woodcutting progress bar
-            , case Maybe.map IdleGame.Timer.percentComplete activityStatus of
+            , case Maybe.map IdleGame.Timer.percentComplete maybeTimer of
                 Nothing ->
                     div [] []
 
