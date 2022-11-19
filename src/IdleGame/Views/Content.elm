@@ -8,21 +8,9 @@ import IdleGame.Game exposing (Game)
 import IdleGame.Timer
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Placeholder
+import IdleGame.XpFormulas
 import Round
 import Time exposing (Posix)
-
-
-skillLevelFromXp : Float -> Int
-skillLevelFromXp xp =
-    floor xp // 100 + 1
-
-
-skillLevelPercentFromXp : Float -> Float
-skillLevelPercentFromXp xp =
-    xp
-        |> floor
-        |> remainderBy 100
-        |> toFloat
 
 
 masteryLevelFromXp : Float -> Int
@@ -52,11 +40,11 @@ renderContent model =
 
         skillLevel =
             game.woodcuttingXp
-                |> skillLevelFromXp
+                |> IdleGame.XpFormulas.skillLevel
                 |> String.fromInt
 
         skillPercent =
-            skillLevelPercentFromXp game.woodcuttingXp
+            IdleGame.XpFormulas.skillLevelPercent game.woodcuttingXp * 100
 
         masteryPercent =
             game.woodcuttingMxp

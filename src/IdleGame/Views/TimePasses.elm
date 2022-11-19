@@ -136,7 +136,7 @@ render game { timePassed, xpGains, itemGains, itemLosses } =
                 )
             ]
         , div [ classList [ ( "hidden", List.isEmpty itemGains && List.isEmpty xpGains ) ] ]
-            [ h3 [ class "text-xl font-bold" ] [ text "You gained" ]
+            [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , ul [ class "font-semibold flex flex-col items-center" ]
                 (List.concat
                     [ xpGains

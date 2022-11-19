@@ -23,8 +23,8 @@ type alias Game =
 create : Posix -> Game
 create now =
     { currentTime = now
-    , woodcuttingXp = 10
-    , woodcuttingMxp = 10
+    , woodcuttingXp = 0
+    , woodcuttingMxp = 0
     , activeTree = Nothing
     , treeData =
         { elm = { mxp = 0 }
@@ -160,32 +160,18 @@ toggleActiveTree toggleType game =
                         Nothing
 
                     else
-                        Just ( toggleType, IdleGame.Timer.create 5000 )
+                        Just ( toggleType, IdleGame.Timer.create 2000 )
 
                 Nothing ->
-                    Just ( toggleType, IdleGame.Timer.create 5000 )
+                    Just ( toggleType, IdleGame.Timer.create 2000 )
     in
     { game | activeTree = newActiveTree }
 
 
 
--- tickTree : TreeType -> ( Tree, { xp : Float, mxp : Float } )
--- tickTree (Tree id treeData maybeActivityTimer) =
---     case maybeActivityTimer of
---         Nothing ->
---             ( Tree id treeData maybeActivityTimer, { xp = 0, mxp = 0 } )
---         Just timer ->
---             let
---                 ( newTimer, timesCompleted ) =
---                     IdleGame.Timer.tick timer
---                 newTreeData =
---                     { treeData | mxp = treeData.mxp + toFloat timesCompleted * treeData.mxpGranted }
---                 xpGranted =
---                     treeData.xpGranted * toFloat timesCompleted
---                 mxpGranted =
---                     treeData.mxpGranted * toFloat timesCompleted
---             in
---             ( Tree id newTreeData (Just newTimer), { xp = xpGranted, mxp = mxpGranted } )
+-- skillLevelFromXp : Float -> Int
+-- skillLevelFromXp xp =
+-- Handle ticks
 
 
 timeOfNextTick : Game -> Posix
