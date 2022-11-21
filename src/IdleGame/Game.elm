@@ -71,34 +71,7 @@ getWoodcuttingListItems { woodcuttingXp } =
 
 
 
--- updateGameObject : Posix -> Game -> Game
--- updateGameObject now gameObject =
---     if Time.posixToMillis (getTimeOfNextTick gameObject) <= Time.posixToMillis now then
---         gameObject
---             |> tick
---             |> updateGameObject now
---     else
---         gameObject
 -- Private
-
-
-type ModType
-    = PercentMod Float
-    | BaseRateMod Float
-    | FlatMod Float
-
-
-type alias Mod =
-    { type_ : ModType
-    , tags : Set Tag
-    }
-
-
-type Tag
-    = Woodcutting
-    | BoatBuilding
-    | SkillXp
-    | MasteryXp
 
 
 getTimeOfNextTick : Game -> Posix
@@ -204,13 +177,23 @@ timeOfNextTick game =
         |> Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc
 
 
+setCurrentTime : Time.Posix -> Game -> Game
+setCurrentTime time g =
+    { g | currentTime = time }
+
+
+setActiveTree : Maybe ( TreeType, IdleGame.Timer.Timer ) -> Game -> Game
+setActiveTree activeTree g =
+    { g | activeTree = activeTree }
+
+
 tick : Game -> Game
 tick game =
     let
-        ( newActiveTree, { xp, mxp } ) =
+        ( newActiveTree, events ) =
             case game.activeTree of
                 Nothing ->
-                    ( game.activeTree, { xp = 0.0, mxp = 0.0 } )
+                    ( game.activeTree, [] )
 
                 Just ( treeType, timer ) ->
                     let
@@ -220,14 +203,31 @@ tick game =
                         tree =
                             getTree treeType
                     in
-                    ( Just ( treeType, newTimer ), { xp = tree.xpGranted * toFloat completions, mxp = 1.0 * toFloat completions } )
+                    ( Just ( treeType, newTimer ), List.repeat completions (gainWoodcuttingXp tree.xpGranted) )
+
+        modifiedEvents =
+            applyMods (getMods game) events
     in
-    { game
-        | currentTime = timeOfNextTick game
-        , activeTree = newActiveTree
-        , woodcuttingXp = game.woodcuttingXp + xp
-        , woodcuttingMxp = game.woodcuttingMxp + mxp
-    }
+    game
+        |> (\g -> List.foldl applyModifiedEvent g modifiedEvents)
+        |> setCurrentTime (timeOfNextTick game)
+        |> setActiveTree newActiveTree
+
+
+applyModifiedEvent : ( Event, List Mod ) -> Game -> Game
+applyModifiedEvent ( event, mods ) game =
+    case event.type_ of
+        WoodcuttingXp amount ->
+            let
+                applyMod mod a =
+                    case mod.type_ of
+                        Percent p ->
+                            a * (p / 100 + 1)
+
+                finalAmount =
+                    List.foldl applyMod amount mods
+            in
+            { game | woodcuttingXp = game.woodcuttingXp + finalAmount }
 
 
 updateGameToTime : Posix -> Game -> Game
@@ -293,3 +293,68 @@ getTimePassesData oldGame newGame =
     , itemGains = []
     , itemLosses = []
     }
+
+
+
+-- Events
+
+
+type Tag
+    = Woodcutting
+    | Xp
+
+
+type EventType
+    = WoodcuttingXp Float
+
+
+type alias Event =
+    { type_ : EventType
+    , tags : List Tag
+    }
+
+
+gainWoodcuttingXp : Float -> Event
+gainWoodcuttingXp amount =
+    { type_ = WoodcuttingXp amount
+    , tags = [ Woodcutting, Xp ]
+    }
+
+
+type ModType
+    = Percent Float
+
+
+type alias Mod =
+    { type_ : ModType
+    , tags : List Tag
+    }
+
+
+devGlobalXpBuff : Mod
+devGlobalXpBuff =
+    { type_ = Percent 100.0
+    , tags = [ Xp ]
+    }
+
+
+getMods : Game -> List Mod
+getMods game =
+    [ devGlobalXpBuff
+    ]
+
+
+listContains : List a -> List a -> Bool
+listContains inner outer =
+    List.all (\el -> List.member el outer) inner
+
+
+applyMods : List Mod -> List Event -> List ( Event, List Mod )
+applyMods mods events =
+    events
+        |> List.map
+            (\event ->
+                ( event
+                , List.filter (\mod -> listContains mod.tags event.tags) mods
+                )
+            )

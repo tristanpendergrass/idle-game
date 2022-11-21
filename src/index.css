@@ -24,11 +24,8 @@
   }
 }
 
-.bubble-shake {
+.bubble-shake:not(:active) {
   animation: bubble-shake var(--animation-btn, 1.25s) linear;
-}
-.bubble-shake:active:hover, .clickable:active:focus {
-  animation: none;
 }
 
 @keyframes bubble-shake {
