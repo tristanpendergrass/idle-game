@@ -87,7 +87,7 @@ type alias Tree =
     { type_ : TreeType
     , title : String
     , rewardText : String
-    , xpGranted : Float
+    , onHarvest : Event
     }
 
 
@@ -98,21 +98,21 @@ getTree type_ =
             { type_ = Elm
             , title = "Elm"
             , rewardText = "N/A"
-            , xpGranted = 5.0
+            , onHarvest = gainWoodcuttingXp 5.0
             }
 
         Oak ->
             { type_ = Oak
             , title = "Oak"
             , rewardText = "N/A"
-            , xpGranted = 10.0
+            , onHarvest = gainWoodcuttingXp 10.0
             }
 
         Willow ->
             { type_ = Willow
             , title = "Elm"
             , rewardText = "N/A"
-            , xpGranted = 5.0
+            , onHarvest = gainWoodcuttingXp 15.0
             }
 
 
@@ -203,19 +203,29 @@ tick game =
                         tree =
                             getTree treeType
                     in
-                    ( Just ( treeType, newTimer ), List.repeat completions (gainWoodcuttingXp tree.xpGranted) )
+                    ( Just ( treeType, newTimer ), List.repeat completions tree.onHarvest )
+
+        mods =
+            getAllMods game
 
         modifiedEvents =
-            applyMods (getMods game) events
+            List.map (modifyEvent mods) events
     in
     game
-        |> (\g -> List.foldl applyModifiedEvent g modifiedEvents)
-        |> setCurrentTime (timeOfNextTick game)
         |> setActiveTree newActiveTree
+        |> (\g -> List.foldl applyEvent g modifiedEvents)
+        |> setCurrentTime (timeOfNextTick game)
 
 
-applyModifiedEvent : ( Event, List Mod ) -> Game -> Game
-applyModifiedEvent ( event, mods ) game =
+applyEvent : Event -> Game -> Game
+applyEvent event game =
+    case event.type_ of
+        WoodcuttingXp amount ->
+            { game | woodcuttingXp = game.woodcuttingXp + amount }
+
+
+modifyEvent : List Mod -> Event -> Event
+modifyEvent mods event =
     case event.type_ of
         WoodcuttingXp amount ->
             let
@@ -227,7 +237,7 @@ applyModifiedEvent ( event, mods ) game =
                 finalAmount =
                     List.foldl applyMod amount mods
             in
-            { game | woodcuttingXp = game.woodcuttingXp + finalAmount }
+            { event | type_ = WoodcuttingXp finalAmount }
 
 
 updateGameToTime : Posix -> Game -> Game
@@ -338,23 +348,17 @@ devGlobalXpBuff =
     }
 
 
-getMods : Game -> List Mod
-getMods game =
+getAllMods : Game -> List Mod
+getAllMods _ =
     [ devGlobalXpBuff
     ]
+
+
+modAppliesToEvent : Event -> Mod -> Bool
+modAppliesToEvent event mod =
+    listContains mod.tags event.tags
 
 
 listContains : List a -> List a -> Bool
 listContains inner outer =
     List.all (\el -> List.member el outer) inner
-
-
-applyMods : List Mod -> List Event -> List ( Event, List Mod )
-applyMods mods events =
-    events
-        |> List.map
-            (\event ->
-                ( event
-                , List.filter (\mod -> listContains mod.tags event.tags) mods
-                )
-            )

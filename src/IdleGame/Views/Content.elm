@@ -133,7 +133,7 @@ woodcuttingHeight =
 
 
 renderTree : Game -> IdleGame.Game.Tree -> Html Msg
-renderTree game { type_, title, xpGranted, rewardText } =
+renderTree game { type_, title, onHarvest, rewardText } =
     let
         handleClick =
             IdleGame.Types.ToggleActiveTree type_
@@ -152,6 +152,20 @@ renderTree game { type_, title, xpGranted, rewardText } =
 
                 Nothing ->
                     Nothing
+
+        allMods =
+            IdleGame.Game.getAllMods game
+
+        mods =
+            List.filter (IdleGame.Game.modAppliesToEvent onHarvest) allMods
+
+        modifiedHarvestEvent =
+            IdleGame.Game.modifyEvent mods onHarvest
+
+        skillXp =
+            case modifiedHarvestEvent.type_ of
+                IdleGame.Game.WoodcuttingXp amount ->
+                    amount
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
@@ -170,7 +184,7 @@ renderTree game { type_, title, xpGranted, rewardText } =
                 -- Woodcutting XP rewards
                 , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor xpGranted) ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor skillXp) ]
                     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
                     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor 1.0) ]
                     ]
