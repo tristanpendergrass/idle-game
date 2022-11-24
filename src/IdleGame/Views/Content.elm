@@ -168,7 +168,7 @@ renderTree game { type_, title, onHarvest, rewardText } =
                     amount
     in
     div
-        [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop"
+        [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
         , class woodcuttingHeight
         , onClick handleClick
         ]
