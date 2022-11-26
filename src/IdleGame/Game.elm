@@ -116,6 +116,19 @@ getTree type_ =
             }
 
 
+incrementTreeMxp : Float -> TreeType -> TreeData -> TreeData
+incrementTreeMxp amount type_ treeData =
+    case type_ of
+        Elm ->
+            { treeData | elm = { mxp = treeData.elm.mxp + amount } }
+
+        Oak ->
+            { treeData | elm = { mxp = treeData.oak.mxp + amount } }
+
+        Willow ->
+            { treeData | elm = { mxp = treeData.willow.mxp + amount } }
+
+
 type alias TreeData =
     { elm : { mxp : Float }
     , oak : { mxp : Float }
@@ -223,6 +236,12 @@ applyEvent event game =
         WoodcuttingXp amount ->
             { game | woodcuttingXp = game.woodcuttingXp + amount }
 
+        WoodcuttingMxp amount treeType ->
+            { game
+                | woodcuttingMxp = game.woodcuttingMxp + (amount / 2)
+                , treeData = incrementTreeMxp amount treeType game.treeData
+            }
+
 
 modifyEvent : List Mod -> Event -> Event
 modifyEvent mods event =
@@ -238,6 +257,9 @@ modifyEvent mods event =
                     List.foldl applyMod amount mods
             in
             { event | type_ = WoodcuttingXp finalAmount }
+
+        WoodcuttingMxp amount ->
+            
 
 
 updateGameToTime : Posix -> Game -> Game
@@ -316,6 +338,7 @@ type Tag
 
 type EventType
     = WoodcuttingXp Float
+    | WoodcuttingMxp Float TreeType
 
 
 type alias Event =
