@@ -13,19 +13,6 @@ import Round
 import Time exposing (Posix)
 
 
-masteryLevelFromXp : Float -> Int
-masteryLevelFromXp xp =
-    floor xp // 10 + 1
-
-
-masteryLevelPercentFromXp : Float -> Float
-masteryLevelPercentFromXp xp =
-    xp
-        |> floor
-        |> remainderBy 10
-        |> toFloat
-
-
 getActivityProgress : IdleGame.Game.ActivityStatus -> Maybe Float
 getActivityProgress activityStatus =
     activityStatus
@@ -133,13 +120,10 @@ woodcuttingHeight =
 
 
 renderTree : Game -> IdleGame.Game.Tree -> Html Msg
-renderTree game { type_, title, onHarvest, rewardText } =
+renderTree game { type_, title, xp, rewardText } =
     let
         handleClick =
             IdleGame.Types.ToggleActiveTree type_
-
-        mxp =
-            IdleGame.Game.getMxp type_ game.treeData
 
         maybeTimer =
             case game.activeTree of
@@ -156,16 +140,45 @@ renderTree game { type_, title, onHarvest, rewardText } =
         allMods =
             IdleGame.Game.getAllMods game
 
-        mods =
-            List.filter (IdleGame.Game.modAppliesToEvent onHarvest) allMods
+        onHarvestXp =
+            IdleGame.Game.gainWoodcuttingXp xp
 
-        modifiedHarvestEvent =
-            IdleGame.Game.modifyEvent mods onHarvest
+        xpMods =
+            List.filter (IdleGame.Game.modAppliesToEvent onHarvestXp) allMods
 
-        skillXp =
-            case modifiedHarvestEvent.type_ of
+        modifiedHarvestXpEvent =
+            IdleGame.Game.modifyEvent xpMods onHarvestXp
+
+        displayXp =
+            case modifiedHarvestXpEvent.type_ of
                 IdleGame.Game.WoodcuttingXp amount ->
                     amount
+
+                _ ->
+                    0.0
+
+        mastery =
+            IdleGame.Game.getMastery type_ game.treeData
+
+        mxp =
+            IdleGame.Game.getMxp type_ game.treeData
+
+        onHarvestMxp =
+            IdleGame.Game.gainWoodcuttingMxp mxp type_
+
+        mxpMods =
+            List.filter (IdleGame.Game.modAppliesToEvent onHarvestMxp) allMods
+
+        modifiedHarvestMxpEvent =
+            IdleGame.Game.modifyEvent mxpMods onHarvestMxp
+
+        displayMxp =
+            case modifiedHarvestMxpEvent.type_ of
+                IdleGame.Game.WoodcuttingMxp amount _ ->
+                    amount
+
+                _ ->
+                    0.0
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
@@ -184,14 +197,14 @@ renderTree game { type_, title, onHarvest, rewardText } =
                 -- Woodcutting XP rewards
                 , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor skillXp) ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayXp) ]
                     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor 1.0) ]
+                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayMxp) ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (masteryLevelFromXp mxp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.XpFormulas.skillLevel mastery) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (masteryLevelPercentFromXp mxp) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mastery * 100) ++ "%") ] []
                         ]
                     ]
                 ]

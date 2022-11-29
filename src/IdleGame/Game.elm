@@ -87,7 +87,7 @@ type alias Tree =
     { type_ : TreeType
     , title : String
     , rewardText : String
-    , onHarvest : Event
+    , xp : Float
     }
 
 
@@ -98,21 +98,21 @@ getTree type_ =
             { type_ = Elm
             , title = "Elm"
             , rewardText = "N/A"
-            , onHarvest = gainWoodcuttingXp 5.0
+            , xp = 5.0
             }
 
         Oak ->
             { type_ = Oak
             , title = "Oak"
             , rewardText = "N/A"
-            , onHarvest = gainWoodcuttingXp 10.0
+            , xp = 10.0
             }
 
         Willow ->
             { type_ = Willow
             , title = "Elm"
             , rewardText = "N/A"
-            , onHarvest = gainWoodcuttingXp 15.0
+            , xp = 15.0
             }
 
 
@@ -138,6 +138,13 @@ type alias TreeData =
 
 getMxp : TreeType -> TreeData -> Float
 getMxp type_ treeData =
+    getMastery type_ treeData
+        |> IdleGame.XpFormulas.skillLevel
+        |> toFloat
+
+
+getMastery : TreeType -> TreeData -> Float
+getMastery type_ treeData =
     case type_ of
         Elm ->
             treeData.elm.mxp
@@ -215,8 +222,11 @@ tick game =
 
                         tree =
                             getTree treeType
+
+                        mxpGained =
+                            getMxp tree.type_ game.treeData
                     in
-                    ( Just ( treeType, newTimer ), List.repeat completions tree.onHarvest )
+                    ( Just ( treeType, newTimer ), List.repeat completions (gainWoodcuttingXp tree.xp) ++ List.repeat completions (gainWoodcuttingMxp mxpGained tree.type_) )
 
         mods =
             getAllMods game
@@ -244,7 +254,12 @@ applyEvent event game =
 
 
 modifyEvent : List Mod -> Event -> Event
-modifyEvent mods event =
+modifyEvent allMods event =
+    let
+        mods =
+            allMods
+                |> List.filter (modAppliesToEvent event)
+    in
     case event.type_ of
         WoodcuttingXp amount ->
             let
@@ -258,8 +273,17 @@ modifyEvent mods event =
             in
             { event | type_ = WoodcuttingXp finalAmount }
 
-        WoodcuttingMxp amount ->
-            
+        WoodcuttingMxp amount treeType ->
+            let
+                applyMod mod a =
+                    case mod.type_ of
+                        Percent p ->
+                            a * (p / 100 + 1)
+
+                finalAmount =
+                    List.foldl applyMod amount mods
+            in
+            { event | type_ = WoodcuttingMxp finalAmount treeType }
 
 
 updateGameToTime : Posix -> Game -> Game
@@ -334,6 +358,7 @@ getTimePassesData oldGame newGame =
 type Tag
     = Woodcutting
     | Xp
+    | Mxp
 
 
 type EventType
@@ -354,6 +379,13 @@ gainWoodcuttingXp amount =
     }
 
 
+gainWoodcuttingMxp : Float -> TreeType -> Event
+gainWoodcuttingMxp amount type_ =
+    { type_ = WoodcuttingMxp amount type_
+    , tags = [ Woodcutting, Mxp ]
+    }
+
+
 type ModType
     = Percent Float
 
@@ -371,10 +403,30 @@ devGlobalXpBuff =
     }
 
 
+masteryXpBuff : Mod
+masteryXpBuff =
+    { type_ = Percent 100.0
+    , tags = [ Woodcutting, Mxp ]
+    }
+
+
+bigMasteryXpBuff : Mod
+bigMasteryXpBuff =
+    { type_ = Percent 200.0
+    , tags = [ Woodcutting, Mxp ]
+    }
+
+
 getAllMods : Game -> List Mod
-getAllMods _ =
-    [ devGlobalXpBuff
-    ]
+getAllMods game =
+    []
+        ++ [ devGlobalXpBuff ]
+        ++ (if game.woodcuttingMxp > 10 then
+                [ masteryXpBuff ]
+
+            else
+                [ bigMasteryXpBuff ]
+           )
 
 
 modAppliesToEvent : Event -> Mod -> Bool
