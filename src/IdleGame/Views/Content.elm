@@ -4,6 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Event exposing (Event, Mod)
 import IdleGame.Game exposing (Game)
 import IdleGame.Timer
 import IdleGame.Types exposing (..)
@@ -141,17 +142,17 @@ renderTree game { type_, title, xp, rewardText } =
             IdleGame.Game.getAllMods game
 
         onHarvestXp =
-            IdleGame.Game.gainWoodcuttingXp xp
+            IdleGame.Event.gainWoodcuttingXp xp
 
         xpMods =
-            List.filter (IdleGame.Game.modAppliesToEvent onHarvestXp) allMods
+            List.filter (IdleGame.Event.modAppliesToEvent onHarvestXp) allMods
 
         modifiedHarvestXpEvent =
-            IdleGame.Game.modifyEvent xpMods onHarvestXp
+            IdleGame.Event.modifyEvent xpMods onHarvestXp
 
         displayXp =
             case modifiedHarvestXpEvent.type_ of
-                IdleGame.Game.WoodcuttingXp amount ->
+                IdleGame.Event.WoodcuttingXp amount ->
                     amount
 
                 _ ->
@@ -164,17 +165,17 @@ renderTree game { type_, title, xp, rewardText } =
             IdleGame.Game.getMxp type_ game.treeData
 
         onHarvestMxp =
-            IdleGame.Game.gainWoodcuttingMxp mxp type_
+            IdleGame.Event.gainWoodcuttingMxp mxp type_
 
         mxpMods =
-            List.filter (IdleGame.Game.modAppliesToEvent onHarvestMxp) allMods
+            List.filter (IdleGame.Event.modAppliesToEvent onHarvestMxp) allMods
 
         modifiedHarvestMxpEvent =
-            IdleGame.Game.modifyEvent mxpMods onHarvestMxp
+            IdleGame.Event.modifyEvent mxpMods onHarvestMxp
 
         displayMxp =
             case modifiedHarvestMxpEvent.type_ of
-                IdleGame.Game.WoodcuttingMxp amount _ ->
+                IdleGame.Event.WoodcuttingMxp amount _ ->
                     amount
 
                 _ ->

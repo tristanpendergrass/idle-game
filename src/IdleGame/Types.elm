@@ -3,6 +3,7 @@ module IdleGame.Types exposing (..)
 import Browser.Events
 import FeatherIcons
 import IdleGame.Game exposing (Game)
+import IdleGame.GameTypes
 import IdleGame.Tabs exposing (Tabs)
 import IdleGame.Timer
 import Time exposing (Posix)
@@ -42,4 +43,4 @@ type Msg
     | HandleVisibilityChange Browser.Events.Visibility Posix
     | CloseModal
       -- Woodcutting
-    | ToggleActiveTree IdleGame.Game.TreeType
+    | ToggleActiveTree IdleGame.GameTypes.TreeType
