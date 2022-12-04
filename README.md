@@ -26,8 +26,3 @@ $ npm run build
 ```
 
 # Todos
-
-## Milestone 1: Implement woodcutting
-
-[ ] Achieve compilation
-[ ] Rework so that time is not present in game object but rather in model

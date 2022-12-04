@@ -21,7 +21,7 @@ type alias Tab =
 
 type Modal
     = TimePassesModal IdleGame.Game.TimePassesData
-    | WoodcuttingMasteryCheckpointsModal
+    | ChoreMasteryCheckpointsModal
 
 
 type alias Model =
@@ -42,5 +42,5 @@ type Msg
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility Posix
     | CloseModal
-      -- Woodcutting
-    | ToggleActiveTree IdleGame.GameTypes.TreeType
+      -- Chores
+    | ToggleActiveChore IdleGame.GameTypes.ChoreType

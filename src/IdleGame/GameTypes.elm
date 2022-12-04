@@ -1,7 +1,7 @@
 module IdleGame.GameTypes exposing (..)
 
 
-type TreeType
-    = Elm
-    | Oak
-    | Willow
+type ChoreType
+    = CleanStables
+    | CleanBigBubba
+    | GatherFirewood

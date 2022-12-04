@@ -50,7 +50,7 @@ update msg model =
         WithTime msgWithTime ->
             ( model, Task.perform msgWithTime Time.now )
 
-        ToggleActiveTree toggleId ->
+        ToggleActiveChore toggleId ->
             ( { model | game = IdleGame.Game.toggleActiveTree toggleId model.game }, Cmd.none )
 
         HandleAnimationFrame now ->
@@ -114,7 +114,7 @@ view model =
                             ]
                         ]
 
-                    Just WoodcuttingMasteryCheckpointsModal ->
+                    Just ChoreMasteryCheckpointsModal ->
                         []
                )
         )

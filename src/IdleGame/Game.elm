@@ -16,9 +16,9 @@ import Time.Extra
 
 type alias Game =
     { currentTime : Posix
-    , woodcuttingXp : Float
-    , woodcuttingMxp : Float
-    , activeTree : Maybe ( TreeType, IdleGame.Timer.Timer )
+    , choresXp : Float
+    , choresMxp : Float
+    , activeTree : Maybe ( ChoreType, IdleGame.Timer.Timer )
     , treeData : TreeData
     }
 
@@ -26,8 +26,8 @@ type alias Game =
 create : Posix -> Game
 create now =
     { currentTime = now
-    , woodcuttingXp = 0
-    , woodcuttingMxp = 0
+    , choresXp = 0
+    , choresMxp = 0
     , activeTree = Nothing
     , treeData =
         { elm = { mxp = 0 }
@@ -37,35 +37,35 @@ create now =
     }
 
 
-type WoodcuttingListItem
-    = WoodcuttingLockedItem Int
-    | WoodcuttingTree TreeType
+type ChoresListItem
+    = LockedChore Int
+    | ChoreItem ChoreType
 
 
 treeUnlockRequirements =
-    [ ( Elm, 1 )
-    , ( Oak, 2 )
-    , ( Willow, 3 )
+    [ ( CleanStables, 1 )
+    , ( CleanBigBubba, 2 )
+    , ( GatherFirewood, 3 )
     ]
 
 
-getWoodcuttingListItems : Game -> List WoodcuttingListItem
-getWoodcuttingListItems { woodcuttingXp } =
+getChoreListItems : Game -> List ChoresListItem
+getChoreListItems { choresXp } =
     let
         skillLevel =
-            IdleGame.XpFormulas.skillLevel woodcuttingXp
+            IdleGame.XpFormulas.skillLevel choresXp
 
         unlockedTreeTypes =
             treeUnlockRequirements
                 |> List.filter (\( _, treeLevel ) -> treeLevel <= skillLevel)
-                |> List.map (\( type_, _ ) -> WoodcuttingTree type_)
+                |> List.map (\( type_, _ ) -> ChoreItem type_)
 
         maybeNextUnlock =
             treeUnlockRequirements
                 |> List.filter (\( _, treeLevel ) -> treeLevel > skillLevel)
                 |> List.sortBy Tuple.second
                 |> List.head
-                |> Maybe.map (\( _, level ) -> WoodcuttingLockedItem level)
+                |> Maybe.map (\( _, level ) -> LockedChore level)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
@@ -82,53 +82,53 @@ getTimeOfNextTick =
 
 
 
--- Woodcutting
+-- Chores
 
 
-type alias Tree =
-    { type_ : TreeType
+type alias Chore =
+    { type_ : ChoreType
     , title : String
     , rewardText : String
     , xp : Float
     }
 
 
-getTree : TreeType -> Tree
-getTree type_ =
+getChore : ChoreType -> Chore
+getChore type_ =
     case type_ of
-        Elm ->
-            { type_ = Elm
-            , title = "Elm"
+        CleanStables ->
+            { type_ = CleanStables
+            , title = "Clean Stables"
             , rewardText = "N/A"
             , xp = 5.0
             }
 
-        Oak ->
-            { type_ = Oak
-            , title = "Oak"
+        CleanBigBubba ->
+            { type_ = CleanBigBubba
+            , title = "Clean Big Bubba's Stall"
             , rewardText = "N/A"
             , xp = 10.0
             }
 
-        Willow ->
-            { type_ = Willow
-            , title = "Elm"
+        GatherFirewood ->
+            { type_ = GatherFirewood
+            , title = "Gather Firewood"
             , rewardText = "N/A"
             , xp = 15.0
             }
 
 
-incrementTreeMxp : Float -> TreeType -> TreeData -> TreeData
+incrementTreeMxp : Float -> ChoreType -> TreeData -> TreeData
 incrementTreeMxp amount type_ treeData =
     case type_ of
-        Elm ->
+        CleanStables ->
             { treeData | elm = { mxp = treeData.elm.mxp + amount } }
 
-        Oak ->
-            { treeData | elm = { mxp = treeData.oak.mxp + amount } }
+        CleanBigBubba ->
+            { treeData | oak = { mxp = treeData.oak.mxp + amount } }
 
-        Willow ->
-            { treeData | elm = { mxp = treeData.willow.mxp + amount } }
+        GatherFirewood ->
+            { treeData | willow = { mxp = treeData.willow.mxp + amount } }
 
 
 type alias TreeData =
@@ -138,23 +138,23 @@ type alias TreeData =
     }
 
 
-getMxp : TreeType -> TreeData -> Float
+getMxp : ChoreType -> TreeData -> Float
 getMxp type_ treeData =
     getMastery type_ treeData
         |> IdleGame.XpFormulas.skillLevel
         |> toFloat
 
 
-getMastery : TreeType -> TreeData -> Float
+getMastery : ChoreType -> TreeData -> Float
 getMastery type_ treeData =
     case type_ of
-        Elm ->
+        CleanStables ->
             treeData.elm.mxp
 
-        Oak ->
+        CleanBigBubba ->
             treeData.oak.mxp
 
-        Willow ->
+        GatherFirewood ->
             treeData.willow.mxp
 
 
@@ -162,7 +162,7 @@ type alias ActivityStatus =
     Maybe IdleGame.Timer.Timer
 
 
-toggleActiveTree : TreeType -> Game -> Game
+toggleActiveTree : ChoreType -> Game -> Game
 toggleActiveTree toggleType game =
     let
         newActiveTree =
@@ -198,7 +198,7 @@ setCurrentTime time g =
     { g | currentTime = time }
 
 
-setActiveTree : Maybe ( TreeType, IdleGame.Timer.Timer ) -> Game -> Game
+setActiveTree : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
 setActiveTree activeTree g =
     { g | activeTree = activeTree }
 
@@ -217,12 +217,12 @@ tick game =
                             IdleGame.Timer.tick timer
 
                         tree =
-                            getTree treeType
+                            getChore treeType
 
                         mxpGained =
                             getMxp tree.type_ game.treeData
                     in
-                    ( Just ( treeType, newTimer ), List.repeat completions (IdleGame.Event.gainWoodcuttingXp tree.xp) ++ List.repeat completions (IdleGame.Event.gainWoodcuttingMxp mxpGained tree.type_) )
+                    ( Just ( treeType, newTimer ), List.repeat completions (IdleGame.Event.gainChoresXp tree.xp) ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained tree.type_) )
 
         mods =
             getAllMods game
@@ -239,12 +239,12 @@ tick game =
 applyEvent : Event -> Game -> Game
 applyEvent event game =
     case event.type_ of
-        IdleGame.Event.WoodcuttingXp amount ->
-            { game | woodcuttingXp = game.woodcuttingXp + amount }
+        IdleGame.Event.ChoresXp amount ->
+            { game | choresXp = game.choresXp + amount }
 
-        IdleGame.Event.WoodcuttingMxp amount treeType ->
+        IdleGame.Event.ChoresMxp amount treeType ->
             { game
-                | woodcuttingMxp = game.woodcuttingMxp + (amount / 2)
+                | choresMxp = game.choresMxp + (amount / 2)
                 , treeData = incrementTreeMxp amount treeType game.treeData
             }
 
@@ -306,7 +306,7 @@ getTimePassesData oldGame newGame =
     { timePassed = Time.posixToMillis newGame.currentTime - Time.posixToMillis oldGame.currentTime
     , xpGains =
         [ { title = "Woodchopping XP"
-          , amount = floor newGame.woodcuttingXp - floor oldGame.woodcuttingXp
+          , amount = floor newGame.choresXp - floor oldGame.choresXp
           }
         ]
     , itemGains = []
@@ -322,7 +322,7 @@ getAllMods : Game -> List Mod
 getAllMods game =
     []
         ++ [ IdleGame.Event.devGlobalXpBuff ]
-        ++ (if game.woodcuttingMxp > 10 then
+        ++ (if game.choresMxp > 10 then
                 [ IdleGame.Event.masteryXpBuff ]
 
             else

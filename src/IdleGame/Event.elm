@@ -5,8 +5,8 @@ module IdleGame.Event exposing
     , Tag
     , bigMasteryXpBuff
     , devGlobalXpBuff
-    , gainWoodcuttingMxp
-    , gainWoodcuttingXp
+    , gainChoresMxp
+    , gainChoresXp
     , masteryXpBuff
     , modAppliesToEvent
     , modifyEvent
@@ -16,8 +16,8 @@ import IdleGame.GameTypes exposing (..)
 
 
 type EventType
-    = WoodcuttingXp Float
-    | WoodcuttingMxp Float TreeType
+    = ChoresXp Float
+    | ChoresMxp Float ChoreType
 
 
 type alias Event =
@@ -31,7 +31,7 @@ type alias Event =
 
 
 type Tag
-    = Woodcutting
+    = Chores
     | Xp
     | Mxp
 
@@ -68,7 +68,7 @@ modifyEvent allMods event =
                 |> List.filter (modAppliesToEvent event)
     in
     case event.type_ of
-        WoodcuttingXp amount ->
+        ChoresXp amount ->
             let
                 applyMod mod a =
                     case mod.type_ of
@@ -78,9 +78,9 @@ modifyEvent allMods event =
                 finalAmount =
                     List.foldl applyMod amount mods
             in
-            { event | type_ = WoodcuttingXp finalAmount }
+            { event | type_ = ChoresXp finalAmount }
 
-        WoodcuttingMxp amount treeType ->
+        ChoresMxp amount treeType ->
             let
                 applyMod mod a =
                     case mod.type_ of
@@ -90,24 +90,24 @@ modifyEvent allMods event =
                 finalAmount =
                     List.foldl applyMod amount mods
             in
-            { event | type_ = WoodcuttingMxp finalAmount treeType }
+            { event | type_ = ChoresMxp finalAmount treeType }
 
 
 
 -- Events
 
 
-gainWoodcuttingXp : Float -> Event
-gainWoodcuttingXp amount =
-    { type_ = WoodcuttingXp amount
-    , tags = [ Woodcutting, Xp ]
+gainChoresXp : Float -> Event
+gainChoresXp amount =
+    { type_ = ChoresXp amount
+    , tags = [ Chores, Xp ]
     }
 
 
-gainWoodcuttingMxp : Float -> TreeType -> Event
-gainWoodcuttingMxp amount type_ =
-    { type_ = WoodcuttingMxp amount type_
-    , tags = [ Woodcutting, Mxp ]
+gainChoresMxp : Float -> ChoreType -> Event
+gainChoresMxp amount type_ =
+    { type_ = ChoresMxp amount type_
+    , tags = [ Chores, Mxp ]
     }
 
 
@@ -121,12 +121,12 @@ devGlobalXpBuff =
 masteryXpBuff : Mod
 masteryXpBuff =
     { type_ = Percent 100.0
-    , tags = [ Woodcutting, Mxp ]
+    , tags = [ Chores, Mxp ]
     }
 
 
 bigMasteryXpBuff : Mod
 bigMasteryXpBuff =
     { type_ = Percent 200.0
-    , tags = [ Woodcutting, Mxp ]
+    , tags = [ Chores, Mxp ]
     }
