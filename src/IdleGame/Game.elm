@@ -5,9 +5,13 @@ import IdleGame.Event exposing (Event, Mod)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
 import IdleGame.XpFormulas
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (..)
+import Json.Encode as E
 import Set exposing (Set)
 import Time exposing (Posix)
 import Time.Extra
+import Tuple
 
 
 
@@ -18,9 +22,20 @@ type alias Game =
     { currentTime : Posix
     , choresXp : Float
     , choresMxp : Float
-    , activeTree : Maybe ( ChoreType, IdleGame.Timer.Timer )
-    , treeData : TreeData
+    , activeChore : Maybe ( ChoreType, IdleGame.Timer.Timer )
+    , choresData : ChoresData
     }
+
+
+type alias ChoresData =
+    { cleanStables : ChoreData
+    , cleanBigBubba : ChoreData
+    , gatherFirewood : ChoreData
+    }
+
+
+type alias ChoreData =
+    { mxp : Float }
 
 
 create : Posix -> Game
@@ -28,13 +43,61 @@ create now =
     { currentTime = now
     , choresXp = 0
     , choresMxp = 0
-    , activeTree = Nothing
-    , treeData =
-        { elm = { mxp = 0 }
-        , oak = { mxp = 0 }
-        , willow = { mxp = 0 }
+    , activeChore = Nothing
+    , choresData =
+        { cleanStables = { mxp = 0 }
+        , cleanBigBubba = { mxp = 0 }
+        , gatherFirewood = { mxp = 0 }
         }
     }
+
+
+gameDecoder : D.Decoder Game
+gameDecoder =
+    let
+        choreTypeDecoder : D.Decoder ChoreType
+        choreTypeDecoder =
+            D.string
+                |> D.andThen
+                    (\string ->
+                        case string of
+                            "CleanStables" ->
+                                D.succeed CleanStables
+
+                            "CleanBigBubba" ->
+                                D.succeed CleanBigBubba
+
+                            "GatherFirewood" ->
+                                D.succeed GatherFirewood
+
+                            _ ->
+                                D.fail <| "Unrecognized chore: " ++ string
+                    )
+
+        activeChoreDecoder : D.Decoder ( ChoreType, IdleGame.Timer.Timer )
+        activeChoreDecoder =
+            D.map2 Tuple.pair
+                choreTypeDecoder
+                IdleGame.Timer.timerDecoder
+
+        posixDecoder : D.Decoder Posix
+        posixDecoder =
+            D.map Time.millisToPosix D.int
+
+        choreDataDecoder : D.Decoder ChoreData
+        choreDataDecoder =
+            D.map (\mxp -> { mxp = mxp }) (D.field "mxp" D.float)
+
+        choresDataDecoder : D.Decoder ChoresData
+        choresDataDecoder =
+            D.map3 ChoresData (D.field "cleanStables" choreDataDecoder) (D.field "cleanBigBubba" choreDataDecoder) (D.field "gatherFirewood" choreDataDecoder)
+    in
+    D.succeed Game
+        |> required "currentTime" posixDecoder
+        |> required "choresXp" D.float
+        |> required "choresMxp" D.float
+        |> required "activeChore" (D.nullable activeChoreDecoder)
+        |> required "choreData" choresDataDecoder
 
 
 type ChoresListItem
@@ -42,7 +105,7 @@ type ChoresListItem
     | ChoreItem ChoreType
 
 
-treeUnlockRequirements =
+choreUnlockRequirements =
     [ ( CleanStables, 1 )
     , ( CleanBigBubba, 2 )
     , ( GatherFirewood, 3 )
@@ -55,21 +118,21 @@ getChoreListItems { choresXp } =
         skillLevel =
             IdleGame.XpFormulas.skillLevel choresXp
 
-        unlockedTreeTypes =
-            treeUnlockRequirements
-                |> List.filter (\( _, treeLevel ) -> treeLevel <= skillLevel)
+        unlockedChoreTypes =
+            choreUnlockRequirements
+                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
                 |> List.map (\( type_, _ ) -> ChoreItem type_)
 
         maybeNextUnlock =
-            treeUnlockRequirements
-                |> List.filter (\( _, treeLevel ) -> treeLevel > skillLevel)
+            choreUnlockRequirements
+                |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
                 |> List.sortBy Tuple.second
                 |> List.head
                 |> Maybe.map (\( _, level ) -> LockedChore level)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
-    unlockedTreeTypes ++ maybeNextUnlock
+    unlockedChoreTypes ++ maybeNextUnlock
 
 
 
@@ -118,55 +181,55 @@ getChore type_ =
             }
 
 
-incrementTreeMxp : Float -> ChoreType -> TreeData -> TreeData
-incrementTreeMxp amount type_ treeData =
+incrementChoreMxp : Float -> ChoreType -> ChoresData -> ChoresData
+incrementChoreMxp amount type_ choreData =
     case type_ of
         CleanStables ->
-            { treeData | elm = { mxp = treeData.elm.mxp + amount } }
+            { choreData | cleanStables = { mxp = choreData.cleanStables.mxp + amount } }
 
         CleanBigBubba ->
-            { treeData | oak = { mxp = treeData.oak.mxp + amount } }
+            { choreData | cleanBigBubba = { mxp = choreData.cleanBigBubba.mxp + amount } }
 
         GatherFirewood ->
-            { treeData | willow = { mxp = treeData.willow.mxp + amount } }
+            { choreData | gatherFirewood = { mxp = choreData.gatherFirewood.mxp + amount } }
 
 
-type alias TreeData =
+type alias ChoreData =
     { elm : { mxp : Float }
     , oak : { mxp : Float }
     , willow : { mxp : Float }
     }
 
 
-getMxp : ChoreType -> TreeData -> Float
-getMxp type_ treeData =
-    getMastery type_ treeData
+getMxp : ChoreType -> ChoresData -> Float
+getMxp type_ choreData =
+    getMastery type_ choreData
         |> IdleGame.XpFormulas.skillLevel
         |> toFloat
 
 
-getMastery : ChoreType -> TreeData -> Float
-getMastery type_ treeData =
+getMastery : ChoreType -> ChoresData -> Float
+getMastery type_ choreData =
     case type_ of
         CleanStables ->
-            treeData.elm.mxp
+            choreData.cleanStables.mxp
 
         CleanBigBubba ->
-            treeData.oak.mxp
+            choreData.cleanBigBubba.mxp
 
         GatherFirewood ->
-            treeData.willow.mxp
+            choreData.gatherFirewood.mxp
 
 
 type alias ActivityStatus =
     Maybe IdleGame.Timer.Timer
 
 
-toggleActiveTree : ChoreType -> Game -> Game
-toggleActiveTree toggleType game =
+toggleActiveChore : ChoreType -> Game -> Game
+toggleActiveChore toggleType game =
     let
-        newActiveTree =
-            case game.activeTree of
+        newActiveChore =
+            case game.activeChore of
                 Just ( type_, _ ) ->
                     if type_ == toggleType then
                         Nothing
@@ -177,7 +240,7 @@ toggleActiveTree toggleType game =
                 Nothing ->
                     Just ( toggleType, IdleGame.Timer.create 2000 )
     in
-    { game | activeTree = newActiveTree }
+    { game | activeChore = newActiveChore }
 
 
 
@@ -198,31 +261,31 @@ setCurrentTime time g =
     { g | currentTime = time }
 
 
-setActiveTree : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
-setActiveTree activeTree g =
-    { g | activeTree = activeTree }
+setActiveChore : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
+setActiveChore activeChore g =
+    { g | activeChore = activeChore }
 
 
 tick : Game -> Game
 tick game =
     let
-        ( newActiveTree, events ) =
-            case game.activeTree of
+        ( newActiveChore, events ) =
+            case game.activeChore of
                 Nothing ->
-                    ( game.activeTree, [] )
+                    ( game.activeChore, [] )
 
-                Just ( treeType, timer ) ->
+                Just ( choreType, timer ) ->
                     let
                         ( newTimer, completions ) =
                             IdleGame.Timer.tick timer
 
-                        tree =
-                            getChore treeType
+                        chore =
+                            getChore choreType
 
                         mxpGained =
-                            getMxp tree.type_ game.treeData
+                            getMxp chore.type_ game.choresData
                     in
-                    ( Just ( treeType, newTimer ), List.repeat completions (IdleGame.Event.gainChoresXp tree.xp) ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained tree.type_) )
+                    ( Just ( choreType, newTimer ), List.repeat completions (IdleGame.Event.gainChoresXp chore.xp) ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained chore.type_) )
 
         mods =
             getAllMods game
@@ -231,7 +294,7 @@ tick game =
             List.map (IdleGame.Event.modifyEvent mods) events
     in
     game
-        |> setActiveTree newActiveTree
+        |> setActiveChore newActiveChore
         |> (\g -> List.foldl applyEvent g modifiedEvents)
         |> setCurrentTime (timeOfNextTick game)
 
@@ -242,10 +305,10 @@ applyEvent event game =
         IdleGame.Event.ChoresXp amount ->
             { game | choresXp = game.choresXp + amount }
 
-        IdleGame.Event.ChoresMxp amount treeType ->
+        IdleGame.Event.ChoresMxp amount choreType ->
             { game
                 | choresMxp = game.choresMxp + (amount / 2)
-                , treeData = incrementTreeMxp amount treeType game.treeData
+                , choresData = incrementChoreMxp amount choreType game.choresData
             }
 
 

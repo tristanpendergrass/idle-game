@@ -1,37 +1,44 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Browser.Events exposing (onVisibilityChange)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game
+import IdleGame.Game exposing (Game)
 import IdleGame.Tabs
 import IdleGame.Types exposing (..)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
-import Json.Decode
+import Json.Decode as D
+import Json.Decode.Pipeline exposing (..)
+import Json.Encode as E
 import Task
 import Time
 
 
-main : Program Int Model Msg
+port sendToLocalStorage : E.Value -> Cmd msg
+
+
+main : Program ( Int, D.Value ) Model Msg
 main =
     Browser.element { init = init, update = update, view = view, subscriptions = subscriptions }
 
 
-init : Int -> ( Model, Cmd Msg )
-init nowMillis =
+init : ( Int, D.Value ) -> ( Model, Cmd Msg )
+init ( nowMillis, localStorageData ) =
     let
         now =
             Time.millisToPosix nowMillis
     in
-    ( { tabs = IdleGame.Tabs.initialTabs
+    ( { tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
       , isVisible = True
       , activeModal = Nothing
-      , game = IdleGame.Game.create now
+      , game =
+            D.decodeValue (D.field "game" IdleGame.Game.gameDecoder) localStorageData
+                |> Result.withDefault (IdleGame.Game.create now)
       }
     , Cmd.none
     )
@@ -51,7 +58,7 @@ update msg model =
             ( model, Task.perform msgWithTime Time.now )
 
         ToggleActiveChore toggleId ->
-            ( { model | game = IdleGame.Game.toggleActiveTree toggleId model.game }, Cmd.none )
+            ( { model | game = IdleGame.Game.toggleActiveChore toggleId model.game }, Cmd.none )
 
         HandleAnimationFrame now ->
             if model.isVisible then

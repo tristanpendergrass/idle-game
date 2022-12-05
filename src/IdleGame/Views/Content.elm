@@ -127,7 +127,7 @@ renderChore game { type_, title, xp, rewardText } =
             IdleGame.Types.ToggleActiveChore type_
 
         maybeTimer =
-            case game.activeTree of
+            case game.activeChore of
                 Just ( activeType, timer ) ->
                     if type_ == activeType then
                         Just timer
@@ -159,10 +159,10 @@ renderChore game { type_, title, xp, rewardText } =
                     0.0
 
         mastery =
-            IdleGame.Game.getMastery type_ game.treeData
+            IdleGame.Game.getMastery type_ game.choresData
 
         mxp =
-            IdleGame.Game.getMxp type_ game.treeData
+            IdleGame.Game.getMxp type_ game.choresData
 
         onHarvestMxp =
             IdleGame.Event.gainChoresMxp mxp type_
