@@ -5,11 +5,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game
-import IdleGame.Types exposing (..)
 import Json.Decode
+import Types exposing (..)
 
 
-renderModal : List (Html Msg) -> Html Msg
+renderModal : List (Html FrontendMsg) -> Html FrontendMsg
 renderModal children =
     div [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 z-10 flex justify-center items-center cursor-pointer", onClick CloseModal ]
         [ div
@@ -20,7 +20,7 @@ renderModal children =
         ]
 
 
-renderCloseButton : Html Msg
+renderCloseButton : Html FrontendMsg
 renderCloseButton =
     button [ class "btn btn-primary", onClick CloseModal ]
         [ text "Done" ]

@@ -5,10 +5,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Tabs as Tabs exposing (Tab)
-import IdleGame.Types exposing (Model, Msg)
+import IdleGame.Views.Icon as Icon
+import Types exposing (FrontendModel, FrontendMsg)
 
 
-renderDrawer : Model -> Html Msg
+renderDrawer : FrontendModel -> Html FrontendMsg
 renderDrawer model =
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
@@ -42,7 +43,7 @@ renderDrawer model =
         ]
 
 
-renderCategory : Bool -> Tabs.Category -> Html Msg
+renderCategory : Bool -> Tabs.Category -> Html FrontendMsg
 renderCategory withTopLine category =
     let
         maybeTopLine =
@@ -70,12 +71,13 @@ renderCategory withTopLine category =
         (maybeTopLine ++ maybeTitle ++ List.map renderTab category.items)
 
 
-renderTab : Tab -> Html Msg
+renderTab : Tab -> Html FrontendMsg
 renderTab tab =
     li [ classList [ ( "disabled", tab.disabled ) ] ]
         [ span [ class "flex gap-4" ]
             [ span [ class "flex-none" ]
                 [ tab.icon
+                    |> Icon.toFeatherIcon
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
                 ]

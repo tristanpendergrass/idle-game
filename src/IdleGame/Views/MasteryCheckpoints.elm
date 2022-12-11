@@ -4,11 +4,11 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Types exposing (..)
 import Json.Decode
+import Types exposing (..)
 
 
-render : Html Msg
+render : Html FrontendMsg
 render =
     div
         [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 z-10 flex justify-center items-center cursor-pointer" ]

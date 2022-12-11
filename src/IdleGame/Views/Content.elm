@@ -7,11 +7,11 @@ import Html.Events exposing (..)
 import IdleGame.Event exposing (Event, Mod)
 import IdleGame.Game exposing (Game)
 import IdleGame.Timer
-import IdleGame.Types exposing (..)
 import IdleGame.Views.Placeholder
 import IdleGame.XpFormulas
 import Round
 import Time exposing (Posix)
+import Types exposing (..)
 
 
 getActivityProgress : IdleGame.Game.ActivityStatus -> Maybe Float
@@ -20,7 +20,7 @@ getActivityProgress activityStatus =
         |> Maybe.map IdleGame.Timer.percentComplete
 
 
-renderContent : Model -> Html Msg
+renderContent : FrontendModel -> Html FrontendMsg
 renderContent model =
     let
         game =
@@ -105,7 +105,7 @@ renderContent model =
         ]
 
 
-renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html Msg
+renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
         IdleGame.Game.ChoreItem type_ ->
@@ -120,11 +120,11 @@ choreHeight =
     "h-[324px]"
 
 
-renderChore : Game -> IdleGame.Game.Chore -> Html Msg
+renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
 renderChore game { type_, title, xp, rewardText } =
     let
         handleClick =
-            IdleGame.Types.ToggleActiveChore type_
+            ToggleActiveChore type_
 
         maybeTimer =
             case game.activeChore of
@@ -225,7 +225,7 @@ renderChore game { type_, title, xp, rewardText } =
         ]
 
 
-renderLockedChore : Int -> Html Msg
+renderLockedChore : Int -> Html FrontendMsg
 renderLockedChore level =
     div
         [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake"

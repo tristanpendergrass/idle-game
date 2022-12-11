@@ -1,10 +1,15 @@
 # Development
 
-1. [Install Elm](https://guide.elm-lang.org/install/elm.html)
-2.
+1. [Install Lamdera](https://lamdera.com/start)
+
+2. Run css watcher in one terminal tab:
 ```
-$ npm install
-$ npm start
+$ npm run build:css -- --watch
+```
+
+3. Run lamdera in a different terminal tab:
+```
+$ lamdera live
 ```
 
 # Testing
@@ -18,11 +23,3 @@ or
 ```
 $ npm test -- --watch
 ```
-
-# Deployment
-
-```
-$ npm run build
-```
-
-# Todos

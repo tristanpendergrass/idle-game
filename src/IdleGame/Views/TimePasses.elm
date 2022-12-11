@@ -5,9 +5,10 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game
-import IdleGame.Types exposing (..)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.ModalWrapper
 import Json.Decode
+import Types exposing (..)
 
 
 resourceIcon : FeatherIcons.Icon
@@ -114,7 +115,7 @@ getDurationStringParts millis =
         []
 
 
-render : IdleGame.Game.Game -> IdleGame.Game.TimePassesData -> Html Msg
+render : IdleGame.Game.Game -> IdleGame.Game.TimePassesData -> Html FrontendMsg
 render game { timePassed, xpGains, itemGains, itemLosses } =
     div [ class "flex flex-col justify-center items-center gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
@@ -128,6 +129,7 @@ render game { timePassed, xpGains, itemGains, itemLosses } =
                             li [ class "flex items-center gap-2" ]
                                 [ span [ class "text-error" ] [ text <| String.fromInt amount ]
                                 , icon
+                                    |> Icon.toFeatherIcon
                                     |> FeatherIcons.withClass "inline-block"
                                     |> FeatherIcons.toHtml []
                                 , span [] [ text title ]
@@ -153,6 +155,7 @@ render game { timePassed, xpGains, itemGains, itemLosses } =
                                 li [ class "flex items-center gap-2" ]
                                     [ span [ class "text-success" ] [ text <| String.fromInt amount ]
                                     , icon
+                                        |> Icon.toFeatherIcon
                                         |> FeatherIcons.withClass "inline-block"
                                         |> FeatherIcons.toHtml []
                                     , span [] [ text title ]

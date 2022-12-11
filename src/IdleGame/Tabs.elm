@@ -1,6 +1,6 @@
 module IdleGame.Tabs exposing (Category, Tab, Tabs, getCategories, initialTabs)
 
-import FeatherIcons
+import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
 type Tabs
@@ -16,7 +16,7 @@ type alias Category =
 
 type alias Tab =
     { title : String
-    , icon : FeatherIcons.Icon
+    , icon : Icon
     , disabled : Bool
     }
 
@@ -33,11 +33,11 @@ initialTabs =
           , forbidden = False
           , items =
                 [ { title = "Bag"
-                  , icon = FeatherIcons.box
+                  , icon = Icon.bag
                   , disabled = False
                   }
                 , { title = "Shop"
-                  , icon = FeatherIcons.dollarSign
+                  , icon = Icon.shop
                   , disabled = False
                   }
                 ]
@@ -46,19 +46,19 @@ initialTabs =
           , forbidden = False
           , items =
                 [ { title = "Chores"
-                  , icon = FeatherIcons.tool
+                  , icon = Icon.chores
                   , disabled = False
                   }
                 , { title = "Exploration"
-                  , icon = FeatherIcons.map
+                  , icon = Icon.exploration
                   , disabled = False
                   }
                 , { title = "Mischief"
-                  , icon = FeatherIcons.target
+                  , icon = Icon.mischief
                   , disabled = False
                   }
                 , { title = "Dueling"
-                  , icon = FeatherIcons.gitlab
+                  , icon = Icon.dueling
                   , disabled = False
                   }
                 ]
@@ -67,19 +67,19 @@ initialTabs =
           , forbidden = False
           , items =
                 [ { title = "Botany"
-                  , icon = FeatherIcons.cloudDrizzle
+                  , icon = Icon.botany
                   , disabled = True
                   }
                 , { title = "Potionmaking"
-                  , icon = FeatherIcons.droplet
+                  , icon = Icon.potionmaking
                   , disabled = True
                   }
                 , { title = "Hexes"
-                  , icon = FeatherIcons.zap
+                  , icon = Icon.hexes
                   , disabled = True
                   }
                 , { title = "Wards"
-                  , icon = FeatherIcons.zapOff
+                  , icon = Icon.wards
                   , disabled = True
                   }
                 ]
@@ -88,11 +88,11 @@ initialTabs =
           , forbidden = True
           , items =
                 [ { title = "Forbidden knowledge"
-                  , icon = FeatherIcons.alertTriangle
+                  , icon = Icon.forbiddenKnowledge
                   , disabled = True
                   }
                 , { title = "Forbidden knowledge"
-                  , icon = FeatherIcons.alertTriangle
+                  , icon = Icon.forbiddenKnowledge
                   , disabled = True
                   }
                 ]

@@ -9,8 +9,6 @@
     "tailwindcss": "^3.1.8"
   },
   "scripts": {
-    "build": "npx parcel build src/index.html",
-    "start": "npx parcel src/index.html",
-    "test": "npx elm-test \"src/**/*_test.elm\""
+    "build:css": "npx tailwindcss -i ./src/index.css -o ./public/output.css"
   }
 }

@@ -4,6 +4,7 @@ import FeatherIcons
 import IdleGame.Event exposing (Event, Mod)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
+import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
 import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
@@ -194,13 +195,6 @@ incrementChoreMxp amount type_ choreData =
             { choreData | gatherFirewood = { mxp = choreData.gatherFirewood.mxp + amount } }
 
 
-type alias ChoreData =
-    { elm : { mxp : Float }
-    , oak : { mxp : Float }
-    , willow : { mxp : Float }
-    }
-
-
 getMxp : ChoreType -> ChoresData -> Float
 getMxp type_ choreData =
     getMastery type_ choreData
@@ -339,14 +333,14 @@ updateCurrentTime now game =
 type alias TimePassesItemGain =
     { amount : Int
     , title : String
-    , icon : FeatherIcons.Icon
+    , icon : Icon
     }
 
 
 type alias TimePassesItemLoss =
     { amount : Int
     , title : String
-    , icon : FeatherIcons.Icon
+    , icon : Icon
     }
 
 
