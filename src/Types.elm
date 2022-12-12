@@ -17,17 +17,23 @@ import Url exposing (Url)
 
 
 type Modal
-    = TimePassesModal IdleGame.Game.TimePassesData
+    = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreMasteryCheckpointsModal
+
+
+type alias GameState =
+    { currentTime : Posix
+    , lastTick : Posix
+    , game : Game
+    }
 
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
-    , currentTime : Posix
     , tabs : Tabs
     , isVisible : Bool
     , activeModal : Maybe Modal
-    , game : Game
+    , gameState : Maybe GameState
     }
 
 

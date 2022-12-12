@@ -8,6 +8,7 @@ import IdleGame.Game
 import IdleGame.Views.Icon as Icon
 import IdleGame.Views.ModalWrapper
 import Json.Decode
+import Time exposing (Posix)
 import Types exposing (..)
 
 
@@ -115,11 +116,11 @@ getDurationStringParts millis =
         []
 
 
-render : IdleGame.Game.Game -> IdleGame.Game.TimePassesData -> Html FrontendMsg
-render game { timePassed, xpGains, itemGains, itemLosses } =
+render : Posix -> IdleGame.Game.TimePassesData -> Html FrontendMsg
+render timePassed { xpGains, itemGains, itemLosses } =
     div [ class "flex flex-col justify-center items-center gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
-        , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString timePassed ++ ")" ]
+        , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , div [ classList [ ( "hidden", List.isEmpty itemLosses ) ] ]
             [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
             , ul [ class "font-semibold flex flex-col items-center" ]

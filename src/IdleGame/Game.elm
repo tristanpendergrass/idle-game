@@ -10,8 +10,6 @@ import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
 import Json.Encode as E
 import Set exposing (Set)
-import Time exposing (Posix)
-import Time.Extra
 import Tuple
 
 
@@ -20,8 +18,7 @@ import Tuple
 
 
 type alias Game =
-    { currentTime : Posix
-    , choresXp : Float
+    { choresXp : Float
     , choresMxp : Float
     , activeChore : Maybe ( ChoreType, IdleGame.Timer.Timer )
     , choresData : ChoresData
@@ -39,10 +36,9 @@ type alias ChoreData =
     { mxp : Float }
 
 
-create : Posix -> Game
-create now =
-    { currentTime = now
-    , choresXp = 0
+create : Game
+create =
+    { choresXp = 0
     , choresMxp = 0
     , activeChore = Nothing
     , choresData =
@@ -81,10 +77,6 @@ gameDecoder =
                 choreTypeDecoder
                 IdleGame.Timer.timerDecoder
 
-        posixDecoder : D.Decoder Posix
-        posixDecoder =
-            D.map Time.millisToPosix D.int
-
         choreDataDecoder : D.Decoder ChoreData
         choreDataDecoder =
             D.map (\mxp -> { mxp = mxp }) (D.field "mxp" D.float)
@@ -94,7 +86,6 @@ gameDecoder =
             D.map3 ChoresData (D.field "cleanStables" choreDataDecoder) (D.field "cleanBigBubba" choreDataDecoder) (D.field "gatherFirewood" choreDataDecoder)
     in
     D.succeed Game
-        |> required "currentTime" posixDecoder
         |> required "choresXp" D.float
         |> required "choresMxp" D.float
         |> required "activeChore" (D.nullable activeChoreDecoder)
@@ -134,15 +125,6 @@ getChoreListItems { choresXp } =
                 |> Maybe.withDefault []
     in
     unlockedChoreTypes ++ maybeNextUnlock
-
-
-
--- Private
-
-
-getTimeOfNextTick : Game -> Posix
-getTimeOfNextTick =
-    .currentTime >> Time.Extra.add Time.Extra.Millisecond 20 Time.utc
 
 
 
@@ -243,18 +225,6 @@ toggleActiveChore toggleType game =
 -- Handle ticks
 
 
-timeOfNextTick : Game -> Posix
-timeOfNextTick game =
-    game
-        |> .currentTime
-        |> Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc
-
-
-setCurrentTime : Time.Posix -> Game -> Game
-setCurrentTime time g =
-    { g | currentTime = time }
-
-
 setActiveChore : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
 setActiveChore activeChore g =
     { g | activeChore = activeChore }
@@ -290,7 +260,6 @@ tick game =
     game
         |> setActiveChore newActiveChore
         |> (\g -> List.foldl applyEvent g modifiedEvents)
-        |> setCurrentTime (timeOfNextTick game)
 
 
 applyEvent : Event -> Game -> Game
@@ -304,26 +273,6 @@ applyEvent event game =
                 | choresMxp = game.choresMxp + (amount / 2)
                 , choresData = incrementChoreMxp amount choreType game.choresData
             }
-
-
-updateGameToTime : Posix -> Game -> Game
-updateGameToTime now game =
-    let
-        shouldTick =
-            Time.posixToMillis now >= Time.posixToMillis (timeOfNextTick game)
-    in
-    if shouldTick then
-        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
-        -- Additional reading: https://jfmengels.net/tail-call-optimization/
-        updateGameToTime now (tick game)
-
-    else
-        game
-
-
-updateCurrentTime : Posix -> Game -> Game
-updateCurrentTime now game =
-    { game | currentTime = now }
 
 
 
@@ -351,8 +300,7 @@ type alias TimePassesXpGain =
 
 
 type alias TimePassesData =
-    { timePassed : Int
-    , xpGains : List TimePassesXpGain
+    { xpGains : List TimePassesXpGain
     , itemGains : List TimePassesItemGain
     , itemLosses : List TimePassesItemLoss
     }
@@ -360,9 +308,8 @@ type alias TimePassesData =
 
 getTimePassesData : Game -> Game -> TimePassesData
 getTimePassesData oldGame newGame =
-    { timePassed = Time.posixToMillis newGame.currentTime - Time.posixToMillis oldGame.currentTime
-    , xpGains =
-        [ { title = "Woodchopping XP"
+    { xpGains =
+        [ { title = "Chores XP"
           , amount = floor newGame.choresXp - floor oldGame.choresXp
           }
         ]

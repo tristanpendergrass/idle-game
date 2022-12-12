@@ -20,12 +20,9 @@ getActivityProgress activityStatus =
         |> Maybe.map IdleGame.Timer.percentComplete
 
 
-renderContent : FrontendModel -> Html FrontendMsg
-renderContent model =
+renderContent : Game -> Html FrontendMsg
+renderContent game =
     let
-        game =
-            model.game
-
         skillLevel =
             game.choresXp
                 |> IdleGame.XpFormulas.skillLevel

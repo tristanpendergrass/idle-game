@@ -10,6 +10,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Tabs
+import IdleGame.Timer
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.ModalWrapper
@@ -19,24 +20,19 @@ import Json.Decode.Pipeline exposing (..)
 import Json.Encode as E
 import Lamdera
 import Task
-import Time
+import Time exposing (Posix)
+import Time.Extra
 import Types exposing (..)
 import Url exposing (Url)
 
 
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
-    let
-        now =
-            -- TODO: set this correctly
-            Time.millisToPosix 0
-    in
     ( { key = key
-      , currentTime = now
       , tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
       , isVisible = True
       , activeModal = Nothing
-      , game = IdleGame.Game.create now
+      , gameState = Nothing
       }
     , Cmd.none
     )
@@ -68,29 +64,57 @@ update msg model =
             noOp
 
         ToggleActiveChore toggleId ->
-            ( { model | game = IdleGame.Game.toggleActiveChore toggleId model.game }, Cmd.none )
+            case model.gameState of
+                Nothing ->
+                    noOp
+
+                Just gameState ->
+                    ( { model
+                        | gameState = Just { gameState | game = IdleGame.Game.toggleActiveChore toggleId gameState.game }
+                      }
+                    , Cmd.none
+                    )
 
         HandleAnimationFrame now ->
-            if model.isVisible then
-                ( { model | game = IdleGame.Game.updateGameToTime now model.game, currentTime = now }, Cmd.none )
+            case model.gameState of
+                Nothing ->
+                    ( { model | gameState = Just { currentTime = now, lastTick = now, game = IdleGame.Game.create } }, Cmd.none )
 
-            else
-                noOp
+                Just gameState ->
+                    if model.isVisible then
+                        let
+                            ( newTick, newGame ) =
+                                updateGameToTime now ( gameState.lastTick, gameState.game )
+                        in
+                        ( { model | gameState = Just { gameState | currentTime = now, lastTick = newTick, game = newGame } }, Cmd.none )
+
+                    else
+                        ( { model | gameState = Just { gameState | currentTime = now } }, Cmd.none )
 
         HandleVisibilityChange visibility ->
-            if visibility == Browser.Events.Visible then
-                let
-                    newGame =
-                        IdleGame.Game.updateGameToTime model.currentTime model.game
+            case model.gameState of
+                Nothing ->
+                    noOp
 
-                    timePassesData : IdleGame.Game.TimePassesData
-                    timePassesData =
-                        IdleGame.Game.getTimePassesData model.game newGame
-                in
-                ( { model | activeModal = Just (TimePassesModal timePassesData), isVisible = True }, Cmd.none )
+                Just { currentTime, lastTick, game } ->
+                    if visibility == Browser.Events.Visible then
+                        let
+                            ( newTick, newGame ) =
+                                updateGameToTime currentTime ( lastTick, game )
 
-            else
-                ( { model | isVisible = False }, Cmd.none )
+                            timePassesData : IdleGame.Game.TimePassesData
+                            timePassesData =
+                                IdleGame.Game.getTimePassesData game newGame
+
+                            timePassed =
+                                Time.posixToMillis newTick
+                                    - Time.posixToMillis lastTick
+                                    |> Time.millisToPosix
+                        in
+                        ( { model | activeModal = Just (TimePassesModal timePassed timePassesData), isVisible = True }, Cmd.none )
+
+                    else
+                        ( { model | isVisible = False }, Cmd.none )
 
         CloseModal ->
             ( { model | activeModal = Nothing }, Cmd.none )
@@ -120,26 +144,31 @@ view model =
     in
     { title = "Idle Game"
     , body =
-        css
-            ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
-                    [ input [ id "drawer", type_ "checkbox", class "drawer-toggle" ] []
-                    , IdleGame.Views.Content.renderContent model
-                    , IdleGame.Views.Drawer.renderDrawer model
-                    ]
-               ]
-            ++ (case model.activeModal of
-                    Nothing ->
-                        []
+        case model.gameState of
+            Nothing ->
+                css
 
-                    Just (TimePassesModal timePassesData) ->
-                        [ IdleGame.Views.ModalWrapper.renderModal
-                            [ IdleGame.Views.TimePasses.render model.game timePassesData
+            Just { game } ->
+                css
+                    ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
+                            [ input [ id "drawer", type_ "checkbox", class "drawer-toggle" ] []
+                            , IdleGame.Views.Content.renderContent game
+                            , IdleGame.Views.Drawer.renderDrawer game model.tabs
                             ]
-                        ]
+                       ]
+                    ++ (case model.activeModal of
+                            Nothing ->
+                                []
 
-                    Just ChoreMasteryCheckpointsModal ->
-                        []
-               )
+                            Just (TimePassesModal timePassed timePassesData) ->
+                                [ IdleGame.Views.ModalWrapper.renderModal
+                                    [ IdleGame.Views.TimePasses.render timePassed timePassesData
+                                    ]
+                                ]
+
+                            Just ChoreMasteryCheckpointsModal ->
+                                []
+                       )
     }
 
 
@@ -153,3 +182,25 @@ app =
         , subscriptions = subscriptions
         , view = view
         }
+
+
+
+-- Ticks
+
+
+updateGameToTime : Posix -> ( Posix, Game ) -> ( Posix, Game )
+updateGameToTime now ( oldTick, game ) =
+    let
+        nextTick =
+            Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc oldTick
+
+        shouldTick =
+            Time.posixToMillis now >= Time.posixToMillis nextTick
+    in
+    if shouldTick then
+        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
+        -- Additional reading: https://jfmengels.net/tail-call-optimization/
+        updateGameToTime now ( nextTick, IdleGame.Game.tick game )
+
+    else
+        ( oldTick, game )

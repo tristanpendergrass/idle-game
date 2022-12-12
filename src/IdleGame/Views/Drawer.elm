@@ -4,13 +4,14 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Tabs as Tabs exposing (Tab)
+import IdleGame.Game exposing (Game)
+import IdleGame.Tabs as Tabs exposing (Tab, Tabs)
 import IdleGame.Views.Icon as Icon
 import Types exposing (FrontendModel, FrontendMsg)
 
 
-renderDrawer : FrontendModel -> Html FrontendMsg
-renderDrawer model =
+renderDrawer : Game -> Tabs -> Html FrontendMsg
+renderDrawer game tabs =
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
@@ -38,7 +39,7 @@ renderDrawer model =
                 ]
              , div [ class "h-4" ] []
              ]
-                ++ List.indexedMap (\index category -> renderCategory (index /= 0) category) (Tabs.getCategories model.tabs)
+                ++ List.indexedMap (\index category -> renderCategory (index /= 0) category) (Tabs.getCategories tabs)
             )
         ]
 
