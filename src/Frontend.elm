@@ -32,10 +32,25 @@ init url key =
       , tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
       , isVisible = True
       , activeModal = Nothing
+      , saveGameTimer = IdleGame.Timer.create 1000
       , gameState = Nothing
       }
     , Cmd.none
     )
+
+
+setCurrentTime : Posix -> GameState -> GameState
+setCurrentTime now gameState =
+    { gameState | currentTime = now }
+
+
+laterGameState : GameState -> GameState -> GameState
+laterGameState left right =
+    if Time.posixToMillis left.lastTick < Time.posixToMillis right.lastTick then
+        right
+
+    else
+        left
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -63,6 +78,26 @@ update msg model =
         UrlChanged url ->
             noOp
 
+        UpdateGameStateWithTime serverGameState now ->
+            let
+                latestGameState =
+                    case model.gameState of
+                        Nothing ->
+                            serverGameState
+
+                        Just localGameState ->
+                            laterGameState localGameState serverGameState
+            in
+            ( { model
+                | gameState =
+                    Just
+                        (latestGameState
+                            |> setCurrentTime now
+                        )
+              }
+            , Cmd.none
+            )
+
         ToggleActiveChore toggleId ->
             case model.gameState of
                 Nothing ->
@@ -85,8 +120,32 @@ update msg model =
                         let
                             ( newTick, newGame ) =
                                 updateGameToTime now ( gameState.lastTick, gameState.game )
+
+                            newGameState =
+                                { gameState | currentTime = now, lastTick = newTick, game = newGame }
+
+                            delta =
+                                Time.posixToMillis now - Time.posixToMillis gameState.currentTime
+
+                            ( newSaveGameTimer, saveGameCompletions ) =
+                                IdleGame.Timer.increment delta model.saveGameTimer
+
+                            shouldSaveGame =
+                                saveGameCompletions > 0
+
+                            saveGameCmd =
+                                Lamdera.sendToBackend (Save newGameState)
                         in
-                        ( { model | gameState = Just { gameState | currentTime = now, lastTick = newTick, game = newGame } }, Cmd.none )
+                        ( { model
+                            | gameState = Just newGameState
+                            , saveGameTimer = newSaveGameTimer
+                          }
+                        , if shouldSaveGame then
+                            saveGameCmd
+
+                          else
+                            Cmd.none
+                        )
 
                     else
                         ( { model | gameState = Just { gameState | currentTime = now } }, Cmd.none )
@@ -122,7 +181,12 @@ update msg model =
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
-    ( model, Cmd.none )
+    case msg of
+        NoOpToFrontend ->
+            ( model, Cmd.none )
+
+        UpdateGameState gameState ->
+            ( model, Task.perform (UpdateGameStateWithTime gameState) Time.now )
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg

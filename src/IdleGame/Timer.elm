@@ -1,6 +1,7 @@
 module IdleGame.Timer exposing
     ( Timer
     , create
+    , increment
     , percentComplete
     , tick
     , tickDuration
@@ -37,10 +38,15 @@ tickDuration =
 
 
 tick : Timer -> ( Timer, Int )
-tick (Timer { current, length }) =
+tick =
+    increment tickDuration
+
+
+increment : Int -> Timer -> ( Timer, Int )
+increment duration (Timer { current, length }) =
     let
         sum =
-            current + tickDuration
+            current + duration
 
         completions =
             sum // length
