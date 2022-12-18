@@ -53,6 +53,47 @@ laterGameState left right =
         left
 
 
+setGameState : Maybe GameState -> FrontendModel -> FrontendModel
+setGameState newGameState model =
+    { model | gameState = newGameState }
+
+
+mapGame : (Game -> Game) -> FrontendModel -> FrontendModel
+mapGame fn model =
+    { model | gameState = Maybe.map (\gameState -> { gameState | game = fn gameState.game }) model.gameState }
+
+
+setIsVisible : Bool -> FrontendModel -> FrontendModel
+setIsVisible isVisible model =
+    { model | isVisible = isVisible }
+
+
+setActiveModal : Maybe Modal -> FrontendModel -> FrontendModel
+setActiveModal activeModal model =
+    { model | activeModal = activeModal }
+
+
+getTimePassesModal : GameState -> Modal
+getTimePassesModal gameState =
+    let
+        { currentTime, lastTick, game } =
+            gameState
+
+        ( newTick, newGame ) =
+            updateGameToTime currentTime ( lastTick, game )
+
+        timePassesData : IdleGame.Game.TimePassesData
+        timePassesData =
+            IdleGame.Game.getTimePassesData game newGame
+
+        timePassed =
+            Time.posixToMillis newTick
+                - Time.posixToMillis lastTick
+                |> Time.millisToPosix
+    in
+    TimePassesModal timePassed timePassesData
+
+
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
     let
@@ -78,42 +119,28 @@ update msg model =
         UrlChanged url ->
             noOp
 
-        UpdateGameStateWithTime serverGameState now ->
+        InitializeGameWithTime serverGameState now ->
             let
-                latestGameState =
-                    case model.gameState of
-                        Nothing ->
-                            serverGameState
-
-                        Just localGameState ->
-                            laterGameState localGameState serverGameState
+                newGameState =
+                    model.gameState
+                        -- Note: only setting the gameState in case its local value is Nothing because we only want this to be for initialization
+                        |> Maybe.withDefault (setCurrentTime now serverGameState)
             in
-            ( { model
-                | gameState =
-                    Just
-                        (latestGameState
-                            |> setCurrentTime now
-                        )
-              }
+            ( model
+                |> setGameState (Just newGameState)
             , Cmd.none
             )
 
         ToggleActiveChore toggleId ->
-            case model.gameState of
-                Nothing ->
-                    noOp
-
-                Just gameState ->
-                    ( { model
-                        | gameState = Just { gameState | game = IdleGame.Game.toggleActiveChore toggleId gameState.game }
-                      }
-                    , Cmd.none
-                    )
+            ( model
+                |> mapGame (IdleGame.Game.toggleActiveChore toggleId)
+            , Cmd.none
+            )
 
         HandleAnimationFrame now ->
             case model.gameState of
                 Nothing ->
-                    ( { model | gameState = Just { currentTime = now, lastTick = now, game = IdleGame.Game.create } }, Cmd.none )
+                    noOp
 
                 Just gameState ->
                     if model.isVisible then
@@ -155,28 +182,29 @@ update msg model =
                 Nothing ->
                     noOp
 
-                Just { currentTime, lastTick, game } ->
+                Just gameState ->
                     if visibility == Browser.Events.Visible then
                         let
-                            ( newTick, newGame ) =
-                                updateGameToTime currentTime ( lastTick, game )
-
-                            timePassesData : IdleGame.Game.TimePassesData
-                            timePassesData =
-                                IdleGame.Game.getTimePassesData game newGame
-
-                            timePassed =
-                                Time.posixToMillis newTick
-                                    - Time.posixToMillis lastTick
-                                    |> Time.millisToPosix
+                            timePassesModal =
+                                getTimePassesModal gameState
                         in
-                        ( { model | activeModal = Just (TimePassesModal timePassed timePassesData), isVisible = True }, Cmd.none )
+                        ( model
+                            |> setActiveModal (Just timePassesModal)
+                            |> setIsVisible True
+                        , Cmd.none
+                        )
 
                     else
-                        ( { model | isVisible = False }, Cmd.none )
+                        ( model
+                            |> setIsVisible False
+                        , Cmd.none
+                        )
 
         CloseModal ->
-            ( { model | activeModal = Nothing }, Cmd.none )
+            ( model
+                |> setActiveModal Nothing
+            , Cmd.none
+            )
 
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -185,12 +213,12 @@ updateFromBackend msg model =
         NoOpToFrontend ->
             ( model, Cmd.none )
 
-        UpdateGameState gameState ->
-            ( model, Task.perform (UpdateGameStateWithTime gameState) Time.now )
+        InitializeGame gameState ->
+            ( model, Task.perform (InitializeGameWithTime gameState) Time.now )
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame HandleAnimationFrame
         , Browser.Events.onVisibilityChange HandleVisibilityChange

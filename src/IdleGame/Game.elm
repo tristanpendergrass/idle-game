@@ -1,14 +1,10 @@
 module IdleGame.Game exposing (..)
 
-import FeatherIcons
 import IdleGame.Event exposing (Event, Mod)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
-import Json.Decode as D
-import Json.Decode.Pipeline exposing (..)
-import Json.Encode as E
 import Set exposing (Set)
 import Tuple
 
@@ -47,49 +43,6 @@ create =
         , gatherFirewood = { mxp = 0 }
         }
     }
-
-
-gameDecoder : D.Decoder Game
-gameDecoder =
-    let
-        choreTypeDecoder : D.Decoder ChoreType
-        choreTypeDecoder =
-            D.string
-                |> D.andThen
-                    (\string ->
-                        case string of
-                            "CleanStables" ->
-                                D.succeed CleanStables
-
-                            "CleanBigBubba" ->
-                                D.succeed CleanBigBubba
-
-                            "GatherFirewood" ->
-                                D.succeed GatherFirewood
-
-                            _ ->
-                                D.fail <| "Unrecognized chore: " ++ string
-                    )
-
-        activeChoreDecoder : D.Decoder ( ChoreType, IdleGame.Timer.Timer )
-        activeChoreDecoder =
-            D.map2 Tuple.pair
-                choreTypeDecoder
-                IdleGame.Timer.timerDecoder
-
-        choreDataDecoder : D.Decoder ChoreData
-        choreDataDecoder =
-            D.map (\mxp -> { mxp = mxp }) (D.field "mxp" D.float)
-
-        choresDataDecoder : D.Decoder ChoresData
-        choresDataDecoder =
-            D.map3 ChoresData (D.field "cleanStables" choreDataDecoder) (D.field "cleanBigBubba" choreDataDecoder) (D.field "gatherFirewood" choreDataDecoder)
-    in
-    D.succeed Game
-        |> required "choresXp" D.float
-        |> required "choresMxp" D.float
-        |> required "activeChore" (D.nullable activeChoreDecoder)
-        |> required "choreData" choresDataDecoder
 
 
 type ChoresListItem

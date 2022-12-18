@@ -53,7 +53,7 @@ type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
     | UrlChanged Url
-    | UpdateGameStateWithTime GameState Posix
+    | InitializeGameWithTime GameState Posix
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
@@ -74,4 +74,4 @@ type BackendMsg
 
 type ToFrontend
     = NoOpToFrontend
-    | UpdateGameState GameState
+    | InitializeGame GameState

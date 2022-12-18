@@ -26,10 +26,17 @@ update msg model =
                     Dict.get sessionId model.sessionGameMap
                         |> Maybe.withDefault { currentTime = now, lastTick = now, game = IdleGame.Game.create }
             in
-            ( model, Lamdera.sendToFrontend clientId (UpdateGameState gameState) )
+            ( model, Lamdera.sendToFrontend clientId (InitializeGame gameState) )
 
         HandleConnect sessionId clientId ->
             ( model, Task.perform (HandleConnectWithTime sessionId clientId) Time.now )
+
+
+updateSessionGameMap : (SessionGameMap -> SessionGameMap) -> BackendModel -> BackendModel
+updateSessionGameMap fn model =
+    { model
+        | sessionGameMap = fn model.sessionGameMap
+    }
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
@@ -39,11 +46,8 @@ updateFromFrontend sessionId clientId msg model =
             ( model, Cmd.none )
 
         Save clientGameState ->
-            ( { model
-                | sessionGameMap =
-                    model.sessionGameMap
-                        |> Dict.insert sessionId clientGameState
-              }
+            ( model
+                |> updateSessionGameMap (Dict.insert sessionId clientGameState)
             , Cmd.none
             )
 
