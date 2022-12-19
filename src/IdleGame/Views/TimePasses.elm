@@ -118,12 +118,12 @@ getDurationStringParts millis =
 
 render : Posix -> IdleGame.Game.TimePassesData -> Html FrontendMsg
 render timePassed { xpGains, itemGains, itemLosses } =
-    div [ class "flex flex-col justify-center items-center gap-4" ]
+    div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , div [ classList [ ( "hidden", List.isEmpty itemLosses ) ] ]
             [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
-            , ul [ class "font-semibold flex flex-col items-center" ]
+            , ul [ class "t-column font-semibold" ]
                 (itemLosses
                     |> List.map
                         (\{ title, amount, icon } ->
@@ -140,7 +140,7 @@ render timePassed { xpGains, itemGains, itemLosses } =
             ]
         , div [ classList [ ( "hidden", List.isEmpty itemGains && List.isEmpty xpGains ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
-            , ul [ class "font-semibold flex flex-col items-center" ]
+            , ul [ class "t-column font-semibold" ]
                 (List.concat
                     [ xpGains
                         |> List.map

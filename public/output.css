@@ -2183,6 +2183,39 @@ html {
   display: flex;
 }
 
+.modal {
+  pointer-events: none;
+  visibility: hidden;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  z-index: 999;
+  background-color: hsl(var(--nf, var(--n)) / var(--tw-bg-opacity));
+  --tw-bg-opacity: 0.4;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: transform, opacity;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+}
+
+:where(.modal) {
+  align-items: center;
+}
+
+.modal-open, 
+.modal:target, 
+.modal-toggle:checked + .modal {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+}
+
 .navbar {
   display: flex;
   align-items: center;
@@ -2459,6 +2492,12 @@ html {
   background-color: hsl(var(--af, var(--a)) / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: hsl(var(--ac) / var(--tw-text-opacity));
+}
+
+.btm-nav>*:where(.active) {
+  border-top-width: 2px;
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b1) / var(--tw-bg-opacity));
 }
 
 .btm-nav>*.disabled, 
@@ -3006,6 +3045,15 @@ body[dir="rtl"] .checkbox:checked,
   border-bottom-left-radius: inherit;
 }
 
+.modal-open .modal-box, 
+.modal-toggle:checked + .modal .modal-box, 
+.modal:target .modal-box {
+  --tw-translate-y: 0px;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .progress::-moz-progress-bar {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--n) / var(--tw-bg-opacity));
@@ -3095,6 +3143,14 @@ body[dir="rtl"] .checkbox:checked,
   border-bottom-left-radius: var(--tab-radius, 0.5rem);
 }
 
+.table tr.active th, 
+    .table tr.active td, 
+    .table tr.active:nth-child(even) th, 
+    .table tr.active:nth-child(even) td {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b3, var(--b2)) / var(--tw-bg-opacity));
+}
+
 @keyframes toast-pop {
   0% {
     transform: scale(0.9);
@@ -3161,6 +3217,22 @@ body[dir="rtl"] .checkbox:checked,
   line-height: .75rem;
   padding-left: 0.313rem;
   padding-right: 0.313rem;
+}
+
+.btm-nav-xs>*:where(.active) {
+  border-top-width: 1px;
+}
+
+.btm-nav-sm>*:where(.active) {
+  border-top-width: 2px;
+}
+
+.btm-nav-md>*:where(.active) {
+  border-top-width: 2px;
+}
+
+.btm-nav-lg>*:where(.active) {
+  border-top-width: 4px;
 }
 
 .btn-xs {
@@ -3477,6 +3549,10 @@ body[dir="rtl"] .checkbox:checked,
   align-items: center;
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-end {
   justify-content: flex-end;
 }
@@ -3784,44 +3860,55 @@ body[dir="rtl"] .checkbox:checked,
   transition-duration: 200ms;
 }
 
-.bubble-pop {
-  animation: bubble-pop var(--animation-btn, 0.25s) ease-out;
-}
+@layer component {
+  .bubble-pop {
+    animation: bubble-pop var(--animation-btn, 0.25s) ease-out;
+  }
 
-.bubble-pop:active:hover, .clickable:active:focus {
-  animation: none;
-  transform: scale(var(--btn-focus-scale, 0.95));
-}
-
-@keyframes bubble-pop {
-  0% {
+  .bubble-pop:active:hover, .clickable:active:focus {
+    animation: none;
     transform: scale(var(--btn-focus-scale, 0.95));
   }
 
-  40% {
-    transform: scale(1.02);
+  @keyframes bubble-pop {
+    0% {
+      transform: scale(var(--btn-focus-scale, 0.95));
+    }
+
+    40% {
+      transform: scale(1.02);
+    }
+
+    100% {
+      transform: scale(1);
+    }
   }
 
-  100% {
-    transform: scale(1);
-  }
-}
-
-.bubble-shake:not(:active) {
-  animation: bubble-shake var(--animation-btn, 1.25s) linear;
-}
-
-@keyframes bubble-shake {
-  10%, 90% {
-    transform: translate3d(-1px, 0, 0);
+  .bubble-shake:not(:active) {
+    animation: bubble-shake var(--animation-btn, 1.25s) linear;
   }
 
-  30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+  @keyframes bubble-shake {
+    10%, 90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+      transform: translate3d(4px, 0, 0);
+    }
   }
 
-  40%, 60% {
-    transform: translate3d(4px, 0, 0);
+  .t-column {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 }
 

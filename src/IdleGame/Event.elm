@@ -3,11 +3,11 @@ module IdleGame.Event exposing
     , EventType(..)
     , Mod
     , Tag
-    , bigMasteryXpBuff
+    , choresMxpBuff
+    , choresXpBuff
     , devGlobalXpBuff
     , gainChoresMxp
     , gainChoresXp
-    , masteryXpBuff
     , modAppliesToEvent
     , modifyEvent
     )
@@ -47,6 +47,7 @@ type ModType
 type alias Mod =
     { type_ : ModType
     , tags : List Tag
+    , label : String
     }
 
 
@@ -111,22 +112,29 @@ gainChoresMxp amount type_ =
     }
 
 
+
+-- Mods
+
+
 devGlobalXpBuff : Mod
 devGlobalXpBuff =
     { type_ = Percent 100.0
     , tags = [ Xp ]
+    , label = "+100% Global XP"
     }
 
 
-masteryXpBuff : Mod
-masteryXpBuff =
-    { type_ = Percent 100.0
+choresMxpBuff : Float -> Mod
+choresMxpBuff percent =
+    { type_ = Percent percent
     , tags = [ Chores, Mxp ]
+    , label = "+" ++ String.fromInt (floor percent) ++ "% Chores Mastery XP"
     }
 
 
-bigMasteryXpBuff : Mod
-bigMasteryXpBuff =
-    { type_ = Percent 200.0
-    , tags = [ Chores, Mxp ]
+choresXpBuff : Float -> Mod
+choresXpBuff percent =
+    { type_ = Percent percent
+    , tags = [ Chores, Xp ]
+    , label = "+" ++ String.fromInt (floor percent) ++ "% Chores XP"
     }

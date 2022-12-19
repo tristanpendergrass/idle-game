@@ -57,6 +57,7 @@ type FrontendMsg
     | HandleAnimationFrame Time.Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
+    | OpenMasteryCheckpointsModal
       -- Chores
     | ToggleActiveChore IdleGame.GameTypes.ChoreType
 

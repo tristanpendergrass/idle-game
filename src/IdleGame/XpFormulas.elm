@@ -73,3 +73,8 @@ skillLevelPercentHelp xp i =
 
         _ ->
             1.0
+
+
+masteryPoolPercent : Float -> Float
+masteryPoolPercent amount =
+    (amount / 4500000) * 100

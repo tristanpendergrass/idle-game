@@ -32,14 +32,12 @@ renderContent game =
             IdleGame.XpFormulas.skillLevelPercent game.choresXp * 100
 
         masteryPercent =
-            game.choresMxp
-                / 4500000
-                * 100
+            IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
 
         masteryPercentLabel =
             Round.round 2 masteryPercent
     in
-    div [ class "drawer-content flex flex-col items-center", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
+    div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
             -- TOP NAV
             [ nav [ class "navbar w-full bg-orange-900 " ]
@@ -66,10 +64,10 @@ renderContent game =
                     ]
                 ]
             ]
-        , div [ class "flex flex-col items-center gap-4 p-6 pb-16 w-full max-w-[1920px] min-w-[375px]" ]
+        , div [ class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
             -- Skill card
             [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
-                [ div [ class "w-full flex flex-col gap-2" ]
+                [ div [ class "t-column" ]
                     [ div [ class "w-full flex items-center justify-between" ]
                         [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
                         , div [ class "text-2xs" ] [ text <| String.fromInt (floor game.choresXp) ]
@@ -91,7 +89,7 @@ renderContent game =
                             ]
                         ]
                     , div [ class "w-full flex justify-end" ]
-                        [ button [ class "btn btn-xs btn-secondary" ] [ text "View Checkpoints" ] ]
+                        [ button [ class "btn btn-xs btn-secondary", onClick OpenMasteryCheckpointsModal ] [ text "View Checkpoints" ] ]
                     ]
                 ]
 
@@ -187,7 +185,7 @@ renderChore game { type_, title, xp, rewardText } =
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
         , div [ class "relative card-body" ]
-            [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
+            [ div [ class "t-column h-full z-20" ]
                 -- Chore title
                 [ h2 [ class "card-title text-lg h-[3rem]" ] [ text title ]
                 , div [ class "" ] [ text rewardText ]
@@ -232,7 +230,7 @@ renderLockedChore level =
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
         , div [ class "relative card-body" ]
-            [ div [ class "w-full h-full z-20 flex flex-col items-center text-center gap-4" ]
+            [ div [ class "t-column h-full z-20 gap-4" ]
                 -- Chore title
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24

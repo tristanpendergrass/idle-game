@@ -1,7 +1,5 @@
 module Frontend exposing (app)
 
--- import IdleGame.Types exposing (..)
-
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation as Nav
@@ -13,6 +11,7 @@ import IdleGame.Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
 import Json.Decode as D
@@ -26,17 +25,53 @@ import Types exposing (..)
 import Url exposing (Url)
 
 
+app =
+    Lamdera.frontend
+        { init = init
+        , onUrlRequest = UrlClicked
+        , onUrlChange = UrlChanged
+        , update = update
+        , updateFromBackend = updateFromBackend
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
       , isVisible = True
-      , activeModal = Nothing
+
+      --   , activeModal = Nothing
+      , activeModal = Just ChoreMasteryCheckpointsModal
       , saveGameTimer = IdleGame.Timer.create 1000
       , gameState = Nothing
       }
     , Cmd.none
     )
+
+
+
+-- Update
+
+
+updateGameToTime : Posix -> ( Posix, Game ) -> ( Posix, Game )
+updateGameToTime now ( oldTick, game ) =
+    let
+        nextTick =
+            Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc oldTick
+
+        shouldTick =
+            Time.posixToMillis now >= Time.posixToMillis nextTick
+    in
+    if shouldTick then
+        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
+        -- Additional reading: https://jfmengels.net/tail-call-optimization/
+        updateGameToTime now ( nextTick, IdleGame.Game.tick game )
+
+    else
+        ( oldTick, game )
 
 
 setCurrentTime : Posix -> GameState -> GameState
@@ -73,8 +108,8 @@ setActiveModal activeModal model =
     { model | activeModal = activeModal }
 
 
-getTimePassesModal : GameState -> Modal
-getTimePassesModal gameState =
+createTimePassesModal : GameState -> Maybe Modal
+createTimePassesModal gameState =
     let
         { currentTime, lastTick, game } =
             gameState
@@ -82,16 +117,13 @@ getTimePassesModal gameState =
         ( newTick, newGame ) =
             updateGameToTime currentTime ( lastTick, game )
 
-        timePassesData : IdleGame.Game.TimePassesData
-        timePassesData =
-            IdleGame.Game.getTimePassesData game newGame
-
         timePassed =
             Time.posixToMillis newTick
                 - Time.posixToMillis lastTick
                 |> Time.millisToPosix
     in
-    TimePassesModal timePassed timePassesData
+    IdleGame.Game.getTimePassesData game newGame
+        |> Maybe.map (TimePassesModal timePassed)
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -185,11 +217,16 @@ update msg model =
                 Just gameState ->
                     if visibility == Browser.Events.Visible then
                         let
-                            timePassesModal =
-                                getTimePassesModal gameState
+                            newActiveModal =
+                                case createTimePassesModal gameState of
+                                    Just timePassesModal ->
+                                        Just timePassesModal
+
+                                    Nothing ->
+                                        model.activeModal
                         in
                         ( model
-                            |> setActiveModal (Just timePassesModal)
+                            |> setActiveModal newActiveModal
                             |> setIsVisible True
                         , Cmd.none
                         )
@@ -203,6 +240,12 @@ update msg model =
         CloseModal ->
             ( model
                 |> setActiveModal Nothing
+            , Cmd.none
+            )
+
+        OpenMasteryCheckpointsModal ->
+            ( model
+                |> setActiveModal (Just ChoreMasteryCheckpointsModal)
             , Cmd.none
             )
 
@@ -259,40 +302,8 @@ view model =
                                 ]
 
                             Just ChoreMasteryCheckpointsModal ->
-                                []
+                                [ IdleGame.Views.ModalWrapper.renderModal
+                                    [ IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryCheckpoints } ]
+                                ]
                        )
     }
-
-
-app =
-    Lamdera.frontend
-        { init = init
-        , onUrlRequest = UrlClicked
-        , onUrlChange = UrlChanged
-        , update = update
-        , updateFromBackend = updateFromBackend
-        , subscriptions = subscriptions
-        , view = view
-        }
-
-
-
--- Ticks
-
-
-updateGameToTime : Posix -> ( Posix, Game ) -> ( Posix, Game )
-updateGameToTime now ( oldTick, game ) =
-    let
-        nextTick =
-            Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc oldTick
-
-        shouldTick =
-            Time.posixToMillis now >= Time.posixToMillis nextTick
-    in
-    if shouldTick then
-        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
-        -- Additional reading: https://jfmengels.net/tail-call-optimization/
-        updateGameToTime now ( nextTick, IdleGame.Game.tick game )
-
-    else
-        ( oldTick, game )

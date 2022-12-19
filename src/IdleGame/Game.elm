@@ -259,29 +259,87 @@ type alias TimePassesData =
     }
 
 
-getTimePassesData : Game -> Game -> TimePassesData
+getTimePassesData : Game -> Game -> Maybe TimePassesData
 getTimePassesData oldGame newGame =
-    { xpGains =
-        [ { title = "Chores XP"
-          , amount = floor newGame.choresXp - floor oldGame.choresXp
-          }
-        ]
-    , itemGains = []
-    , itemLosses = []
-    }
+    let
+        choresXpAmount =
+            floor newGame.choresXp - floor oldGame.choresXp
+
+        hasNewData =
+            choresXpAmount > 0
+    in
+    if hasNewData then
+        Just
+            { xpGains =
+                [ { title = "Chores XP"
+                  , amount = choresXpAmount
+                  }
+                ]
+            , itemGains = []
+            , itemLosses = []
+            }
+
+    else
+        Nothing
 
 
 
 -- Events
 
 
+type alias MasteryCheckpoints =
+    { ten : Mod
+    , twentyFive : Mod
+    , fifty : Mod
+    , ninetyFive : Mod
+    }
+
+
+choreMasteryCheckpoints : MasteryCheckpoints
+choreMasteryCheckpoints =
+    { ten = IdleGame.Event.choresXpBuff 25
+    , twentyFive = IdleGame.Event.choresMxpBuff 10
+    , fifty = IdleGame.Event.choresXpBuff 25
+    , ninetyFive = IdleGame.Event.choresMxpBuff 10
+    }
+
+
+getChoreMasteryMods : Game -> List Mod
+getChoreMasteryMods game =
+    let
+        mxpPercent =
+            IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
+
+        checkpoints =
+            choreMasteryCheckpoints
+    in
+    if mxpPercent >= 95 then
+        [ checkpoints.ten
+        , checkpoints.twentyFive
+        , checkpoints.fifty
+        , checkpoints.ninetyFive
+        ]
+
+    else if mxpPercent >= 50 then
+        [ checkpoints.ten
+        , checkpoints.twentyFive
+        , checkpoints.fifty
+        ]
+
+    else if mxpPercent >= 25 then
+        [ checkpoints.ten
+        , checkpoints.twentyFive
+        ]
+
+    else if mxpPercent >= 10 then
+        [ checkpoints.ten ]
+
+    else
+        []
+
+
 getAllMods : Game -> List Mod
 getAllMods game =
     []
         ++ [ IdleGame.Event.devGlobalXpBuff ]
-        ++ (if game.choresMxp > 10 then
-                [ IdleGame.Event.masteryXpBuff ]
-
-            else
-                [ IdleGame.Event.bigMasteryXpBuff ]
-           )
+        ++ getChoreMasteryMods game

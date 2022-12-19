@@ -2,42 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-.bubble-pop {
-  animation: bubble-pop var(--animation-btn, 0.25s) ease-out;
-}
-.bubble-pop:active:hover, .clickable:active:focus {
-  animation: none;
-}
-.bubble-pop:active:hover, .clickable:active:focus {
-  transform: scale(var(--btn-focus-scale, 0.95));
-}
-
-@keyframes bubble-pop {
-  0% {
+@layer component {
+  .bubble-pop {
+    animation: bubble-pop var(--animation-btn, 0.25s) ease-out;
+  }
+  .bubble-pop:active:hover, .clickable:active:focus {
+    animation: none;
+  }
+  .bubble-pop:active:hover, .clickable:active:focus {
     transform: scale(var(--btn-focus-scale, 0.95));
   }
-  40% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
 
-.bubble-shake:not(:active) {
-  animation: bubble-shake var(--animation-btn, 1.25s) linear;
-}
-
-@keyframes bubble-shake {
-  10%, 90% {
-    transform: translate3d(-1px, 0, 0);
+  @keyframes bubble-pop {
+    0% {
+      transform: scale(var(--btn-focus-scale, 0.95));
+    }
+    40% {
+      transform: scale(1.02);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
-  30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
+  .bubble-shake:not(:active) {
+    animation: bubble-shake var(--animation-btn, 1.25s) linear;
   }
 
-  40%, 60% {
-    transform: translate3d(4px, 0, 0);
+  @keyframes bubble-shake {
+    10%, 90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    30%, 50%, 70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%, 60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  .t-column {
+    @apply flex flex-col justify-center items-center w-full gap-2;
   }
 }
