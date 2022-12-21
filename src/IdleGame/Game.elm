@@ -201,8 +201,18 @@ tick game =
 
                         mxpGained =
                             getMxp chore.type_ game.choresData
+
+                        activeChore =
+                            Just ( choreType, newTimer )
+
+                        newEvents =
+                            []
+                                ++ List.repeat completions (IdleGame.Event.gainChoresXp chore.xp)
+                                ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained chore.type_)
                     in
-                    ( Just ( choreType, newTimer ), List.repeat completions (IdleGame.Event.gainChoresXp chore.xp) ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained chore.type_) )
+                    ( activeChore
+                    , newEvents
+                    )
 
         mods =
             getAllMods game

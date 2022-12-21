@@ -53,7 +53,7 @@ render { mxp, checkpoints } =
                 ]
             ]
         , div [ class "t-column" ]
-            [ renderCheckpoint { number = 10, label = checkpoints.ten.label, isActive = True }
+            [ renderCheckpoint { number = 10, label = checkpoints.ten.label, isActive = masteryPercent >= 10.0 }
             , renderCheckpoint { number = 25, label = checkpoints.twentyFive.label, isActive = masteryPercent >= 25.0 }
             , renderCheckpoint { number = 50, label = checkpoints.fifty.label, isActive = masteryPercent >= 50.0 }
             , renderCheckpoint { number = 95, label = checkpoints.ninetyFive.label, isActive = masteryPercent >= 95.0 }
