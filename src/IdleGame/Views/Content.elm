@@ -32,10 +32,11 @@ renderContent game =
             IdleGame.XpFormulas.skillLevelPercent game.choresXp * 100
 
         masteryPercent =
-            IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
+            100
 
+        -- IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
         masteryPercentLabel =
-            Round.round 2 masteryPercent
+            String.fromInt (floor masteryPercent) ++ "%"
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
@@ -65,7 +66,7 @@ renderContent game =
                 ]
             ]
         , div [ class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-            -- Skill card
+            -- Chore XP and MXP
             [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
                 [ div [ class "t-column" ]
                     [ div [ class "w-full flex items-center justify-between" ]
@@ -79,17 +80,31 @@ renderContent game =
                             [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat skillPercent ++ "%") ] []
                             ]
                         ]
-                    , div [ class "w-full flex items-center justify-between" ]
+                    , div [ class "w-full flex items-center justify-start" ]
                         [ div [ class "text-2xs font-bold" ] [ text "Mastery" ]
-                        , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor game.choresMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
+
+                        -- , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor game.choresMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
                         ]
-                    , div [ class "w-full flex items-center gap-2" ]
-                        [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                            [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat masteryPercent ++ "%") ] []
+                    , div [ class "relative" ]
+                        [ div
+                            [ class "radial-progress text-secondary z-10 text-xs font-bold"
+                            , attribute "style" ("--value:" ++ String.fromFloat masteryPercent ++ ";--size:3rem;--thickness:0.1rem")
                             ]
+                            [ text masteryPercentLabel ]
+                        , div
+                            [ class "radial-progress text-secondary/25 absolute top-0 left-0"
+                            , attribute "style" "--value:100;--size:3rem;--thickness:0.1rem"
+                            ]
+                            []
                         ]
-                    , div [ class "w-full flex justify-end" ]
-                        [ button [ class "btn btn-xs btn-secondary", onClick OpenMasteryCheckpointsModal ] [ text "View Checkpoints" ] ]
+
+                    -- , div [ class "w-full flex items-center gap-2" ]
+                    --     [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
+                    --         [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat masteryPercent ++ "%") ] []
+                    --         ]
+                    --     ]
+                    -- , div [ class "w-full flex justify-end" ]
+                    --     [ button [ class "btn btn-xs btn-secondary", onClick OpenMasteryCheckpointsModal ] [ text "View Checkpoints" ] ]
                     ]
                 ]
 

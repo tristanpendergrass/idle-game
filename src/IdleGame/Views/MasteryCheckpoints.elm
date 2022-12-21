@@ -11,6 +11,25 @@ import Round
 import Types exposing (..)
 
 
+renderCheckpoint : { number : Int, label : String, isActive : Bool } -> Html FrontendMsg
+renderCheckpoint { number, label, isActive } =
+    div
+        [ class "flex w-full items-center gap-4 p-2"
+        ]
+        [ div
+            [ class "text-xl font-bold leading-none"
+            , class <|
+                if isActive then
+                    "text-success underline"
+
+                else
+                    ""
+            ]
+            [ text <| String.fromInt number ++ "%" ]
+        , div [ class "flex-grow" ] [ text label ]
+        ]
+
+
 render : { mxp : Float, checkpoints : IdleGame.Game.MasteryCheckpoints } -> Html FrontendMsg
 render { mxp, checkpoints } =
     let
@@ -33,21 +52,9 @@ render { mxp, checkpoints } =
                 ]
             ]
         , div [ class "t-column" ]
-            [ div [ class "w-full flex" ]
-                [ div [] [ text "10%" ]
-                , div [] [ text checkpoints.ten.label ]
-                ]
-            , div [ class "w-full flex" ]
-                [ div [] [ text "25%" ]
-                , div [] [ text checkpoints.twentyFive.label ]
-                ]
-            , div [ class "w-full flex" ]
-                [ div [] [ text "50%" ]
-                , div [] [ text checkpoints.fifty.label ]
-                ]
-            , div [ class "w-full flex" ]
-                [ div [] [ text "95%" ]
-                , div [] [ text checkpoints.ninetyFive.label ]
-                ]
+            [ renderCheckpoint { number = 10, label = checkpoints.ten.label, isActive = True }
+            , renderCheckpoint { number = 25, label = checkpoints.twentyFive.label, isActive = masteryPercent >= 25.0 }
+            , renderCheckpoint { number = 50, label = checkpoints.fifty.label, isActive = masteryPercent >= 50.0 }
+            , renderCheckpoint { number = 95, label = checkpoints.ninetyFive.label, isActive = masteryPercent >= 95.0 }
             ]
         ]
