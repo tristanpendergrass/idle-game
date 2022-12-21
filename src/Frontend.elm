@@ -296,14 +296,22 @@ view model =
                                 []
 
                             Just (TimePassesModal timePassed timePassesData) ->
-                                [ IdleGame.Views.ModalWrapper.renderModal
-                                    [ IdleGame.Views.TimePasses.render timePassed timePassesData
-                                    ]
+                                let
+                                    children =
+                                        IdleGame.Views.TimePasses.render timePassed timePassesData
+                                in
+                                [ IdleGame.Views.ModalWrapper.create children
+                                    |> IdleGame.Views.ModalWrapper.withBorderColor "secondary"
+                                    |> IdleGame.Views.ModalWrapper.render
                                 ]
 
                             Just ChoreMasteryCheckpointsModal ->
-                                [ IdleGame.Views.ModalWrapper.renderModal
-                                    [ IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryCheckpoints } ]
+                                let
+                                    children =
+                                        IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryCheckpoints }
+                                in
+                                [ IdleGame.Views.ModalWrapper.create children
+                                    |> IdleGame.Views.ModalWrapper.render
                                 ]
                        )
     }

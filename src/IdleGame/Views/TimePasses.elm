@@ -165,5 +165,5 @@ render timePassed { xpGains, itemGains, itemLosses } =
                     ]
                 )
             ]
-        , IdleGame.Views.ModalWrapper.renderCloseButton
+        , IdleGame.Views.ModalWrapper.closeButton
         ]

@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game
+import IdleGame.Views.ModalWrapper
 import IdleGame.XpFormulas
 import Json.Decode
 import Round
@@ -57,4 +58,5 @@ render { mxp, checkpoints } =
             , renderCheckpoint { number = 50, label = checkpoints.fifty.label, isActive = masteryPercent >= 50.0 }
             , renderCheckpoint { number = 95, label = checkpoints.ninetyFive.label, isActive = masteryPercent >= 95.0 }
             ]
+        , IdleGame.Views.ModalWrapper.closeButton
         ]
