@@ -80,7 +80,7 @@ renderContent game =
                             ]
                         ]
                     , div [ class "w-full flex items-center justify-between" ]
-                        [ div [ class "text-2xs font-bold" ] [ text "Mastery" ]
+                        [ div [ class "text-2xs font-bold" ] [ text "Mastery Pool" ]
                         , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor game.choresMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
                         ]
                     , div [ class "w-full flex items-center gap-2" ]

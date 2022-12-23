@@ -31,7 +31,7 @@ renderCheckpoint { number, label, isActive } =
         ]
 
 
-render : { mxp : Float, checkpoints : IdleGame.Game.MasteryCheckpoints } -> Html FrontendMsg
+render : { mxp : Float, checkpoints : IdleGame.Game.MasteryPoolCheckpoints } -> Html FrontendMsg
 render { mxp, checkpoints } =
     let
         masteryPercent =

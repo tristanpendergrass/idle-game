@@ -308,7 +308,7 @@ view model =
                             Just ChoreMasteryCheckpointsModal ->
                                 let
                                     children =
-                                        IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryCheckpoints }
+                                        IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
                                     |> IdleGame.Views.ModalWrapper.render

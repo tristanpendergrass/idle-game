@@ -297,7 +297,7 @@ getTimePassesData oldGame newGame =
 -- Events
 
 
-type alias MasteryCheckpoints =
+type alias MasteryPoolCheckpoints =
     { ten : Mod
     , twentyFive : Mod
     , fifty : Mod
@@ -305,8 +305,8 @@ type alias MasteryCheckpoints =
     }
 
 
-choreMasteryCheckpoints : MasteryCheckpoints
-choreMasteryCheckpoints =
+choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
+choreMasteryPoolCheckpoints =
     { ten = IdleGame.Event.choresXpBuff 25
     , twentyFive = IdleGame.Event.choresMxpBuff 10
     , fifty = IdleGame.Event.choresXpBuff 25
@@ -314,14 +314,45 @@ choreMasteryCheckpoints =
     }
 
 
-getChoreMasteryMods : Game -> List Mod
-getChoreMasteryMods game =
+type alias MasteryUnlocks =
+    { perLevel : Mod
+    , checkpoints : List ( Int, Mod )
+    }
+
+
+choreMasteryUnlocks : MasteryUnlocks
+choreMasteryUnlocks =
+    { perLevel = IdleGame.Event.choresXpBuff 1
+    , checkpoints = []
+    }
+
+
+
+-- getChoreMasteryMods : Game -> List Mod
+-- getChoreMasteryMods game =
+--     case game.activeChore of
+--         Nothing ->
+--             []
+--         Just activeChore ->
+--             let
+--                 ()
+--                 mxp =
+--                     getMxp activeChore.type_ game.choresData
+--                 masteryLevel =
+--                     IdleGame.XpFormulas.skillLevel mxp
+--             in
+--             []
+--                 ++ List.repeat
+
+
+getChoreMasteryPoolMods : Game -> List Mod
+getChoreMasteryPoolMods game =
     let
         mxpPercent =
             IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
 
         checkpoints =
-            choreMasteryCheckpoints
+            choreMasteryPoolCheckpoints
     in
     if mxpPercent >= 95 then
         [ checkpoints.ten
@@ -352,4 +383,8 @@ getAllMods : Game -> List Mod
 getAllMods game =
     []
         ++ [ IdleGame.Event.devGlobalXpBuff ]
-        ++ getChoreMasteryMods game
+        ++ getChoreMasteryPoolMods game
+
+
+
+-- ++ getChoreMasteryMods game

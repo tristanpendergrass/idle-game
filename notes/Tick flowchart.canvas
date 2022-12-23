@@ -1,0 +1,25 @@
+{
+	"nodes":[
+		{"id":"11671851f12a9f34","x":-772,"y":-371,"width":338,"height":60,"type":"text","text":"handleAnimationFrame()"},
+		{"id":"b5f66dced765df06","x":-772,"y":-291,"width":338,"height":60,"type":"text","text":"gameState indicates a tick should happen"},
+		{"id":"1b65c7fdb3da7a44","x":-772,"y":-211,"width":338,"height":60,"type":"text","text":"Bring game up to date with Game.tick()"},
+		{"id":"3ea5f5a6c8a93b36","x":-76,"y":654,"width":250,"height":60,"type":"text","text":""},
+		{"id":"1c8711be1862db30","x":214,"y":-281,"width":272,"height":166,"color":"6","type":"text","text":"Game"},
+		{"id":"28b6dafa92c8fc27","x":-224,"y":-291,"width":250,"height":60,"type":"text","text":"Calculate mods from game"},
+		{"id":"8b099a7ea3bb07c0","x":219,"y":-672,"width":250,"height":60,"type":"text","text":"Modified event: Gain Mxp"},
+		{"id":"846681576587b176","x":236,"y":-560,"width":250,"height":60,"type":"text","text":"Modified event: Gain Xp"},
+		{"id":"976bb397ac1b7853","x":-147,"y":-530,"width":197,"height":60,"type":"text","text":"Event: Gain Xp"},
+		{"id":"b6e83c0abdb1c47b","x":-173,"y":-642,"width":250,"height":60,"type":"text","text":"Event: Gain Mxp"},
+		{"id":"a4cb92bfb1e4c5a6","x":-772,"y":-7,"width":338,"height":60,"type":"text","text":"Send Save msg to backend"},
+		{"id":"cae892946a061660","x":-720,"y":-110,"width":250,"height":60,"type":"text","text":"Update "}
+	],
+	"edges":[
+		{"id":"d981dcc31919b56e","fromNode":"11671851f12a9f34","fromSide":"bottom","toNode":"b5f66dced765df06","toSide":"top"},
+		{"id":"2bd67261e98bf949","fromNode":"b5f66dced765df06","fromSide":"bottom","toNode":"1b65c7fdb3da7a44","toSide":"top"},
+		{"id":"adc78ddcfa5796e9","fromNode":"1c8711be1862db30","fromSide":"left","toNode":"28b6dafa92c8fc27","toSide":"right"},
+		{"id":"cc5e24602b7cb78c","fromNode":"b6e83c0abdb1c47b","fromSide":"right","toNode":"8b099a7ea3bb07c0","toSide":"left"},
+		{"id":"38d085095cba7cf5","fromNode":"976bb397ac1b7853","fromSide":"right","toNode":"846681576587b176","toSide":"left"},
+		{"id":"9ff1d7b9f0c16208","fromNode":"28b6dafa92c8fc27","fromSide":"top","toNode":"846681576587b176","toSide":"bottom"},
+		{"id":"f82044008ebf30ab","fromNode":"28b6dafa92c8fc27","fromSide":"top","toNode":"8b099a7ea3bb07c0","toSide":"bottom"}
+	]
+}
