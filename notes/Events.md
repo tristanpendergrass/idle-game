@@ -143,3 +143,46 @@ xpJuicerMod =
 			GainResource _ amount ->
 				
 ```
+
+# Branching probability
+One situation that the design of our mod system has to accommodate is when one random effect leads to another. A mod must be able to say:
+* When a given effect happens, there's an X% chance of something else happening
+* When that other thing happens there's a Y% chance of some further thing happening
+* Ad infinitum
+
+Currently we account for probability in this way:
+```
+type Effects
+    = Determinate { effects : List Effect }
+    | Indeterminate { effects : List Effect, probability : Float, failEffects : List Effect }
+```
+
+Forget about mods for second, how do we represent the Effects of an action that works the following way:
+* Attempt to smelt some ore
+	* 50% chance of failure, deterministic loss of 1 ore
+	* 50% chance of success, deterministic gain of 1 ingot, loss of 1 ore
+		* 50% chance of gold due to gaining ingot
+			* 50% chance of ruby due to gaining gold
+
+```
+Effects =
+	List (Float, Effects)
+
+gainWood =
+	[ (1.0, GainResource 1 Wood)
+	]
+
+smeltIngot =
+	[ (0.5, GainResource -1 Ore)
+	, (0.5, [ GainResource -1 Ore, GainResource 1 Ingot, GainXp 10 Smelting ])
+	]
+
+buffedSmeltIngot =
+	[ (0.5, GainResource -1 Ore)
+	, (0.5, [ GainResource -1 Ore, ...,
+		[ (0.1, [ GainGold 1 ])
+		]
+		])
+	]
+
+```

@@ -1,10 +1,11 @@
 module IdleGame.Game exposing (..)
 
-import IdleGame.Event exposing (Event, Mod)
+import IdleGame.Event3 exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
+import Random
 import Set exposing (Set)
 import Tuple
 
@@ -207,8 +208,8 @@ tick game =
 
                         newEvents =
                             []
-                                ++ List.repeat completions (IdleGame.Event.gainChoresXp chore.xp)
-                                ++ List.repeat completions (IdleGame.Event.gainChoresMxp mxpGained chore.type_)
+                                ++ List.repeat completions (gainChoresXp chore.xp)
+                                ++ List.repeat completions (gainChoresMxp mxpGained chore.type_)
                     in
                     ( activeChore
                     , newEvents
@@ -218,24 +219,53 @@ tick game =
             getAllMods game
 
         modifiedEvents =
-            List.map (IdleGame.Event.modifyEvent mods) events
+            List.map (modifyEvent mods) events
     in
     game
         |> setActiveChore newActiveChore
-        |> (\g -> List.foldl applyEvent g modifiedEvents)
+        -- |> (\g -> List.foldl applyEvent g modifiedEvents)
+        |> Debug.todo "Implement apply event with random generator"
 
 
-applyEvent : Event -> Game -> Game
-applyEvent event game =
-    case event.type_ of
-        IdleGame.Event.ChoresXp amount ->
-            { game | choresXp = game.choresXp + amount }
+successGenerator : Float -> Random.Generator Bool
+successGenerator probability =
+    Random.float 0 1
+        |> Random.map
+            (\num ->
+                num <= probability
+            )
 
-        IdleGame.Event.ChoresMxp amount choreType ->
-            { game
-                | choresMxp = game.choresMxp + (amount / 2)
-                , choresData = incrementChoreMxp amount choreType game.choresData
-            }
+
+applyEffect : Effect -> Game -> Game
+applyEffect effect game =
+    Debug.todo "Implement"
+
+
+applyEvent : ModdedEvent -> Game -> Random.Generator Game
+applyEvent (ModdedEvent eventData) game =
+    -- case eventData.effects of
+    --     Determinate { effects } ->
+    --         Random.constant <| List.foldl applyEffect game effects
+    --     Indeterminate { effects, probability, failEffects } ->
+    --         successGenerator probability
+    --             |> Random.map
+    --                 (\isSuccess ->
+    --                     if isSuccess then
+    --                         List.foldl applyEffect game effects
+    --                     else
+    --                         List.foldl applyEffect game failEffects
+    --                 )
+    Debug.todo ""
+
+
+gainChoresXp : Float -> Event
+gainChoresXp =
+    Debug.todo "Implement"
+
+
+gainChoresMxp : Float -> ChoreType -> Event
+gainChoresMxp =
+    Debug.todo "Implement"
 
 
 
@@ -307,10 +337,10 @@ type alias MasteryPoolCheckpoints =
 
 choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
 choreMasteryPoolCheckpoints =
-    { ten = IdleGame.Event.choresXpBuff 25
-    , twentyFive = IdleGame.Event.choresMxpBuff 10
-    , fifty = IdleGame.Event.choresXpBuff 25
-    , ninetyFive = IdleGame.Event.choresMxpBuff 10
+    { ten = choresXpBuff 0.25
+    , twentyFive = choresMxpBuff 0.1
+    , fifty = choresXpBuff 0.25
+    , ninetyFive = choresMxpBuff 0.1
     }
 
 
@@ -320,14 +350,12 @@ type alias MasteryUnlocks =
     }
 
 
-choreMasteryUnlocks : MasteryUnlocks
-choreMasteryUnlocks =
-    { perLevel = IdleGame.Event.choresXpBuff 1
-    , checkpoints = []
-    }
 
-
-
+-- choreMasteryUnlocks : MasteryUnlocks
+-- choreMasteryUnlocks =
+--     { perLevel = IdleGame.Event.choresXpBuff 1
+--     , checkpoints = []
+--     }
 -- getChoreMasteryMods : Game -> List Mod
 -- getChoreMasteryMods game =
 --     case game.activeChore of
@@ -379,10 +407,71 @@ getChoreMasteryPoolMods game =
         []
 
 
+xpTransformer : Float -> Transformer
+xpTransformer buff effect =
+    -- case effect.type_ of
+    --     GainXp { base, multiplier } skill ->
+    --         effect
+    --             |> setEffectType (GainXp { base = base, multiplier = multiplier + buff } skill)
+    --             |> ChangeEffect
+    --     _ ->
+    --         NoChange
+    Debug.todo ""
+
+
+mxpTransformer : Float -> Transformer
+mxpTransformer buff effect =
+    -- case effect.type_ of
+    --     GainChoreMxp { base, multiplier } chore ->
+    --         effect
+    --             |> setEffectType (GainChoreMxp { base = base, multiplier = multiplier + buff } chore)
+    --             |> Change
+    --     _ ->
+    --         NoChange
+    Debug.todo ""
+
+
+xpModLabel : Float -> String
+xpModLabel multiplier =
+    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% XP"
+
+
+mxpModLabel : Float -> String
+mxpModLabel multiplier =
+    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% Mastery XP"
+
+
+devGlobalXpBuff : Mod
+devGlobalXpBuff =
+    { tags = [ Xp ]
+    , label = xpModLabel 0.05
+    , transformer = xpTransformer 0.05
+    , source = AdminCrimes
+    }
+
+
+choresXpBuff : Float -> Mod
+choresXpBuff buff =
+    { tags = [ Chores, Xp ]
+    , label = xpModLabel buff
+    , transformer = xpTransformer buff
+    , source = AdminCrimes
+    }
+
+
+choresMxpBuff : Float -> Mod
+choresMxpBuff buff =
+    { tags = []
+    , label = mxpModLabel buff
+    , transformer = mxpTransformer buff
+    , source = AdminCrimes
+    }
+
+
 getAllMods : Game -> List Mod
 getAllMods game =
     []
-        ++ [ IdleGame.Event.devGlobalXpBuff ]
+        ++ [ devGlobalXpBuff ]
         ++ getChoreMasteryPoolMods game
 
 
