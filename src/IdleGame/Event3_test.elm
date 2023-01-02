@@ -7,12 +7,12 @@ import Test exposing (..)
 
 withModsEquals : List Mod -> ModdedEvent -> Event -> Expectation
 withModsEquals mods moddedEvent event =
-    Expect.equal moddedEvent (modifyEvent mods NoFilter event)
+    Expect.equal moddedEvent (applyModsToEvent mods event)
 
 
 withMods : List Mod -> Event -> ModdedEvent
 withMods mods event =
-    modifyEvent mods NoFilter event
+    applyModsToEvent mods event
 
 
 mockEffect : EffectType -> Effect
@@ -126,9 +126,19 @@ smeltOre successProbability =
         }
 
 
-withTag : Tag -> { a | tags : List Tag } -> { a | tags : List Tag }
-withTag tag obj =
-    { obj | tags = tag :: obj.tags }
+eventWithTags : List Tag -> Event -> Event
+eventWithTags tags (Event eventData) =
+    Event { eventData | tags = List.concat [ tags, eventData.tags ] }
+
+
+moddedEventWithTags : List Tag -> ModdedEvent -> ModdedEvent
+moddedEventWithTags tags (ModdedEvent eventData) =
+    ModdedEvent { eventData | tags = List.concat [ tags, eventData.tags ] }
+
+
+scopeModToTags : List Tag -> Mod -> Mod
+scopeModToTags tags mod =
+    { mod | transformer = scopeTransformerToTags tags mod.transformer }
 
 
 suite : Test
@@ -195,16 +205,27 @@ suite =
                                 }
                             ]
                     }
-
-        -- , test "mods don't apply if their tags don't match event" <|
-        --     \_ ->
-        --         testMods
-        --             { mods =
-        --                 [ mockMod (xpIncreaser 0.1)
-        --                     |> withTag Chores
-        --                 ]
-        --             , event = mockEvent [ getChoresXp 10 ]
-        --             , moddedEvent =
-        --                 mockModdedEvent [ GainXp { base = 10, multiplier = 1 } ChoresSkill ]
-        --             }
+        , test "scopeTransformerToTags prevents a mod working if it has a tag that doesn't match the event" <|
+            \_ ->
+                testMods
+                    { mods =
+                        [ mockMod (xpIncreaser 0.1)
+                            |> scopeModToTags [ Chores ]
+                        ]
+                    , event = mockEvent [ getChoresXp 10 ]
+                    , moddedEvent =
+                        mockModdedEvent [ GainXp { base = 10, multiplier = 1 } ChoresSkill ]
+                    }
+        , test "scopeTransformerToTags allows a mod to work if it has a tags that match the event" <|
+            \_ ->
+                testMods
+                    { mods =
+                        [ mockMod (xpIncreaser 0.1)
+                            |> scopeModToTags [ Chores ]
+                        ]
+                    , event = mockEvent [ getChoresXp 10 ] |> eventWithTags [ Chores ]
+                    , moddedEvent =
+                        mockModdedEvent [ GainXp { base = 10, multiplier = 1 } ChoresSkill ]
+                            |> moddedEventWithTags [ Chores ]
+                    }
         ]

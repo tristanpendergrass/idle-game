@@ -235,11 +235,8 @@ tick game =
         mods =
             getAllMods game
 
-        filter =
-            Debug.todo ""
-
         modifiedEvents =
-            List.map (modifyEvent mods filter) events
+            List.map (applyModsToEvent mods) events
 
         effects : List Effect
         effects =

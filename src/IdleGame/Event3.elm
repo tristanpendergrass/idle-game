@@ -102,6 +102,24 @@ type alias SimpleTransformer =
     EffectType -> EffectType
 
 
+effectHasTags : List Tag -> Effect -> Bool
+effectHasTags mandatoryTags (Effect { tags }) =
+    List.all
+        (\tag ->
+            List.member tag tags
+        )
+        mandatoryTags
+
+
+scopeTransformerToTags : List Tag -> Transformer -> Transformer
+scopeTransformerToTags tags transformer effect =
+    if effectHasTags tags effect then
+        transformer effect
+
+    else
+        NoChange
+
+
 includeVariableEffects : Transformer -> Transformer
 includeVariableEffects transformer effect =
     case getType effect of
@@ -111,7 +129,7 @@ includeVariableEffects transformer effect =
                     let
                         newEffects : List Effect
                         newEffects =
-                            List.concatMap (modifyEffect 0 [ transformer ]) successEffects
+                            List.concatMap (applyTransformersToEffect 0 [ transformer ]) successEffects
                     in
                     ( True, newEffects )
 
@@ -119,7 +137,7 @@ includeVariableEffects transformer effect =
                     let
                         newEffects : List Effect
                         newEffects =
-                            List.concatMap (modifyEffect 0 [ transformer ]) failureEffects
+                            List.concatMap (applyTransformersToEffect 0 [ transformer ]) failureEffects
                     in
                     ( True, newEffects )
 
@@ -149,8 +167,8 @@ useSimpleTransformer transformFn effect =
     ChangeEffect newEffect
 
 
-applyModToEffect : Transformer -> ( Effect, List Effect ) -> ( Effect, List Effect )
-applyModToEffect transformer ( effectAccum, furtherEffectsAccum ) =
+transformEffect : Transformer -> ( Effect, List Effect ) -> ( Effect, List Effect )
+transformEffect transformer ( effectAccum, furtherEffectsAccum ) =
     case transformer effectAccum of
         NoChange ->
             ( effectAccum, furtherEffectsAccum )
@@ -162,51 +180,33 @@ applyModToEffect transformer ( effectAccum, furtherEffectsAccum ) =
             ( changedEffect, furtherEffectsAccum ++ changedFurtherEffects )
 
 
-modifyEffect : Int -> List Transformer -> Effect -> List Effect
-modifyEffect depth transformers effect =
+applyTransformersToEffect : Int -> List Transformer -> Effect -> List Effect
+applyTransformersToEffect depth transformers effect =
     let
-        result : ( Effect, List Effect )
-        result =
-            List.foldl applyModToEffect ( effect, [] ) transformers
-
         ( newEffect, furtherEffects ) =
-            result
+            List.foldl
+                (\transformer accum -> transformEffect transformer accum)
+                ( effect, [] )
+                transformers
     in
     newEffect
         -- The depth < 20 is an arbitrary limit that shouldn't usually be reached. It should be rare for a "further effect" to trigger
         -- a mod that gives another further effect and have that repeat more than 20 times, if so the player just doesn't get the benefit -- :)
         :: (if depth < 20 then
-                List.concatMap (modifyEffect (depth + 1) transformers) furtherEffects
+                List.concatMap (applyTransformersToEffect (depth + 1) transformers) furtherEffects
 
             else
-                [ newEffect ]
+                []
            )
 
 
-type ModFilter
-    = NoFilter
-    | FilterToTags (List Tag)
-
-
-filterModsToTags : List Tag -> List Mod -> List Mod
-filterModsToTags =
-    Debug.todo ""
-
-
-modifyEvent : List Mod -> ModFilter -> Event -> ModdedEvent
-modifyEvent mods modFilter (Event eventData) =
+applyModsToEvent : List Mod -> Event -> ModdedEvent
+applyModsToEvent mods (Event eventData) =
     let
-        -- filteredMods =
-        --     case modFilter of
-        --         NoFilter ->
-        --             mods
-        --         FilterToTags tags ->
-        --             filterModsToTags tags mods
         transformers =
             List.map .transformer mods
-
-        newEffects : List Effect
-        newEffects =
-            List.concatMap (modifyEffect 0 transformers) eventData.effects
     in
-    ModdedEvent { eventData | effects = newEffects }
+    ModdedEvent
+        { eventData
+            | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
+        }
