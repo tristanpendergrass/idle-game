@@ -3,6 +3,7 @@ module Backend exposing (app)
 import Dict
 import IdleGame.Game
 import Lamdera exposing (ClientId, SessionId)
+import Random
 import Task
 import Time
 import Types exposing (..)
@@ -10,7 +11,12 @@ import Types exposing (..)
 
 init : ( BackendModel, Cmd BackendMsg )
 init =
-    ( { sessionGameMap = Dict.empty }, Cmd.none )
+    ( { sessionGameMap = Dict.empty, seed = Random.initialSeed 0 }, Cmd.none )
+
+
+setSeed : Random.Seed -> BackendModel -> BackendModel
+setSeed newSeed model =
+    { model | seed = newSeed }
 
 
 update : BackendMsg -> BackendModel -> ( BackendModel, Cmd BackendMsg )
@@ -21,12 +27,18 @@ update msg model =
 
         HandleConnectWithTime sessionId clientId now ->
             let
+                ( seedForGame, newSeed ) =
+                    Random.step Random.independentSeed model.seed
+
                 gameState : GameState
                 gameState =
                     Dict.get sessionId model.sessionGameMap
-                        |> Maybe.withDefault { currentTime = now, lastTick = now, game = IdleGame.Game.create }
+                        |> Maybe.withDefault { currentTime = now, lastTick = now, game = IdleGame.Game.create seedForGame }
             in
-            ( model, Lamdera.sendToFrontend clientId (InitializeGame gameState) )
+            ( model
+                |> setSeed newSeed
+            , Lamdera.sendToFrontend clientId (InitializeGame gameState)
+            )
 
         HandleConnect sessionId clientId ->
             ( model, Task.perform (HandleConnectWithTime sessionId clientId) Time.now )

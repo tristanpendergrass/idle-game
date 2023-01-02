@@ -35,8 +35,7 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -102,7 +101,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Events.md",
+                "file": "Tick flowchart.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Events.md",
+                "file": "Tick flowchart.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -142,7 +141,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Events.md"
+                "file": "Tick flowchart.canvas"
               }
             }
           }
@@ -163,8 +162,9 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "710ceb1c7709e519",
+  "active": "ff3326ff9d1b034d",
   "lastOpenFiles": [
+    "Events.md",
     "Tick flowchart.canvas",
     "Mastery Unlocks.md",
     "Mastery Checkpoints.md"

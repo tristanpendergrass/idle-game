@@ -5,8 +5,9 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
-import Random
+import Random exposing (Generator)
 import Set exposing (Set)
+import Svg.Attributes exposing (in_)
 import Tuple
 
 
@@ -15,10 +16,13 @@ import Tuple
 
 
 type alias Game =
-    { choresXp : Float
+    { seed : Random.Seed
+    , choresXp : Float
     , choresMxp : Float
     , activeChore : Maybe ( ChoreType, IdleGame.Timer.Timer )
     , choresData : ChoresData
+    , gold : Int
+    , manure : Int
     }
 
 
@@ -33,9 +37,10 @@ type alias ChoreData =
     { mxp : Float }
 
 
-create : Game
-create =
-    { choresXp = 0
+create : Random.Seed -> Game
+create seed =
+    { seed = seed
+    , choresXp = 0
     , choresMxp = 0
     , activeChore = Nothing
     , choresData =
@@ -43,6 +48,8 @@ create =
         , cleanBigBubba = { mxp = 0 }
         , gatherFirewood = { mxp = 0 }
         }
+    , gold = 0
+    , manure = 0
     }
 
 
@@ -86,6 +93,7 @@ getChoreListItems { choresXp } =
 
 
 type alias Chore =
+    -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
     { type_ : ChoreType
     , title : String
     , rewardText : String
@@ -115,6 +123,25 @@ getChore type_ =
             , title = "Gather Firewood"
             , rewardText = "N/A"
             , xp = 15.0
+            }
+
+
+updateChoreData : (ChoreData -> ChoreData) -> ChoreType -> ChoresData -> ChoresData
+updateChoreData fn type_ choresData =
+    case type_ of
+        CleanStables ->
+            { choresData
+                | cleanStables = fn choresData.cleanStables
+            }
+
+        CleanBigBubba ->
+            { choresData
+                | cleanStables = fn choresData.cleanBigBubba
+            }
+
+        GatherFirewood ->
+            { choresData
+                | cleanStables = fn choresData.gatherFirewood
             }
 
 
@@ -173,12 +200,6 @@ toggleActiveChore toggleType game =
     { game | activeChore = newActiveChore }
 
 
-
--- skillLevelFromXp : Float -> Int
--- skillLevelFromXp xp =
--- Handle ticks
-
-
 setActiveChore : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
 setActiveChore activeChore g =
     { g | activeChore = activeChore }
@@ -200,16 +221,12 @@ tick game =
                         chore =
                             getChore choreType
 
-                        mxpGained =
-                            getMxp chore.type_ game.choresData
-
                         activeChore =
                             Just ( choreType, newTimer )
 
                         newEvents =
                             []
-                                ++ List.repeat completions (gainChoresXp chore.xp)
-                                ++ List.repeat completions (gainChoresMxp mxpGained chore.type_)
+                                ++ List.repeat completions (triggerChore chore)
                     in
                     ( activeChore
                     , newEvents
@@ -218,54 +235,148 @@ tick game =
         mods =
             getAllMods game
 
+        filter =
+            Debug.todo ""
+
         modifiedEvents =
-            List.map (modifyEvent mods) events
+            List.map (modifyEvent mods filter) events
+
+        effects : List Effect
+        effects =
+            modifiedEvents
+                |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
+
+        gameGenerator =
+            game
+                |> setActiveChore newActiveChore
+                |> (\g -> List.foldl effectReducer (Random.constant g) effects)
+
+        ( newGame, newSeed ) =
+            Random.step gameGenerator game.seed
     in
-    game
-        |> setActiveChore newActiveChore
-        -- |> (\g -> List.foldl applyEvent g modifiedEvents)
-        |> Debug.todo "Implement apply event with random generator"
+    { newGame | seed = newSeed }
 
 
-successGenerator : Float -> Random.Generator Bool
+effectReducer : Effect -> Generator Game -> Generator Game
+effectReducer effect =
+    Random.andThen (applyEffect effect)
+
+
+successGenerator : Float -> Generator Bool
 successGenerator probability =
     Random.float 0 1
         |> Random.map
             (\num ->
-                num <= probability
+                num < probability
             )
 
 
-applyEffect : Effect -> Game -> Game
+intGenerator : { base : Int, doublingChance : Float } -> Generator Int
+intGenerator { base, doublingChance } =
+    successGenerator doublingChance
+        |> Random.map
+            (\doubled ->
+                if doubled then
+                    base * 2
+
+                else
+                    base
+            )
+
+
+floatGenerator : { base : Float, multiplier : Float } -> Generator Float
+floatGenerator { base, multiplier } =
+    Random.constant <| base * multiplier
+
+
+applyEffect : Effect -> Game -> Generator Game
 applyEffect effect game =
-    Debug.todo "Implement"
+    case getType effect of
+        VariableSuccess { successProbability, successEffects, failureEffects } ->
+            successGenerator successProbability
+                |> Random.andThen
+                    (\succeeded ->
+                        let
+                            chosenEffects =
+                                if succeeded then
+                                    successEffects
+
+                                else
+                                    failureEffects
+                        in
+                        List.foldl effectReducer (Random.constant game) chosenEffects
+                    )
+
+        GainResource quantity resource ->
+            intGenerator quantity
+                |> Random.map (\amount -> addResource resource amount game)
+
+        GainXp quantity skill ->
+            floatGenerator quantity
+                |> Random.map (\amount -> addXp skill amount game)
+
+        GainChoreMxp { multiplier } choreType ->
+            let
+                base =
+                    getMxp choreType game.choresData
+            in
+            Random.constant <| addMxp choreType (base * multiplier) game
+
+        GainGold quantity ->
+            intGenerator quantity
+                |> Random.map (\amount -> addGold amount game)
+
+
+addResource : Resource -> Int -> Game -> Game
+addResource resource amount game =
+    case resource of
+        Manure ->
+            { game | manure = game.manure + amount }
+
+        _ ->
+            game
+
+
+addXp : Skill -> Float -> Game -> Game
+addXp resource amount game =
+    case resource of
+        ChoresSkill ->
+            { game | choresXp = game.choresXp + amount }
+
+
+addMxp : ChoreType -> Float -> Game -> Game
+addMxp chore amount game =
+    let
+        fn : ChoreData -> ChoreData
+        fn { mxp } =
+            { mxp = mxp + amount }
+    in
+    { game | choresData = updateChoreData fn chore game.choresData }
+
+
+addGold : Int -> Game -> Game
+addGold amount game =
+    { game | gold = game.gold + amount }
 
 
 applyEvent : ModdedEvent -> Game -> Random.Generator Game
 applyEvent (ModdedEvent eventData) game =
-    -- case eventData.effects of
-    --     Determinate { effects } ->
-    --         Random.constant <| List.foldl applyEffect game effects
-    --     Indeterminate { effects, probability, failEffects } ->
-    --         successGenerator probability
-    --             |> Random.map
-    --                 (\isSuccess ->
-    --                     if isSuccess then
-    --                         List.foldl applyEffect game effects
-    --                     else
-    --                         List.foldl applyEffect game failEffects
-    --                 )
-    Debug.todo ""
+    List.foldl
+        (applyEffect >> Random.andThen)
+        (Random.constant game)
+        eventData.effects
 
 
-gainChoresXp : Float -> Event
-gainChoresXp =
-    Debug.todo "Implement"
-
-
-gainChoresMxp : Float -> ChoreType -> Event
-gainChoresMxp =
-    Debug.todo "Implement"
+triggerChore : Chore -> Event
+triggerChore { xp, type_ } =
+    Event
+        { effects =
+            [ Effect { type_ = GainXp { base = xp, multiplier = 1.0 } ChoresSkill, tags = [ Xp ] }
+            , Effect { type_ = GainResource { base = 1, doublingChance = 0 } Manure, tags = [] }
+            , Effect { type_ = GainChoreMxp { multiplier = 1.0 } type_, tags = [ Mxp ] }
+            ]
+        , tags = [ Chores ]
+        }
 
 
 

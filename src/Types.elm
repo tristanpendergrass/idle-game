@@ -10,6 +10,7 @@ import IdleGame.GameTypes
 import IdleGame.Tabs exposing (Tabs)
 import IdleGame.Timer exposing (Timer)
 import Lamdera exposing (ClientId, SessionId)
+import Random
 import Time exposing (Posix)
 import Url exposing (Url)
 
@@ -46,6 +47,7 @@ type alias SessionGameMap =
 
 type alias BackendModel =
     { sessionGameMap : SessionGameMap
+    , seed : Random.Seed
     }
 
 

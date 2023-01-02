@@ -7,12 +7,12 @@ import Test exposing (..)
 
 withModsEquals : List Mod -> ModdedEvent -> Event -> Expectation
 withModsEquals mods moddedEvent event =
-    Expect.equal moddedEvent (modifyEvent mods event)
+    Expect.equal moddedEvent (modifyEvent mods NoFilter event)
 
 
 withMods : List Mod -> Event -> ModdedEvent
 withMods mods event =
-    modifyEvent mods event
+    modifyEvent mods NoFilter event
 
 
 mockEffect : EffectType -> Effect
@@ -58,11 +58,33 @@ xpIncreaser buff =
         )
 
 
+probabilityIncreaser : Float -> Transformer
+probabilityIncreaser amount =
+    useSimpleTransformer
+        (\effectType ->
+            case effectType of
+                VariableSuccess { successProbability, successEffects, failureEffects } ->
+                    VariableSuccess
+                        { successProbability = successProbability + amount
+                        , successEffects = successEffects
+                        , failureEffects = failureEffects
+                        }
+
+                _ ->
+                    effectType
+        )
+
+
 manureGiver : Transformer
 manureGiver effect =
+    -- Grants 1 Manure every time any amount of a resource other than manure is gained
     case getType effect of
-        GainXp _ _ ->
-            ChangeAndAddEffects effect [ mockEffect (getResource 1 Manure) ]
+        GainResource { base } resource ->
+            if resource == Manure || base <= 0 then
+                NoChange
+
+            else
+                ChangeAndAddEffects effect [ mockEffect (getResource 1 Manure) ]
 
         _ ->
             NoChange
@@ -73,6 +95,40 @@ testMods { mods, event, moddedEvent } =
     event
         |> withMods mods
         |> equal moddedEvent
+
+
+getGold : Int -> EffectType
+getGold amount =
+    GainGold { base = amount, doublingChance = 0 }
+
+
+getResource : Int -> Resource -> EffectType
+getResource amount resource =
+    GainResource { base = amount, doublingChance = 0.0 } resource
+
+
+getChoresXp : Float -> EffectType
+getChoresXp amount =
+    GainXp { base = amount, multiplier = 1.0 } ChoresSkill
+
+
+smeltOre : Float -> EffectType
+smeltOre successProbability =
+    VariableSuccess
+        { successProbability = successProbability
+        , successEffects =
+            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+            , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+            ]
+        , failureEffects =
+            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+            ]
+        }
+
+
+withTag : Tag -> { a | tags : List Tag } -> { a | tags : List Tag }
+withTag tag obj =
+    { obj | tags = tag :: obj.tags }
 
 
 suite : Test
@@ -105,11 +161,50 @@ suite =
             \_ ->
                 testMods
                     { mods = [ mockMod manureGiver ]
-                    , event = mockEvent [ getChoresXp 10 ]
+                    , event = mockEvent [ getResource 1 Ore ]
                     , moddedEvent =
                         mockModdedEvent
-                            [ getChoresXp 10
+                            [ getResource 1 Ore
                             , getResource 1 Manure
                             ]
                     }
+        , test "applies a mod that changes a probability" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod (probabilityIncreaser 0.1) ]
+                    , event = mockEvent [ smeltOre 0.5 ]
+                    , moddedEvent = mockModdedEvent [ smeltOre 0.6 ]
+                    }
+        , test "includeVariableEffects causes mods to apply to sub-effects of VariableSuccess" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod (includeVariableEffects manureGiver) ]
+                    , event = mockEvent [ smeltOre 0.5 ]
+                    , moddedEvent =
+                        mockModdedEvent
+                            [ VariableSuccess
+                                { successProbability = 0.5
+                                , successEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                    ]
+                                , failureEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    ]
+                                }
+                            ]
+                    }
+
+        -- , test "mods don't apply if their tags don't match event" <|
+        --     \_ ->
+        --         testMods
+        --             { mods =
+        --                 [ mockMod (xpIncreaser 0.1)
+        --                     |> withTag Chores
+        --                 ]
+        --             , event = mockEvent [ getChoresXp 10 ]
+        --             , moddedEvent =
+        --                 mockModdedEvent [ GainXp { base = 10, multiplier = 1 } ChoresSkill ]
+        --             }
         ]

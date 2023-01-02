@@ -4,12 +4,11 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event exposing (Event, Mod)
+import IdleGame.Event3 exposing (Event, Mod)
 import IdleGame.Game exposing (Game)
 import IdleGame.Timer
 import IdleGame.Views.Placeholder
 import IdleGame.XpFormulas
-import Round
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -116,8 +115,11 @@ choreHeight =
 
 
 renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
-renderChore game { type_, title, xp, rewardText } =
+renderChore game chore =
     let
+        { type_, title, xp, rewardText } =
+            chore
+
         handleClick =
             ToggleActiveChore type_
 
@@ -136,11 +138,12 @@ renderChore game { type_, title, xp, rewardText } =
         allMods =
             IdleGame.Game.getAllMods game
 
-        onHarvestXp =
-            IdleGame.Event.gainChoresXp xp
+        onHarvest : Event
+        onHarvest =
+            IdleGame.Game.triggerChore chore
 
         xpMods =
-            List.filter (IdleGame.Event.modAppliesToEvent onHarvestXp) allMods
+            List.filter (IdleGame.Event.modAppliesToEvent onHarvestXp) (Debug.todo "")
 
         modifiedHarvestXpEvent =
             IdleGame.Event.modifyEvent xpMods onHarvestXp
@@ -163,7 +166,7 @@ renderChore game { type_, title, xp, rewardText } =
             IdleGame.Event.gainChoresMxp mxp type_
 
         mxpMods =
-            List.filter (IdleGame.Event.modAppliesToEvent onHarvestMxp) allMods
+            List.filter (IdleGame.Event.modAppliesToEvent onHarvestMxp) (Debug.todo "")
 
         modifiedHarvestMxpEvent =
             IdleGame.Event.modifyEvent mxpMods onHarvestMxp

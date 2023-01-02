@@ -66,7 +66,7 @@ updateGameToTime now ( oldTick, game ) =
             Time.posixToMillis now >= Time.posixToMillis nextTick
     in
     if shouldTick then
-        -- Note: be careful with the next line causing stack overflows. It is written in a particular way to allow Tail-call elimination and should stay that way.
+        -- Note: be careful with the next line causing a stack overflow. It is written in a particular way to allow Tail-call elimination and should stay that way.
         -- Additional reading: https://jfmengels.net/tail-call-optimization/
         updateGameToTime now ( nextTick, IdleGame.Game.tick game )
 
