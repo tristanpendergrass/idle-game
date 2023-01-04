@@ -114,6 +114,20 @@ choreHeight =
     "h-[324px]"
 
 
+renderChoreReward : Html FrontendMsg
+renderChoreReward =
+    div [] [ text <| "Why hello there" ]
+
+
+
+-- , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
+--     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
+--     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayXp) ]
+--     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
+--     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayMxp) ]
+--     ]
+
+
 renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
 renderChore game chore =
     let
@@ -138,46 +152,13 @@ renderChore game chore =
         allMods =
             IdleGame.Game.getAllMods game
 
-        onHarvest : Event
+        onHarvest : IdleGame.Event3.ModdedEvent
         onHarvest =
             IdleGame.Game.triggerChore chore
-
-        xpMods =
-            List.filter (IdleGame.Event.modAppliesToEvent onHarvestXp) (Debug.todo "")
-
-        modifiedHarvestXpEvent =
-            IdleGame.Event.modifyEvent xpMods onHarvestXp
-
-        displayXp =
-            case modifiedHarvestXpEvent.type_ of
-                IdleGame.Event.ChoresXp amount ->
-                    amount
-
-                _ ->
-                    0.0
+                |> IdleGame.Event3.applyModsToEvent allMods
 
         mastery =
             IdleGame.Game.getMastery type_ game.choresData
-
-        mxp =
-            IdleGame.Game.getMxp type_ game.choresData
-
-        onHarvestMxp =
-            IdleGame.Event.gainChoresMxp mxp type_
-
-        mxpMods =
-            List.filter (IdleGame.Event.modAppliesToEvent onHarvestMxp) (Debug.todo "")
-
-        modifiedHarvestMxpEvent =
-            IdleGame.Event.modifyEvent mxpMods onHarvestMxp
-
-        displayMxp =
-            case modifiedHarvestMxpEvent.type_ of
-                IdleGame.Event.ChoresMxp amount _ ->
-                    amount
-
-                _ ->
-                    0.0
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
@@ -194,12 +175,7 @@ renderChore game chore =
                 , div [ class "" ] [ text rewardText ]
 
                 -- Chore XP rewards
-                , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-                    [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayXp) ]
-                    , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
-                    , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayMxp) ]
-                    ]
+                , renderChoreReward
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.XpFormulas.skillLevel mastery) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]

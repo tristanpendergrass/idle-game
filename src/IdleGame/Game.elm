@@ -317,7 +317,10 @@ applyEffect effect game =
                 base =
                     getMxp choreType game.choresData
             in
-            Random.constant <| addMxp choreType (base * multiplier) game
+            game
+                |> addMxp choreType (base * multiplier)
+                |> addMasteryPoolXp (base * multiplier / 2)
+                |> Random.constant
 
         GainGold quantity ->
             intGenerator quantity
@@ -349,6 +352,11 @@ addMxp chore amount game =
             { mxp = mxp + amount }
     in
     { game | choresData = updateChoreData fn chore game.choresData }
+
+
+addMasteryPoolXp : Float -> Game -> Game
+addMasteryPoolXp amount game =
+    { game | choresMxp = game.choresMxp + amount }
 
 
 addGold : Int -> Game -> Game
@@ -517,26 +525,26 @@ getChoreMasteryPoolMods game =
 
 xpTransformer : Float -> Transformer
 xpTransformer buff effect =
-    -- case effect.type_ of
-    --     GainXp { base, multiplier } skill ->
-    --         effect
-    --             |> setEffectType (GainXp { base = base, multiplier = multiplier + buff } skill)
-    --             |> ChangeEffect
-    --     _ ->
-    --         NoChange
-    Debug.todo ""
+    case getType effect of
+        GainXp { base, multiplier } skill ->
+            effect
+                |> setType (GainXp { base = base, multiplier = multiplier + buff } skill)
+                |> ChangeEffect
+
+        _ ->
+            NoChange
 
 
 mxpTransformer : Float -> Transformer
 mxpTransformer buff effect =
-    -- case effect.type_ of
-    --     GainChoreMxp { base, multiplier } chore ->
-    --         effect
-    --             |> setEffectType (GainChoreMxp { base = base, multiplier = multiplier + buff } chore)
-    --             |> Change
-    --     _ ->
-    --         NoChange
-    Debug.todo ""
+    case getType effect of
+        GainChoreMxp { multiplier } chore ->
+            effect
+                |> setType (GainChoreMxp { multiplier = multiplier + buff } chore)
+                |> ChangeEffect
+
+        _ ->
+            NoChange
 
 
 xpModLabel : Float -> String
