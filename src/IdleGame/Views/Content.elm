@@ -4,7 +4,6 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event exposing (gainChoresMxp)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
@@ -220,7 +219,7 @@ renderChore game chore =
         , div [ class "relative card-body" ]
             [ div [ class "t-column h-full z-20" ]
                 -- Chore title
-                [ h2 [ class "card-title text-lg h-[3rem]" ] [ text title ]
+                [ h2 [ class "card-title text-lg text-center h-[3rem]" ] [ text title ]
                 , div [ class "" ] [ text rewardText ]
 
                 -- Chore XP rewards

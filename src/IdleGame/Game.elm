@@ -136,12 +136,12 @@ updateChoreData fn type_ choresData =
 
         CleanBigBubba ->
             { choresData
-                | cleanStables = fn choresData.cleanBigBubba
+                | cleanBigBubba = fn choresData.cleanBigBubba
             }
 
         GatherFirewood ->
             { choresData
-                | cleanStables = fn choresData.gatherFirewood
+                | gatherFirewood = fn choresData.gatherFirewood
             }
 
 
@@ -345,13 +345,13 @@ addXp resource amount game =
 
 
 addMxp : ChoreType -> Float -> Game -> Game
-addMxp chore amount game =
+addMxp choreType amount game =
     let
         fn : ChoreData -> ChoreData
         fn { mxp } =
             { mxp = mxp + amount }
     in
-    { game | choresData = updateChoreData fn chore game.choresData }
+    { game | choresData = updateChoreData fn choreType game.choresData }
 
 
 addMasteryPoolXp : Float -> Game -> Game

@@ -301,7 +301,7 @@ view model =
                                         IdleGame.Views.TimePasses.render timePassed timePassesData
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
-                                    |> IdleGame.Views.ModalWrapper.withBorderColor "secondary"
+                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
                                     |> IdleGame.Views.ModalWrapper.render
                                 ]
 
@@ -311,6 +311,7 @@ view model =
                                         IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
+                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
                                     |> IdleGame.Views.ModalWrapper.render
                                 ]
                        )
