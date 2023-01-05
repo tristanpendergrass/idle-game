@@ -4,11 +4,14 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event3 exposing (Event, Mod)
+import IdleGame.Event exposing (gainChoresMxp)
+import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.GameTypes
 import IdleGame.Timer
 import IdleGame.Views.Placeholder
 import IdleGame.XpFormulas
+import List.Extra
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -109,23 +112,69 @@ renderChoreListItem game item =
             renderLockedChore level
 
 
+getChoresSkillXp : Effect -> Maybe Float
+getChoresSkillXp effect =
+    case getType effect of
+        GainXp { base, multiplier } ChoresSkill ->
+            Just (base * multiplier)
+
+        _ ->
+            Nothing
+
+
+getChoreMxp : IdleGame.GameTypes.ChoreType -> IdleGame.Game.ChoresData -> Effect -> Maybe Float
+getChoreMxp choreType choresData effect =
+    case getType effect of
+        GainChoreMxp { multiplier } t ->
+            if t == choreType then
+                let
+                    base =
+                        IdleGame.Game.getMxp choreType choresData
+                in
+                Just (base * multiplier)
+
+            else
+                Nothing
+
+        _ ->
+            Nothing
+
+
+
+-- case getType effect of
+--     GainXp
+
+
 choreHeight : String
 choreHeight =
     "h-[324px]"
 
 
-renderChoreReward : Html FrontendMsg
-renderChoreReward =
-    div [] [ text <| "Why hello there" ]
+renderChoreReward : Game -> IdleGame.GameTypes.ChoreType -> ModdedEvent -> Html FrontendMsg
+renderChoreReward game choreType (ModdedEvent eventData) =
+    let
+        skillXpLabel =
+            case List.Extra.findMap getChoresSkillXp eventData.effects of
+                Just skillXp ->
+                    String.fromInt (floor skillXp)
 
+                Nothing ->
+                    "N/A"
 
+        mxpLabel =
+            case List.Extra.findMap (getChoreMxp choreType game.choresData) eventData.effects of
+                Just skillXp ->
+                    String.fromInt (floor skillXp)
 
--- , div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
---     [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
---     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayXp) ]
---     , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
---     , span [ class "font-bold col-span-4" ] [ text <| String.fromInt (floor displayMxp) ]
---     ]
+                Nothing ->
+                    "N/A"
+    in
+    div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
+        [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
+        , span [ class "font-bold col-span-4" ] [ text skillXpLabel ]
+        , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
+        , span [ class "font-bold col-span-4" ] [ text mxpLabel ]
+        ]
 
 
 renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
@@ -152,7 +201,7 @@ renderChore game chore =
         allMods =
             IdleGame.Game.getAllMods game
 
-        onHarvest : IdleGame.Event3.ModdedEvent
+        onHarvest : ModdedEvent
         onHarvest =
             IdleGame.Game.triggerChore chore
                 |> IdleGame.Event3.applyModsToEvent allMods
@@ -175,7 +224,7 @@ renderChore game chore =
                 , div [ class "" ] [ text rewardText ]
 
                 -- Chore XP rewards
-                , renderChoreReward
+                , renderChoreReward game chore.type_ onHarvest
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.XpFormulas.skillLevel mastery) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
