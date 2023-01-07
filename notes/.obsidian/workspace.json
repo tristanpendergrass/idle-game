@@ -4,35 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "be608047bf6ad96a",
+        "id": "a31c994b7db3af4f",
         "type": "tabs",
         "children": [
           {
-            "id": "ff3326ff9d1b034d",
+            "id": "fb7a5e036f678b3c",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "Tick flowchart.canvas",
-                "viewState": {
-                  "x": 36,
-                  "y": -95,
-                  "zoom": 0,
-                  "snapToGrid": false
-                }
-              }
-            }
-          },
-          {
-            "id": "710ceb1c7709e519",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Events.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -101,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Tick flowchart.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Tick flowchart.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -140,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "Tick flowchart.canvas"
-              }
+              "state": {}
             }
           }
         ]
@@ -162,7 +138,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "ff3326ff9d1b034d",
+  "active": "fb7a5e036f678b3c",
   "lastOpenFiles": [
     "Events.md",
     "Tick flowchart.canvas",

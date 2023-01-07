@@ -22,6 +22,7 @@ import Url exposing (Url)
 type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreMasteryCheckpointsModal
+    | ChoreItemUnlocksModal
 
 
 type alias GameState =
@@ -60,6 +61,7 @@ type FrontendMsg
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
     | OpenMasteryCheckpointsModal
+    | OpenMasteryUnlocksModal
       -- Chores
     | ToggleActiveChore IdleGame.GameTypes.ChoreType
 

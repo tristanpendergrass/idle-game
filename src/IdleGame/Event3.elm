@@ -84,6 +84,7 @@ type alias Mod =
     { tags : List Tag
     , label : String
     , transformer : Transformer
+    , multiplier : Int
     , source : ModSource
     }
 
@@ -204,9 +205,56 @@ applyModsToEvent : List Mod -> Event -> ModdedEvent
 applyModsToEvent mods (Event eventData) =
     let
         transformers =
-            List.map .transformer mods
+            mods
+                |> List.map
+                    (\{ transformer, multiplier } ->
+                        multiplyTransformer multiplier transformer
+                    )
     in
     ModdedEvent
         { eventData
             | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
         }
+
+
+multiplyTransformer : Int -> Transformer -> Transformer
+multiplyTransformer multiplier fn effect =
+    let
+        result =
+            fn effect
+    in
+    case result of
+        NoChange ->
+            result
+
+        ChangeEffect newEffect ->
+            if multiplier <= 1 then
+                result
+
+            else
+                multiplyTransformer (multiplier - 1) fn newEffect
+
+        ChangeAndAddEffects newEffect newAdditions ->
+            if multiplier <= 1 then
+                result
+
+            else
+                case multiplyTransformer (multiplier - 1) fn newEffect of
+                    NoChange ->
+                        result
+
+                    ChangeEffect e ->
+                        ChangeAndAddEffects e newAdditions
+
+                    ChangeAndAddEffects e a ->
+                        ChangeAndAddEffects e a
+
+
+withMods : List Mod -> Event -> ModdedEvent
+withMods mods event =
+    applyModsToEvent mods event
+
+
+withMultiplier : Int -> Mod -> Mod
+withMultiplier multiplier mod =
+    { mod | multiplier = multiplier }

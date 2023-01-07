@@ -41,10 +41,12 @@ create : Random.Seed -> Game
 create seed =
     { seed = seed
     , choresXp = 0
-    , choresMxp = 0
+
+    -- , choresMxp = 0
+    , choresMxp = 4500000 / 2
     , activeChore = Nothing
     , choresData =
-        { cleanStables = { mxp = 0 }
+        { cleanStables = { mxp = 4500000 / 2 }
         , cleanBigBubba = { mxp = 0 }
         , gatherFirewood = { mxp = 0 }
         }
@@ -232,11 +234,17 @@ tick game =
                     , newEvents
                     )
 
-        mods =
-            getAllMods game
-
         modifiedEvents =
-            List.map (applyModsToEvent mods) events
+            case events of
+                [] ->
+                    []
+
+                _ ->
+                    let
+                        mods =
+                            getAllMods game
+                    in
+                    List.map (applyModsToEvent (Debug.log "mods" mods)) (Debug.log "events" events)
 
         effects : List Effect
         effects =
@@ -451,6 +459,10 @@ type alias MasteryPoolCheckpoints =
     }
 
 
+type MasteryUnlocks
+    = EveryTenLevels Mod
+
+
 choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
 choreMasteryPoolCheckpoints =
     { ten = choresXpBuff 0.25
@@ -460,33 +472,9 @@ choreMasteryPoolCheckpoints =
     }
 
 
-type alias MasteryUnlocks =
-    { perLevel : Mod
-    , checkpoints : List ( Int, Mod )
-    }
-
-
-
--- choreMasteryUnlocks : MasteryUnlocks
--- choreMasteryUnlocks =
---     { perLevel = IdleGame.Event.choresXpBuff 1
---     , checkpoints = []
---     }
--- getChoreMasteryMods : Game -> List Mod
--- getChoreMasteryMods game =
---     case game.activeChore of
---         Nothing ->
---             []
---         Just activeChore ->
---             let
---                 ()
---                 mxp =
---                     getMxp activeChore.type_ game.choresData
---                 masteryLevel =
---                     IdleGame.XpFormulas.skillLevel mxp
---             in
---             []
---                 ++ List.repeat
+choreMasteryUnlocks : MasteryUnlocks
+choreMasteryUnlocks =
+    EveryTenLevels (choresMxpBuff 1.0)
 
 
 getChoreMasteryPoolMods : Game -> List Mod
@@ -521,6 +509,26 @@ getChoreMasteryPoolMods game =
 
     else
         []
+
+
+getChoreUnlocksMods : Game -> List Mod
+getChoreUnlocksMods game =
+    let
+        cleanStablesMod : Mod
+        cleanStablesMod =
+            case choreMasteryUnlocks of
+                EveryTenLevels bonusPerLevel ->
+                    let
+                        masteryLevel =
+                            IdleGame.XpFormulas.skillLevel game.choresData.cleanStables.mxp
+
+                        repetitions =
+                            masteryLevel // 10
+                    in
+                    choresMxpBuff 1.0
+                        |> withMultiplier repetitions
+    in
+    [ cleanStablesMod ]
 
 
 xpTransformer : Float -> Transformer
@@ -563,6 +571,7 @@ devGlobalXpBuff =
     , label = xpModLabel 0.05
     , transformer = xpTransformer 0.05
     , source = AdminCrimes
+    , multiplier = 1
     }
 
 
@@ -572,6 +581,7 @@ choresXpBuff buff =
     , label = xpModLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
+    , multiplier = 1
     }
 
 
@@ -581,15 +591,13 @@ choresMxpBuff buff =
     , label = mxpModLabel buff
     , transformer = mxpTransformer buff
     , source = AdminCrimes
+    , multiplier = 1
     }
 
 
 getAllMods : Game -> List Mod
 getAllMods game =
     []
-        ++ [ devGlobalXpBuff ]
+        -- ++ [ devGlobalXpBuff ]
         ++ getChoreMasteryPoolMods game
-
-
-
--- ++ getChoreMasteryMods game
+        ++ getChoreUnlocksMods game

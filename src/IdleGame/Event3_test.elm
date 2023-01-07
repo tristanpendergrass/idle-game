@@ -10,11 +10,6 @@ withModsEquals mods moddedEvent event =
     Expect.equal moddedEvent (applyModsToEvent mods event)
 
 
-withMods : List Mod -> Event -> ModdedEvent
-withMods mods event =
-    applyModsToEvent mods event
-
-
 mockEffect : EffectType -> Effect
 mockEffect type_ =
     Effect { type_ = type_, tags = [] }
@@ -42,6 +37,7 @@ mockMod transformer =
     , label = "Test"
     , transformer = transformer
     , source = AdminCrimes
+    , multiplier = 1
     }
 
 
@@ -88,6 +84,20 @@ manureGiver effect =
 
         _ ->
             NoChange
+
+
+getOneMoreGold : Transformer
+getOneMoreGold =
+    useSimpleTransformer
+        (\effectType ->
+            -- Grants +1 gold when gold is gained
+            case effectType of
+                GainGold { base, doublingChance } ->
+                    GainGold { base = base + 1, doublingChance = doublingChance }
+
+                _ ->
+                    effectType
+        )
 
 
 testMods : { mods : List Mod, event : Event, moddedEvent : ModdedEvent } -> Expectation
@@ -227,5 +237,49 @@ suite =
                     , moddedEvent =
                         mockModdedEvent [ GainXp { base = 10, multiplier = 1 } ChoresSkill ]
                             |> moddedEventWithTags [ Chores ]
+                    }
+        , test "multiplier of 2 repeats mod" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod getOneMoreGold |> withMultiplier 2 ]
+                    , event = mockEvent [ getGold 1 ]
+                    , moddedEvent =
+                        mockModdedEvent [ getGold 3 ]
+                    }
+        , test "multiplier of 2 repeats probability mod" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod (probabilityIncreaser 0.1) |> withMultiplier 2 ]
+                    , event = mockEvent [ smeltOre 0.5 ]
+                    , moddedEvent = mockModdedEvent [ smeltOre 0.7 ]
+                    }
+        , test "multiplier of 2 works with includeVariableEffects" <|
+            \_ ->
+                -- testMods
+                --     { mods = [ mockMod (probabilityIncreaser 0.1) |> withMultiplier 2 ]
+                --     , event = mockEvent [ smeltOre 0.5 ]
+                --     , moddedEvent = mockModdedEvent [ smeltOre 0.7 ]
+                --     }
+                testMods
+                    { mods =
+                        [ mockMod (includeVariableEffects manureGiver)
+                            |> withMultiplier 2
+                        ]
+                    , event = mockEvent [ smeltOre 0.5 ]
+                    , moddedEvent =
+                        mockModdedEvent
+                            [ VariableSuccess
+                                { successProbability = 0.5
+                                , successEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                    ]
+                                , failureEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    ]
+                                }
+                            ]
                     }
         ]

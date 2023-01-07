@@ -6,12 +6,13 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.MasteryCheckpoints
+import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
 import Json.Decode as D
@@ -42,9 +43,9 @@ init url key =
     ( { key = key
       , tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
       , isVisible = True
+      , activeModal = Nothing
 
-      --   , activeModal = Nothing
-      , activeModal = Just ChoreMasteryCheckpointsModal
+      --   , activeModal = Just ChoreMasteryCheckpointsModal
       , saveGameTimer = IdleGame.Timer.create 1000
       , gameState = Nothing
       }
@@ -249,6 +250,12 @@ update msg model =
             , Cmd.none
             )
 
+        OpenMasteryUnlocksModal ->
+            ( model
+                |> setActiveModal (Just ChoreItemUnlocksModal)
+            , Cmd.none
+            )
+
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
@@ -309,6 +316,16 @@ view model =
                                 let
                                     children =
                                         IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
+                                in
+                                [ IdleGame.Views.ModalWrapper.create children
+                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                                    |> IdleGame.Views.ModalWrapper.render
+                                ]
+
+                            Just ChoreItemUnlocksModal ->
+                                let
+                                    children =
+                                        IdleGame.Views.MasteryUnlocks.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
                                     |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"

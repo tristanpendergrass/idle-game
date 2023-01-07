@@ -98,6 +98,9 @@ renderContent game =
             , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
                 (List.map (renderChoreListItem game) (IdleGame.Game.getChoreListItems game))
             ]
+        , div [ class "absolute bottom-[2rem] right-[2rem]" ]
+            [ button [ class "btn btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
+            ]
         ]
 
 
