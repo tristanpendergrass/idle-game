@@ -1,6 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import IdleGame.Event3 exposing (..)
+import IdleGame.Event3_test exposing (eventWithTags)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
@@ -388,7 +389,7 @@ triggerChore { xp, type_ } =
             , Effect { type_ = GainResource { base = 1, doublingChance = 0 } Manure, tags = [] }
             , Effect { type_ = GainChoreMxp { multiplier = 1.0 } type_, tags = [ Mxp ] }
             ]
-        , tags = [ Chores ]
+        , tags = [ Chores, ChoreTag type_ ]
         }
 
 
@@ -525,18 +526,35 @@ getChoreUnlocksMods game =
                         repetitions =
                             masteryLevel // 10
                     in
-                    choresMxpBuff 1.0
+                    bonusPerLevel
                         |> withMultiplier repetitions
+                        |> modWithTags [ ChoreTag CleanStables ]
+
+        cleanBigBubbaMod : Mod
+        cleanBigBubbaMod =
+            case choreMasteryUnlocks of
+                EveryTenLevels bonusPerLevel ->
+                    let
+                        masteryLevel =
+                            IdleGame.XpFormulas.skillLevel game.choresData.cleanBigBubba.mxp
+
+                        repetitions =
+                            masteryLevel // 10
+                    in
+                    -- TODO: make this only apply to matching tag
+                    bonusPerLevel
+                        |> withMultiplier repetitions
+                        |> modWithTags [ ChoreTag CleanBigBubba ]
     in
-    [ cleanStablesMod ]
+    [ cleanStablesMod, cleanBigBubbaMod ]
 
 
 xpTransformer : Float -> Transformer
-xpTransformer buff effect =
+xpTransformer buff effectMultiplier effect =
     case getType effect of
         GainXp { base, multiplier } skill ->
             effect
-                |> setType (GainXp { base = base, multiplier = multiplier + buff } skill)
+                |> setType (GainXp { base = base, multiplier = multiplier + (buff * toFloat effectMultiplier) } skill)
                 |> ChangeEffect
 
         _ ->
@@ -544,11 +562,11 @@ xpTransformer buff effect =
 
 
 mxpTransformer : Float -> Transformer
-mxpTransformer buff effect =
+mxpTransformer buff effectMultiplier effect =
     case getType effect of
         GainChoreMxp { multiplier } chore ->
             effect
-                |> setType (GainChoreMxp { multiplier = multiplier + buff } chore)
+                |> setType (GainChoreMxp { multiplier = multiplier + (buff * toFloat effectMultiplier) } chore)
                 |> ChangeEffect
 
         _ ->

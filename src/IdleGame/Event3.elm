@@ -12,6 +12,7 @@ type Tag
     = Chores
     | Xp
     | Mxp
+    | ChoreTag ChoreType
 
 
 type Skill
@@ -90,7 +91,7 @@ type alias Mod =
 
 
 type alias Transformer =
-    Effect -> TransformerResult
+    Int -> Effect -> TransformerResult
 
 
 type TransformerResult
@@ -113,50 +114,72 @@ effectHasTags mandatoryTags (Effect { tags }) =
 
 
 scopeTransformerToTags : List Tag -> Transformer -> Transformer
-scopeTransformerToTags tags transformer effect =
+scopeTransformerToTags tags transformer multiplier effect =
     if effectHasTags tags effect then
-        transformer effect
+        transformer multiplier effect
 
     else
         NoChange
 
 
-includeVariableEffects : Transformer -> Transformer
-includeVariableEffects transformer effect =
-    case getType effect of
-        VariableSuccess { successProbability, successEffects, failureEffects } ->
-            let
-                ( successEffectsDidChange, newSuccessEffects ) =
-                    let
-                        newEffects : List Effect
-                        newEffects =
-                            List.concatMap (applyTransformersToEffect 0 [ transformer ]) successEffects
-                    in
-                    ( True, newEffects )
+includeVariableEffects : Mod -> Mod
+includeVariableEffects mod =
+    let
+        transformer =
+            mod.transformer
 
-                ( failureEffectsDidChange, newFailureEffects ) =
-                    let
-                        newEffects : List Effect
-                        newEffects =
-                            List.concatMap (applyTransformersToEffect 0 [ transformer ]) failureEffects
-                    in
-                    ( True, newEffects )
+        newTransformer =
+            \multiplier effect ->
+                case getType effect of
+                    VariableSuccess { successProbability, successEffects, failureEffects } ->
+                        let
+                            ( successEffectsDidChange, newSuccessEffects ) =
+                                let
+                                    newEffects : List Effect
+                                    newEffects =
+                                        List.concatMap (applyModsToEffect 0 [ mod ]) successEffects
+                                in
+                                ( successEffects /= newEffects, newEffects )
 
-                effectDidChange =
-                    successEffectsDidChange || failureEffectsDidChange
-            in
-            if effectDidChange then
-                ChangeEffect <| setType (VariableSuccess { successProbability = successProbability, successEffects = newSuccessEffects, failureEffects = newFailureEffects }) effect
+                            ( failureEffectsDidChange, newFailureEffects ) =
+                                let
+                                    newEffects : List Effect
+                                    newEffects =
+                                        List.concatMap (applyModsToEffect 0 [ mod ]) failureEffects
+                                in
+                                ( failureEffects /= newEffects, newEffects )
 
-            else
-                NoChange
+                            effectDidChange =
+                                successEffectsDidChange || failureEffectsDidChange
+                        in
+                        if effectDidChange then
+                            effect
+                                |> setType
+                                    (VariableSuccess
+                                        { successProbability = successProbability
+                                        , successEffects = newSuccessEffects
+                                        , failureEffects = newFailureEffects
+                                        }
+                                    )
+                                |> ChangeEffect
 
-        _ ->
-            transformer effect
+                        else
+                            NoChange
+
+                    _ ->
+                        transformer multiplier effect
+    in
+    { mod | transformer = newTransformer }
 
 
 useSimpleTransformer : SimpleTransformer -> Transformer
-useSimpleTransformer transformFn effect =
+useSimpleTransformer =
+    -- TODO: add unit test for recursive transformer only working 20x
+    useSimpleTransformerHelp 0
+
+
+useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
+useSimpleTransformerHelp depth transformFn multiplier effect =
     let
         newEffectType =
             transformFn (getType effect)
@@ -165,36 +188,51 @@ useSimpleTransformer transformFn effect =
             effect
                 |> setType newEffectType
     in
-    ChangeEffect newEffect
+    if multiplier > 1 && depth < 20 then
+        useSimpleTransformerHelp (depth + 1) transformFn (multiplier - 1) newEffect
+
+    else
+        ChangeEffect newEffect
 
 
-transformEffect : Transformer -> ( Effect, List Effect ) -> ( Effect, List Effect )
-transformEffect transformer ( effectAccum, furtherEffectsAccum ) =
-    case transformer effectAccum of
-        NoChange ->
-            ( effectAccum, furtherEffectsAccum )
+applyModToEffect : Mod -> ( Effect, List Effect ) -> ( Effect, List Effect )
+applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
+    if effectHasTags mod.tags effectAccum then
+        case mod.transformer mod.multiplier effectAccum of
+            NoChange ->
+                ( effectAccum, furtherEffectsAccum )
 
-        ChangeEffect changedEffect ->
-            ( changedEffect, furtherEffectsAccum )
+            ChangeEffect changedEffect ->
+                ( changedEffect, furtherEffectsAccum )
 
-        ChangeAndAddEffects changedEffect changedFurtherEffects ->
-            ( changedEffect, furtherEffectsAccum ++ changedFurtherEffects )
+            ChangeAndAddEffects changedEffect changedFurtherEffects ->
+                ( changedEffect, furtherEffectsAccum ++ changedFurtherEffects )
+
+    else
+        ( effectAccum, furtherEffectsAccum )
 
 
-applyTransformersToEffect : Int -> List Transformer -> Effect -> List Effect
-applyTransformersToEffect depth transformers effect =
+applyModsToEffect : Int -> List Mod -> Effect -> List Effect
+applyModsToEffect depth mods effect =
     let
         ( newEffect, furtherEffects ) =
             List.foldl
-                (\transformer accum -> transformEffect transformer accum)
+                (\mod accum ->
+                    if effectHasTags mod.tags effect then
+                        applyModToEffect mod accum
+
+                    else
+                        accum
+                )
                 ( effect, [] )
-                transformers
+                mods
     in
     newEffect
+        -- TODO: unit test this 20 threshold?
         -- The depth < 20 is an arbitrary limit that shouldn't usually be reached. It should be rare for a "further effect" to trigger
         -- a mod that gives another further effect and have that repeat more than 20 times, if so the player just doesn't get the benefit -- :)
         :: (if depth < 20 then
-                List.concatMap (applyTransformersToEffect (depth + 1) transformers) furtherEffects
+                List.concatMap (applyModsToEffect (depth + 1) mods) furtherEffects
 
             else
                 []
@@ -203,51 +241,11 @@ applyTransformersToEffect depth transformers effect =
 
 applyModsToEvent : List Mod -> Event -> ModdedEvent
 applyModsToEvent mods (Event eventData) =
-    let
-        transformers =
-            mods
-                |> List.map
-                    (\{ transformer, multiplier } ->
-                        multiplyTransformer multiplier transformer
-                    )
-    in
     ModdedEvent
         { eventData
-            | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
+          -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
+            | effects = List.concatMap (applyModsToEffect 0 mods) eventData.effects
         }
-
-
-multiplyTransformer : Int -> Transformer -> Transformer
-multiplyTransformer multiplier fn effect =
-    let
-        result =
-            fn effect
-    in
-    case result of
-        NoChange ->
-            result
-
-        ChangeEffect newEffect ->
-            if multiplier <= 1 then
-                result
-
-            else
-                multiplyTransformer (multiplier - 1) fn newEffect
-
-        ChangeAndAddEffects newEffect newAdditions ->
-            if multiplier <= 1 then
-                result
-
-            else
-                case multiplyTransformer (multiplier - 1) fn newEffect of
-                    NoChange ->
-                        result
-
-                    ChangeEffect e ->
-                        ChangeAndAddEffects e newAdditions
-
-                    ChangeAndAddEffects e a ->
-                        ChangeAndAddEffects e a
 
 
 withMods : List Mod -> Event -> ModdedEvent
@@ -258,3 +256,8 @@ withMods mods event =
 withMultiplier : Int -> Mod -> Mod
 withMultiplier multiplier mod =
     { mod | multiplier = multiplier }
+
+
+modWithTags : List Tag -> Mod -> Mod
+modWithTags tags mod =
+    { mod | tags = mod.tags ++ tags }

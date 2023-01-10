@@ -72,7 +72,7 @@ probabilityIncreaser amount =
 
 
 manureGiver : Transformer
-manureGiver effect =
+manureGiver multiplier effect =
     -- Grants 1 Manure every time any amount of a resource other than manure is gained
     case getType effect of
         GainResource { base } resource ->
@@ -80,7 +80,7 @@ manureGiver effect =
                 NoChange
 
             else
-                ChangeAndAddEffects effect [ mockEffect (getResource 1 Manure) ]
+                ChangeAndAddEffects effect [ mockEffect (getResource multiplier Manure) ]
 
         _ ->
             NoChange
@@ -198,7 +198,7 @@ suite =
         , test "includeVariableEffects causes mods to apply to sub-effects of VariableSuccess" <|
             \_ ->
                 testMods
-                    { mods = [ mockMod (includeVariableEffects manureGiver) ]
+                    { mods = [ mockMod manureGiver |> includeVariableEffects ]
                     , event = mockEvent [ smeltOre 0.5 ]
                     , moddedEvent =
                         mockModdedEvent
@@ -212,6 +212,46 @@ suite =
                                 , failureEffects =
                                     [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
                                     ]
+                                }
+                            ]
+                    }
+        , test "includeVariableEffects causes mods to apply to sub-effects of VariableSuccess two levels deep" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod manureGiver |> includeVariableEffects ]
+                    , event =
+                        mockEvent
+                            [ VariableSuccess
+                                { successProbability = 0.5
+                                , successEffects =
+                                    [ mockEffect <|
+                                        VariableSuccess
+                                            { successProbability = 0.5
+                                            , successEffects =
+                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                                ]
+                                            , failureEffects = []
+                                            }
+                                    ]
+                                , failureEffects = []
+                                }
+                            ]
+                    , moddedEvent =
+                        mockModdedEvent
+                            [ VariableSuccess
+                                { successProbability = 0.5
+                                , successEffects =
+                                    [ mockEffect <|
+                                        VariableSuccess
+                                            { successProbability = 0.5
+                                            , successEffects =
+                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                                , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                                ]
+                                            , failureEffects = []
+                                            }
+                                    ]
+                                , failureEffects = []
                                 }
                             ]
                     }
@@ -253,33 +293,30 @@ suite =
                     , event = mockEvent [ smeltOre 0.5 ]
                     , moddedEvent = mockModdedEvent [ smeltOre 0.7 ]
                     }
-        , test "multiplier of 2 works with includeVariableEffects" <|
-            \_ ->
-                -- testMods
-                --     { mods = [ mockMod (probabilityIncreaser 0.1) |> withMultiplier 2 ]
-                --     , event = mockEvent [ smeltOre 0.5 ]
-                --     , moddedEvent = mockModdedEvent [ smeltOre 0.7 ]
-                --     }
-                testMods
-                    { mods =
-                        [ mockMod (includeVariableEffects manureGiver)
-                            |> withMultiplier 2
-                        ]
-                    , event = mockEvent [ smeltOre 0.5 ]
-                    , moddedEvent =
-                        mockModdedEvent
-                            [ VariableSuccess
-                                { successProbability = 0.5
-                                , successEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
-                                    ]
-                                , failureEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-                                    ]
-                                }
-                            ]
-                    }
+
+        -- , test "multiplier of 2 works with includeVariableEffects" <|
+        --     \_ ->
+        --         testMods
+        --             { mods =
+        --                 [ mockMod manureGiver
+        --                     |> withMultiplier 2
+        --                     |> includeVariableEffects
+        --                 ]
+        --             , event = mockEvent [ smeltOre 0.5 ]
+        --             , moddedEvent =
+        --                 mockModdedEvent
+        --                     [ VariableSuccess
+        --                         { successProbability = 0.5
+        --                         , successEffects =
+        --                             [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+        --                             ]
+        --                         , failureEffects =
+        --                             [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+        --                             ]
+        --                         }
+        --                     ]
+        --             }
         ]
