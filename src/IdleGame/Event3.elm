@@ -122,52 +122,66 @@ scopeTransformerToTags tags transformer multiplier effect =
         NoChange
 
 
+
+-- variableEffectsTransformer : Transformer
+-- variableEffectsTransformer multiplier effect =
+--     case getType effect of
+--         VariableSuccess {successProbability, successEffects, failureEffects} ->
+--             effect
+--                 |> setType (VariableSuccess
+--                     { successProbability = successProbability
+--                     , successEffects =
+--                     }
+--                 )
+--                 |> ChangeEffect
+
+
 includeVariableEffects : Mod -> Mod
 includeVariableEffects mod =
     let
         transformer =
             mod.transformer
 
-        newTransformer =
-            \multiplier effect ->
-                case getType effect of
-                    VariableSuccess { successProbability, successEffects, failureEffects } ->
-                        let
-                            ( successEffectsDidChange, newSuccessEffects ) =
-                                let
-                                    newEffects : List Effect
-                                    newEffects =
-                                        List.concatMap (applyModsToEffect 0 [ mod ]) successEffects
-                                in
-                                ( successEffects /= newEffects, newEffects )
+        newTransformer : Int -> Effect -> TransformerResult
+        newTransformer multiplier effect =
+            case getType effect of
+                VariableSuccess { successProbability, successEffects, failureEffects } ->
+                    let
+                        ( successEffectsDidChange, newSuccessEffects ) =
+                            let
+                                newEffects : List Effect
+                                newEffects =
+                                    List.concatMap (applyModsToEffect 0 [ { mod | transformer = newTransformer } ]) successEffects
+                            in
+                            ( successEffects /= newEffects, newEffects )
 
-                            ( failureEffectsDidChange, newFailureEffects ) =
-                                let
-                                    newEffects : List Effect
-                                    newEffects =
-                                        List.concatMap (applyModsToEffect 0 [ mod ]) failureEffects
-                                in
-                                ( failureEffects /= newEffects, newEffects )
+                        ( failureEffectsDidChange, newFailureEffects ) =
+                            let
+                                newEffects : List Effect
+                                newEffects =
+                                    List.concatMap (applyModsToEffect 0 [ mod ]) failureEffects
+                            in
+                            ( failureEffects /= newEffects, newEffects )
 
-                            effectDidChange =
-                                successEffectsDidChange || failureEffectsDidChange
-                        in
-                        if effectDidChange then
-                            effect
-                                |> setType
-                                    (VariableSuccess
-                                        { successProbability = successProbability
-                                        , successEffects = newSuccessEffects
-                                        , failureEffects = newFailureEffects
-                                        }
-                                    )
-                                |> ChangeEffect
+                        effectDidChange =
+                            successEffectsDidChange || failureEffectsDidChange
+                    in
+                    if effectDidChange then
+                        effect
+                            |> setType
+                                (VariableSuccess
+                                    { successProbability = successProbability
+                                    , successEffects = newSuccessEffects
+                                    , failureEffects = newFailureEffects
+                                    }
+                                )
+                            |> ChangeEffect
 
-                        else
-                            NoChange
+                    else
+                        NoChange
 
-                    _ ->
-                        transformer multiplier effect
+                _ ->
+                    transformer multiplier effect
     in
     { mod | transformer = newTransformer }
 
