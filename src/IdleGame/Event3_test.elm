@@ -293,30 +293,28 @@ suite =
                     , event = mockEvent [ smeltOre 0.5 ]
                     , moddedEvent = mockModdedEvent [ smeltOre 0.7 ]
                     }
-
-        -- , test "multiplier of 2 works with includeVariableEffects" <|
-        --     \_ ->
-        --         testMods
-        --             { mods =
-        --                 [ mockMod manureGiver
-        --                     |> withMultiplier 2
-        --                     |> includeVariableEffects
-        --                 ]
-        --             , event = mockEvent [ smeltOre 0.5 ]
-        --             , moddedEvent =
-        --                 mockModdedEvent
-        --                     [ VariableSuccess
-        --                         { successProbability = 0.5
-        --                         , successEffects =
-        --                             [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
-        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
-        --                             , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
-        --                             ]
-        --                         , failureEffects =
-        --                             [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-        --                             ]
-        --                         }
-        --                     ]
-        --             }
+        , test "multiplier of 2 works with includeVariableEffects" <|
+            \_ ->
+                testMods
+                    { mods =
+                        [ mockMod manureGiver
+                            |> withMultiplier 2
+                            |> includeVariableEffects
+                        ]
+                    , event = mockEvent [ smeltOre 0.5 ]
+                    , moddedEvent =
+                        mockModdedEvent
+                            [ VariableSuccess
+                                { successProbability = 0.5
+                                , successEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                    , mockEffect <| GainResource { base = 2, doublingChance = 0 } Manure
+                                    ]
+                                , failureEffects =
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    ]
+                                }
+                            ]
+                    }
         ]
