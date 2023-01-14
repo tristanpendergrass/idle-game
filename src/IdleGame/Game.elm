@@ -515,38 +515,28 @@ getChoreMasteryPoolMods game =
 getChoreUnlocksMods : Game -> List Mod
 getChoreUnlocksMods game =
     let
-        cleanStablesMod : Mod
-        cleanStablesMod =
+        baseBonus =
             case choreMasteryUnlocks of
-                EveryTenLevels bonusPerLevel ->
-                    let
-                        masteryLevel =
-                            IdleGame.XpFormulas.skillLevel game.choresData.cleanStables.mxp
+                EveryTenLevels bonus ->
+                    bonus
 
-                        repetitions =
-                            masteryLevel // 10
-                    in
-                    bonusPerLevel
-                        |> withMultiplier repetitions
-                        |> modWithTags [ ChoreTag CleanStables ]
+        choreUnlocksFor : (ChoresData -> ChoreData) -> Tag -> Mod
+        choreUnlocksFor getter tag =
+            let
+                masteryLevel =
+                    IdleGame.XpFormulas.skillLevel (getter game.choresData).mxp
 
-        cleanBigBubbaMod : Mod
-        cleanBigBubbaMod =
-            case choreMasteryUnlocks of
-                EveryTenLevels bonusPerLevel ->
-                    let
-                        masteryLevel =
-                            IdleGame.XpFormulas.skillLevel game.choresData.cleanBigBubba.mxp
-
-                        repetitions =
-                            masteryLevel // 10
-                    in
-                    -- TODO: make this only apply to matching tag
-                    bonusPerLevel
-                        |> withMultiplier repetitions
-                        |> modWithTags [ ChoreTag CleanBigBubba ]
+                repetitions =
+                    masteryLevel // 10
+            in
+            baseBonus
+                |> withMultiplier repetitions
+                |> modWithTags [ tag ]
     in
-    [ cleanStablesMod, cleanBigBubbaMod ]
+    [ choreUnlocksFor .cleanStables (ChoreTag CleanStables)
+    , choreUnlocksFor .cleanBigBubba (ChoreTag CleanBigBubba)
+    , choreUnlocksFor .gatherFirewood (ChoreTag GatherFirewood)
+    ]
 
 
 xpTransformer : Float -> Transformer
