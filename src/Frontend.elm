@@ -325,7 +325,7 @@ view model =
                             Just ChoreItemUnlocksModal ->
                                 let
                                     children =
-                                        IdleGame.Views.MasteryUnlocks.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
+                                        IdleGame.Views.MasteryUnlocks.render { masteryUnlocks = IdleGame.Game.choreMasteryUnlocks }
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
                                     |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
