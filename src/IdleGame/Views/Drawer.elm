@@ -5,13 +5,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.Tabs as Tabs exposing (Tab, Tabs)
 import IdleGame.Views.Icon as Icon
-import Types exposing (FrontendModel, FrontendMsg)
+import Types exposing (..)
 
 
-renderDrawer : Game -> Tabs -> Html FrontendMsg
-renderDrawer game tabs =
+renderDrawer : Game -> Tab -> Html FrontendMsg
+renderDrawer game activeTab =
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
@@ -39,49 +38,77 @@ renderDrawer game tabs =
                 ]
              , div [ class "h-4" ] []
              ]
-                ++ List.indexedMap (\index category -> renderCategory (index /= 0) category) (Tabs.getCategories tabs)
+                ++ [ li [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                        [ li []
+                            [ span
+                                [ class "flex gap-4"
+                                , classList [ ( "active", activeTab == BagTab ) ]
+                                , onClick <| SetActiveTab BagTab
+                                ]
+                                [ span [ class "flex-none" ]
+                                    [ Icon.Bag
+                                        |> Icon.toFeatherIcon
+                                        |> FeatherIcons.withSize 24
+                                        |> FeatherIcons.toHtml []
+                                    ]
+                                , span [ class "flex-1" ] [ text "Bag" ]
+                                ]
+                            ]
+                        , li []
+                            [ span
+                                [ class "flex gap-4"
+                                , classList [ ( "active", activeTab == ChoresTab ) ]
+                                , onClick <| SetActiveTab ChoresTab
+                                ]
+                                [ span [ class "flex-none" ]
+                                    [ Icon.Chores
+                                        |> Icon.toFeatherIcon
+                                        |> FeatherIcons.withSize 24
+                                        |> FeatherIcons.toHtml []
+                                    ]
+                                , span [ class "flex-1" ] [ text "Chores" ]
+                                ]
+                            ]
+                        ]
+                   ]
             )
         ]
 
 
-renderCategory : Bool -> Tabs.Category -> Html FrontendMsg
-renderCategory withTopLine category =
-    let
-        maybeTopLine =
-            if withTopLine then
-                [ li [] [] ]
 
-            else
-                []
-
-        maybeTitle =
-            case category.title of
-                Just title ->
-                    [ li [ class "menu-title" ]
-                        [ span []
-                            [ span [ classList [ ( "text-error text-opacity-40", category.forbidden ) ] ]
-                                [ text title ]
-                            ]
-                        ]
-                    ]
-
-                Nothing ->
-                    []
-    in
-    ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-        (maybeTopLine ++ maybeTitle ++ List.map renderTab category.items)
-
-
-renderTab : Tab -> Html FrontendMsg
-renderTab tab =
-    li [ classList [ ( "disabled", tab.selection == Tabs.Disabled ) ] ]
-        [ span [ class "flex gap-4", classList [ ( "active", tab.selection == Tabs.Selected ) ] ]
-            [ span [ class "flex-none" ]
-                [ tab.icon
-                    |> Icon.toFeatherIcon
-                    |> FeatherIcons.withSize 24
-                    |> FeatherIcons.toHtml []
-                ]
-            , span [ class "flex-1" ] [ text tab.title ]
-            ]
-        ]
+-- renderCategory : Bool -> Maybe Tab -> Tabs.Category -> Html FrontendMsg
+-- renderCategory withTopLine activeTab category =
+--     let
+--         maybeTopLine =
+--             if withTopLine then
+--                 [ li [] [] ]
+--             else
+--                 []
+--         maybeTitle =
+--             case category.title of
+--                 Just title ->
+--                     [ li [ class "menu-title" ]
+--                         [ span []
+--                             [ span [ classList [ ( "text-error text-opacity-40", category.forbidden ) ] ]
+--                                 [ text title ]
+--                             ]
+--                         ]
+--                     ]
+--                 Nothing ->
+--                     []
+--     in
+--     ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+--         (maybeTopLine ++ maybeTitle ++ List.map (\tab -> renderTab tab (Just tab.type_ == Maybe.map .type_ activeTab)) category.items)
+-- renderTab : Tab -> Bool -> Html FrontendMsg
+-- renderTab tab isActive =
+--     li [ classList [ ( "disabled", tab.disabled ) ] ]
+--         [ span [ class "flex gap-4", classList [ ( "active", isActive ) ] ]
+--             [ span [ class "flex-none" ]
+--                 [ tab.icon
+--                     |> Icon.toFeatherIcon
+--                     |> FeatherIcons.withSize 24
+--                     |> FeatherIcons.toHtml []
+--                 ]
+--             , span [ class "flex-1" ] [ text tab.title ]
+--             ]
+--         ]

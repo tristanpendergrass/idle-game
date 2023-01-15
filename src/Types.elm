@@ -7,7 +7,6 @@ import Dict exposing (Dict)
 import FeatherIcons
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
-import IdleGame.Tabs exposing (Tabs)
 import IdleGame.Timer exposing (Timer)
 import Lamdera exposing (ClientId, SessionId)
 import Random
@@ -32,9 +31,14 @@ type alias GameState =
     }
 
 
+type Tab
+    = BagTab
+    | ChoresTab
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
-    , tabs : Tabs
+    , activeTab : Tab
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
@@ -62,6 +66,7 @@ type FrontendMsg
     | CloseModal
     | OpenMasteryCheckpointsModal
     | OpenMasteryUnlocksModal
+    | SetActiveTab Tab
       -- Chores
     | ToggleActiveChore IdleGame.GameTypes.ChoreType
 

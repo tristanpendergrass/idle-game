@@ -41,9 +41,7 @@ app =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
-      , tabs =
-            Tabs.initialTabs
-                |> Tabs.selectTab Tabs.Chores
+      , activeTab = ChoresTab
       , isVisible = True
       , activeModal = Nothing
 
@@ -127,6 +125,11 @@ createTimePassesModal gameState =
     in
     IdleGame.Game.getTimePassesData game newGame
         |> Maybe.map (TimePassesModal timePassed)
+
+
+setActiveTab : Tab -> FrontendModel -> FrontendModel
+setActiveTab tab model =
+    { model | activeTab = tab }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -258,6 +261,12 @@ update msg model =
             , Cmd.none
             )
 
+        SetActiveTab tab ->
+            ( model
+                |> setActiveTab tab
+            , Cmd.none
+            )
+
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
@@ -296,8 +305,8 @@ view model =
                 css
                     ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
                             [ input [ id "drawer", type_ "checkbox", class "drawer-toggle" ] []
-                            , IdleGame.Views.Content.renderContent game
-                            , IdleGame.Views.Drawer.renderDrawer game model.tabs
+                            , IdleGame.Views.Content.renderContent game model.activeTab
+                            , IdleGame.Views.Drawer.renderDrawer game model.activeTab
                             ]
                        ]
                     ++ (case model.activeModal of
