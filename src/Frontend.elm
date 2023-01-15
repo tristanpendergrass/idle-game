@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
-import IdleGame.Tabs
+import IdleGame.Tabs as Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
@@ -41,7 +41,9 @@ app =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
-      , tabs = IdleGame.Tabs.initialTabs -- TODO: most of the config for tabs should not live in the model but in a config function. only being enabled/disabled should be in model
+      , tabs =
+            Tabs.initialTabs
+                |> Tabs.selectTab Tabs.Chores
       , isVisible = True
       , activeModal = Nothing
 

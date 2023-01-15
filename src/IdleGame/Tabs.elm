@@ -1,6 +1,12 @@
-module IdleGame.Tabs exposing (Category, Tab, Tabs, getCategories, initialTabs)
+module IdleGame.Tabs exposing (..)
 
 import IdleGame.Views.Icon as Icon exposing (Icon)
+
+
+type TabType
+    = Placeholder -- A type given to tabs in the sidebar that have no content yet
+    | Bag
+    | Chores
 
 
 type Tabs
@@ -14,10 +20,17 @@ type alias Category =
     }
 
 
+type Selection
+    = Selected
+    | NotSelected
+    | Disabled
+
+
 type alias Tab =
-    { title : String
+    { type_ : TabType
+    , title : String
     , icon : Icon
-    , disabled : Bool
+    , selection : Selection
     }
 
 
@@ -26,74 +39,109 @@ getCategories (Tabs categories) =
     categories
 
 
+map : (Tab -> Tab) -> Tabs -> Tabs
+map fn tabs =
+    tabs
+        |> getCategories
+        |> List.map (\category -> { category | items = List.map fn category.items })
+        |> Tabs
+
+
+selectTab : TabType -> Tabs -> Tabs
+selectTab type_ =
+    map
+        (\tab ->
+            if tab.selection == Disabled then
+                tab
+
+            else if tab.type_ == type_ then
+                { tab | selection = Selected }
+
+            else
+                { tab | selection = NotSelected }
+        )
+
+
 initialTabs : Tabs
 initialTabs =
     Tabs
         [ { title = Nothing
           , forbidden = False
           , items =
-                [ { title = "Bag"
+                [ { type_ = Bag
+                  , title = "Bag"
                   , icon = Icon.bag
-                  , disabled = False
+                  , selection = NotSelected
                   }
-                , { title = "Shop"
+                , { type_ = Placeholder
+                  , title = "Shop"
                   , icon = Icon.shop
-                  , disabled = False
+                  , selection = NotSelected
                   }
                 ]
           }
         , { title = Just "Extracurricular"
           , forbidden = False
           , items =
-                [ { title = "Chores"
+                [ { type_ = Chores
+                  , title = "Chores"
                   , icon = Icon.chores
-                  , disabled = False
+                  , selection = NotSelected
                   }
-                , { title = "Exploration"
+                , { type_ = Placeholder
+                  , title = "Exploration"
                   , icon = Icon.exploration
-                  , disabled = False
+                  , selection = NotSelected
                   }
-                , { title = "Mischief"
+                , { type_ = Placeholder
+                  , title = "Mischief"
                   , icon = Icon.mischief
-                  , disabled = False
+                  , selection = NotSelected
                   }
-                , { title = "Dueling"
+                , { type_ = Placeholder
+                  , title = "Dueling"
                   , icon = Icon.dueling
-                  , disabled = False
+                  , selection = NotSelected
                   }
                 ]
           }
         , { title = Just "Classes"
           , forbidden = False
           , items =
-                [ { title = "Botany"
+                [ { type_ = Placeholder
+                  , title = "Botany"
                   , icon = Icon.botany
-                  , disabled = True
+                  , selection = Disabled
                   }
-                , { title = "Potionmaking"
+                , { type_ = Placeholder
+                  , title = "Potionmaking"
                   , icon = Icon.potionmaking
-                  , disabled = True
+                  , selection = Disabled
                   }
-                , { title = "Hexes"
+                , { type_ = Placeholder
+                  , title = "Hexes"
                   , icon = Icon.hexes
-                  , disabled = True
+                  , selection = Disabled
                   }
-                , { title = "Wards"
+                , { type_ = Placeholder
+                  , title = "Wards"
                   , icon = Icon.wards
-                  , disabled = True
+                  , selection = Disabled
                   }
                 ]
           }
         , { title = Just "Dark Arts"
           , forbidden = True
           , items =
-                [ { title = "Forbidden knowledge"
+                [ { type_ = Placeholder
+                  , title = "Forbidden knowledge"
                   , icon = Icon.forbiddenKnowledge
-                  , disabled = True
+                  , selection = Disabled
                   }
-                , { title = "Forbidden knowledge"
+                , { type_ = Placeholder
+                  , title = "Forbidden knowledge"
                   , icon = Icon.forbiddenKnowledge
-                  , disabled = True
+                  , selection = Disabled
                   }
                 ]
           }

@@ -74,8 +74,8 @@ renderCategory withTopLine category =
 
 renderTab : Tab -> Html FrontendMsg
 renderTab tab =
-    li [ classList [ ( "disabled", tab.disabled ) ] ]
-        [ span [ class "flex gap-4" ]
+    li [ classList [ ( "disabled", tab.selection == Tabs.Disabled ) ] ]
+        [ span [ class "flex gap-4", classList [ ( "active", tab.selection == Tabs.Selected ) ] ]
             [ span [ class "flex-none" ]
                 [ tab.icon
                     |> Icon.toFeatherIcon
