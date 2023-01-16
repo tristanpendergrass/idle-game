@@ -42,19 +42,11 @@ renderContent game activeTab =
 
                 ChoresTab ->
                     IdleGame.Views.Icon.chores
-
-        topNavBgColor =
-            case activeTab of
-                BagTab ->
-                    "bg-blue-900"
-
-                ChoresTab ->
-                    "bg-orange-900"
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
             -- TOP NAV
-            [ nav [ class "navbar w-full", class topNavBgColor ]
+            [ nav [ class "navbar w-full bg-primary text-primary-content" ]
                 -- Menu to open sidebar
                 [ div [ class "flex gap-2 lg:gap-4" ]
                     [ span [ class "tooltip tooltip-bottom before:text-xs before:content-[attr(data-tip)]", attribute "data-tip" "Menu" ]
