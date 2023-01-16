@@ -41,7 +41,7 @@ app =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
-      , activeTab = ChoresTab
+      , activeTab = BagTab
       , isVisible = True
       , activeModal = Nothing
 
