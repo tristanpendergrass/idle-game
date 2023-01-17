@@ -226,3 +226,10 @@ renderLockedChore level =
                 ]
             ]
         ]
+
+
+renderBottomRight : Html FrontendMsg
+renderBottomRight =
+    div [ class "absolute bottom-[2rem] right-[2rem]" ]
+        [ button [ class "btn btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
+        ]

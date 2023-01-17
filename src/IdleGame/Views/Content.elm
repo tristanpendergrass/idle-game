@@ -6,15 +6,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.GameTypes
 import IdleGame.Timer
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon
-import IdleGame.Views.Placeholder
-import IdleGame.XpFormulas
-import List.Extra
-import Time exposing (Posix)
 import Types exposing (..)
 
 
@@ -27,21 +22,19 @@ getActivityProgress activityStatus =
 renderContent : Game -> Tab -> Html FrontendMsg
 renderContent game activeTab =
     let
-        topNavTitle =
+        { title, icon, bottomRight } =
             case activeTab of
                 BagTab ->
-                    "Bag"
+                    { title = "Bag"
+                    , icon = IdleGame.Views.Icon.bag
+                    , bottomRight = IdleGame.Views.Bag.renderBottomRight
+                    }
 
                 ChoresTab ->
-                    "Chores"
-
-        topNavIcon =
-            case activeTab of
-                BagTab ->
-                    IdleGame.Views.Icon.bag
-
-                ChoresTab ->
-                    IdleGame.Views.Icon.chores
+                    { title = "Chores"
+                    , icon = IdleGame.Views.Icon.chores
+                    , bottomRight = IdleGame.Views.Chores.renderBottomRight
+                    }
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
@@ -59,11 +52,11 @@ renderContent game activeTab =
 
                     -- Left side stuff
                     , div [ class "flex items-center gap-2" ]
-                        [ topNavIcon
+                        [ icon
                             |> IdleGame.Views.Icon.toFeatherIcon
                             |> FeatherIcons.withSize 24
                             |> FeatherIcons.toHtml []
-                        , span [] [ text topNavTitle ]
+                        , span [] [ text title ]
                         ]
 
                     -- Right side stuff
@@ -79,7 +72,5 @@ renderContent game activeTab =
 
             ChoresTab ->
                 IdleGame.Views.Chores.render game
-        , div [ class "absolute bottom-[2rem] right-[2rem]" ]
-            [ button [ class "btn btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
-            ]
+        , bottomRight
         ]
