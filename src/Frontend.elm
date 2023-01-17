@@ -41,6 +41,7 @@ app =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
+      , isDrawerOpen = False
       , activeTab = BagTab
       , isVisible = True
       , activeModal = Nothing
@@ -132,6 +133,11 @@ setActiveTab tab model =
     { model | activeTab = tab }
 
 
+setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
+setIsDrawerOpen isOpen model =
+    { model | isDrawerOpen = isOpen }
+
+
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
     let
@@ -172,6 +178,12 @@ update msg model =
         ToggleActiveChore toggleId ->
             ( model
                 |> mapGame (IdleGame.Game.toggleActiveChore toggleId)
+            , Cmd.none
+            )
+
+        SetDrawerOpen newValue ->
+            ( model
+                |> setIsDrawerOpen newValue
             , Cmd.none
             )
 
@@ -264,6 +276,7 @@ update msg model =
         SetActiveTab tab ->
             ( model
                 |> setActiveTab tab
+                |> setIsDrawerOpen False
             , Cmd.none
             )
 
@@ -304,7 +317,14 @@ view model =
             Just { game } ->
                 css
                     ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
-                            [ input [ id "drawer", type_ "checkbox", class "drawer-toggle" ] []
+                            [ input
+                                [ id "drawer"
+                                , type_ "checkbox"
+                                , class "drawer-toggle"
+                                , checked model.isDrawerOpen
+                                , onCheck SetDrawerOpen
+                                ]
+                                []
                             , IdleGame.Views.Content.renderContent game model.activeTab
                             , IdleGame.Views.Drawer.renderDrawer game model.activeTab
                             ]

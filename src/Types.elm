@@ -38,6 +38,7 @@ type Tab
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , isDrawerOpen : Bool
     , activeTab : Tab
     , isVisible : Bool
     , activeModal : Maybe Modal
@@ -62,6 +63,7 @@ type FrontendMsg
     | UrlChanged Url
     | InitializeGameWithTime GameState Posix
     | HandleAnimationFrame Time.Posix
+    | SetDrawerOpen Bool
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
     | OpenMasteryCheckpointsModal

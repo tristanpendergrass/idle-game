@@ -245,7 +245,7 @@ tick game =
                         mods =
                             getAllMods game
                     in
-                    List.map (applyModsToEvent (Debug.log "mods" mods)) (Debug.log "events" events)
+                    List.map (applyModsToEvent mods) events
 
         effects : List Effect
         effects =
