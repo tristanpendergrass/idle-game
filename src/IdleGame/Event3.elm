@@ -2,6 +2,7 @@ module IdleGame.Event3 exposing (..)
 
 import IdleGame.Event exposing (Event)
 import IdleGame.GameTypes exposing (ChoreType)
+import IdleGame.Resource exposing (Resource)
 
 
 
@@ -17,13 +18,6 @@ type Tag
 
 type Skill
     = ChoresSkill
-
-
-type Resource
-    = Manure
-    | Ore
-    | Ingot
-    | Ruby
 
 
 type ModSource

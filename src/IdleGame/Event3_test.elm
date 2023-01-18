@@ -2,6 +2,7 @@ module IdleGame.Event3_test exposing (..)
 
 import Expect exposing (..)
 import IdleGame.Event3 exposing (..)
+import IdleGame.Resource as Resource exposing (Resource)
 import Test exposing (..)
 
 
@@ -76,11 +77,11 @@ manureGiver multiplier effect =
     -- Grants 1 Manure every time any amount of a resource other than manure is gained
     case getType effect of
         GainResource { base } resource ->
-            if resource == Manure || base <= 0 then
+            if resource == Resource.Manure || base <= 0 then
                 NoChange
 
             else
-                ChangeAndAddEffects effect [ mockEffect (getResource multiplier Manure) ]
+                ChangeAndAddEffects effect [ mockEffect (getResource multiplier Resource.Manure) ]
 
         _ ->
             NoChange
@@ -127,11 +128,11 @@ smeltOre successProbability =
     VariableSuccess
         { successProbability = successProbability
         , successEffects =
-            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-            , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
+            , mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Ingot
             ]
         , failureEffects =
-            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+            [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
             ]
         }
 
@@ -181,11 +182,11 @@ suite =
             \_ ->
                 testMods
                     { mods = [ mockMod manureGiver ]
-                    , event = mockEvent [ getResource 1 Ore ]
+                    , event = mockEvent [ getResource 1 Resource.Ore ]
                     , moddedEvent =
                         mockModdedEvent
-                            [ getResource 1 Ore
-                            , getResource 1 Manure
+                            [ getResource 1 Resource.Ore
+                            , getResource 1 Resource.Manure
                             ]
                     }
         , test "applies a mod that changes a probability" <|
@@ -205,12 +206,12 @@ suite =
                             [ VariableSuccess
                                 { successProbability = 0.5
                                 , successEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Ingot
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Manure
                                     ]
                                 , failureEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
                                     ]
                                 }
                             ]
@@ -228,7 +229,7 @@ suite =
                                         VariableSuccess
                                             { successProbability = 0.5
                                             , successEffects =
-                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
+                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Ingot
                                                 ]
                                             , failureEffects = []
                                             }
@@ -245,8 +246,8 @@ suite =
                                         VariableSuccess
                                             { successProbability = 0.5
                                             , successEffects =
-                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
-                                                , mockEffect <| GainResource { base = 1, doublingChance = 0 } Manure
+                                                [ mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Ingot
+                                                , mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Manure
                                                 ]
                                             , failureEffects = []
                                             }
@@ -307,12 +308,12 @@ suite =
                             [ VariableSuccess
                                 { successProbability = 0.5
                                 , successEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
-                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Ingot
-                                    , mockEffect <| GainResource { base = 2, doublingChance = 0 } Manure
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
+                                    , mockEffect <| GainResource { base = 1, doublingChance = 0 } Resource.Ingot
+                                    , mockEffect <| GainResource { base = 2, doublingChance = 0 } Resource.Manure
                                     ]
                                 , failureEffects =
-                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Ore
+                                    [ mockEffect <| GainResource { base = -1, doublingChance = 0 } Resource.Ore
                                     ]
                                 }
                             ]

@@ -3,6 +3,7 @@ module IdleGame.Game exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Event3_test exposing (eventWithTags)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Resource as Resource exposing (Resource)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
@@ -24,6 +25,7 @@ type alias Game =
     , choresData : ChoresData
     , gold : Int
     , manure : Int
+    , sticks : Int
     }
 
 
@@ -53,6 +55,7 @@ create seed =
         }
     , gold = 0
     , manure = 0
+    , sticks = 0
     }
 
 
@@ -99,9 +102,33 @@ type alias Chore =
     -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
     { type_ : ChoreType
     , title : String
-    , rewardText : String
-    , xp : Float
+    , outcome : ChoreOutcome
     }
+
+
+type alias ChoreOutcome =
+    { xp : Float
+    , extraResourceProbability : Float
+    , extraResource : Resource
+    , gold : Int
+    }
+
+
+getEvent : Chore -> Event
+getEvent { type_, outcome } =
+    let
+        { xp, extraResourceProbability, extraResource, gold } =
+            outcome
+    in
+    Event
+        { effects =
+            [ gainXp xp ChoresSkill
+            , gainChoreMxp type_
+            , gainWithProbability extraResourceProbability [ gainResource 1 extraResource ]
+            , gainGold gold
+            ]
+        , tags = [ Chores, ChoreTag type_ ]
+        }
 
 
 getChore : ChoreType -> Chore
@@ -110,22 +137,34 @@ getChore type_ =
         CleanStables ->
             { type_ = CleanStables
             , title = "Clean Stables"
-            , rewardText = "N/A"
-            , xp = 5.0
+            , outcome =
+                { xp = 5.0
+                , extraResourceProbability = 0.25
+                , extraResource = Resource.Manure
+                , gold = 5
+                }
             }
 
         CleanBigBubba ->
             { type_ = CleanBigBubba
             , title = "Clean Big Bubba's Stall"
-            , rewardText = "N/A"
-            , xp = 10.0
+            , outcome =
+                { xp = 10.0
+                , extraResourceProbability = 1
+                , extraResource = Resource.Manure
+                , gold = 50
+                }
             }
 
         GatherFirewood ->
             { type_ = GatherFirewood
             , title = "Gather Firewood"
-            , rewardText = "N/A"
-            , xp = 15.0
+            , outcome =
+                { xp = 15.0
+                , extraResourceProbability = 0.65
+                , extraResource = Resource.Stick
+                , gold = 500
+                }
             }
 
 
@@ -229,7 +268,7 @@ tick game =
 
                         newEvents =
                             []
-                                ++ List.repeat completions (triggerChore chore)
+                                ++ List.repeat completions (getEvent chore)
                     in
                     ( activeChore
                     , newEvents
@@ -339,11 +378,20 @@ applyEffect effect game =
 addResource : Resource -> Int -> Game -> Game
 addResource resource amount game =
     case resource of
-        Manure ->
+        Resource.Manure ->
             { game | manure = game.manure + amount }
 
-        _ ->
+        Resource.Ingot ->
             game
+
+        Resource.Ore ->
+            game
+
+        Resource.Ruby ->
+            game
+
+        Resource.Stick ->
+            { game | sticks = game.sticks + amount }
 
 
 addXp : Skill -> Float -> Game -> Game
@@ -381,19 +429,44 @@ applyEvent (ModdedEvent eventData) game =
         eventData.effects
 
 
-triggerChore : Chore -> Event
-triggerChore { xp, type_ } =
-    Event
-        { effects =
-            [ Effect { type_ = GainXp { base = xp, multiplier = 1.0 } ChoresSkill, tags = [ Xp ] }
-            , Effect { type_ = GainResource { base = 1, doublingChance = 0 } Manure, tags = [] }
-            , Effect { type_ = GainChoreMxp { multiplier = 1.0 } type_, tags = [ Mxp ] }
-            ]
-        , tags = [ Chores, ChoreTag type_ ]
+gainResource : Int -> Resource -> Effect
+gainResource amount resource =
+    Effect { type_ = GainResource { base = amount, doublingChance = 0 } resource, tags = [] }
+
+
+gainXp : Float -> Skill -> Effect
+gainXp amount skill =
+    Effect { type_ = GainXp { base = amount, multiplier = 1 } skill, tags = [ Xp ] }
+
+
+gainChoreMxp : ChoreType -> Effect
+gainChoreMxp chore =
+    Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp ] }
+
+
+gainGold : Int -> Effect
+gainGold amount =
+    Effect { type_ = GainGold { base = amount, doublingChance = 1 }, tags = [] }
+
+
+gainWithProbability : Float -> List Effect -> Effect
+gainWithProbability probability successEffects =
+    Effect { type_ = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }, tags = [] }
+
+
+withTags : List Tag -> Effect -> Effect
+withTags newTags (Effect { type_, tags }) =
+    Effect
+        { type_ = type_
+
+        -- TODO: dedupe tags?
+        , tags = tags ++ newTags
         }
 
 
 
+-- type alias ChoreReward =
+--     { xp : Float, mxp : Float,  }
 -- Time passes logic
 
 

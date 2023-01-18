@@ -42,7 +42,7 @@ init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , isDrawerOpen = False
-      , activeTab = BagTab
+      , activeTab = ChoresTab
       , isVisible = True
       , activeModal = Nothing
 

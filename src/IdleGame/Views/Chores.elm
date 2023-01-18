@@ -7,11 +7,11 @@ import Html.Events exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
+import IdleGame.Resource as Resource exposing (Resource)
 import IdleGame.Timer
 import IdleGame.Views.Placeholder
 import IdleGame.XpFormulas
 import List.Extra
-import Time exposing (Posix)
 import Types exposing (..)
 
 
@@ -61,7 +61,7 @@ render game =
             ]
 
         -- Chore grid
-        , div [ class "w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" ]
+        , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4" ]
             (List.map (renderChoreListItem game) (IdleGame.Game.getChoreListItems game))
         ]
 
@@ -106,11 +106,11 @@ getChoreMxp choreType choresData effect =
 
 choreHeight : String
 choreHeight =
-    "h-[324px]"
+    "h-[390px]"
 
 
-renderChoreReward : Game -> IdleGame.GameTypes.ChoreType -> ModdedEvent -> Html FrontendMsg
-renderChoreReward game choreType (ModdedEvent eventData) =
+renderChoreXpReward : Game -> IdleGame.GameTypes.ChoreType -> ModdedEvent -> Html FrontendMsg
+renderChoreXpReward game choreType (ModdedEvent eventData) =
     let
         skillXpLabel =
             case List.Extra.findMap getChoresSkillXp eventData.effects of
@@ -136,10 +136,15 @@ renderChoreReward game choreType (ModdedEvent eventData) =
         ]
 
 
+probabilityToInt : Float -> Int
+probabilityToInt x =
+    floor (x * 100)
+
+
 renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
 renderChore game chore =
     let
-        { type_, title, xp, rewardText } =
+        { type_, title, outcome } =
             chore
 
         handleClick =
@@ -160,13 +165,34 @@ renderChore game chore =
         allMods =
             IdleGame.Game.getAllMods game
 
-        onHarvest : ModdedEvent
-        onHarvest =
-            IdleGame.Game.triggerChore chore
+        moddedEvent : ModdedEvent
+        moddedEvent =
+            IdleGame.Game.getEvent chore
                 |> IdleGame.Event3.applyModsToEvent allMods
 
         mastery =
             IdleGame.Game.getMastery type_ game.choresData
+
+        renderGold amount =
+            div [ class "flex items-center gap-1" ]
+                [ div [ class "flex items-center gap-1" ]
+                    [ span [] [ text ("+" ++ String.fromInt amount) ]
+                    , span [ class "font-semibold" ] [ text "Gold" ]
+                    ]
+                ]
+
+        renderResource amount resource =
+            div [ class "flex items-center gap-1" ]
+                [ span [] [ text ("+" ++ String.fromInt amount) ]
+                , span [ class "font-semibold" ] [ text resource ]
+                ]
+
+        renderSuccessCondition probability child =
+            div [ class "flex items-center gap-1" ]
+                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (String.fromInt probability ++ "%") ]
+                , div [] [ text ":" ]
+                , child
+                ]
     in
     div
         [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
@@ -180,10 +206,12 @@ renderChore game chore =
             [ div [ class "t-column h-full z-20" ]
                 -- Chore title
                 [ h2 [ class "card-title text-lg text-center h-[3rem]" ] [ text title ]
-                , div [ class "" ] [ text rewardText ]
+                , renderGold chore.outcome.gold
+                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource 1 (Resource.toString outcome.extraResource))
+                , div [ class "divider" ] []
 
                 -- Chore XP rewards
-                , renderChoreReward game chore.type_ onHarvest
+                , renderChoreXpReward game chore.type_ moddedEvent
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.XpFormulas.skillLevel mastery) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
