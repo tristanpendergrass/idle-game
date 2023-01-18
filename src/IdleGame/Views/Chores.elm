@@ -201,7 +201,9 @@ renderChore game chore =
         ]
         -- Chore image
         [ figure []
-            [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
+            [ img [ src chore.imgSrc, class "w-full h-24 object-cover" ] [] ]
+
+        -- [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24" ] ]
         , div [ class "relative card-body" ]
             [ div [ class "t-column h-full z-20" ]
                 -- Chore title

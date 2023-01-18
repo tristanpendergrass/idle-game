@@ -102,6 +102,7 @@ type alias Chore =
     -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
     { type_ : ChoreType
     , title : String
+    , imgSrc : String
     , outcome : ChoreOutcome
     }
 
@@ -137,6 +138,7 @@ getChore type_ =
         CleanStables ->
             { type_ = CleanStables
             , title = "Clean Stables"
+            , imgSrc = "/stable.png"
             , outcome =
                 { xp = 5.0
                 , extraResourceProbability = 0.25
@@ -148,6 +150,7 @@ getChore type_ =
         CleanBigBubba ->
             { type_ = CleanBigBubba
             , title = "Clean Big Bubba's Stall"
+            , imgSrc = "/bubba2.png"
             , outcome =
                 { xp = 10.0
                 , extraResourceProbability = 1
@@ -159,6 +162,7 @@ getChore type_ =
         GatherFirewood ->
             { type_ = GatherFirewood
             , title = "Gather Firewood"
+            , imgSrc = "firewood.png"
             , outcome =
                 { xp = 15.0
                 , extraResourceProbability = 0.65

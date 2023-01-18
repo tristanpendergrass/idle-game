@@ -3867,6 +3867,11 @@ body[dir="rtl"] .checkbox:checked,
   --tw-bg-opacity: 0.25;
 }
 
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 .p-6 {
   padding: 1.5rem;
 }
