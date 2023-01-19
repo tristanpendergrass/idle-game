@@ -6,7 +6,7 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game exposing (Game, MasteryUnlocks)
+import IdleGame.Game exposing (Game, MasteryUnlocks, Notification)
 import IdleGame.Tabs as Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
@@ -19,9 +19,11 @@ import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
 import Json.Encode as E
 import Lamdera
+import Process
 import Task
 import Time exposing (Posix)
 import Time.Extra
+import Toast
 import Types exposing (..)
 import Url exposing (Url)
 
@@ -38,9 +40,15 @@ app =
         }
 
 
+delay : Int -> msg -> Cmd msg
+delay ms msg =
+    Task.perform (always msg) (Process.sleep <| toFloat ms)
+
+
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
+      , tray = Toast.tray
       , isDrawerOpen = False
       , activeTab = ChoresTab
       , isVisible = True
@@ -51,6 +59,11 @@ init url key =
       , gameState = Nothing
       }
     , Cmd.none
+      -- , Cmd.batch
+      --     [ delay 0 (AddToast "hello, world")
+      --     , delay 1000 (AddToast "hello, world 2")
+      --     , delay 2000 (AddToast "hello, world 3")
+      --     ]
     )
 
 
@@ -58,22 +71,47 @@ init url key =
 -- Update
 
 
-updateGameToTime : Posix -> ( Posix, Game ) -> ( Posix, Game )
-updateGameToTime now ( oldTick, game ) =
+updateGameToTime : Posix -> ( Posix, Game, List Notification ) -> ( Posix, Game, List Notification )
+updateGameToTime nowPos ( oldTick, game, notifications ) =
     let
+        tickDuration =
+            IdleGame.Timer.tickDuration
+
+        nextTickPos =
+            Time.Extra.add Time.Extra.Millisecond tickDuration Time.utc oldTick
+
         nextTick =
-            Time.Extra.add Time.Extra.Millisecond IdleGame.Timer.tickDuration Time.utc oldTick
+            nextTickPos
+                |> Time.posixToMillis
+
+        now =
+            Time.posixToMillis nowPos
 
         shouldTick =
-            Time.posixToMillis now >= Time.posixToMillis nextTick
+            now >= nextTick
+
+        isLastTick =
+            nextTick + tickDuration > now
     in
     if shouldTick then
         -- Note: be careful with the next line causing a stack overflow. It is written in a particular way to allow Tail-call elimination and should stay that way.
         -- Additional reading: https://jfmengels.net/tail-call-optimization/
-        updateGameToTime now ( nextTick, IdleGame.Game.tick game )
+        let
+            ( newGame, tickNotifications ) =
+                IdleGame.Game.tick game
+
+            newNotifications =
+                -- We don't want to show a mountain of notifications when calculating many ticks back to back
+                if isLastTick then
+                    notifications ++ tickNotifications
+
+                else
+                    notifications
+        in
+        updateGameToTime nowPos ( nextTickPos, newGame, newNotifications )
 
     else
-        ( oldTick, game )
+        ( oldTick, game, notifications )
 
 
 setCurrentTime : Posix -> GameState -> GameState
@@ -116,8 +154,8 @@ createTimePassesModal gameState =
         { currentTime, lastTick, game } =
             gameState
 
-        ( newTick, newGame ) =
-            updateGameToTime currentTime ( lastTick, game )
+        ( newTick, newGame, _ ) =
+            updateGameToTime currentTime ( lastTick, game, [] )
 
         timePassed =
             Time.posixToMillis newTick
@@ -163,6 +201,21 @@ update msg model =
         UrlChanged url ->
             noOp
 
+        AddToast content ->
+            Toast.expireIn 3000 content
+                -- Toast.persistent content
+                -- Number passed to withExistTransition should match the transition duration of class "toast" in index.css
+                |> Toast.withExitTransition 700
+                |> Toast.add model.tray
+                |> Toast.tuple ToastMsg model
+
+        ToastMsg tmsg ->
+            let
+                ( tray, newTmesg ) =
+                    Toast.update tmsg model.tray
+            in
+            ( { model | tray = tray }, Cmd.map ToastMsg newTmesg )
+
         InitializeGameWithTime serverGameState now ->
             let
                 newGameState =
@@ -195,8 +248,8 @@ update msg model =
                 Just gameState ->
                     if model.isVisible then
                         let
-                            ( newTick, newGame ) =
-                                updateGameToTime now ( gameState.lastTick, gameState.game )
+                            ( newTick, newGame, notifications ) =
+                                updateGameToTime now ( gameState.lastTick, gameState.game, [] )
 
                             newGameState =
                                 { gameState | currentTime = now, lastTick = newTick, game = newGame }
@@ -204,24 +257,39 @@ update msg model =
                             delta =
                                 Time.posixToMillis now - Time.posixToMillis gameState.currentTime
 
-                            ( newSaveGameTimer, saveGameCompletions ) =
+                            ( newSaveGameTimer, saveGameTimerTriggered ) =
                                 IdleGame.Timer.increment delta model.saveGameTimer
 
                             shouldSaveGame =
-                                saveGameCompletions > 0
+                                saveGameTimerTriggered > 0
 
                             saveGameCmd =
-                                Lamdera.sendToBackend (Save newGameState)
+                                if shouldSaveGame then
+                                    [ Lamdera.sendToBackend (Save newGameState) ]
+
+                                else
+                                    []
+
+                            notificationToToast notification =
+                                case notification of
+                                    IdleGame.Game.GainedResource amount resource ->
+                                        delay 0 (AddToast "Gained Resource")
+
+                                    IdleGame.Game.GainedGold amount ->
+                                        delay 0 (AddToast "Gained Gold")
+
+                            notificationCmds =
+                                if model.isVisible then
+                                    List.map notificationToToast notifications
+
+                                else
+                                    []
                         in
                         ( { model
                             | gameState = Just newGameState
                             , saveGameTimer = newSaveGameTimer
                           }
-                        , if shouldSaveGame then
-                            saveGameCmd
-
-                          else
-                            Cmd.none
+                        , Cmd.batch <| saveGameCmd ++ notificationCmds
                         )
 
                     else
@@ -316,6 +384,7 @@ view model =
 
             Just { game } ->
                 css
+                    ++ [ Toast.render viewToast model.tray toastConfig ]
                     ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
                             [ input
                                 [ id "drawer"
@@ -363,4 +432,46 @@ view model =
                                     |> IdleGame.Views.ModalWrapper.render
                                 ]
                        )
+
+    -- ++ [ div [ class "toastify toastify-center toastify-bottom", attribute "style" "transform: translate(0px, 0px); bottom: 15px;" ] [ text "+100 Gold" ] ]
+    }
+
+
+viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info String -> Html FrontendMsg
+viewToast attributes toast =
+    Html.div
+        attributes
+        [ Html.text toast.content ]
+
+
+toastConfig : Toast.Config FrontendMsg
+toastConfig =
+    Toast.config ToastMsg
+        |> Toast.withTrayAttributes [ style.tray ]
+        |> Toast.withAttributes [ style.toast.base ]
+        |> Toast.withTransitionAttributes [ style.toast.fadeOut ]
+        |> Toast.withFocusAttributes [ style.toast.active ]
+
+
+style =
+    { tray = class "toast-tray"
+    , toast =
+        { base = class "toast"
+        , fadeOut = class "toast--fade-out"
+        , spaced = class "toast--spaced"
+        , active = class "toast--active"
+        , closeButton = class "toast__close"
+        }
+    , toastFrame =
+        { base = class "toast-frame"
+        , fadeOut = class "toast-frame--fade-out"
+        }
+    , background =
+        { green = class "bg-green"
+        , blue = class "bg-blue"
+        , yellow = class "bg-yellow"
+        , red = class "bg-red"
+        }
+    , triggers = class "trigger-buttons"
+    , button = class "button"
     }

@@ -47,3 +47,61 @@
     @apply flex flex-col items-center w-full gap-2;
   }
 }
+
+
+/* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
+
+.toast-tray {
+  @apply t-column gap-2;
+  position: fixed;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+}
+
+.toast {
+  @apply bg-success text-success-content rounded py-1 px-2;
+  box-sizing: content-box;
+  display: flex;
+  position: relative;
+  opacity: 1;
+  transition:
+    /* opacity --toast-transition-duration ease,
+    transform --toast-transition-duration ease; */
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.toast--fade-out {
+  opacity: 0;
+  /* transform: translateY(20em); */
+}
+
+.toast--fade-in {
+  opacity: 0;
+  transform: translateY(20em);
+}
+
+.toast--spaced {
+  margin-bottom: 1em;
+}
+
+.toast-frame {
+  min-height: 4em;
+  max-height: 4em;
+  transition:
+    min-height 0.6s linear,
+    min-height 0.6s linear;
+}
+
+.toast-frame--fade-out {
+  min-height: 0;
+  max-height: 0;
+}
+
+.toast__close {
+  cursor: pointer;
+  font-family: monospace;
+  color: #f8f8f8;
+}

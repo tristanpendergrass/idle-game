@@ -25,7 +25,13 @@ render game =
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ ul [ class "w-full grid gap-x-8 gap-y-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
+        [ div [ class "w-full flex justify-center items-center" ]
+            [ div [ class "flex items-center gap-1 px-2 py-1 bg-accent text-accent-content rounded" ]
+                [ span [ class "text-lg truncate" ] [ text "Gold" ]
+                , span [ class "text-log font-semibold" ] [ text <| String.fromInt game.gold ]
+                ]
+            ]
+        , ul [ class "w-full grid gap-x-8 gap-y-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
             [ listItem "Manure" manureQuantity
             , listItem "Sticks" stickQuantity
             ]

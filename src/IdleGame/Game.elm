@@ -251,7 +251,12 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-tick : Game -> Game
+type Notification
+    = GainedGold Int
+    | GainedResource Int Resource
+
+
+tick : Game -> ( Game, List Notification )
 tick game =
     let
         ( newActiveChore, events ) =
@@ -295,20 +300,29 @@ tick game =
             modifiedEvents
                 |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
 
+        gameGenerator : Generator ( Game, List Notification )
         gameGenerator =
             game
                 |> setActiveChore newActiveChore
-                |> (\g -> List.foldl effectReducer (Random.constant g) effects)
+                |> (\g -> List.foldl effectReducer (Random.constant ( g, [] )) effects)
 
-        ( newGame, newSeed ) =
+        ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
     in
-    { newGame | seed = newSeed }
+    ( { newGame | seed = newSeed }, notifications )
 
 
-effectReducer : Effect -> Generator Game -> Generator Game
-effectReducer effect =
-    Random.andThen (applyEffect effect)
+effectReducer : Effect -> Generator ( Game, List Notification ) -> Generator ( Game, List Notification )
+effectReducer effect gen =
+    gen
+        |> Random.andThen
+            (\( game, notifications ) ->
+                applyEffect effect game
+                    |> Random.map
+                        (\( newGame, newNotifications ) ->
+                            ( newGame, notifications ++ newNotifications )
+                        )
+            )
 
 
 successGenerator : Float -> Generator Bool
@@ -338,7 +352,7 @@ floatGenerator { base, multiplier } =
     Random.constant <| base * multiplier
 
 
-applyEffect : Effect -> Game -> Generator Game
+applyEffect : Effect -> Game -> Generator ( Game, List Notification )
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
@@ -353,7 +367,7 @@ applyEffect effect game =
                                 else
                                     failureEffects
                         in
-                        List.foldl effectReducer (Random.constant game) chosenEffects
+                        List.foldl effectReducer (Random.constant ( game, [] )) chosenEffects
                     )
 
         GainResource quantity resource ->
@@ -362,7 +376,7 @@ applyEffect effect game =
 
         GainXp quantity skill ->
             floatGenerator quantity
-                |> Random.map (\amount -> addXp skill amount game)
+                |> Random.map (\amount -> ( addXp skill amount game, [] ))
 
         GainChoreMxp { multiplier } choreType ->
             let
@@ -372,30 +386,30 @@ applyEffect effect game =
             game
                 |> addMxp choreType (base * multiplier)
                 |> addMasteryPoolXp (base * multiplier / 2)
-                |> Random.constant
+                |> (\newGame -> Random.constant ( newGame, [] ))
 
         GainGold quantity ->
             intGenerator quantity
                 |> Random.map (\amount -> addGold amount game)
 
 
-addResource : Resource -> Int -> Game -> Game
+addResource : Resource -> Int -> Game -> ( Game, List Notification )
 addResource resource amount game =
     case resource of
         Resource.Manure ->
-            { game | manure = game.manure + amount }
+            ( { game | manure = game.manure + amount }, [ GainedResource amount resource ] )
 
         Resource.Ingot ->
-            game
+            ( game, [] )
 
         Resource.Ore ->
-            game
+            ( game, [] )
 
         Resource.Ruby ->
-            game
+            ( game, [] )
 
         Resource.Stick ->
-            { game | sticks = game.sticks + amount }
+            ( { game | sticks = game.sticks + amount }, [] )
 
 
 addXp : Skill -> Float -> Game -> Game
@@ -420,16 +434,29 @@ addMasteryPoolXp amount game =
     { game | choresMxp = game.choresMxp + amount }
 
 
-addGold : Int -> Game -> Game
+addGold : Int -> Game -> ( Game, List Notification )
 addGold amount game =
-    { game | gold = game.gold + amount }
+    ( { game | gold = game.gold + amount }, [ GainedGold amount ] )
 
 
-applyEvent : ModdedEvent -> Game -> Random.Generator Game
+applyEvent : ModdedEvent -> Game -> Random.Generator ( Game, List Notification )
 applyEvent (ModdedEvent eventData) game =
+    let
+        reducer : Effect -> Generator ( Game, List Notification ) -> Generator ( Game, List Notification )
+        reducer effect gen =
+            gen
+                |> Random.andThen
+                    (\( accumGame, notifications ) ->
+                        applyEffect effect accumGame
+                            |> Random.map
+                                (\( newGame, newNotifications ) ->
+                                    ( newGame, notifications ++ newNotifications )
+                                )
+                    )
+    in
     List.foldl
-        (applyEffect >> Random.andThen)
-        (Random.constant game)
+        reducer
+        (Random.constant ( game, [] ))
         eventData.effects
 
 

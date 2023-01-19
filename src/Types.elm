@@ -11,6 +11,7 @@ import IdleGame.Timer exposing (Timer)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Time exposing (Posix)
+import Toast
 import Url exposing (Url)
 
 
@@ -38,6 +39,7 @@ type Tab
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , tray : Toast.Tray String
     , isDrawerOpen : Bool
     , activeTab : Tab
     , isVisible : Bool
@@ -61,6 +63,8 @@ type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
     | UrlChanged Url
+    | ToastMsg Toast.Msg
+    | AddToast String
     | InitializeGameWithTime GameState Posix
     | HandleAnimationFrame Time.Posix
     | SetDrawerOpen Bool
