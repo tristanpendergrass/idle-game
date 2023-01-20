@@ -41,7 +41,7 @@ render (Modal { borderColor } children) =
         , onClick CloseModal
         ]
         [ div
-            [ class "bg-base-100 rounded-xl w-[512px] max-w-[90%] max-h-[90%] cursor-auto overflow-x-hidden overflow-y-auto shadow-xl p-8 animate-pop-in border-t-4 border-secondary"
+            [ class "bg-base-100 rounded-xl w-[512px] max-w-[90%] max-h-[90%] cursor-auto overflow-x-hidden overflow-y-auto shadow-xl p-8 animate-pop-in border-t-4"
             , borderColorAttr
             , custom "click" (Json.Decode.succeed { message = NoOp, stopPropagation = True, preventDefault = False })
             ]
