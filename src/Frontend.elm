@@ -8,7 +8,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Notification as Notification exposing (Notification)
-import IdleGame.Tabs as Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
@@ -16,9 +15,7 @@ import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
-import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
-import Json.Encode as E
 import Lamdera
 import Process
 import Task
@@ -352,6 +349,23 @@ subscriptions _ =
         ]
 
 
+viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info String -> Html FrontendMsg
+viewToast attributes toast =
+    Html.div
+        attributes
+        [ Html.text toast.content ]
+
+
+toastConfig : Toast.Config FrontendMsg
+toastConfig =
+    Toast.config ToastMsg
+        -- attributes applied to the toast tray
+        |> Toast.withTrayAttributes [ class "toast-tray" ]
+        -- attributes applied to the toasts
+        |> Toast.withAttributes [ class "toast" ]
+        |> Toast.withTransitionAttributes [ class "toast--fade-out" ]
+
+
 view : FrontendModel -> Document FrontendMsg
 view model =
     let
@@ -417,32 +431,4 @@ view model =
                                     |> IdleGame.Views.ModalWrapper.render
                                 ]
                        )
-    }
-
-
-viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info String -> Html FrontendMsg
-viewToast attributes toast =
-    Html.div
-        attributes
-        [ Html.text toast.content ]
-
-
-toastConfig : Toast.Config FrontendMsg
-toastConfig =
-    Toast.config ToastMsg
-        |> Toast.withTrayAttributes [ style.tray ]
-        |> Toast.withAttributes [ style.toast.base ]
-        |> Toast.withTransitionAttributes [ style.toast.fadeOut ]
-        |> Toast.withFocusAttributes [ style.toast.active ]
-
-
-style =
-    { tray = class "toast-tray"
-    , toast =
-        { base = class "toast"
-        , fadeOut = class "toast--fade-out"
-        , spaced = class "toast--spaced"
-        , active = class "toast--active"
-        , closeButton = class "toast__close"
-        }
     }
