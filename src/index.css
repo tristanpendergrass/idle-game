@@ -78,11 +78,6 @@
   /* transform: translateY(20em); */
 }
 
-.toast--fade-in {
-  opacity: 0;
-  transform: translateY(20em);
-}
-
 .toast--spaced {
   margin-bottom: 1em;
 }

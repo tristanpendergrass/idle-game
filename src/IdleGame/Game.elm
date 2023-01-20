@@ -3,6 +3,7 @@ module IdleGame.Game exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Event3_test exposing (eventWithTags)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Resource as Resource exposing (Resource)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
@@ -251,11 +252,6 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-type Notification
-    = GainedGold Int
-    | GainedResource Int Resource
-
-
 tick : Game -> ( Game, List Notification )
 tick game =
     let
@@ -397,7 +393,7 @@ addResource : Resource -> Int -> Game -> ( Game, List Notification )
 addResource resource amount game =
     case resource of
         Resource.Manure ->
-            ( { game | manure = game.manure + amount }, [ GainedResource amount resource ] )
+            ( { game | manure = game.manure + amount }, [ Notification.GainedResource amount Resource.Manure ] )
 
         Resource.Ingot ->
             ( game, [] )
@@ -409,7 +405,7 @@ addResource resource amount game =
             ( game, [] )
 
         Resource.Stick ->
-            ( { game | sticks = game.sticks + amount }, [] )
+            ( { game | sticks = game.sticks + amount }, [ Notification.GainedResource amount Resource.Stick ] )
 
 
 addXp : Skill -> Float -> Game -> Game
@@ -436,7 +432,7 @@ addMasteryPoolXp amount game =
 
 addGold : Int -> Game -> ( Game, List Notification )
 addGold amount game =
-    ( { game | gold = game.gold + amount }, [ GainedGold amount ] )
+    ( { game | gold = game.gold + amount }, [ Notification.GainedGold amount ] )
 
 
 applyEvent : ModdedEvent -> Game -> Random.Generator ( Game, List Notification )

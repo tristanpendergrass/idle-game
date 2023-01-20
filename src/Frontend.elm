@@ -6,7 +6,8 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game exposing (Game, MasteryUnlocks, Notification)
+import IdleGame.Game exposing (Game, MasteryUnlocks)
+import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Tabs as Tabs
 import IdleGame.Timer
 import IdleGame.Views.Content
@@ -91,7 +92,8 @@ updateGameToTime nowPos ( oldTick, game, notifications ) =
             now >= nextTick
 
         isLastTick =
-            nextTick + tickDuration > now
+            -- The tickDuration * 2 is deliberate here. The tickDuration is about == an animation frame so without the (* 2) you will see it occassionally skip a notification when the frame and tick don't line up right
+            nextTick + (tickDuration * 2) > now
     in
     if shouldTick then
         -- Note: be careful with the next line causing a stack overflow. It is written in a particular way to allow Tail-call elimination and should stay that way.
@@ -117,15 +119,6 @@ updateGameToTime nowPos ( oldTick, game, notifications ) =
 setCurrentTime : Posix -> GameState -> GameState
 setCurrentTime now gameState =
     { gameState | currentTime = now }
-
-
-laterGameState : GameState -> GameState -> GameState
-laterGameState left right =
-    if Time.posixToMillis left.lastTick < Time.posixToMillis right.lastTick then
-        right
-
-    else
-        left
 
 
 setGameState : Maybe GameState -> FrontendModel -> FrontendModel
@@ -270,17 +263,9 @@ update msg model =
                                 else
                                     []
 
-                            notificationToToast notification =
-                                case notification of
-                                    IdleGame.Game.GainedResource amount resource ->
-                                        delay 0 (AddToast "Gained Resource")
-
-                                    IdleGame.Game.GainedGold amount ->
-                                        delay 0 (AddToast "Gained Gold")
-
                             notificationCmds =
                                 if model.isVisible then
-                                    List.map notificationToToast notifications
+                                    List.map (Notification.toToast >> AddToast >> delay 0) notifications
 
                                 else
                                     []
@@ -432,8 +417,6 @@ view model =
                                     |> IdleGame.Views.ModalWrapper.render
                                 ]
                        )
-
-    -- ++ [ div [ class "toastify toastify-center toastify-bottom", attribute "style" "transform: translate(0px, 0px); bottom: 15px;" ] [ text "+100 Gold" ] ]
     }
 
 
@@ -462,16 +445,4 @@ style =
         , active = class "toast--active"
         , closeButton = class "toast__close"
         }
-    , toastFrame =
-        { base = class "toast-frame"
-        , fadeOut = class "toast-frame--fade-out"
-        }
-    , background =
-        { green = class "bg-green"
-        , blue = class "bg-blue"
-        , yellow = class "bg-yellow"
-        , red = class "bg-red"
-        }
-    , triggers = class "trigger-buttons"
-    , button = class "button"
     }
