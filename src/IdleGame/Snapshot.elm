@@ -2,14 +2,14 @@ module IdleGame.Snapshot exposing
     ( Snapshot
     , Tick
     , createTick
-    , fastForward
     , fromTuple
     , getTime
+    , getTimeDifference
     , getValue
     , map
     , setTime
     , setValue
-    , tickWith
+    , tickUntil
     )
 
 import Time exposing (Posix)
@@ -33,7 +33,7 @@ fromTuple ( now, initialState ) =
     Snapshot ( now, initialState )
 
 
-map : (t -> t) -> Snapshot t -> Snapshot t
+map : (t -> a) -> Snapshot t -> Snapshot a
 map fn (Snapshot ( time, state )) =
     Snapshot ( time, fn state )
 
@@ -58,11 +58,13 @@ setValue state (Snapshot ( time, _ )) =
     Snapshot ( time, state )
 
 
-tickWith : Tick t -> Snapshot t -> Snapshot t
-tickWith (Tick delta fn) (Snapshot ( time, state )) =
+tickUntil : Tick t -> Posix -> Snapshot t -> Snapshot t
+tickUntil (Tick delta fn) endTime (Snapshot ( time, state )) =
     Debug.todo ""
 
 
-fastForward : Tick t -> Posix -> Snapshot t -> Snapshot t
-fastForward (Tick delta fn) endTime (Snapshot ( time, state )) =
-    Debug.todo ""
+getTimeDifference : Snapshot t -> Snapshot a -> Posix
+getTimeDifference (Snapshot ( oldTime, _ )) (Snapshot ( newTime, _ )) =
+    Time.posixToMillis newTime
+        - Time.posixToMillis oldTime
+        |> Time.millisToPosix

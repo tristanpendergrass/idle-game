@@ -65,7 +65,6 @@ type FrontendMsg
     | UrlChanged Url
     | ToastMsg Toast.Msg
     | AddToast String
-    | HandleInitialize (Snapshot Game)
     | HandleFastForward Posix
     | HandleAnimationFrame Time.Posix
     | SetDrawerOpen Bool

@@ -124,21 +124,19 @@ setActiveModal activeModal model =
     { model | activeModal = activeModal }
 
 
-createTimePassesModal : Snapshot Game -> Maybe Modal
-createTimePassesModal snapshot =
+createTimePassesModal : Snapshot Game -> Snapshot Game -> Maybe Modal
+createTimePassesModal oldSnap newSnap =
     let
-        { currentTime, lastTick, game } =
-            snapshot
+        oldGame =
+            Snapshot.getValue oldSnap
 
-        ( newTick, newGame, _ ) =
-            updateGameToTime currentTime ( lastTick, game, [] )
+        newGame =
+            Snapshot.getValue newSnap
 
         timePassed =
-            Time.posixToMillis newTick
-                - Time.posixToMillis lastTick
-                |> Time.millisToPosix
+            Snapshot.getTimeDifference oldSnap newSnap
     in
-    IdleGame.Game.getTimePassesData game newGame
+    IdleGame.Game.getTimePassesData oldGame newGame
         |> Maybe.map (TimePassesModal timePassed)
 
 
@@ -209,21 +207,8 @@ update msg model =
             in
             ( { model | tray = tray }, Cmd.map ToastMsg newTmesg )
 
-        HandleInitialize serverSnapshot ->
-            -- TODO: remove second param from this type, it's not needed after refactor
-            case model.gameState of
-                Initializing ->
-                    ( model
-                        |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot })
-                    , Task.perform HandleFastForward Time.now
-                    )
-
-                _ ->
-                    -- If we receive an InitializeGame message from backend while already initialized we ignore it
-                    noOp
-
         HandleFastForward now ->
-            --
+            -- do something with createTimePassesModal
             Debug.todo ""
 
         ToggleActiveChore toggleId ->
@@ -255,73 +240,86 @@ update msg model =
 
                     else
                         let
-                            ( newTick, newGame, notifications ) =
-                                updateGameToTime now ( snapshot.lastTick, snapshot.game, [] )
+                            -- Decide whether to save game
+                            -- ( newSaveGameTimer, saveGameTimerTriggered ) =
+                            --     IdleGame.Timer.increment delta model.saveGameTimer
+                            -- shouldSaveGame =
+                            --     saveGameTimerTriggered > 0
+                            -- Tick game forward
+                            tick =
+                                Snapshot.createTick 15
+                                    (\( g, n ) ->
+                                        let
+                                            ( ng, nn ) =
+                                                IdleGame.Game.tick g
+                                        in
+                                        ( ng, n ++ nn )
+                                    )
+
+                            oldSnapshot : Snapshot ( Game, List Notification )
+                            oldSnapshot =
+                                snapshot
+                                    |> Snapshot.map (\g -> ( g, [] ))
+
+                            updatedSnapshot : Snapshot ( Game, List Notification )
+                            updatedSnapshot =
+                                oldSnapshot
+                                    |> Snapshot.tickUntil tick now
+
+                            ( _, notifications ) =
+                                Snapshot.getValue updatedSnapshot
 
                             newGameState =
-                                { snapshot | currentTime = now, lastTick = newTick, game = newGame }
+                                updatedSnapshot
+                                    |> Snapshot.map Tuple.first
 
-                            delta =
-                                Time.posixToMillis now - Time.posixToMillis (Snapshot.getTime newGameState)
-
-                            ( newSaveGameTimer, saveGameTimerTriggered ) =
-                                IdleGame.Timer.increment delta model.saveGameTimer
-
-                            shouldSaveGame =
-                                saveGameTimerTriggered > 0
-
-                            saveGameCmd =
-                                if shouldSaveGame then
-                                    [ Lamdera.sendToBackend (Save newGameState) ]
-
-                                else
-                                    []
-
+                            -- saveGameCmd =
+                            --     if shouldSaveGame then
+                            --         [ Lamdera.sendToBackend (Save newGameState) ]
+                            --     else
+                            --         []
                             notificationCmds =
-                                if model.isVisible then
-                                    List.map (Notification.toToast >> AddToast >> delay 0) notifications
-
-                                else
-                                    []
-
-                            newSnapshot =
-                                Debug.todo ""
+                                List.map (Notification.toToast >> AddToast >> delay 0) notifications
                         in
                         ( { model
-                            | gameState = Playing newSnapshot
-                            , saveGameTimer = newSaveGameTimer
+                            | gameState = Playing newGameState
+
+                            -- , saveGameTimer = newSaveGameTimer
                           }
-                        , Cmd.batch <| saveGameCmd ++ notificationCmds
+                          -- , Cmd.batch <| saveGameCmd ++ notificationCmds
+                        , Cmd.batch <| notificationCmds
                         )
 
         -- HandleVisibilityChangeWithTime visibility now ->
         HandleVisibilityChange visibility ->
-            case model.maybeGame of
-                Nothing ->
+            case model.gameState of
+                Initializing ->
                     noOp
 
-                Just gameState ->
-                    if visibility == Browser.Events.Visible then
-                        let
-                            newActiveModal =
-                                case createTimePassesModal gameState of
-                                    Just timePassesModal ->
-                                        Just timePassesModal
+                FastForward _ ->
+                    noOp
 
-                                    Nothing ->
-                                        model.activeModal
-                        in
-                        ( model
-                            |> setActiveModal newActiveModal
-                            |> setIsVisible True
-                        , Cmd.none
-                        )
-
-                    else
-                        ( model
-                            |> setIsVisible False
-                        , Cmd.none
-                        )
+                Playing snapshot ->
+                    -- if visibility == Browser.Events.Visible then
+                    --     let
+                    --         newActiveModal =
+                    --             case createTimePassesModal gameState of
+                    --                 Just timePassesModal ->
+                    --                     Just timePassesModal
+                    --                 Nothing ->
+                    --                     model.activeModal
+                    --     in
+                    --     ( model
+                    --         |> setActiveModal newActiveModal
+                    --         |> setIsVisible True
+                    --     , Cmd.none
+                    --     )
+                    -- else
+                    --     ( model
+                    --         |> setIsVisible False
+                    --     , Cmd.none
+                    --     )
+                    Debug.todo ""
 
         CloseModal ->
             ( model
@@ -351,12 +349,25 @@ update msg model =
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
+    let
+        noOp =
+            ( model, Cmd.none )
+    in
     case msg of
         NoOpToFrontend ->
             ( model, Cmd.none )
 
-        HandleInitialize snapshot ->
-            ( model, Task.perform (HandleInitialize snapshot) Time.now )
+        InitializeGame serverSnapshot ->
+            case model.gameState of
+                Initializing ->
+                    ( model
+                        |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot })
+                    , Task.perform HandleFastForward Time.now
+                    )
+
+                _ ->
+                    -- If we receive an InitializeGame message from backend while already initialized we ignore it
+                    noOp
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
@@ -395,11 +406,14 @@ view model =
     in
     { title = "Idle Game"
     , body =
-        case model.maybeGame of
-            Nothing ->
+        case model.gameState of
+            Initializing ->
                 css
 
-            Just snapshot ->
+            FastForward _ ->
+                css
+
+            Playing snapshot ->
                 let
                     game =
                         Snapshot.getValue snapshot

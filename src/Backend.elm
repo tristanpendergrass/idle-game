@@ -45,7 +45,7 @@ update msg model =
             ( model
                 |> setSeed newSeed
                 |> setSnapshot sessionId snapshot
-            , Lamdera.sendToFrontend clientId (HandleInitialize snapshot)
+            , Lamdera.sendToFrontend clientId (InitializeGame snapshot)
             )
 
         HandleConnect sessionId clientId ->
