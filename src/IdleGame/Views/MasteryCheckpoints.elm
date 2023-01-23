@@ -58,5 +58,5 @@ render { mxp, checkpoints } =
             , renderCheckpoint { number = 50, label = checkpoints.fifty.label, isActive = masteryPercent >= 50.0 }
             , renderCheckpoint { number = 95, label = checkpoints.ninetyFive.label, isActive = masteryPercent >= 95.0 }
             ]
-        , IdleGame.Views.ModalWrapper.closeButton
+        , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

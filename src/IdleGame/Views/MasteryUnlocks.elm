@@ -45,5 +45,5 @@ render { masteryUnlocks } =
             [ span [] [ text <| "Every 10 levels provides" ]
             , span [ class "text-success" ] [ text mod.label ]
             ]
-        , IdleGame.Views.ModalWrapper.closeButton
+        , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

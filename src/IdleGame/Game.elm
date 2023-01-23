@@ -491,23 +491,15 @@ withTags newTags (Effect { type_, tags }) =
         }
 
 
-
--- type alias ChoreReward =
---     { xp : Float, mxp : Float,  }
--- Time passes logic
-
-
-type alias TimePassesItemGain =
+type alias TimePassesResourceGain =
     { amount : Int
     , title : String
-    , icon : Icon
     }
 
 
-type alias TimePassesItemLoss =
+type alias TimePassesResourceLoss =
     { amount : Int
     , title : String
-    , icon : Icon
     }
 
 
@@ -519,8 +511,8 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , itemGains : List TimePassesItemGain
-    , itemLosses : List TimePassesItemLoss
+    , resourceGains : List TimePassesResourceGain
+    , resourceLosses : List TimePassesResourceLoss
     }
 
 
@@ -528,20 +520,44 @@ getTimePassesData : Game -> Game -> Maybe TimePassesData
 getTimePassesData oldGame newGame =
     let
         choresXpAmount =
-            floor newGame.choresXp - floor oldGame.choresXp
+            floor <| newGame.choresXp - oldGame.choresXp
+
+        xpGains =
+            if choresXpAmount > 0 then
+                [ { title = "Chores XP", amount = choresXpAmount } ]
+
+            else
+                []
+
+        manureGained =
+            newGame.manure - oldGame.manure
+
+        sticksGained =
+            newGame.sticks - oldGame.sticks
+
+        resourceGains =
+            []
+                ++ (if manureGained > 0 then
+                        [ { title = "Manure", amount = manureGained } ]
+
+                    else
+                        []
+                   )
+                ++ (if sticksGained > 0 then
+                        [ { title = "Sticks", amount = sticksGained } ]
+
+                    else
+                        []
+                   )
 
         hasNewData =
-            choresXpAmount > 0
+            not <| (List.isEmpty (Debug.log "xpGains" xpGains) && List.isEmpty (Debug.log "resourceGains" resourceGains))
     in
     if hasNewData then
         Just
-            { xpGains =
-                [ { title = "Chores XP"
-                  , amount = choresXpAmount
-                  }
-                ]
-            , itemGains = []
-            , itemLosses = []
+            { xpGains = xpGains
+            , resourceGains = resourceGains
+            , resourceLosses = []
             }
 
     else

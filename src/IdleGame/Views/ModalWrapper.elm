@@ -1,4 +1,4 @@
-module IdleGame.Views.ModalWrapper exposing (Modal, closeButton, create, render, withBorderColor)
+module IdleGame.Views.ModalWrapper exposing (Modal, create, render, renderCloseButton, withBorderColor)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -25,6 +25,12 @@ withBorderColor color (Modal opts children) =
     Modal { opts | borderColor = Just color } children
 
 
+renderCloseButton : Html FrontendMsg
+renderCloseButton =
+    button [ class "btn btn-primary", onClick CloseModal ]
+        [ text "Done" ]
+
+
 render : Modal -> Html FrontendMsg
 render (Modal { borderColor } children) =
     let
@@ -47,9 +53,3 @@ render (Modal { borderColor } children) =
             ]
             [ children ]
         ]
-
-
-closeButton : Html FrontendMsg
-closeButton =
-    button [ class "btn btn-primary", onClick CloseModal ]
-        [ text "Done" ]

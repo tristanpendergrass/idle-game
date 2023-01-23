@@ -1,7 +1,8 @@
 module Backend exposing (app)
 
 import Dict
-import IdleGame.Game
+import IdleGame.Game exposing (..)
+import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Task
@@ -19,6 +20,11 @@ setSeed newSeed model =
     { model | seed = newSeed }
 
 
+setSnapshot : SessionId -> Snapshot Game -> BackendModel -> BackendModel
+setSnapshot sessionId snapshot model =
+    { model | sessionGameMap = Dict.insert sessionId snapshot model.sessionGameMap }
+
+
 update : BackendMsg -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 update msg model =
     case msg of
@@ -30,14 +36,16 @@ update msg model =
                 ( seedForGame, newSeed ) =
                     Random.step Random.independentSeed model.seed
 
-                gameState : GameState
-                gameState =
+                snapshot : Snapshot Game
+                snapshot =
                     Dict.get sessionId model.sessionGameMap
-                        |> Maybe.withDefault { currentTime = now, lastTick = now, game = IdleGame.Game.create seedForGame }
+                        |> Maybe.withDefault
+                            (Snapshot.fromTuple ( now, IdleGame.Game.create seedForGame ))
             in
             ( model
                 |> setSeed newSeed
-            , Lamdera.sendToFrontend clientId (InitializeGame gameState)
+                |> setSnapshot sessionId snapshot
+            , Lamdera.sendToFrontend clientId (HandleInitialize snapshot)
             )
 
         HandleConnect sessionId clientId ->

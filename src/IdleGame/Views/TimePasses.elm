@@ -4,10 +4,9 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game
-import IdleGame.Views.Icon as Icon
+import IdleGame.Game exposing (TimePassesData)
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
-import Json.Decode
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -116,29 +115,25 @@ getDurationStringParts millis =
         []
 
 
-render : Posix -> IdleGame.Game.TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, itemGains, itemLosses } =
+render : Posix -> TimePassesData -> Html FrontendMsg
+render timePassed { xpGains, resourceGains, resourceLosses } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
-        , div [ classList [ ( "hidden", List.isEmpty itemLosses ) ] ]
+        , div [ classList [ ( "hidden", List.isEmpty resourceLosses ) ] ]
             [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
             , ul [ class "t-column font-semibold" ]
-                (itemLosses
+                (resourceLosses
                     |> List.map
-                        (\{ title, amount, icon } ->
+                        (\{ title, amount } ->
                             li [ class "flex items-center gap-2" ]
                                 [ span [ class "text-error" ] [ text <| String.fromInt amount ]
-                                , icon
-                                    |> Icon.toFeatherIcon
-                                    |> FeatherIcons.withClass "inline-block"
-                                    |> FeatherIcons.toHtml []
                                 , span [] [ text title ]
                                 ]
                         )
                 )
             ]
-        , div [ classList [ ( "hidden", List.isEmpty itemGains && List.isEmpty xpGains ) ] ]
+        , div [ classList [ ( "hidden", List.isEmpty resourceGains && List.isEmpty xpGains ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , ul [ class "t-column font-semibold" ]
                 (List.concat
@@ -150,20 +145,16 @@ render timePassed { xpGains, itemGains, itemLosses } =
                                     , span [] [ text title ]
                                     ]
                             )
-                    , itemGains
+                    , resourceGains
                         |> List.map
-                            (\{ title, amount, icon } ->
+                            (\{ title, amount } ->
                                 li [ class "flex items-center gap-2" ]
                                     [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                                    , icon
-                                        |> Icon.toFeatherIcon
-                                        |> FeatherIcons.withClass "inline-block"
-                                        |> FeatherIcons.toHtml []
                                     , span [] [ text title ]
                                     ]
                             )
                     ]
                 )
             ]
-        , IdleGame.Views.ModalWrapper.closeButton
+        , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

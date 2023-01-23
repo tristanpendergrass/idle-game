@@ -7,6 +7,7 @@ import Dict exposing (Dict)
 import FeatherIcons
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
+import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Timer exposing (Timer)
 import Lamdera exposing (ClientId, SessionId)
 import Random
@@ -25,16 +26,15 @@ type Modal
     | ChoreItemUnlocksModal
 
 
-type alias GameState =
-    { currentTime : Posix
-    , lastTick : Posix
-    , game : Game
-    }
-
-
 type Tab
     = BagTab
     | ChoresTab
+
+
+type FrontendGameState
+    = Initializing
+    | Playing (Snapshot Game)
+    | FastForward { original : Snapshot Game, current : Snapshot Game }
 
 
 type alias FrontendModel =
@@ -45,12 +45,12 @@ type alias FrontendModel =
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
-    , gameState : Maybe GameState
+    , gameState : FrontendGameState
     }
 
 
 type alias SessionGameMap =
-    Dict SessionId GameState
+    Dict SessionId (Snapshot Game)
 
 
 type alias BackendModel =
@@ -65,7 +65,8 @@ type FrontendMsg
     | UrlChanged Url
     | ToastMsg Toast.Msg
     | AddToast String
-    | InitializeGameWithTime GameState Posix
+    | HandleInitialize (Snapshot Game)
+    | HandleFastForward Posix
     | HandleAnimationFrame Time.Posix
     | SetDrawerOpen Bool
     | HandleVisibilityChange Browser.Events.Visibility
@@ -79,7 +80,7 @@ type FrontendMsg
 
 type ToBackend
     = NoOpToBackend
-    | Save GameState
+    | Save (Snapshot Game)
 
 
 type BackendMsg
@@ -90,4 +91,4 @@ type BackendMsg
 
 type ToFrontend
     = NoOpToFrontend
-    | InitializeGame GameState
+    | InitializeGame (Snapshot Game)
