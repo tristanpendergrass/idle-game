@@ -70,50 +70,6 @@ init url key =
 -- Update
 
 
-updateGameToTime : Posix -> ( Posix, Game, List Notification ) -> ( Posix, Game, List Notification )
-updateGameToTime nowPos ( oldTick, game, notifications ) =
-    let
-        tickDuration =
-            IdleGame.Timer.tickDuration
-
-        nextTickPos =
-            Time.Extra.add Time.Extra.Millisecond tickDuration Time.utc oldTick
-
-        nextTick =
-            nextTickPos
-                |> Time.posixToMillis
-
-        now =
-            Time.posixToMillis nowPos
-
-        shouldTick =
-            now >= nextTick
-
-        isLastTick =
-            -- The tickDuration * 2 is deliberate here. The tickDuration is about == an animation frame so without the (* 2) you will see it occassionally skip a notification when the frame and tick don't line up right
-            nextTick + (tickDuration * 2) > now
-    in
-    if shouldTick then
-        -- Note: be careful with the next line causing a stack overflow. It is written in a particular way to allow Tail-call elimination and should stay that way.
-        -- Additional reading: https://jfmengels.net/tail-call-optimization/
-        let
-            ( newGame, tickNotifications ) =
-                IdleGame.Game.tick game
-
-            newNotifications =
-                -- We don't want to show a mountain of notifications when calculating many ticks back to back
-                if isLastTick then
-                    notifications ++ tickNotifications
-
-                else
-                    notifications
-        in
-        updateGameToTime nowPos ( nextTickPos, newGame, newNotifications )
-
-    else
-        ( oldTick, game, notifications )
-
-
 setIsVisible : Bool -> FrontendModel -> FrontendModel
 setIsVisible isVisible model =
     { model | isVisible = isVisible }

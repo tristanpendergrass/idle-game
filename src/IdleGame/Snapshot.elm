@@ -13,6 +13,7 @@ module IdleGame.Snapshot exposing
     )
 
 import Time exposing (Posix)
+import Time.Extra
 
 
 type Tick t
@@ -58,9 +59,46 @@ setValue state (Snapshot ( time, _ )) =
     Snapshot ( time, state )
 
 
+getDuration : Tick t -> Int
+getDuration (Tick duration _) =
+    duration
+
+
+getFunction : Tick t -> (t -> t)
+getFunction (Tick _ fn) =
+    fn
+
+
 tickUntil : Tick t -> Posix -> Snapshot t -> Snapshot t
-tickUntil (Tick delta fn) endTime (Snapshot ( time, state )) =
-    Debug.todo ""
+tickUntil tick endTime snapshot =
+    let
+        tickDuration =
+            getDuration tick
+
+        timeOfNextTick =
+            snapshot
+                |> getTime
+                |> Time.Extra.add Time.Extra.Millisecond tickDuration Time.utc
+                |> Time.posixToMillis
+
+        shouldTick : Bool
+        shouldTick =
+            timeOfNextTick < Time.posixToMillis endTime
+    in
+    if shouldTick then
+        let
+            newValue =
+                snapshot
+                    |> getValue
+                    |> getFunction tick
+
+            newSnapshot =
+                Snapshot ( Time.millisToPosix timeOfNextTick, newValue )
+        in
+        tickUntil tick endTime newSnapshot
+
+    else
+        snapshot
 
 
 getTimeDifference : Snapshot t -> Snapshot a -> Posix
