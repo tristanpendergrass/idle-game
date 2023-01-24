@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
-import IdleGame.Timer
+import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.MasteryCheckpoints
@@ -54,7 +54,7 @@ init url key =
       , activeModal = Nothing
 
       --   , activeModal = Just ChoreMasteryCheckpointsModal
-      , saveGameTimer = IdleGame.Timer.create 1000
+      , saveGameTimer = Timer.create 1000
       , gameState = Initializing
       }
     , Cmd.none
@@ -123,6 +123,16 @@ mapGame fn model =
             model
 
 
+setSaveGameTimer : Timer -> FrontendModel -> FrontendModel
+setSaveGameTimer timer model =
+    { model | saveGameTimer = timer }
+
+
+tickDuration : Int
+tickDuration =
+    15
+
+
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
     let
@@ -164,8 +174,25 @@ update msg model =
             ( { model | tray = tray }, Cmd.map ToastMsg newTmesg )
 
         HandleFastForward now ->
-            -- do something with createTimePassesModal
-            Debug.todo ""
+            case model.gameState of
+                FastForward { original, current } ->
+                    -- tick until a certain time. either now or something less than now and then recurse. when done set state to Playing and show modal
+                    let
+                        tick =
+                            Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
+
+                        newSnap =
+                            Snapshot.tickUntil tick now current
+                    in
+                    ( model
+                        |> setGameState
+                            (Playing newSnap)
+                    , Cmd.none
+                    )
+
+                _ ->
+                    -- Shouldn't happen
+                    noOp
 
         ToggleActiveChore toggleId ->
             ( model
@@ -179,13 +206,39 @@ update msg model =
             , Cmd.none
             )
 
+        HandleAnimationFrameDelta delta ->
+            case model.gameState of
+                Playing snapshot ->
+                    let
+                        ( newTimer, saveGameTimerTriggered ) =
+                            -- Note the rounding from (floor delta). Our save game timer will not happen exactly as often as it's supposed to and that's alright I guess...
+                            Timer.increment (floor delta) model.saveGameTimer
+
+                        shouldSaveGame =
+                            saveGameTimerTriggered > 0
+
+                        saveGameCmd =
+                            if shouldSaveGame then
+                                [ Lamdera.sendToBackend (Save snapshot) ]
+
+                            else
+                                []
+                    in
+                    ( model
+                        |> setSaveGameTimer newTimer
+                    , Cmd.batch <| saveGameCmd
+                    )
+
+                _ ->
+                    noOp
+
         HandleAnimationFrame now ->
             case model.gameState of
                 Initializing ->
                     -- Backend has not yet sent an initialization message so no work to do.
                     noOp
 
-                FastForward { original, current } ->
+                FastForward _ ->
                     -- During FastForward there's a recursive set of Cmds updating the snapshot, no work needs to be done in animationFrame explicitly
                     noOp
 
@@ -196,14 +249,8 @@ update msg model =
 
                     else
                         let
-                            -- Decide whether to save game
-                            -- ( newSaveGameTimer, saveGameTimerTriggered ) =
-                            --     IdleGame.Timer.increment delta model.saveGameTimer
-                            -- shouldSaveGame =
-                            --     saveGameTimerTriggered > 0
-                            -- Tick game forward
                             tick =
-                                Snapshot.createTick 15
+                                Snapshot.createTick tickDuration
                                     (\( g, n ) ->
                                         let
                                             ( ng, nn ) =
@@ -229,53 +276,51 @@ update msg model =
                                 updatedSnapshot
                                     |> Snapshot.map Tuple.first
 
-                            -- saveGameCmd =
-                            --     if shouldSaveGame then
-                            --         [ Lamdera.sendToBackend (Save newGameState) ]
-                            --     else
-                            --         []
                             notificationCmds =
                                 List.map (Notification.toToast >> AddToast >> delay 0) notifications
                         in
                         ( { model
                             | gameState = Playing newGameState
-
-                            -- , saveGameTimer = newSaveGameTimer
                           }
-                          -- , Cmd.batch <| saveGameCmd ++ notificationCmds
                         , Cmd.batch <| notificationCmds
                         )
 
         -- HandleVisibilityChangeWithTime visibility now ->
         HandleVisibilityChange visibility ->
-            case model.gameState of
-                Initializing ->
-                    noOp
+            if visibility == Browser.Events.Visible then
+                case model.gameState of
+                    Initializing ->
+                        ( model
+                            |> setIsVisible True
+                        , Cmd.none
+                        )
 
-                FastForward _ ->
-                    noOp
+                    FastForward _ ->
+                        ( model
+                            |> setIsVisible True
+                        , Cmd.none
+                        )
 
-                Playing snapshot ->
-                    -- if visibility == Browser.Events.Visible then
-                    --     let
-                    --         newActiveModal =
-                    --             case createTimePassesModal gameState of
-                    --                 Just timePassesModal ->
-                    --                     Just timePassesModal
-                    --                 Nothing ->
-                    --                     model.activeModal
-                    --     in
-                    --     ( model
-                    --         |> setActiveModal newActiveModal
-                    --         |> setIsVisible True
-                    --     , Cmd.none
-                    --     )
-                    -- else
-                    --     ( model
-                    --         |> setIsVisible False
-                    --     , Cmd.none
-                    --     )
-                    Debug.todo ""
+                    Playing snapshot ->
+                        -- let
+                        --     newActiveModal =
+                        --         case createTimePassesModal gameState of
+                        --             Just timePassesModal ->
+                        --                 Just timePassesModal
+                        --             Nothing ->
+                        --                 model.activeModal
+                        -- in
+                        ( model
+                            -- |> setActiveModal newActiveModal
+                            |> setIsVisible True
+                        , Cmd.none
+                        )
+
+            else
+                ( model
+                    |> setIsVisible False
+                , Cmd.none
+                )
 
         CloseModal ->
             ( model
@@ -330,6 +375,7 @@ subscriptions : FrontendModel -> Sub FrontendMsg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrame HandleAnimationFrame
+        , Browser.Events.onAnimationFrameDelta HandleAnimationFrameDelta
         , Browser.Events.onVisibilityChange HandleVisibilityChange
         ]
 

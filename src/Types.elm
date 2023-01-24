@@ -67,6 +67,7 @@ type FrontendMsg
     | AddToast String
     | HandleFastForward Posix
     | HandleAnimationFrame Time.Posix
+    | HandleAnimationFrameDelta Float
     | SetDrawerOpen Bool
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
