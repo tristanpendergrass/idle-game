@@ -181,14 +181,32 @@ update msg model =
                         tick =
                             Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
 
-                        newSnap =
-                            Snapshot.tickUntil tick now current
+                        nextInterval =
+                            Time.Extra.add Time.Extra.Minute 10 Time.utc (Snapshot.getTime current)
                     in
-                    ( model
-                        |> setGameState
-                            (Playing newSnap)
-                    , Cmd.none
-                    )
+                    if Time.posixToMillis nextInterval < Time.posixToMillis now then
+                        -- recurse
+                        let
+                            newSnap =
+                                Snapshot.tickUntil tick nextInterval current
+                        in
+                        ( model
+                            |> setGameState
+                                (FastForward { original = original, current = newSnap })
+                        , Task.perform HandleFastForward Time.now
+                        )
+
+                    else
+                        -- done
+                        let
+                            newSnap =
+                                Snapshot.tickUntil tick now current
+                        in
+                        ( model
+                            |> setGameState
+                                (Playing newSnap)
+                        , Cmd.none
+                        )
 
                 _ ->
                     -- Shouldn't happen
@@ -414,6 +432,7 @@ view model =
 
             FastForward _ ->
                 css
+                    ++ [ div [] [ text "Fast Forwarding..." ] ]
 
             Playing snapshot ->
                 let

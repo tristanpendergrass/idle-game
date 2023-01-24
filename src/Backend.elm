@@ -6,7 +6,8 @@ import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Task
-import Time
+import Time exposing (Posix)
+import Time.Extra
 import Types exposing (..)
 
 
@@ -36,11 +37,16 @@ update msg model =
                 ( seedForGame, newSeed ) =
                     Random.step Random.independentSeed model.seed
 
+                someTimeAgo : Posix
+                someTimeAgo =
+                    Time.Extra.add Time.Extra.Hour -12 Time.utc now
+
                 snapshot : Snapshot Game
                 snapshot =
                     Dict.get sessionId model.sessionGameMap
                         |> Maybe.withDefault
                             (Snapshot.fromTuple ( now, IdleGame.Game.create seedForGame ))
+                        |> Snapshot.setTime someTimeAgo
             in
             ( model
                 |> setSeed newSeed

@@ -28,6 +28,7 @@ render game =
 
         masteryPercent =
             IdleGame.XpFormulas.masteryPoolPercent game.choresMxp
+                |> Basics.min 100
 
         masteryPercentLabel =
             String.fromInt (floor masteryPercent)
