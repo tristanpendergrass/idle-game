@@ -32,9 +32,9 @@ $ npm test -- --watch
 - [x] Grant items from chores
 - [ ] Icons for gold, manure, xp, mxp
 - [x] Add Notification of gained items
-- [ ] Improve Time passes modal
+- [x] Improve Time passes modal
   - [x] Add all resources to list of things to show
-  - [ ] Show Levels gained not just XP
+  - [x] Show Levels gained not just XP
   - [x] Show Gold gained
 - [x] Improve experience when calculating long amount of time
 - [ ] "Coming soon" for other skills
