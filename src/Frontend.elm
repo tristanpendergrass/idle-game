@@ -52,8 +52,6 @@ init url key =
       , activeTab = ChoresTab
       , isVisible = True
       , activeModal = Nothing
-
-      --   , activeModal = Just ChoreMasteryCheckpointsModal
       , saveGameTimer = Timer.create 1000
       , gameState = Initializing
       }

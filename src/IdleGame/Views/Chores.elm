@@ -241,7 +241,10 @@ renderChore game chore =
 renderLockedChore : Int -> Html FrontendMsg
 renderLockedChore level =
     div
-        [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer bubble-shake"
+        [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer"
+
+        -- Bring this back when we figure out how to solve the problem where the shake happens on every page render?
+        -- , class "bubble-shake"
         , class choreHeight
         ]
         -- Chore image

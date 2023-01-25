@@ -8,6 +8,7 @@ import IdleGame.Game exposing (TimePassesData)
 import IdleGame.Resource as Resource exposing (Resource, Resources)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
+import IdleGame.XpFormulas as XpFormulas
 import Maybe.Extra
 import Time exposing (Posix)
 import Types exposing (..)
@@ -122,7 +123,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
-        , div [ classList [ ( "hidden", Resource.isEmptyDiff resourcesDiff && List.isEmpty xpGains && Maybe.Extra.isNothing goldGains ) ] ]
+        , div []
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , ul [ class "t-column font-semibold" ]
                 (List.concat
@@ -138,10 +139,26 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                             ]
                     , xpGains
                         |> List.map
-                            (\{ title, amount } ->
+                            (\{ title, originalXp, currentXp } ->
+                                let
+                                    displayAmount =
+                                        (currentXp - originalXp)
+                                            |> floor
+
+                                    originalLevel =
+                                        XpFormulas.skillLevel originalXp
+
+                                    currentLevel =
+                                        XpFormulas.skillLevel currentXp
+                                in
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                                    [ span [ class "text-success" ] [ text <| String.fromInt displayAmount ]
                                     , span [] [ text title ]
+                                    , if originalLevel /= currentLevel then
+                                        span [] [ text <| "(Level " ++ String.fromInt originalLevel ++ " -> " ++ String.fromInt currentLevel ++ ")" ]
+
+                                      else
+                                        span [] []
                                     ]
                             )
                     , resourcesDiff

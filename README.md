@@ -33,7 +33,7 @@ $ npm test -- --watch
 - [ ] Icons for gold, manure, xp, mxp
 - [x] Add Notification of gained items
 - [ ] Improve Time passes modal
-  - [ ] Add all resources to list of things to show
+  - [x] Add all resources to list of things to show
   - [ ] Show Levels gained not just XP
   - [x] Show Gold gained
 - [x] Improve experience when calculating long amount of time
@@ -62,3 +62,4 @@ $ npm test -- --watch
 
 ### Glitz
 - [ ] Progress bar animations
+- [ ] Format numbers correctly with commas etc. in Time Passes modal

@@ -92,8 +92,12 @@ getAmount resource =
 
 
 addResource : Resource -> Int -> Resources -> Resources
-addResource resource =
-    (getConfig resource).setter
+addResource resource amount resources =
+    let
+        oldAmount =
+            (getConfig resource).getter resources
+    in
+    (getConfig resource).setter (oldAmount + amount) resources
 
 
 getDiff : { original : Resources, current : Resources } -> ResourcesDiff

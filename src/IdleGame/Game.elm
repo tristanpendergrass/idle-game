@@ -494,7 +494,8 @@ type alias TimePassesResourceLoss =
 
 
 type alias TimePassesXpGain =
-    { amount : Int
+    { originalXp : Float
+    , currentXp : Float
     , title : String
     }
 
@@ -507,27 +508,24 @@ type alias TimePassesData =
 
 
 getTimePassesData : Game -> Game -> Maybe TimePassesData
-getTimePassesData oldGame newGame =
+getTimePassesData originalGame currentGame =
     let
-        choresXpAmount =
-            floor <| newGame.choresXp - oldGame.choresXp
-
         xpGains =
-            if choresXpAmount > 0 then
-                [ { title = "Chores XP", amount = choresXpAmount } ]
-
-            else
+            if originalGame.choresXp == currentGame.choresXp then
                 []
 
+            else
+                [ { title = "Chores XP", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
+
         goldGains =
-            if newGame.gold > oldGame.gold then
-                Just <| newGame.gold - oldGame.gold
+            if currentGame.gold > originalGame.gold then
+                Just <| currentGame.gold - originalGame.gold
 
             else
                 Nothing
 
         resourcesDiff =
-            Resource.getDiff { original = oldGame.resources, current = newGame.resources }
+            Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
 
         hasNewData =
             not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff)
