@@ -56,9 +56,9 @@ $ npm test -- --watch
 - [ ] Move Item Mastery (M) info to detail sidebar
 - [ ] Show Time Passes during Fast Forward with real time change
 
-Features
+### Features
 - [ ] Skill 2
 - [ ] Skill 3
 
-Glitz
+### Glitz
 - [ ] Progress bar animations
