@@ -208,6 +208,7 @@ update msg model =
                         ( model
                             |> setGameState
                                 (Playing newSnap)
+                            |> setActiveModal (createTimePassesModal original newSnap)
                         , Cmd.none
                         )
 
@@ -323,18 +324,10 @@ update msg model =
                         )
 
                     Playing snapshot ->
-                        -- let
-                        --     newActiveModal =
-                        --         case createTimePassesModal gameState of
-                        --             Just timePassesModal ->
-                        --                 Just timePassesModal
-                        --             Nothing ->
-                        --                 model.activeModal
-                        -- in
                         ( model
-                            -- |> setActiveModal newActiveModal
                             |> setIsVisible True
-                        , Cmd.none
+                            |> setGameState (FastForward { original = snapshot, current = snapshot })
+                        , Task.perform HandleFastForward Time.now
                         )
 
             else

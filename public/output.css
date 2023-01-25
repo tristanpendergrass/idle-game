@@ -3612,16 +3612,20 @@ body[dir="rtl"] .checkbox:checked,
   height: 1rem;
 }
 
-.h-\[100vh\] {
-  height: 100vh;
-}
-
 .max-h-\[90\%\] {
   max-height: 90%;
 }
 
+.w-\[80vw\] {
+  width: 80vw;
+}
+
 .w-screen {
   width: 100vw;
+}
+
+.w-56 {
+  width: 14rem;
 }
 
 .w-full {
@@ -3642,10 +3646,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-\[512px\] {
   width: 512px;
-}
-
-.w-56 {
-  width: 14rem;
 }
 
 .min-w-\[375px\] {
@@ -3742,16 +3742,16 @@ body[dir="rtl"] .checkbox:checked,
   justify-items: center;
 }
 
+.gap-2 {
+  gap: 0.5rem;
+}
+
 .gap-1 {
   gap: 0.25rem;
 }
 
 .gap-4 {
   gap: 1rem;
-}
-
-.gap-2 {
-  gap: 0.5rem;
 }
 
 .gap-x-8 {
@@ -4176,6 +4176,7 @@ body[dir="rtl"] .checkbox:checked,
   left: 50%;
   transform: translateX(-50%);
   z-index: 11;
+  width: 80vw;
 }
 
 .toast {

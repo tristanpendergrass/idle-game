@@ -58,6 +58,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 11;
+  width: 80vw;
 }
 
 .toast {
