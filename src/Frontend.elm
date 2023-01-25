@@ -186,6 +186,7 @@ update msg model =
                     -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
                     -- The amount of work to do is arbitrarily set at 10 minutes and the sleep period at 1 ms, which seems to work
                     -- Can play with these numbers in future if not satisfactory
+                    -- Test with CPU slowdown 6x!! It really shows the weakness and why we might want an adaptive strategy in the future!
                     if Time.posixToMillis nextInterval < Time.posixToMillis now then
                         -- run calculation part ways then sleep
                         let
@@ -434,7 +435,13 @@ view model =
 
             FastForward _ ->
                 css
-                    ++ [ div [] [ text "Fast Forwarding..." ] ]
+                    ++ [ div
+                            [ class "w-screen h-screen flex flex-col gap-2 items-center justify-center"
+                            ]
+                            [ div [] [ text "Fast Forwarding..." ]
+                            , progress [ class "progress progress-primary w-56" ] []
+                            ]
+                       ]
 
             Playing snapshot ->
                 let

@@ -39,7 +39,7 @@ update msg model =
 
                 someTimeAgo : Posix
                 someTimeAgo =
-                    Time.Extra.add Time.Extra.Hour -12 Time.utc now
+                    Time.Extra.add Time.Extra.Day -12 Time.utc now
 
                 snapshot : Snapshot Game
                 snapshot =
