@@ -511,6 +511,7 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
+    , goldGains : Maybe Int
     , resourceGains : List TimePassesResourceGain
     , resourceLosses : List TimePassesResourceLoss
     }
@@ -550,12 +551,20 @@ getTimePassesData oldGame newGame =
                         []
                    )
 
+        goldGains =
+            if newGame.gold > oldGame.gold then
+                Just <| newGame.gold - oldGame.gold
+
+            else
+                Nothing
+
         hasNewData =
             not <| (List.isEmpty (Debug.log "xpGains" xpGains) && List.isEmpty (Debug.log "resourceGains" resourceGains))
     in
     if hasNewData then
         Just
             { xpGains = xpGains
+            , goldGains = goldGains
             , resourceGains = resourceGains
             , resourceLosses = []
             }

@@ -7,6 +7,7 @@ import Html.Events exposing (..)
 import IdleGame.Game exposing (TimePassesData)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
+import Maybe.Extra
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -116,7 +117,7 @@ getDurationStringParts millis =
 
 
 render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, resourceGains, resourceLosses } =
+render timePassed { xpGains, goldGains, resourceGains, resourceLosses } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
@@ -133,8 +134,17 @@ render timePassed { xpGains, resourceGains, resourceLosses } =
                         )
                 )
             ]
-        , div [ classList [ ( "hidden", List.isEmpty resourceGains && List.isEmpty xpGains ) ] ]
+        , div [ classList [ ( "hidden", List.isEmpty resourceGains && List.isEmpty xpGains && Maybe.Extra.isNothing goldGains ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
+            , case goldGains of
+                Nothing ->
+                    div [] []
+
+                Just amount ->
+                    div [ class "flex items-center gap-2" ]
+                        [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                        , span [] [ text "Gold" ]
+                        ]
             , ul [ class "t-column font-semibold" ]
                 (List.concat
                     [ xpGains

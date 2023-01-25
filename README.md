@@ -35,7 +35,7 @@ $ npm test -- --watch
 - [ ] Improve Time passes modal
   - [ ] Add all resources to list of things to show
   - [ ] Show Levels gained not just XP
-  - [ ] Show Gold gained
+  - [x] Show Gold gained
 - [x] Improve experience when calculating long amount of time
 - [ ] "Coming soon" for other skills
 - [ ] Shop
