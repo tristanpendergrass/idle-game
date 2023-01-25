@@ -4171,7 +4171,7 @@ body[dir="rtl"] .checkbox:checked,
   bottom: 1em;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 11;
+  z-index: 9;
   width: 80vw;
 }
 

@@ -125,6 +125,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , div []
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
+            , div [ class "divider" ] []
             , ul [ class "t-column font-semibold" ]
                 (List.concat
                     [ case goldGains of
@@ -164,7 +165,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                     , resourcesDiff
                         |> Resource.mapDiff
                             (\amount resource ->
-                                li [ class "flex items-center gap-2" ]
+                                li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
                                     [ span [ class "text-success" ] [ text <| String.fromInt amount ]
                                     , span [] [ text <| Resource.toString resource ]
                                     ]
