@@ -307,7 +307,6 @@ update msg model =
                         , Cmd.batch <| notificationCmds
                         )
 
-        -- HandleVisibilityChangeWithTime visibility now ->
         HandleVisibilityChange visibility ->
             if visibility == Browser.Events.Visible then
                 case model.gameState of
