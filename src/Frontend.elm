@@ -176,7 +176,6 @@ update msg model =
         HandleFastForward now ->
             case model.gameState of
                 FastForward { original, current } ->
-                    -- tick until a certain time. either now or something less than now and then recurse. when done set state to Playing and show modal
                     let
                         tick =
                             Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
@@ -184,8 +183,11 @@ update msg model =
                         nextInterval =
                             Time.Extra.add Time.Extra.Minute 10 Time.utc (Snapshot.getTime current)
                     in
+                    -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
+                    -- The amount of work to do is arbitrarily set at 10 minutes and the sleep period at 1 ms, which seems to work
+                    -- Can play with these numbers in future if not satisfactory
                     if Time.posixToMillis nextInterval < Time.posixToMillis now then
-                        -- recurse
+                        -- run calculation part ways then sleep
                         let
                             newSnap =
                                 Snapshot.tickUntil tick nextInterval current
@@ -193,11 +195,11 @@ update msg model =
                         ( model
                             |> setGameState
                                 (FastForward { original = original, current = newSnap })
-                        , Task.perform HandleFastForward Time.now
+                        , Task.perform HandleFastForward (Process.sleep 1 |> Task.andThen (\_ -> Time.now))
                         )
 
                     else
-                        -- done
+                        -- run calculation to completion
                         let
                             newSnap =
                                 Snapshot.tickUntil tick now current
@@ -209,7 +211,7 @@ update msg model =
                         )
 
                 _ ->
-                    -- Shouldn't happen
+                    -- Shouldn't normally happen
                     noOp
 
         ToggleActiveChore toggleId ->
