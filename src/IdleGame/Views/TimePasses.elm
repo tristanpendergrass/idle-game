@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (TimePassesData)
+import IdleGame.Resource as Resource exposing (Resource, Resources)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
 import Maybe.Extra
@@ -117,37 +118,25 @@ getDurationStringParts millis =
 
 
 render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, goldGains, resourceGains, resourceLosses } =
+render timePassed { xpGains, goldGains, resourcesDiff } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
-        , div [ classList [ ( "hidden", List.isEmpty resourceLosses ) ] ]
-            [ h3 [ class "text-xl font-bold" ] [ text "You used" ]
-            , ul [ class "t-column font-semibold" ]
-                (resourceLosses
-                    |> List.map
-                        (\{ title, amount } ->
-                            li [ class "flex items-center gap-2" ]
-                                [ span [ class "text-error" ] [ text <| String.fromInt amount ]
-                                , span [] [ text title ]
-                                ]
-                        )
-                )
-            ]
-        , div [ classList [ ( "hidden", List.isEmpty resourceGains && List.isEmpty xpGains && Maybe.Extra.isNothing goldGains ) ] ]
+        , div [ classList [ ( "hidden", Resource.isEmptyDiff resourcesDiff && List.isEmpty xpGains && Maybe.Extra.isNothing goldGains ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
-            , case goldGains of
-                Nothing ->
-                    div [] []
-
-                Just amount ->
-                    div [ class "flex items-center gap-2" ]
-                        [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                        , span [] [ text "Gold" ]
-                        ]
             , ul [ class "t-column font-semibold" ]
                 (List.concat
-                    [ xpGains
+                    [ case goldGains of
+                        Nothing ->
+                            []
+
+                        Just amount ->
+                            [ li [ class "flex items-center gap-2" ]
+                                [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                                , span [] [ text "Gold" ]
+                                ]
+                            ]
+                    , xpGains
                         |> List.map
                             (\{ title, amount } ->
                                 li [ class "flex items-center gap-2" ]
@@ -155,12 +144,12 @@ render timePassed { xpGains, goldGains, resourceGains, resourceLosses } =
                                     , span [] [ text title ]
                                     ]
                             )
-                    , resourceGains
-                        |> List.map
-                            (\{ title, amount } ->
+                    , resourcesDiff
+                        |> Resource.mapDiff
+                            (\amount resource ->
                                 li [ class "flex items-center gap-2" ]
                                     [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                                    , span [] [ text title ]
+                                    , span [] [ text <| Resource.toString resource ]
                                     ]
                             )
                     ]

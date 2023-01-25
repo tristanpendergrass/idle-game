@@ -4,7 +4,7 @@ import IdleGame.Event3 exposing (..)
 import IdleGame.Event3_test exposing (eventWithTags)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Notification as Notification exposing (Notification)
-import IdleGame.Resource as Resource exposing (Resource)
+import IdleGame.Resource as Resource exposing (Resource, Resources, ResourcesDiff)
 import IdleGame.Timer
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
@@ -25,8 +25,7 @@ type alias Game =
     , activeChore : Maybe ( ChoreType, IdleGame.Timer.Timer )
     , choresData : ChoresData
     , gold : Int
-    , manure : Int
-    , sticks : Int
+    , resources : Resources
     }
 
 
@@ -55,8 +54,7 @@ create seed =
         , gatherFirewood = { mxp = 0 }
         }
     , gold = 0
-    , manure = 0
-    , sticks = 0
+    , resources = Resource.createResources
     }
 
 
@@ -391,21 +389,13 @@ applyEffect effect game =
 
 addResource : Resource -> Int -> Game -> ( Game, List Notification )
 addResource resource amount game =
-    case resource of
-        Resource.Manure ->
-            ( { game | manure = game.manure + amount }, [ Notification.GainedResource amount Resource.Manure ] )
-
-        Resource.Ingot ->
-            ( game, [] )
-
-        Resource.Ore ->
-            ( game, [] )
-
-        Resource.Ruby ->
-            ( game, [] )
-
-        Resource.Stick ->
-            ( { game | sticks = game.sticks + amount }, [ Notification.GainedResource amount Resource.Stick ] )
+    ( { game
+        | resources =
+            game.resources
+                |> Resource.addResource resource amount
+      }
+    , [ Notification.GainedResource amount resource ]
+    )
 
 
 addXp : Skill -> Float -> Game -> Game
@@ -512,8 +502,7 @@ type alias TimePassesXpGain =
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
     , goldGains : Maybe Int
-    , resourceGains : List TimePassesResourceGain
-    , resourceLosses : List TimePassesResourceLoss
+    , resourcesDiff : ResourcesDiff
     }
 
 
@@ -530,27 +519,6 @@ getTimePassesData oldGame newGame =
             else
                 []
 
-        manureGained =
-            newGame.manure - oldGame.manure
-
-        sticksGained =
-            newGame.sticks - oldGame.sticks
-
-        resourceGains =
-            []
-                ++ (if manureGained > 0 then
-                        [ { title = "Manure", amount = manureGained } ]
-
-                    else
-                        []
-                   )
-                ++ (if sticksGained > 0 then
-                        [ { title = "Sticks", amount = sticksGained } ]
-
-                    else
-                        []
-                   )
-
         goldGains =
             if newGame.gold > oldGame.gold then
                 Just <| newGame.gold - oldGame.gold
@@ -558,15 +526,17 @@ getTimePassesData oldGame newGame =
             else
                 Nothing
 
+        resourcesDiff =
+            Resource.getDiff { original = oldGame.resources, current = newGame.resources }
+
         hasNewData =
-            not <| (List.isEmpty (Debug.log "xpGains" xpGains) && List.isEmpty (Debug.log "resourceGains" resourceGains))
+            not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff)
     in
     if hasNewData then
         Just
             { xpGains = xpGains
             , goldGains = goldGains
-            , resourceGains = resourceGains
-            , resourceLosses = []
+            , resourcesDiff = resourcesDiff
             }
 
     else

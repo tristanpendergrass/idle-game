@@ -5,18 +5,13 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.Resource as Resource exposing (Resource, Resources)
 import Types exposing (..)
 
 
 render : Game -> Html FrontendMsg
 render game =
     let
-        manureQuantity =
-            String.fromInt game.manure
-
-        stickQuantity =
-            String.fromInt game.sticks
-
         listItem : String -> String -> Html FrontendMsg
         listItem label quantity =
             li [ class "flex gap-1" ]
@@ -32,9 +27,12 @@ render game =
                 ]
             ]
         , ul [ class "w-full grid gap-x-8 gap-y-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
-            [ listItem "Manure" manureQuantity
-            , listItem "Sticks" stickQuantity
-            ]
+            (game.resources
+                |> Resource.mapResources
+                    (\amount resource ->
+                        listItem (Resource.toString resource) (String.fromInt amount)
+                    )
+            )
         ]
 
 

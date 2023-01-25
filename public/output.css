@@ -3616,10 +3616,6 @@ body[dir="rtl"] .checkbox:checked,
   max-height: 90%;
 }
 
-.w-\[80vw\] {
-  width: 80vw;
-}
-
 .w-screen {
   width: 100vw;
 }
