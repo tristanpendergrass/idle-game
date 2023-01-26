@@ -3,6 +3,7 @@ module IdleGame.Views.ModalWrapper exposing (Modal, create, render, renderCloseB
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.ZIndexes exposing (zIndexes)
 import Json.Decode
 import Types exposing (..)
 
@@ -43,7 +44,8 @@ render (Modal { borderColor } children) =
                     class <| "border-t-4 " ++ color
     in
     div
-        [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 z-10 flex justify-center items-center cursor-pointer"
+        [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 flex justify-center items-center cursor-pointer"
+        , zIndexes.modalWrapper
         , onClick CloseModal
         ]
         [ div

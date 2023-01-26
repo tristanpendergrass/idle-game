@@ -3548,6 +3548,14 @@ body[dir="rtl"] .checkbox:checked,
   z-index: 30;
 }
 
+.z-0 {
+  z-index: 0;
+}
+
+.z-40 {
+  z-index: 40;
+}
+
 .col-span-8 {
   grid-column: span 8 / span 8;
 }
@@ -4171,7 +4179,6 @@ body[dir="rtl"] .checkbox:checked,
   bottom: 1em;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9;
   width: 80vw;
 }
 

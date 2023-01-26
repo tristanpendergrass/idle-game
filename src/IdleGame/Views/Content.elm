@@ -10,6 +10,7 @@ import IdleGame.Timer
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon
+import IdleGame.ZIndexes exposing (zIndexes)
 import Types exposing (..)
 
 
@@ -37,7 +38,7 @@ renderContent game activeTab =
                     }
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
-        [ div [ class "sticky top-0 z-30 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm" ]
+        [ div [ class "sticky top-0 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm", zIndexes.drawerContent ]
             -- TOP NAV
             [ nav [ class "navbar w-full bg-primary text-primary-content" ]
                 -- Menu to open sidebar
@@ -72,5 +73,4 @@ renderContent game activeTab =
 
             ChoresTab ->
                 IdleGame.Views.Chores.render game
-        , bottomRight
         ]

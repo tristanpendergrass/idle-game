@@ -10,12 +10,15 @@ import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Bag
+import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
 import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
+import IdleGame.ZIndexes exposing (zIndexes)
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
@@ -402,7 +405,7 @@ toastConfig : Toast.Config FrontendMsg
 toastConfig =
     Toast.config ToastMsg
         -- attributes applied to the toast tray
-        |> Toast.withTrayAttributes [ class "toast-tray" ]
+        |> Toast.withTrayAttributes [ class "toast-tray", zIndexes.toast ]
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
         |> Toast.withTransitionAttributes [ class "toast--fade-out" ]
@@ -437,8 +440,17 @@ view model =
                 let
                     game =
                         Snapshot.getValue snapshot
+
+                    bottomRightMenu =
+                        case model.activeTab of
+                            BagTab ->
+                                IdleGame.Views.Bag.renderBottomRight
+
+                            ChoresTab ->
+                                IdleGame.Views.Chores.renderBottomRight
                 in
                 css
+                    ++ [ bottomRightMenu ]
                     ++ [ Toast.render viewToast model.tray toastConfig ]
                     ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
                             [ input
