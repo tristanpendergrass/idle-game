@@ -7,11 +7,12 @@ type Icon
     = Bag
     | Shop
     | Chores
-    | Exploration
+    | Explore
     | Mischief
-    | Dueling
     | Botany
     | Potionmaking
+    | Conjuration
+    | Transmogrification
     | Hexes
     | Wards
     | ForbiddenKnowledge
@@ -29,20 +30,23 @@ toFeatherIcon icon =
         Chores ->
             FeatherIcons.tool
 
-        Exploration ->
+        Explore ->
             FeatherIcons.map
 
         Mischief ->
             FeatherIcons.target
-
-        Dueling ->
-            FeatherIcons.gitlab
 
         Botany ->
             FeatherIcons.cloudDrizzle
 
         Potionmaking ->
             FeatherIcons.droplet
+
+        Conjuration ->
+            Debug.todo ""
+
+        Transmogrification ->
+            Debug.todo ""
 
         Hexes ->
             FeatherIcons.zap
@@ -71,17 +75,12 @@ chores =
 
 exploration : Icon
 exploration =
-    Exploration
+    Explore
 
 
 mischief : Icon
 mischief =
     Mischief
-
-
-dueling : Icon
-dueling =
-    Dueling
 
 
 botany : Icon

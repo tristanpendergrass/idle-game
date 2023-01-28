@@ -5,17 +5,49 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.Views.Icon as Icon
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)
 
 
 renderDrawer : Game -> Tab -> Html FrontendMsg
 renderDrawer game activeTab =
+    let
+        renderTab : { tab : Tab, onClick : FrontendMsg, icon : Icon, label : String } -> Html FrontendMsg
+        renderTab props =
+            span
+                [ class "flex gap-4"
+                , classList [ ( "active", activeTab == props.tab ) ]
+                , onClick props.onClick
+                ]
+                [ span [ class "flex-none" ]
+                    [ props.icon
+                        |> Icon.toFeatherIcon
+                        |> FeatherIcons.withSize 24
+                        |> FeatherIcons.toHtml []
+                    ]
+                , span [ class "flex-1" ] [ text props.label ]
+                ]
+
+        renderForbiddenTab : Html FrontendMsg
+        renderForbiddenTab =
+            span
+                [ class "flex gap-4"
+                , onClick <| SetActiveTab ForbiddenKnowledgeTab
+                ]
+                [ span [ class "flex-none" ]
+                    [ Icon.ForbiddenKnowledge
+                        |> Icon.toFeatherIcon
+                        |> FeatherIcons.withSize 24
+                        |> FeatherIcons.toHtml []
+                    ]
+                , span [ class "flex-1" ] [ text "Forbidden Knowledge" ]
+                ]
+    in
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
             -- title row
-            ([ div [ class "bg-base-200 sticky top-0 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
+            [ div [ class "bg-base-200 sticky top-0 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center gap-2" ]
                     [ div [ class "flex-0 px-2" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl" ]
@@ -36,42 +68,31 @@ renderDrawer game activeTab =
                         |> FeatherIcons.toHtml []
                     ]
                 ]
-             , div [ class "h-4" ] []
-             ]
-                ++ [ li [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                        [ li []
-                            [ span
-                                [ class "flex gap-4"
-                                , classList [ ( "active", activeTab == BagTab ) ]
-                                , onClick <| SetActiveTab BagTab
-                                ]
-                                [ span [ class "flex-none" ]
-                                    [ Icon.Bag
-                                        |> Icon.toFeatherIcon
-                                        |> FeatherIcons.withSize 24
-                                        |> FeatherIcons.toHtml []
-                                    ]
-                                , span [ class "flex-1" ] [ text "Bag" ]
-                                ]
-                            ]
-                        , li []
-                            [ span
-                                [ class "flex gap-4"
-                                , classList [ ( "active", activeTab == ChoresTab ) ]
-                                , onClick <| SetActiveTab ChoresTab
-                                ]
-                                [ span [ class "flex-none" ]
-                                    [ Icon.Chores
-                                        |> Icon.toFeatherIcon
-                                        |> FeatherIcons.withSize 24
-                                        |> FeatherIcons.toHtml []
-                                    ]
-                                , span [ class "flex-1" ] [ text "Chores" ]
-                                ]
-                            ]
-                        ]
-                   ]
-            )
+            , div [ class "h-4" ] []
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] [ renderTab { tab = BagTab, onClick = SetActiveTab BagTab, icon = Icon.Bag, label = "Bag" } ]
+                , li [] [ renderTab { tab = ShopTab, onClick = SetActiveTab ShopTab, icon = Icon.Shop, label = "Shop" } ]
+                , li [] [ renderTab { tab = ChoresTab, onClick = SetActiveTab ChoresTab, icon = Icon.Chores, label = "Chores" } ]
+                , li [] [ renderTab { tab = ExploreTab, onClick = SetActiveTab ExploreTab, icon = Icon.Explore, label = "Explore" } ]
+                , li [] [ renderTab { tab = MischiefTab, onClick = SetActiveTab MischiefTab, icon = Icon.Mischief, label = "Mischief" } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
+                , li [] [ renderTab { tab = BotanyTab, onClick = SetActiveTab BotanyTab, icon = Icon.Botany, label = "Botany" } ]
+                , li [] [ renderTab { tab = PotionmakingTab, onClick = SetActiveTab PotionmakingTab, icon = Icon.Potionmaking, label = "Potionmaking" } ]
+                , li [] [ renderTab { tab = ConjurationTab, onClick = SetActiveTab ConjurationTab, icon = Icon.Conjuration, label = "Conjuration" } ]
+                , li [] [ renderTab { tab = TransmogrificationTab, onClick = SetActiveTab TransmogrificationTab, icon = Icon.Transmogrification, label = "Transmogrification" } ]
+                , li [] [ renderTab { tab = HexesTab, onClick = SetActiveTab HexesTab, icon = Icon.Hexes, label = "Hexes" } ]
+                , li [] [ renderTab { tab = WardsTab, onClick = SetActiveTab WardsTab, icon = Icon.Wards, label = "Wards" } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Dark Arts" ] ]
+                , li [] [ renderForbiddenTab ]
+                , li [] [ renderForbiddenTab ]
+                ]
+            ]
         ]
 
 

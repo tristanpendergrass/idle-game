@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
@@ -23,19 +24,8 @@ getActivityProgress activityStatus =
 renderContent : Game -> Tab -> Html FrontendMsg
 renderContent game activeTab =
     let
-        { title, icon, bottomRight } =
-            case activeTab of
-                BagTab ->
-                    { title = "Bag"
-                    , icon = IdleGame.Views.Icon.bag
-                    , bottomRight = IdleGame.Views.Bag.renderBottomRight
-                    }
-
-                ChoresTab ->
-                    { title = "Chores"
-                    , icon = IdleGame.Views.Icon.chores
-                    , bottomRight = IdleGame.Views.Chores.renderBottomRight
-                    }
+        { label, icon } =
+            Tab.getConfig activeTab
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
         [ div [ class "sticky top-0 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm", zIndexes.drawerContent ]
@@ -57,7 +47,7 @@ renderContent game activeTab =
                             |> IdleGame.Views.Icon.toFeatherIcon
                             |> FeatherIcons.withSize 24
                             |> FeatherIcons.toHtml []
-                        , span [] [ text title ]
+                        , span [] [ text label ]
                         ]
 
                     -- Right side stuff

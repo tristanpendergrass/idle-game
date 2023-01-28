@@ -11,8 +11,16 @@
             "id": "fb7a5e036f678b3c",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "canvas",
+              "state": {
+                "file": "Chores.canvas",
+                "viewState": {
+                  "x": 17,
+                  "y": 159,
+                  "zoom": 0,
+                  "snapToGrid": false
+                }
+              }
             }
           }
         ]
@@ -81,6 +89,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Chores.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +106,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Chores.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +128,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Chores.canvas"
+              }
             }
           }
         ]
@@ -140,6 +152,7 @@
   },
   "active": "fb7a5e036f678b3c",
   "lastOpenFiles": [
+    "Chores.md",
     "Events.md",
     "Tick flowchart.canvas",
     "Mastery Unlocks.md",
