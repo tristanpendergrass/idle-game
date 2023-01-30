@@ -20,7 +20,7 @@ render game =
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ div [ class "w-full flex justify-center items-center" ]
+        [ div [ class "w-full flex justify-start items-center" ]
             [ div [ class "flex items-center gap-1 px-2 py-1 bg-accent text-accent-content rounded" ]
                 [ span [ class "text-lg truncate" ] [ text "Gold" ]
                 , span [ class "text-log font-semibold" ] [ text <| String.fromInt game.gold ]

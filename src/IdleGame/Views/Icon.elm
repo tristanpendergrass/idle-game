@@ -4,7 +4,8 @@ import FeatherIcons
 
 
 type Icon
-    = Bag
+    = UnderConstruction
+    | Bag
     | Shop
     | Chores
     | Explore
@@ -22,6 +23,10 @@ type Icon
 toFeatherIcon : Icon -> FeatherIcons.Icon
 toFeatherIcon icon =
     case icon of
+        UnderConstruction ->
+            FeatherIcons.tool
+                |> FeatherIcons.withClass "text-info"
+
         Bag ->
             FeatherIcons.box
 
@@ -29,7 +34,7 @@ toFeatherIcon icon =
             FeatherIcons.dollarSign
 
         Chores ->
-            FeatherIcons.tool
+            FeatherIcons.clipboard
 
         Explore ->
             FeatherIcons.map

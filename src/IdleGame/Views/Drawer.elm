@@ -13,16 +13,21 @@ import Types exposing (..)
 renderDrawer : Game -> Tab -> Html FrontendMsg
 renderDrawer game activeTab =
     let
-        renderTab : Tab -> Html FrontendMsg
-        renderTab tab =
+        underConstructionIcon =
+            Icon.UnderConstruction
+                |> Icon.toFeatherIcon
+                |> FeatherIcons.withSize 12
+                |> FeatherIcons.toHtml []
+
+        renderTab : { tab : Tab, underConstruction : Bool } -> Html FrontendMsg
+        renderTab { tab, underConstruction } =
             let
                 config =
                     Tab.getConfig tab
             in
             span
-                [ class "flex gap-4"
+                [ class "flex gap-4 items-center"
                 , classList [ ( "active", activeTab == tab ) ]
-                , onClick (SetActiveTab tab)
                 ]
                 [ span [ class "flex-none" ]
                     [ config.icon
@@ -31,12 +36,14 @@ renderDrawer game activeTab =
                         |> FeatherIcons.toHtml []
                     ]
                 , span [ class "flex-1" ] [ text config.title ]
+                , span [ class "flex-none", classList [ ( "hidden", not underConstruction ) ] ]
+                    [ underConstructionIcon ]
                 ]
 
         renderForbiddenTab : Html FrontendMsg
         renderForbiddenTab =
             span
-                [ class "flex gap-4"
+                [ class "flex gap-4 items-center"
                 , onClick <| SetActiveTab Tab.ForbiddenKnowledge
                 ]
                 [ span [ class "flex-none" ]
@@ -46,6 +53,8 @@ renderDrawer game activeTab =
                         |> FeatherIcons.toHtml []
                     ]
                 , span [ class "flex-1" ] [ text "Forbidden Knowledge" ]
+                , span [ class "flex-none" ]
+                    [ underConstructionIcon ]
                 ]
     in
     div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
@@ -75,32 +84,32 @@ renderDrawer game activeTab =
                 ]
             , div [ class "h-4" ] []
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] [ renderTab Tab.Bag ]
-                , li [] [ renderTab Tab.Shop ]
+                [ li [ onClick (SetActiveTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
+                , li [ onClick (SetActiveTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = True } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
-                , li [] [ renderTab Tab.Chores ]
-                , li [] [ renderTab Tab.Explore ]
-                , li [] [ renderTab Tab.Mischief ]
+                , li [ onClick (SetActiveTab Tab.Chores) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
+                , li [ onClick (SetActiveTab Tab.Explore) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
+                , li [ onClick (SetActiveTab Tab.Mischief) ] [ renderTab { tab = Tab.Mischief, underConstruction = True } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li [] [ renderTab Tab.Hexes ]
-                , li [] [ renderTab Tab.Wards ]
-                , li [] [ renderTab Tab.Enchantment ]
-                , li [] [ renderTab Tab.Botany ]
-                , li [] [ renderTab Tab.Potionmaking ]
-                , li [] [ renderTab Tab.Conjuration ]
-                , li [] [ renderTab Tab.Transmogrification ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Hexes, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Potionmaking, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Conjuration, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Transmogrification, underConstruction = True } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Dark Arts" ] ]
-                , li [] [ renderForbiddenTab ]
-                , li [] [ renderForbiddenTab ]
-                , li [] [ renderForbiddenTab ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
                 ]
             ]
         ]
