@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)
 
@@ -12,27 +13,31 @@ import Types exposing (..)
 renderDrawer : Game -> Tab -> Html FrontendMsg
 renderDrawer game activeTab =
     let
-        renderTab : { tab : Tab, onClick : FrontendMsg, icon : Icon, label : String } -> Html FrontendMsg
-        renderTab props =
+        renderTab : Tab -> Html FrontendMsg
+        renderTab tab =
+            let
+                config =
+                    Tab.getConfig tab
+            in
             span
                 [ class "flex gap-4"
-                , classList [ ( "active", activeTab == props.tab ) ]
-                , onClick props.onClick
+                , classList [ ( "active", activeTab == tab ) ]
+                , onClick (SetActiveTab tab)
                 ]
                 [ span [ class "flex-none" ]
-                    [ props.icon
+                    [ config.icon
                         |> Icon.toFeatherIcon
                         |> FeatherIcons.withSize 24
                         |> FeatherIcons.toHtml []
                     ]
-                , span [ class "flex-1" ] [ text props.label ]
+                , span [ class "flex-1" ] [ text config.title ]
                 ]
 
         renderForbiddenTab : Html FrontendMsg
         renderForbiddenTab =
             span
                 [ class "flex gap-4"
-                , onClick <| SetActiveTab ForbiddenKnowledgeTab
+                , onClick <| SetActiveTab Tab.ForbiddenKnowledge
                 ]
                 [ span [ class "flex-none" ]
                     [ Icon.ForbiddenKnowledge
@@ -70,25 +75,30 @@ renderDrawer game activeTab =
                 ]
             , div [ class "h-4" ] []
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] [ renderTab { tab = BagTab, onClick = SetActiveTab BagTab, icon = Icon.Bag, label = "Bag" } ]
-                , li [] [ renderTab { tab = ShopTab, onClick = SetActiveTab ShopTab, icon = Icon.Shop, label = "Shop" } ]
-                , li [] [ renderTab { tab = ChoresTab, onClick = SetActiveTab ChoresTab, icon = Icon.Chores, label = "Chores" } ]
-                , li [] [ renderTab { tab = ExploreTab, onClick = SetActiveTab ExploreTab, icon = Icon.Explore, label = "Explore" } ]
-                , li [] [ renderTab { tab = MischiefTab, onClick = SetActiveTab MischiefTab, icon = Icon.Mischief, label = "Mischief" } ]
+                [ li [] [ renderTab Tab.Bag ]
+                , li [] [ renderTab Tab.Shop ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [] [ renderTab Tab.Chores ]
+                , li [] [ renderTab Tab.Explore ]
+                , li [] [ renderTab Tab.Mischief ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li [] [ renderTab { tab = BotanyTab, onClick = SetActiveTab BotanyTab, icon = Icon.Botany, label = "Botany" } ]
-                , li [] [ renderTab { tab = PotionmakingTab, onClick = SetActiveTab PotionmakingTab, icon = Icon.Potionmaking, label = "Potionmaking" } ]
-                , li [] [ renderTab { tab = ConjurationTab, onClick = SetActiveTab ConjurationTab, icon = Icon.Conjuration, label = "Conjuration" } ]
-                , li [] [ renderTab { tab = TransmogrificationTab, onClick = SetActiveTab TransmogrificationTab, icon = Icon.Transmogrification, label = "Transmogrification" } ]
-                , li [] [ renderTab { tab = HexesTab, onClick = SetActiveTab HexesTab, icon = Icon.Hexes, label = "Hexes" } ]
-                , li [] [ renderTab { tab = WardsTab, onClick = SetActiveTab WardsTab, icon = Icon.Wards, label = "Wards" } ]
+                , li [] [ renderTab Tab.Hexes ]
+                , li [] [ renderTab Tab.Wards ]
+                , li [] [ renderTab Tab.Enchantment ]
+                , li [] [ renderTab Tab.Botany ]
+                , li [] [ renderTab Tab.Potionmaking ]
+                , li [] [ renderTab Tab.Conjuration ]
+                , li [] [ renderTab Tab.Transmogrification ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Dark Arts" ] ]
+                , li [] [ renderForbiddenTab ]
                 , li [] [ renderForbiddenTab ]
                 , li [] [ renderForbiddenTab ]
                 ]

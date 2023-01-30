@@ -9,6 +9,7 @@ import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
+import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
@@ -52,7 +53,7 @@ init url key =
     ( { key = key
       , tray = Toast.tray
       , isDrawerOpen = False
-      , activeTab = ChoresTab
+      , activeTab = Tab.Chores
       , isVisible = True
       , activeModal = Nothing
       , saveGameTimer = Timer.create 1000
@@ -443,14 +444,23 @@ view model =
 
                     bottomRightMenu =
                         case model.activeTab of
-                            BagTab ->
-                                IdleGame.Views.Bag.renderBottomRight
+                            Tab.Bag ->
+                                Just IdleGame.Views.Bag.renderBottomRight
 
-                            ChoresTab ->
-                                IdleGame.Views.Chores.renderBottomRight
+                            Tab.Chores ->
+                                Just IdleGame.Views.Chores.renderBottomRight
+
+                            _ ->
+                                Nothing
                 in
                 css
-                    ++ [ bottomRightMenu ]
+                    ++ (case bottomRightMenu of
+                            Just content ->
+                                [ content ]
+
+                            Nothing ->
+                                []
+                       )
                     ++ [ Toast.render viewToast model.tray toastConfig ]
                     ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
                             [ input

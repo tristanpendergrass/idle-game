@@ -24,7 +24,7 @@ getActivityProgress activityStatus =
 renderContent : Game -> Tab -> Html FrontendMsg
 renderContent game activeTab =
     let
-        { label, icon } =
+        { title, icon } =
             Tab.getConfig activeTab
     in
     div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
@@ -47,7 +47,7 @@ renderContent game activeTab =
                             |> IdleGame.Views.Icon.toFeatherIcon
                             |> FeatherIcons.withSize 24
                             |> FeatherIcons.toHtml []
-                        , span [] [ text label ]
+                        , span [] [ text title ]
                         ]
 
                     -- Right side stuff
@@ -58,9 +58,12 @@ renderContent game activeTab =
 
         -- Chore XP and MXP
         , case activeTab of
-            BagTab ->
+            Tab.Bag ->
                 IdleGame.Views.Bag.render game
 
-            ChoresTab ->
+            Tab.Chores ->
                 IdleGame.Views.Chores.render game
+
+            _ ->
+                Debug.todo ""
         ]

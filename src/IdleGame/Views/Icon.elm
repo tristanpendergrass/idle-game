@@ -9,12 +9,13 @@ type Icon
     | Chores
     | Explore
     | Mischief
+    | Hexes
+    | Wards
+    | Enchantment
     | Botany
     | Potionmaking
     | Conjuration
     | Transmogrification
-    | Hexes
-    | Wards
     | ForbiddenKnowledge
 
 
@@ -36,6 +37,15 @@ toFeatherIcon icon =
         Mischief ->
             FeatherIcons.target
 
+        Hexes ->
+            FeatherIcons.zap
+
+        Wards ->
+            FeatherIcons.shield
+
+        Enchantment ->
+            FeatherIcons.star
+
         Botany ->
             FeatherIcons.cloudDrizzle
 
@@ -43,16 +53,10 @@ toFeatherIcon icon =
             FeatherIcons.droplet
 
         Conjuration ->
-            Debug.todo ""
+            FeatherIcons.aperture
 
         Transmogrification ->
-            Debug.todo ""
-
-        Hexes ->
-            FeatherIcons.zap
-
-        Wards ->
-            FeatherIcons.zapOff
+            FeatherIcons.package
 
         ForbiddenKnowledge ->
             FeatherIcons.alertTriangle

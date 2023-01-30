@@ -8,6 +8,7 @@ import FeatherIcons
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
+import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
 import Lamdera exposing (ClientId, SessionId)
 import Random
@@ -16,19 +17,10 @@ import Toast
 import Url exposing (Url)
 
 
-
--- TODO: Move Modal to another file?
-
-
 type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreMasteryCheckpointsModal
     | ChoreItemUnlocksModal
-
-
-type Tab
-    = BagTab
-    | ChoresTab
 
 
 type FrontendGameState
