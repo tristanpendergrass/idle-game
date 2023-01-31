@@ -37,7 +37,7 @@ $ npm test -- --watch
   - [x] Show Levels gained not just XP
   - [x] Show Gold gained
 - [x] Improve experience when calculating long amount of time
-- [ ] "Coming soon" for other skills
+- [x] "Coming soon" for other skills
 - [ ] Shop
 - [ ] Finalize values for all things
 - [x] Visuals for chores

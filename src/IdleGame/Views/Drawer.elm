@@ -85,7 +85,7 @@ renderDrawer game activeTab =
             , div [ class "h-4" ] []
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [ onClick (SetActiveTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
-                , li [ onClick (SetActiveTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = True } ]
+                , li [ onClick (SetActiveTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []

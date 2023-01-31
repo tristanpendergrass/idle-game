@@ -11,6 +11,7 @@ import IdleGame.Timer
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon
+import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
 import IdleGame.ZIndexes exposing (zIndexes)
 import Types exposing (..)
@@ -64,6 +65,9 @@ renderContent game activeTab =
 
             Tab.Chores ->
                 IdleGame.Views.Chores.render game
+
+            Tab.Shop ->
+                IdleGame.Views.Shop.render game.shopItems
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

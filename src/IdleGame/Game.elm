@@ -5,7 +5,8 @@ import IdleGame.Event3_test exposing (eventWithTags)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Resource as Resource exposing (Resource, Resources, ResourcesDiff)
-import IdleGame.Timer
+import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
 import Random exposing (Generator)
@@ -22,10 +23,11 @@ type alias Game =
     { seed : Random.Seed
     , choresXp : Float
     , choresMxp : Float
-    , activeChore : Maybe ( ChoreType, IdleGame.Timer.Timer )
+    , activeChore : Maybe ( ChoreType, Timer )
     , choresData : ChoresData
     , gold : Int
     , resources : Resources
+    , shopItems : ShopItems
     }
 
 
@@ -55,6 +57,7 @@ create seed =
         }
     , gold = 0
     , resources = Resource.createResources
+    , shopItems = ShopItems.create
     }
 
 
@@ -224,7 +227,7 @@ getMastery type_ choreData =
 
 
 type alias ActivityStatus =
-    Maybe IdleGame.Timer.Timer
+    Maybe Timer
 
 
 toggleActiveChore : ChoreType -> Game -> Game
@@ -237,15 +240,15 @@ toggleActiveChore toggleType game =
                         Nothing
 
                     else
-                        Just ( toggleType, IdleGame.Timer.create 2000 )
+                        Just ( toggleType, Timer.create 2000 )
 
                 Nothing ->
-                    Just ( toggleType, IdleGame.Timer.create 2000 )
+                    Just ( toggleType, Timer.create 2000 )
     in
     { game | activeChore = newActiveChore }
 
 
-setActiveChore : Maybe ( ChoreType, IdleGame.Timer.Timer ) -> Game -> Game
+setActiveChore : Maybe ( ChoreType, Timer.Timer ) -> Game -> Game
 setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
@@ -261,7 +264,7 @@ tick game =
                 Just ( choreType, timer ) ->
                     let
                         ( newTimer, completions ) =
-                            IdleGame.Timer.tick timer
+                            Timer.tick timer
 
                         chore =
                             getChore choreType
