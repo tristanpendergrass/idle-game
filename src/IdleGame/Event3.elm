@@ -269,3 +269,67 @@ withMultiplier multiplier mod =
 modWithTags : List Tag -> Mod -> Mod
 modWithTags tags mod =
     { mod | tags = mod.tags ++ tags }
+
+
+xpTransformer : Float -> Transformer
+xpTransformer buff effectMultiplier effect =
+    case getType effect of
+        GainXp { base, multiplier } skill ->
+            effect
+                |> setType (GainXp { base = base, multiplier = multiplier + (buff * toFloat effectMultiplier) } skill)
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
+mxpTransformer : Float -> Transformer
+mxpTransformer buff effectMultiplier effect =
+    case getType effect of
+        GainChoreMxp { multiplier } chore ->
+            effect
+                |> setType (GainChoreMxp { multiplier = multiplier + (buff * toFloat effectMultiplier) } chore)
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
+xpModLabel : Float -> String
+xpModLabel multiplier =
+    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% XP"
+
+
+mxpModLabel : Float -> String
+mxpModLabel multiplier =
+    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% Mastery XP"
+
+
+devGlobalXpBuff : Mod
+devGlobalXpBuff =
+    { tags = [ Xp ]
+    , label = xpModLabel 0.05
+    , transformer = xpTransformer 0.05
+    , source = AdminCrimes
+    , multiplier = 1
+    }
+
+
+choresXpBuff : Float -> Mod
+choresXpBuff buff =
+    { tags = [ Chores, Xp ]
+    , label = xpModLabel buff
+    , transformer = xpTransformer buff
+    , source = AdminCrimes
+    , multiplier = 1
+    }
+
+
+choresMxpBuff : Float -> Mod
+choresMxpBuff buff =
+    { tags = []
+    , label = mxpModLabel buff
+    , transformer = mxpTransformer buff
+    , source = AdminCrimes
+    , multiplier = 1
+    }

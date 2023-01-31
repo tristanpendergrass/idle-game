@@ -1,5 +1,6 @@
 module IdleGame.ShopItems exposing (..)
 
+import IdleGame.Event3 exposing (Mod)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
@@ -9,7 +10,13 @@ type Item
 
 
 type alias ViewItem =
-    { title : String, icon : Icon, price : Int, owned : Bool }
+    { item : Item
+    , title : String
+    , description : String
+    , icon : Icon
+    , price : Int
+    , owned : Bool
+    }
 
 
 type alias OwnedItems =
@@ -29,7 +36,27 @@ getPrice item =
             5
 
         Item2 ->
-            10
+            100000
+
+
+hasItem : Item -> ShopItems -> Bool
+hasItem item (ShopItems ownedItems) =
+    case item of
+        Item1 ->
+            ownedItems.item1
+
+        Item2 ->
+            ownedItems.item2
+
+
+getMod : Item -> Mod
+getMod item =
+    case item of
+        Item1 ->
+            IdleGame.Event3.choresXpBuff 0.1
+
+        Item2 ->
+            IdleGame.Event3.choresXpBuff 0.1
 
 
 create : ShopItems
@@ -64,8 +91,20 @@ toList (ShopItems ownedItems) =
             (\item ->
                 case item of
                     Item1 ->
-                        { title = "Item 1", icon = Icon.Bag, price = 5, owned = ownedItems.item1 }
+                        { item = Item1
+                        , title = "Item 1"
+                        , description = (getMod item).label
+                        , icon = Icon.Bag
+                        , price = getPrice item
+                        , owned = ownedItems.item1
+                        }
 
                     Item2 ->
-                        { title = "Item 2", icon = Icon.Botany, price = 10, owned = ownedItems.item2 }
+                        { item = Item2
+                        , title = "Item 2"
+                        , description = (getMod item).label
+                        , icon = Icon.Botany
+                        , price = getPrice item
+                        , owned = ownedItems.item2
+                        }
             )

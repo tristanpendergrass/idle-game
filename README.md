@@ -30,7 +30,6 @@ $ npm test -- --watch
 - [x] Mastery for items checkpoints
 - [x] Bag tab
 - [x] Grant items from chores
-- [ ] Icons for gold, manure, xp, mxp
 - [x] Add Notification of gained items
 - [x] Improve Time passes modal
   - [x] Add all resources to list of things to show
@@ -39,6 +38,8 @@ $ npm test -- --watch
 - [x] Improve experience when calculating long amount of time
 - [x] "Coming soon" for other skills
 - [ ] Shop
+- [ ] Icons for things
+- [ ] Develop Mod that speeds up interval
 - [ ] Finalize values for all things
 - [x] Visuals for chores
 
@@ -47,6 +48,7 @@ $ npm test -- --watch
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
+- [ ] Refactor gold to be a non-negative type
 
 ### Fundamentals
 - [ ] Activity detail sidebar

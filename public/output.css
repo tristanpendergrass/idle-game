@@ -3712,8 +3712,24 @@ body[dir="rtl"] .checkbox:checked,
   width: 6rem;
 }
 
+.w-12 {
+  width: 3rem;
+}
+
 .min-w-\[375px\] {
   min-width: 375px;
+}
+
+.min-w-\[6rem\] {
+  min-width: 6rem;
+}
+
+.min-w-\[2rem\] {
+  min-width: 2rem;
+}
+
+.min-w-\[3rem\] {
+  min-width: 3rem;
 }
 
 .max-w-\[1920px\] {

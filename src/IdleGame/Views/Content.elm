@@ -67,7 +67,7 @@ renderContent game activeTab =
                 IdleGame.Views.Chores.render game
 
             Tab.Shop ->
-                IdleGame.Views.Shop.render game.shopItems
+                IdleGame.Views.Shop.render game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

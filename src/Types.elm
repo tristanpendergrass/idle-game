@@ -7,6 +7,7 @@ import Dict exposing (Dict)
 import FeatherIcons
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
+import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
@@ -66,6 +67,7 @@ type FrontendMsg
     | OpenMasteryCheckpointsModal
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
+    | HandleShopItemClick ShopItems.Item
       -- Chores
     | ToggleActiveChore IdleGame.GameTypes.ChoreType
 

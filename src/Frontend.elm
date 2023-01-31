@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.Notification as Notification exposing (Notification)
+import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
@@ -359,6 +360,29 @@ update msg model =
             ( model
                 |> setActiveTab tab
                 |> setIsDrawerOpen False
+            , Cmd.none
+            )
+
+        HandleShopItemClick item ->
+            ( model
+                |> mapGame
+                    (\game ->
+                        let
+                            price =
+                                ShopItems.getPrice item
+
+                            canAfford =
+                                price <= game.gold
+
+                            dontOwnItemYet =
+                                not (ShopItems.hasItem item game.shopItems)
+                        in
+                        if canAfford && dontOwnItemYet then
+                            { game | gold = game.gold - price, shopItems = ShopItems.addItem item game.shopItems }
+
+                        else
+                            game
+                    )
             , Cmd.none
             )
 
