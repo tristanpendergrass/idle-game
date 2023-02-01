@@ -16,20 +16,27 @@ render : Game -> Html FrontendMsg
 render game =
     let
         ownedLabel =
-            div [ class "flex-0 px-2 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]
+            div [ class "flex-0 px-2 py-1 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]
                 [ text "Owned"
                 ]
 
         priceLabel price =
-            div [ class "flex-0 px-2 bg-accent text-accent-content rounded min-w-[3rem] text-center" ]
+            div
+                [ class "flex-0 px-2 py-1 font-bold"
+                , classList [ ( "text-error", price > game.gold ) ]
+                ]
                 [ text <| String.fromInt price
                 ]
 
         renderShopItem : ShopItems.ViewItem -> Html FrontendMsg
         renderShopItem { item, icon, title, price, description, owned } =
+            let
+                shakeOnClick =
+                    not owned && price > game.gold
+            in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer"
-                , classList [ ( "bubble-pop", price <= game.gold ), ( "bubble-shake", price > game.gold ) ]
+                , classList [ ( "bubble-pop", not shakeOnClick ), ( "bubble-shake", shakeOnClick ) ]
                 , onClick <| HandleShopItemClick item
                 ]
                 [ div [ class "avatar" ]
@@ -41,7 +48,7 @@ render game =
                         ]
                     ]
                 , div [ class "flex-1 t-column" ]
-                    [ span [] [ text title ]
+                    [ span [ class "font-bold" ] [ text title ]
                     , span [] [ text description ]
                     ]
                 , if owned then

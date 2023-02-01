@@ -22,6 +22,7 @@ type Skill
 
 type ModSource
     = AdminCrimes
+    | ShopItem
 
 
 
@@ -266,6 +267,11 @@ withMultiplier multiplier mod =
     { mod | multiplier = multiplier }
 
 
+withSource : ModSource -> Mod -> Mod
+withSource source mod =
+    { mod | source = source }
+
+
 modWithTags : List Tag -> Mod -> Mod
 modWithTags tags mod =
     { mod | tags = mod.tags ++ tags }
@@ -308,8 +314,8 @@ mxpModLabel multiplier =
 devGlobalXpBuff : Mod
 devGlobalXpBuff =
     { tags = [ Xp ]
-    , label = xpModLabel 0.05
-    , transformer = xpTransformer 0.05
+    , label = xpModLabel 1.0
+    , transformer = xpTransformer 1.0
     , source = AdminCrimes
     , multiplier = 1
     }

@@ -53,10 +53,12 @@ getMod : Item -> Mod
 getMod item =
     case item of
         Item1 ->
-            IdleGame.Event3.choresXpBuff 0.1
+            IdleGame.Event3.choresXpBuff 0.75
+                |> IdleGame.Event3.withSource IdleGame.Event3.ShopItem
 
         Item2 ->
-            IdleGame.Event3.choresXpBuff 0.1
+            IdleGame.Event3.choresXpBuff 0.75
+                |> IdleGame.Event3.withSource IdleGame.Event3.ShopItem
 
 
 create : ShopItems
@@ -82,6 +84,20 @@ isOwned item (ShopItems ownedItems) =
 
         Item2 ->
             ownedItems.item2
+
+
+toOwnedItems : ShopItems -> List Item
+toOwnedItems shopItems =
+    [ Item1, Item2 ]
+        |> List.foldl
+            (\item accum ->
+                if isOwned item shopItems then
+                    item :: accum
+
+                else
+                    accum
+            )
+            []
 
 
 toList : ShopItems -> List ViewItem

@@ -290,7 +290,7 @@ tick game =
                         mods =
                             getAllMods game
                     in
-                    List.map (applyModsToEvent mods) events
+                    List.map (applyModsToEvent (Debug.log "allMods" mods)) events
 
         effects : List Effect
         effects =
@@ -456,12 +456,18 @@ gainResource amount resource =
 
 gainXp : Float -> Skill -> Effect
 gainXp amount skill =
-    Effect { type_ = GainXp { base = amount, multiplier = 1 } skill, tags = [ Xp ] }
+    let
+        skillTag =
+            case skill of
+                ChoresSkill ->
+                    Chores
+    in
+    Effect { type_ = GainXp { base = amount, multiplier = 1 } skill, tags = [ Xp, skillTag ] }
 
 
 gainChoreMxp : ChoreType -> Effect
 gainChoreMxp chore =
-    Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp ] }
+    Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp, Chores ] }
 
 
 gainGold : Int -> Effect
@@ -635,9 +641,17 @@ getChoreUnlocksMods game =
     ]
 
 
+getShopItemMods : Game -> List Mod
+getShopItemMods game =
+    game.shopItems
+        |> ShopItems.toOwnedItems
+        |> List.map ShopItems.getMod
+
+
 getAllMods : Game -> List Mod
 getAllMods game =
     []
         -- ++ [ devGlobalXpBuff ]
-        ++ getChoreMasteryPoolMods game
-        ++ getChoreUnlocksMods game
+        -- ++ getChoreMasteryPoolMods game
+        -- ++ getChoreUnlocksMods game
+        ++ getShopItemMods game
