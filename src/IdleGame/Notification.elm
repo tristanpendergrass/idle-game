@@ -1,6 +1,6 @@
 module IdleGame.Notification exposing (..)
 
-import IdleGame.Resource as Resource exposing (..)
+import IdleGame.Resource as Resource
 
 
 type alias Toast =
@@ -13,7 +13,7 @@ type alias Toast =
 
 type Notification
     = GainedGold Int
-    | GainedResource Int Resource
+    | GainedResource Int Resource.Kind
 
 
 toToast : Notification -> Toast
@@ -23,4 +23,8 @@ toToast notification =
             "+" ++ String.fromInt amount ++ " Gold"
 
         GainedResource amount resource ->
-            "+" ++ String.fromInt amount ++ " " ++ Resource.toString resource
+            let
+                label =
+                    (Resource.getStats resource).title
+            in
+            "+" ++ String.fromInt amount ++ " " ++ label

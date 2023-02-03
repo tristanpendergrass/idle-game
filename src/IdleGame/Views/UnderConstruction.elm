@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.Resource as Resource exposing (Resource, Resources)
+import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)
 

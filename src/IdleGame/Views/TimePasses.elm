@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (TimePassesData)
-import IdleGame.Resource as Resource exposing (Resource, Resources)
+import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
 import IdleGame.XpFormulas as XpFormulas
@@ -166,7 +166,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                             (\amount resource ->
                                 li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
                                     [ span [ class "text-success" ] [ text <| String.fromInt amount ]
-                                    , span [] [ text <| Resource.toString resource ]
+                                    , span [] [ text <| (Resource.getStats resource).title ]
                                     ]
                             )
                     ]

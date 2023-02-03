@@ -3,7 +3,7 @@ module IdleGame.Game exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Notification as Notification exposing (Notification)
-import IdleGame.Resource as Resource exposing (Resource, Resources, ResourcesDiff)
+import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
@@ -25,7 +25,7 @@ type alias Game =
     , activeChore : Maybe ( ChoreType, Timer )
     , choresData : ChoresData
     , gold : Int
-    , resources : Resources
+    , resources : Resource.Amounts
     , shopItems : ShopItems
     }
 
@@ -111,7 +111,7 @@ type alias Chore =
 type alias ChoreOutcome =
     { xp : Float
     , extraResourceProbability : Float
-    , extraResource : Resource
+    , extraResource : Resource.Kind
     , gold : Int
     }
 
@@ -167,7 +167,7 @@ getChore type_ =
             , outcome =
                 { xp = 15.0
                 , extraResourceProbability = 0.65
-                , extraResource = Resource.Stick
+                , extraResource = Resource.GreenhouseDirt
                 , gold = 500
                 }
             }
@@ -389,7 +389,7 @@ applyEffect effect game =
                 |> Random.map (\amount -> addGold amount game)
 
 
-addResource : Resource -> Int -> Game -> ( Game, List Notification )
+addResource : Resource.Kind -> Int -> Game -> ( Game, List Notification )
 addResource resource amount game =
     ( { game
         | resources =
@@ -448,7 +448,7 @@ applyEvent (ModdedEvent eventData) game =
         eventData.effects
 
 
-gainResource : Int -> Resource -> Effect
+gainResource : Int -> Resource.Kind -> Effect
 gainResource amount resource =
     Effect { type_ = GainResource { base = amount, doublingChance = 0 } resource, tags = [] }
 
@@ -511,7 +511,7 @@ type alias TimePassesXpGain =
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
     , goldGains : Maybe Int
-    , resourcesDiff : ResourcesDiff
+    , resourcesDiff : Resource.Diff
     }
 
 

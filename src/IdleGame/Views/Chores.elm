@@ -7,7 +7,7 @@ import Html.Events exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
-import IdleGame.Resource as Resource exposing (Resource)
+import IdleGame.Resource as Resource
 import IdleGame.Timer
 import IdleGame.Views.Placeholder
 import IdleGame.XpFormulas
@@ -209,7 +209,7 @@ renderChore game chore =
                 -- Chore title
                 [ h2 [ class "card-title text-lg text-center h-[3rem]" ] [ text title ]
                 , renderGold chore.outcome.gold
-                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource 1 (Resource.toString outcome.extraResource))
+                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource 1 (Resource.getStats outcome.extraResource).title)
                 , div [ class "divider" ] []
 
                 -- Chore XP rewards

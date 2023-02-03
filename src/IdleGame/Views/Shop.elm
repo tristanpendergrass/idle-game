@@ -1,12 +1,10 @@
 module IdleGame.Views.Shop exposing (..)
 
-import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.Resource as Resource exposing (Resource, Resources)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)

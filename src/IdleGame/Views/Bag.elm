@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.Resource as Resource exposing (Resource, Resources)
+import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)
 
@@ -35,7 +35,7 @@ render game =
             (game.resources
                 |> Resource.mapResources
                     (\amount resource ->
-                        listItem (Resource.toString resource) (String.fromInt amount)
+                        listItem (Resource.getStats resource).title (String.fromInt amount)
                     )
             )
         ]

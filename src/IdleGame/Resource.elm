@@ -2,142 +2,168 @@ module IdleGame.Resource exposing (..)
 
 
 type
-    Resource
+    Kind
     -- Don't forget to update `allResources` when you add stuff here!
     = Manure
-    | Ore
-    | Ingot
-    | Ruby
-    | Stick
+    | Soot
+    | GreenhouseDirt
+    | WashWater
+    | EmptyBottle
+    | Scrap
+    | Ectoplasm
+    | Parchment
 
 
-allResources : List Resource
+allResources : List Kind
 allResources =
-    [ Manure, Ore, Ingot, Ruby, Stick ]
+    [ Manure, Soot, GreenhouseDirt, WashWater, EmptyBottle, Scrap, Ectoplasm, Parchment ]
 
 
-type alias ResourceConfig =
-    { string : String
-    , getter : Resources -> Int
-    , setter : Int -> Resources -> Resources
+type alias Amounts =
+    { manure : Int
+    , soot : Int
+    , greenhouseDirt : Int
+    , washWater : Int
+    , emptyBottles : Int
+    , scrap : Int
+    , ectoplasm : Int
+    , parchment : Int
     }
 
 
-getConfig : Resource -> ResourceConfig
-getConfig resource =
-    case resource of
+type alias Stats =
+    { title : String
+    , getter : Amounts -> Int
+    , setter : Int -> Amounts -> Amounts
+    }
+
+
+getStats : Kind -> Stats
+getStats kind =
+    case kind of
         Manure ->
-            { string = "Manure"
+            { title = "Manure"
             , getter = .manure
             , setter = \amount resources -> { resources | manure = amount }
             }
 
-        Ore ->
-            { string = "Ore"
-            , getter = .ore
-            , setter = \amount resources -> { resources | ore = amount }
+        Soot ->
+            { title = "Soot"
+            , getter = .soot
+            , setter = \amount resources -> { resources | soot = amount }
             }
 
-        Ingot ->
-            { string = "Ingot"
-            , getter = .ingots
-            , setter = \amount resources -> { resources | ingots = amount }
+        GreenhouseDirt ->
+            { title = "Greenhouse Dirt"
+            , getter = .greenhouseDirt
+            , setter = \amount resources -> { resources | greenhouseDirt = amount }
             }
 
-        Ruby ->
-            { string = "Ruby"
-            , getter = .rubies
-            , setter = \amount resources -> { resources | rubies = amount }
+        WashWater ->
+            { title = "Wash Water"
+            , getter = .washWater
+            , setter = \amount resources -> { resources | washWater = amount }
             }
 
-        Stick ->
-            { string = "Stick"
-            , getter = .sticks
-            , setter = \amount resources -> { resources | sticks = amount }
+        EmptyBottle ->
+            { title = "Empty Bottle"
+            , getter = .emptyBottles
+            , setter = \amount resources -> { resources | emptyBottles = amount }
+            }
+
+        Scrap ->
+            { title = "Scrap"
+            , getter = .scrap
+            , setter = \amount resources -> { resources | scrap = amount }
+            }
+
+        Ectoplasm ->
+            { title = "Ectoplasm"
+            , getter = .ectoplasm
+            , setter = \amount resources -> { resources | ectoplasm = amount }
+            }
+
+        Parchment ->
+            { title = "Parchment"
+            , getter = .parchment
+            , setter = \amount resources -> { resources | parchment = amount }
             }
 
 
-toString : Resource -> String
-toString resource =
-    (getConfig resource).string
+type alias Diff =
+    -- I don't know if it will always make sense for this type alias and Amounts to be the same shape but for now it is and saves us work
+    Amounts
 
 
-type alias Resources =
-    { manure : Int
-    , ore : Int
-    , ingots : Int
-    , rubies : Int
-    , sticks : Int
-    }
-
-
-type alias ResourcesDiff =
-    -- I don't know if it will always make sense for this type alias and Resources to be the same shape but for now it is and saves us work
-    Resources
-
-
-createResources : Resources
+createResources : Amounts
 createResources =
     { manure = 0
-    , ore = 0
-    , ingots = 0
-    , rubies = 0
-    , sticks = 0
+    , soot = 0
+    , greenhouseDirt = 0
+    , washWater = 0
+    , emptyBottles = 0
+    , scrap = 0
+    , ectoplasm = 0
+    , parchment = 0
     }
 
 
-getAmount : Resource -> Resources -> Int
+getAmount : Kind -> Amounts -> Int
 getAmount resource =
-    (getConfig resource).getter
+    (getStats resource).getter
 
 
-addResource : Resource -> Int -> Resources -> Resources
+addResource : Kind -> Int -> Amounts -> Amounts
 addResource resource amount resources =
     let
         oldAmount =
-            (getConfig resource).getter resources
+            (getStats resource).getter resources
     in
-    (getConfig resource).setter (oldAmount + amount) resources
+    (getStats resource).setter (oldAmount + amount) resources
 
 
-getDiff : { original : Resources, current : Resources } -> ResourcesDiff
+getDiff : { original : Amounts, current : Amounts } -> Diff
 getDiff { original, current } =
+    -- TODO: improvements definitely possible here. Make Diff a List with only elements that were different present? Automate so we dont have to modify this function when adding new Kinds of resources?
     { manure = current.manure - original.manure
-    , ore = current.ore - original.ore
-    , ingots = current.ingots - original.ingots
-    , rubies = current.rubies - original.rubies
-    , sticks = current.sticks - original.sticks
+    , soot = current.soot - original.soot
+    , greenhouseDirt = current.greenhouseDirt - original.greenhouseDirt
+    , washWater = current.washWater - original.washWater
+    , emptyBottles = current.emptyBottles - original.emptyBottles
+    , scrap = current.scrap - original.scrap
+    , ectoplasm = current.ectoplasm - original.ectoplasm
+    , parchment = current.parchment - original.parchment
     }
 
 
-mapDiff : (Int -> Resource -> a) -> Resources -> List a
+mapDiff : (Int -> Kind -> a) -> Amounts -> List a
 mapDiff fn diff =
-    [ Manure, Ore, Ingot, Ruby, Stick ]
+    allResources
         |> List.map
             (\resource ->
                 let
                     amount =
-                        (getConfig resource).getter diff
+                        (getStats resource).getter diff
                 in
                 fn amount resource
             )
 
 
-isEmptyDiff : ResourcesDiff -> Bool
+isEmptyDiff : Diff -> Bool
 isEmptyDiff resourcesDiff =
-    [ Manure, Ore, Ingot, Ruby, Stick ]
+    allResources
         |> List.map (\resource -> getAmount resource resourcesDiff)
         |> List.all ((==) 0)
 
 
-mapResources : (Int -> Resource -> a) -> Resources -> List a
+mapResources : (Int -> Kind -> a) -> Amounts -> List a
 mapResources fn resources =
-    [ Manure, Ore, Ingot, Ruby, Stick ]
+    allResources
         |> List.map
             (\resource ->
                 let
                     amount =
-                        (getConfig resource).getter resources
+                        (getStats resource).getter resources
                 in
                 fn amount resource
             )

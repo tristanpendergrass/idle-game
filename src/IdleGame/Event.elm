@@ -1,7 +1,7 @@
 module IdleGame.Event exposing (..)
 
 import IdleGame.GameTypes exposing (ChoreType)
-import IdleGame.Resource exposing (Resource)
+import IdleGame.Resource as Resource
 
 
 
@@ -48,7 +48,7 @@ type ModdedEvent
 
 type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
-    | GainResource { base : Int, doublingChance : Float } Resource
+    | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Float, multiplier : Float } Skill
     | GainChoreMxp { multiplier : Float } ChoreType
     | GainGold { base : Int, doublingChance : Float }
