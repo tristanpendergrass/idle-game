@@ -50,6 +50,14 @@ sizeToPx size =
         Large ->
             24
 
+sizeToRem : Size -> Float
+sizeToRem size =
+    case size of
+        Small ->
+            0.75
+
+        Large ->
+            1.5
 
 sizeToTailwindClass : Size -> String
 sizeToTailwindClass size =
@@ -66,7 +74,8 @@ toHtml icon =
     case icon of
         IconFeather featherIcon params ->
             featherIcon
-                |> FeatherIcons.withSize (sizeToPx params.size)
+                |> FeatherIcons.withSize (sizeToRem params.size)
+                |> FeatherIcons.withSizeUnit "rem"
                 |> FeatherIcons.toHtml []
 
         IconPublic iconSrc params ->
