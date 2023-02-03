@@ -1,5 +1,7 @@
 module IdleGame.Resource exposing (..)
 
+import IdleGame.Views.Icon as Icon exposing (Icon)
+
 
 type
     Kind
@@ -33,6 +35,7 @@ type alias Amounts =
 
 type alias Stats =
     { title : String
+    , icon : Icon
     , getter : Amounts -> Int
     , setter : Int -> Amounts -> Amounts
     }
@@ -43,48 +46,56 @@ getStats kind =
     case kind of
         Manure ->
             { title = "Manure"
+            , icon = Icon.manure
             , getter = .manure
             , setter = \amount resources -> { resources | manure = amount }
             }
 
         Soot ->
             { title = "Soot"
+            , icon = Icon.soot
             , getter = .soot
             , setter = \amount resources -> { resources | soot = amount }
             }
 
         GreenhouseDirt ->
             { title = "Greenhouse Dirt"
+            , icon = Icon.greenhouseDirt
             , getter = .greenhouseDirt
             , setter = \amount resources -> { resources | greenhouseDirt = amount }
             }
 
         WashWater ->
             { title = "Wash Water"
+            , icon = Icon.washWater
             , getter = .washWater
             , setter = \amount resources -> { resources | washWater = amount }
             }
 
         EmptyBottle ->
             { title = "Empty Bottle"
+            , icon = Icon.emptyBottle
             , getter = .emptyBottles
             , setter = \amount resources -> { resources | emptyBottles = amount }
             }
 
         Scrap ->
             { title = "Scrap"
+            , icon = Icon.scrap
             , getter = .scrap
             , setter = \amount resources -> { resources | scrap = amount }
             }
 
         Ectoplasm ->
             { title = "Ectoplasm"
+            , icon = Icon.ectoplasm
             , getter = .ectoplasm
             , setter = \amount resources -> { resources | ectoplasm = amount }
             }
 
         Parchment ->
             { title = "Parchment"
+            , icon = Icon.parchment
             , getter = .parchment
             , setter = \amount resources -> { resources | parchment = amount }
             }

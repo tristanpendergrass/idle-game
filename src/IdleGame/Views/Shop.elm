@@ -40,7 +40,6 @@ render game =
                 [ div [ class "avatar" ]
                     [ div [ class "w-24 rounded-full" ]
                         [ icon
-                            |> Icon.withSize Icon.Large
                             |> Icon.toHtml
                         ]
                     ]

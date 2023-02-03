@@ -29,7 +29,6 @@ renderDrawer game activeTab =
                 ]
                 [ span [ class "flex-none" ]
                     [ config.icon
-                        |> Icon.withSize Icon.Large
                         |> Icon.toHtml
                     ]
                 , span [ class "flex-1" ] [ text config.title ]
@@ -45,7 +44,6 @@ renderDrawer game activeTab =
                 ]
                 [ span [ class "flex-none" ]
                     [ Icon.forbiddenKnowledge
-                        |> Icon.withSize Icon.Large
                         |> Icon.toHtml
                     ]
                 , span [ class "flex-1" ] [ text "Forbidden Knowledge" ]

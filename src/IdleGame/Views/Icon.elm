@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 
 type Size
     = Small
+    | Medium
     | Large
 
 
@@ -22,7 +23,7 @@ type Icon
 
 defaultParams : Params
 defaultParams =
-    { size = Small
+    { size = Medium
     }
 
 
@@ -47,8 +48,12 @@ sizeToPx size =
         Small ->
             12
 
-        Large ->
+        Medium ->
             24
+
+        Large ->
+            48
+
 
 sizeToRem : Size -> Float
 sizeToRem size =
@@ -56,17 +61,24 @@ sizeToRem size =
         Small ->
             0.75
 
-        Large ->
+        Medium ->
             1.5
+
+        Large ->
+            3.0
+
 
 sizeToTailwindClass : Size -> String
 sizeToTailwindClass size =
     case size of
         Small ->
-            "w-3"
+            "w-3 h-3"
+
+        Medium ->
+            "w-6 h-6"
 
         Large ->
-            "w-6"
+            "w-12 h-12"
 
 
 toHtml : Icon -> Html msg
@@ -178,3 +190,43 @@ underConstruction =
 gold : Icon
 gold =
     createIconPublic "/coin.png"
+
+
+manure : Icon
+manure =
+    createIconPublic "/manure.png"
+
+
+soot : Icon
+soot =
+    createIconPublic "/soot_2.png"
+
+
+greenhouseDirt : Icon
+greenhouseDirt =
+    createIconPublic "/greenhouseDirt.png"
+
+
+washWater : Icon
+washWater =
+    createIconPublic "/washWater.png"
+
+
+emptyBottle : Icon
+emptyBottle =
+    createIconPublic "/emptyBottle.png"
+
+
+scrap : Icon
+scrap =
+    createIconPublic "/scrap.png"
+
+
+ectoplasm : Icon
+ectoplasm =
+    createIconPublic "/ectoplasm_2.png"
+
+
+parchment : Icon
+parchment =
+    createIconPublic "/parchment.png"

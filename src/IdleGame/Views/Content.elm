@@ -37,7 +37,6 @@ renderContent game activeTab =
                     [ span [ class "tooltip tooltip-bottom before:text-xs before:content-[attr(data-tip)]", attribute "data-tip" "Menu" ]
                         [ label [ for "drawer", class "btn btn-square btn-sm  drawer-button lg:hidden" ]
                             [ Icon.menu
-                                |> Icon.withSize Icon.Large
                                 |> Icon.toHtml
                             ]
                         ]
@@ -45,7 +44,6 @@ renderContent game activeTab =
                     -- Left side stuff
                     , div [ class "flex items-center gap-2" ]
                         [ icon
-                            |> Icon.withSize Icon.Large
                             |> Icon.toHtml
                         , span [] [ text title ]
                         ]

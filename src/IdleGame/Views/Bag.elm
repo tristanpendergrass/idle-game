@@ -13,11 +13,20 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     let
-        listItem : String -> String -> Html FrontendMsg
-        listItem label quantity =
+        listItem : Int -> Resource.Kind -> Html FrontendMsg
+        listItem quantity resource =
+            let
+                stats =
+                    Resource.getStats resource
+            in
             li [ class "flex gap-1" ]
-                [ span [ class "w-full text-lg truncate" ] [ text label ]
-                , span [ class "text-lg font-semibold" ] [ text quantity ]
+                [ div [ class "border-2 border-primary bg-primary/50 rounded" ]
+                    [ stats.icon
+                        |> Icon.withSize Icon.Large
+                        |> Icon.toHtml
+                    ]
+                , span [ class "w-full text-lg truncate" ] [ text stats.title ]
+                , span [ class "text-lg font-semibold" ] [ text <| String.fromInt quantity ]
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
@@ -32,12 +41,7 @@ render game =
                 ]
             ]
         , ul [ class "w-full grid gap-x-8 gap-y-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
-            (game.resources
-                |> Resource.mapResources
-                    (\amount resource ->
-                        listItem (Resource.getStats resource).title (String.fromInt amount)
-                    )
-            )
+            (Resource.mapResources listItem game.resources)
         ]
 
 
