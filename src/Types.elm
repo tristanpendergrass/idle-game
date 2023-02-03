@@ -4,7 +4,6 @@ import Browser exposing (UrlRequest)
 import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
-import FeatherIcons
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)

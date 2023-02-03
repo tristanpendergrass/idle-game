@@ -3676,6 +3676,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 1rem;
 }
 
+.h-6 {
+  height: 1.5rem;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
@@ -3714,6 +3718,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-12 {
   width: 3rem;
+}
+
+.w-3 {
+  width: 0.75rem;
 }
 
 .min-w-\[375px\] {

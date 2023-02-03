@@ -1,117 +1,171 @@
 module IdleGame.Views.Icon exposing (..)
 
 import FeatherIcons
+import Html exposing (..)
+import Html.Attributes exposing (..)
+
+
+type Size
+    = Small
+    | Large
+
+
+type alias Params =
+    { size : Size
+    }
 
 
 type Icon
-    = UnderConstruction
-    | Bag
-    | Shop
-    | Chores
-    | Explore
-    | Mischief
-    | Hexes
-    | Wards
-    | Enchantment
-    | Botany
-    | Potionmaking
-    | Conjuration
-    | Transmogrification
-    | ForbiddenKnowledge
+    = IconFeather FeatherIcons.Icon Params
+    | IconPublic String Params
 
 
-toFeatherIcon : Icon -> FeatherIcons.Icon
-toFeatherIcon icon =
+defaultParams : Params
+defaultParams =
+    { size = Small
+    }
+
+
+mapParams : (Params -> Params) -> Icon -> Icon
+mapParams fn icon =
     case icon of
-        UnderConstruction ->
-            FeatherIcons.tool
-                |> FeatherIcons.withClass "text-info"
+        IconFeather f params ->
+            IconFeather f (fn params)
 
-        Bag ->
-            FeatherIcons.box
+        IconPublic p params ->
+            IconPublic p (fn params)
 
-        Shop ->
-            FeatherIcons.dollarSign
 
-        Chores ->
-            FeatherIcons.clipboard
+withSize : Size -> Icon -> Icon
+withSize size =
+    mapParams (\params -> { params | size = size })
 
-        Explore ->
-            FeatherIcons.map
 
-        Mischief ->
-            FeatherIcons.target
+sizeToPx : Size -> Float
+sizeToPx size =
+    case size of
+        Small ->
+            12
 
-        Hexes ->
-            FeatherIcons.zap
+        Large ->
+            24
 
-        Wards ->
-            FeatherIcons.shield
 
-        Enchantment ->
-            FeatherIcons.star
+sizeToTailwindClass : Size -> String
+sizeToTailwindClass size =
+    case size of
+        Small ->
+            "w-3"
 
-        Botany ->
-            FeatherIcons.cloudDrizzle
+        Large ->
+            "w-6"
 
-        Potionmaking ->
-            FeatherIcons.droplet
 
-        Conjuration ->
-            FeatherIcons.aperture
+toHtml : Icon -> Html msg
+toHtml icon =
+    case icon of
+        IconFeather featherIcon params ->
+            featherIcon
+                |> FeatherIcons.withSize (sizeToPx params.size)
+                |> FeatherIcons.toHtml []
 
-        Transmogrification ->
-            FeatherIcons.package
+        IconPublic iconSrc params ->
+            img
+                [ src iconSrc
+                , class (sizeToTailwindClass params.size)
+                ]
+                []
 
-        ForbiddenKnowledge ->
-            FeatherIcons.alertTriangle
+
+
+-- Icon creators
+
+
+createIconFeather : FeatherIcons.Icon -> Icon
+createIconFeather featherIcon =
+    IconFeather featherIcon defaultParams
+
+
+createIconPublic : String -> Icon
+createIconPublic iconSrc =
+    IconPublic iconSrc defaultParams
+
+
+menu : Icon
+menu =
+    createIconFeather FeatherIcons.menu
 
 
 bag : Icon
 bag =
-    Bag
+    createIconFeather FeatherIcons.box
 
 
 shop : Icon
 shop =
-    Shop
+    createIconFeather FeatherIcons.dollarSign
 
 
 chores : Icon
 chores =
-    Chores
+    createIconFeather FeatherIcons.clipboard
 
 
-exploration : Icon
-exploration =
-    Explore
+explore : Icon
+explore =
+    createIconFeather FeatherIcons.map
 
 
 mischief : Icon
 mischief =
-    Mischief
+    createIconFeather FeatherIcons.target
 
 
 botany : Icon
 botany =
-    Botany
+    createIconFeather FeatherIcons.cloudDrizzle
 
 
 potionmaking : Icon
 potionmaking =
-    Potionmaking
+    createIconFeather FeatherIcons.droplet
 
 
 hexes : Icon
 hexes =
-    Hexes
+    createIconFeather FeatherIcons.zap
 
 
 wards : Icon
 wards =
-    Wards
+    createIconFeather FeatherIcons.shield
+
+
+enchantment : Icon
+enchantment =
+    createIconFeather FeatherIcons.star
+
+
+conjuration : Icon
+conjuration =
+    createIconFeather FeatherIcons.aperture
+
+
+transmogrification : Icon
+transmogrification =
+    createIconFeather FeatherIcons.package
 
 
 forbiddenKnowledge : Icon
 forbiddenKnowledge =
-    ForbiddenKnowledge
+    createIconFeather FeatherIcons.alertTriangle
+
+
+underConstruction : Icon
+underConstruction =
+    createIconFeather FeatherIcons.tool
+
+
+gold : Icon
+gold =
+    createIconPublic "/coin.png"

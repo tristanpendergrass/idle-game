@@ -1,6 +1,5 @@
 module IdleGame.Views.UnderConstruction exposing (..)
 
-import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -24,7 +23,8 @@ render =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex gap-2" ]
-                [ Icon.UnderConstruction |> Icon.toFeatherIcon |> FeatherIcons.toHtml []
+                [ Icon.underConstruction
+                    |> Icon.toHtml
                 , span [] [ text "Under construction" ]
                 ]
             ]

@@ -1,6 +1,5 @@
 module IdleGame.Views.Content exposing (..)
 
-import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -10,7 +9,7 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
-import IdleGame.Views.Icon
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
 import IdleGame.ZIndexes exposing (zIndexes)
@@ -37,18 +36,17 @@ renderContent game activeTab =
                 [ div [ class "flex gap-2 lg:gap-4" ]
                     [ span [ class "tooltip tooltip-bottom before:text-xs before:content-[attr(data-tip)]", attribute "data-tip" "Menu" ]
                         [ label [ for "drawer", class "btn btn-square btn-sm  drawer-button lg:hidden" ]
-                            [ FeatherIcons.menu
-                                |> FeatherIcons.withSize 20
-                                |> FeatherIcons.toHtml []
+                            [ Icon.menu
+                                |> Icon.withSize Icon.Large
+                                |> Icon.toHtml
                             ]
                         ]
 
                     -- Left side stuff
                     , div [ class "flex items-center gap-2" ]
                         [ icon
-                            |> IdleGame.Views.Icon.toFeatherIcon
-                            |> FeatherIcons.withSize 24
-                            |> FeatherIcons.toHtml []
+                            |> Icon.withSize Icon.Large
+                            |> Icon.toHtml
                         , span [] [ text title ]
                         ]
 

@@ -9,7 +9,6 @@ import IdleGame.Resource as Resource exposing (Resource, Resources)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
 import IdleGame.XpFormulas as XpFormulas
-import Maybe.Extra
 import Time exposing (Posix)
 import Types exposing (..)
 

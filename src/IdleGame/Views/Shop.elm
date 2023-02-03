@@ -42,9 +42,8 @@ render game =
                 [ div [ class "avatar" ]
                     [ div [ class "w-24 rounded-full" ]
                         [ icon
-                            |> Icon.toFeatherIcon
-                            |> FeatherIcons.withSize 96
-                            |> FeatherIcons.toHtml []
+                            |> Icon.withSize Icon.Large
+                            |> Icon.toHtml
                         ]
                     ]
                 , div [ class "flex-1 t-column" ]

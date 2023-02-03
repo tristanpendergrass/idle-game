@@ -110,7 +110,7 @@ toList (ShopItems ownedItems) =
                         { item = Item1
                         , title = "Item 1"
                         , description = (getMod item).label
-                        , icon = Icon.Bag
+                        , icon = Icon.bag
                         , price = getPrice item
                         , owned = ownedItems.item1
                         }
@@ -119,7 +119,7 @@ toList (ShopItems ownedItems) =
                         { item = Item2
                         , title = "Item 2"
                         , description = (getMod item).label
-                        , icon = Icon.Botany
+                        , icon = Icon.botany
                         , price = getPrice item
                         , owned = ownedItems.item2
                         }

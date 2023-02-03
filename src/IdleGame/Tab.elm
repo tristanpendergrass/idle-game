@@ -31,65 +31,65 @@ getConfig tab =
     case tab of
         ForbiddenKnowledge ->
             { title = "Forbidden Knowledge"
-            , icon = Icon.ForbiddenKnowledge
+            , icon = Icon.forbiddenKnowledge
             }
 
         Bag ->
             { title = "Bag"
-            , icon = Icon.Bag
+            , icon = Icon.bag
             }
 
         Shop ->
             { title = "Shop"
-            , icon = Icon.Shop
+            , icon = Icon.shop
             }
 
         Chores ->
             { title = "Chores"
-            , icon = Icon.Chores
+            , icon = Icon.chores
             }
 
         Explore ->
             { title = "Explore"
-            , icon = Icon.Explore
+            , icon = Icon.explore
             }
 
         Mischief ->
             { title = "Mischief"
-            , icon = Icon.Mischief
+            , icon = Icon.mischief
             }
 
         Hexes ->
             { title = "Hexes"
-            , icon = Icon.Hexes
+            , icon = Icon.hexes
             }
 
         Wards ->
             { title = "Wards"
-            , icon = Icon.Wards
+            , icon = Icon.wards
             }
 
         Enchantment ->
             { title = "Enchantment"
-            , icon = Icon.Enchantment
+            , icon = Icon.enchantment
             }
 
         Botany ->
             { title = "Botany"
-            , icon = Icon.Botany
+            , icon = Icon.botany
             }
 
         Potionmaking ->
             { title = "Potionmaking"
-            , icon = Icon.Potionmaking
+            , icon = Icon.potionmaking
             }
 
         Conjuration ->
             { title = "Conjuration"
-            , icon = Icon.Conjuration
+            , icon = Icon.conjuration
             }
 
         Transmogrification ->
             { title = "Transmogrification"
-            , icon = Icon.Transmogrification
+            , icon = Icon.transmogrification
             }

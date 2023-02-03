@@ -14,10 +14,8 @@ renderDrawer : Game -> Tab -> Html FrontendMsg
 renderDrawer game activeTab =
     let
         underConstructionIcon =
-            Icon.UnderConstruction
-                |> Icon.toFeatherIcon
-                |> FeatherIcons.withSize 12
-                |> FeatherIcons.toHtml []
+            Icon.underConstruction
+                |> Icon.toHtml
 
         renderTab : { tab : Tab, underConstruction : Bool } -> Html FrontendMsg
         renderTab { tab, underConstruction } =
@@ -31,9 +29,8 @@ renderDrawer game activeTab =
                 ]
                 [ span [ class "flex-none" ]
                     [ config.icon
-                        |> Icon.toFeatherIcon
-                        |> FeatherIcons.withSize 24
-                        |> FeatherIcons.toHtml []
+                        |> Icon.withSize Icon.Large
+                        |> Icon.toHtml
                     ]
                 , span [ class "flex-1" ] [ text config.title ]
                 , span [ class "flex-none", classList [ ( "hidden", not underConstruction ) ] ]
@@ -47,10 +44,9 @@ renderDrawer game activeTab =
                 , onClick <| SetActiveTab Tab.ForbiddenKnowledge
                 ]
                 [ span [ class "flex-none" ]
-                    [ Icon.ForbiddenKnowledge
-                        |> Icon.toFeatherIcon
-                        |> FeatherIcons.withSize 24
-                        |> FeatherIcons.toHtml []
+                    [ Icon.forbiddenKnowledge
+                        |> Icon.withSize Icon.Large
+                        |> Icon.toHtml
                     ]
                 , span [ class "flex-1" ] [ text "Forbidden Knowledge" ]
                 , span [ class "flex-none" ]

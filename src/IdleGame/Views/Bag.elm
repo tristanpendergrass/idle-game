@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Event3 exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Resource as Resource exposing (Resource, Resources)
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import Types exposing (..)
 
 
@@ -21,8 +22,12 @@ render game =
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-start items-center" ]
-            [ div [ class "flex items-center gap-1 px-2 py-1 bg-accent text-accent-content rounded" ]
-                [ span [ class "text-lg truncate" ] [ text "Gold" ]
+            [ div [ class "flex items-center gap-1 px-2 py-1 rounded" ]
+                [ span [ class "text-lg truncate" ]
+                    [ Icon.gold
+                        |> Icon.withSize Icon.Large
+                        |> Icon.toHtml
+                    ]
                 , span [ class "text-log font-semibold" ] [ text <| String.fromInt game.gold ]
                 ]
             ]

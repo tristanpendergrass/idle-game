@@ -37,7 +37,7 @@ $ npm test -- --watch
   - [x] Show Gold gained
 - [x] Improve experience when calculating long amount of time
 - [x] "Coming soon" for other skills
-- [ ] Shop
+- [x] Shop
 - [ ] Icons for things
 - [ ] Develop Mod that speeds up interval
 - [ ] Finalize values for all things
