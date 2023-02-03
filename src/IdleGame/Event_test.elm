@@ -1,7 +1,7 @@
-module IdleGame.Event3_test exposing (..)
+module IdleGame.Event_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.Event3 exposing (..)
+import IdleGame.Event exposing (..)
 import IdleGame.Resource as Resource exposing (Resource)
 import Test exposing (..)
 

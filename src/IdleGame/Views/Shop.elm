@@ -4,7 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event3 exposing (..)
+import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Resource as Resource exposing (Resource, Resources)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)

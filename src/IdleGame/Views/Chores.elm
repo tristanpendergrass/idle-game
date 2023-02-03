@@ -4,7 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event3 exposing (..)
+import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
 import IdleGame.Resource as Resource exposing (Resource)
@@ -170,7 +170,7 @@ renderChore game chore =
         moddedEvent : ModdedEvent
         moddedEvent =
             IdleGame.Game.getEvent chore
-                |> IdleGame.Event3.applyModsToEvent allMods
+                |> IdleGame.Event.applyModsToEvent allMods
 
         mastery =
             IdleGame.Game.getMastery type_ game.choresData

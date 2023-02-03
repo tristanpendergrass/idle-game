@@ -1,6 +1,6 @@
 module IdleGame.ShopItems exposing (..)
 
-import IdleGame.Event3 exposing (Mod)
+import IdleGame.Event as Event exposing (Event)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
@@ -49,16 +49,16 @@ hasItem item (ShopItems ownedItems) =
             ownedItems.item2
 
 
-getMod : Item -> Mod
+getMod : Item -> Event.Mod
 getMod item =
     case item of
         Item1 ->
-            IdleGame.Event3.choresXpBuff 0.75
-                |> IdleGame.Event3.withSource IdleGame.Event3.ShopItem
+            Event.choresXpBuff 0.75
+                |> Event.withSource Event.ShopItem
 
         Item2 ->
-            IdleGame.Event3.choresXpBuff 0.75
-                |> IdleGame.Event3.withSource IdleGame.Event3.ShopItem
+            Event.choresXpBuff 0.75
+                |> Event.withSource Event.ShopItem
 
 
 create : ShopItems

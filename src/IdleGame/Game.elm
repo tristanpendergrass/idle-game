@@ -1,7 +1,6 @@
 module IdleGame.Game exposing (..)
 
-import IdleGame.Event3 exposing (..)
-import IdleGame.Event3_test exposing (eventWithTags)
+import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Resource as Resource exposing (Resource, Resources, ResourcesDiff)
