@@ -8,6 +8,7 @@ import IdleGame.Game exposing (TimePassesData)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
+import IdleGame.Views.Utils
 import IdleGame.XpFormulas as XpFormulas
 import Time exposing (Posix)
 import Types exposing (..)
@@ -78,7 +79,7 @@ getDurationStringParts millis =
                 else
                     "day"
         in
-        (String.fromInt wholeDays ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // day) * day))
+        (IdleGame.Views.Utils.intToString wholeDays ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // day) * day))
 
     else if wholeHours > 0 then
         let
@@ -89,7 +90,7 @@ getDurationStringParts millis =
                 else
                     "hour"
         in
-        (String.fromInt wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
+        (IdleGame.Views.Utils.intToString wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
 
     else if wholeMinutes > 0 then
         let
@@ -100,7 +101,7 @@ getDurationStringParts millis =
                 else
                     "minute"
         in
-        (String.fromInt wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
+        (IdleGame.Views.Utils.intToString wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
 
     else if wholeSeconds > 0 then
         let
@@ -111,7 +112,7 @@ getDurationStringParts millis =
                 else
                     "second"
         in
-        [ String.fromInt wholeSeconds ++ " " ++ displayUnit ]
+        [ IdleGame.Views.Utils.intToString wholeSeconds ++ " " ++ displayUnit ]
 
     else
         []
@@ -133,7 +134,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
 
                         Just amount ->
                             [ li [ class "flex items-center gap-2" ]
-                                [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                                [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString amount ]
                                 , span [] [ text "Gold" ]
                                 ]
                             ]
@@ -152,10 +153,10 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                                         XpFormulas.skillLevel currentXp
                                 in
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-success" ] [ text <| String.fromInt displayAmount ]
+                                    [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString displayAmount ]
                                     , span [] [ text title ]
                                     , if originalLevel /= currentLevel then
-                                        span [] [ text <| "(Level " ++ String.fromInt originalLevel ++ " -> " ++ String.fromInt currentLevel ++ ")" ]
+                                        span [] [ text <| "(Level " ++ IdleGame.Views.Utils.intToString originalLevel ++ " -> " ++ IdleGame.Views.Utils.intToString currentLevel ++ ")" ]
 
                                       else
                                         span [] []
@@ -165,7 +166,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                         |> Resource.mapDiff
                             (\amount resource ->
                                 li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
-                                    [ span [ class "text-success" ] [ text <| String.fromInt amount ]
+                                    [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString amount ]
                                     , span [] [ text <| (Resource.getStats resource).title ]
                                     ]
                             )

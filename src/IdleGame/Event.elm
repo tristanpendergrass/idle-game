@@ -2,6 +2,7 @@ module IdleGame.Event exposing (..)
 
 import IdleGame.GameTypes exposing (ChoreType)
 import IdleGame.Resource as Resource
+import IdleGame.Views.Utils
 
 
 
@@ -302,12 +303,12 @@ mxpTransformer buff effectMultiplier effect =
 
 xpModLabel : Float -> String
 xpModLabel multiplier =
-    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% XP"
+    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% XP"
 
 
 mxpModLabel : Float -> String
 mxpModLabel multiplier =
-    "+" ++ String.fromInt (floor (multiplier * 100)) ++ "% Mastery XP"
+    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Mastery XP"
 
 
 devGlobalXpBuff : Mod

@@ -1,8 +1,7 @@
 module IdleGame.Views.Bag exposing (..)
 
--- import FormatNumber
--- import FormatNumber.Locales
-
+import FormatNumber
+import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -10,6 +9,7 @@ import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Utils
 import Types exposing (..)
 
 
@@ -32,8 +32,7 @@ render game =
                         -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
                         , div [ class "t-absolute-center-x -bottom-5" ]
                             [ span [ class "px-4 bg-base-100 text-base-content border border-primary-content rounded-xl text-sm font-semibold" ]
-                                -- [ text <| FormatNumber.format FormatNumber.Locales.usLocale (toFloat quantity)
-                                [ text ""
+                                [ text <| IdleGame.Views.Utils.intToString quantity
                                 ]
                             ]
                         ]
@@ -50,8 +49,7 @@ render game =
                         |> Icon.toHtml
                     ]
                 , span [ class "text-log font-semibold" ]
-                    -- [ text <| FormatNumber.format FormatNumber.Locales.usLocale (toFloat game.gold)
-                    [ text ""
+                    [ text <| IdleGame.Views.Utils.intToString game.gold
                     ]
                 ]
             ]

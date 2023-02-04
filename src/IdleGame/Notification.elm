@@ -1,6 +1,7 @@
 module IdleGame.Notification exposing (..)
 
 import IdleGame.Resource as Resource
+import IdleGame.Views.Utils
 
 
 type alias Toast =
@@ -20,11 +21,11 @@ toToast : Notification -> Toast
 toToast notification =
     case notification of
         GainedGold amount ->
-            "+" ++ String.fromInt amount ++ " Gold"
+            "+" ++ IdleGame.Views.Utils.intToString amount ++ " Gold"
 
         GainedResource amount resource ->
             let
                 label =
                     (Resource.getStats resource).title
             in
-            "+" ++ String.fromInt amount ++ " " ++ label
+            "+" ++ IdleGame.Views.Utils.intToString amount ++ " " ++ label

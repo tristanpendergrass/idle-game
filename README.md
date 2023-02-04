@@ -49,6 +49,8 @@ $ npm test -- --watch
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
 - [ ] Refactor gold to be a non-negative type
+- [ ] Set up elm-review
+  - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 
 ### Fundamentals
 - [ ] Activity detail sidebar

@@ -7,6 +7,7 @@ import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Utils
 import Types exposing (..)
 
 
@@ -23,7 +24,7 @@ render game =
                 [ class "flex-0 px-2 py-1 font-bold"
                 , classList [ ( "text-error", price > game.gold ) ]
                 ]
-                [ text <| String.fromInt price
+                [ text <| IdleGame.Views.Utils.intToString price
                 ]
 
         renderShopItem : ShopItems.ViewItem -> Html FrontendMsg

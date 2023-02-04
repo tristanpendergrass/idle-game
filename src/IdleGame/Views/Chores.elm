@@ -10,6 +10,7 @@ import IdleGame.GameTypes
 import IdleGame.Resource as Resource
 import IdleGame.Timer
 import IdleGame.Views.Placeholder
+import IdleGame.Views.Utils
 import IdleGame.XpFormulas
 import IdleGame.ZIndexes exposing (zIndexes)
 import List.Extra
@@ -22,7 +23,7 @@ render game =
         skillLevel =
             game.choresXp
                 |> IdleGame.XpFormulas.skillLevel
-                |> String.fromInt
+                |> IdleGame.Views.Utils.intToString
 
         skillPercent =
             IdleGame.XpFormulas.skillLevelPercent game.choresXp * 100
@@ -32,14 +33,14 @@ render game =
                 |> Basics.min 100
 
         masteryPercentLabel =
-            String.fromInt (floor masteryPercent)
+            IdleGame.Views.Utils.intToString (floor masteryPercent)
     in
     div [ class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
             [ div [ class "t-column" ]
                 [ div [ class "w-full flex items-center justify-between" ]
                     [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
-                    , div [ class "text-2xs" ] [ text <| String.fromInt (floor game.choresXp) ]
+                    , div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.intToString (floor game.choresXp) ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
@@ -50,7 +51,7 @@ render game =
                     ]
                 , div [ class "w-full flex items-center justify-between" ]
                     [ div [ class "text-2xs font-bold" ] [ text "Mastery Pool" ]
-                    , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor game.choresMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
+                    , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| IdleGame.Views.Utils.intToString (floor game.choresMxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
@@ -117,7 +118,7 @@ renderChoreXpReward game choreType (ModdedEvent eventData) =
         skillXpLabel =
             case List.Extra.findMap getChoresSkillXp eventData.effects of
                 Just skillXp ->
-                    String.fromInt (floor skillXp)
+                    IdleGame.Views.Utils.intToString (floor skillXp)
 
                 Nothing ->
                     "N/A"
@@ -125,7 +126,7 @@ renderChoreXpReward game choreType (ModdedEvent eventData) =
         mxpLabel =
             case List.Extra.findMap (getChoreMxp choreType game.choresData) eventData.effects of
                 Just skillXp ->
-                    String.fromInt (floor skillXp)
+                    IdleGame.Views.Utils.intToString (floor skillXp)
 
                 Nothing ->
                     "N/A"
@@ -178,20 +179,20 @@ renderChore game chore =
         renderGold amount =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text ("+" ++ String.fromInt amount) ]
+                    [ span [] [ text ("+" ++ IdleGame.Views.Utils.intToString amount) ]
                     , span [ class "font-semibold" ] [ text "Gold" ]
                     ]
                 ]
 
         renderResource amount resource =
             div [ class "flex items-center gap-1" ]
-                [ span [] [ text ("+" ++ String.fromInt amount) ]
+                [ span [] [ text ("+" ++ IdleGame.Views.Utils.intToString amount) ]
                 , span [ class "font-semibold" ] [ text resource ]
                 ]
 
         renderSuccessCondition probability child =
             div [ class "flex items-center gap-1" ]
-                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (String.fromInt probability ++ "%") ]
+                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (IdleGame.Views.Utils.intToString probability ++ "%") ]
                 , div [] [ text ":" ]
                 , child
                 ]
@@ -215,7 +216,7 @@ renderChore game chore =
                 -- Chore XP rewards
                 , renderChoreXpReward game chore.type_ moddedEvent
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| String.fromInt (IdleGame.XpFormulas.skillLevel mastery) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mastery) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
                         [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mastery * 100) ++ "%") ] []
                         ]
@@ -256,7 +257,7 @@ renderLockedChore level =
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
-                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ String.fromInt level ]
+                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ IdleGame.Views.Utils.intToString level ]
                 ]
             ]
         ]

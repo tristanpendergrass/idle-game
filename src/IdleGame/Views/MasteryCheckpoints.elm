@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game
 import IdleGame.Views.ModalWrapper
+import IdleGame.Views.Utils
 import IdleGame.XpFormulas
 import Json.Decode
 import Round
@@ -26,7 +27,7 @@ renderCheckpoint { number, label, isActive } =
                 else
                     ""
             ]
-            [ text <| String.fromInt number ++ "%" ]
+            [ text <| IdleGame.Views.Utils.intToString number ++ "%" ]
         , div [ class "flex-grow" ] [ text label ]
         ]
 
@@ -44,7 +45,7 @@ render { mxp, checkpoints } =
         [ h2 [ class "text-lg font-bold" ] [ text "Mastery Pool Checkpoints" ]
         , div [ class "t-column" ]
             [ div [ class "w-full flex items-center justify-end" ]
-                [ div [ class "text-2xs flex gap-1" ] [ span [] [ text <| String.fromInt (floor mxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
+                [ div [ class "text-2xs flex gap-1" ] [ span [] [ text <| IdleGame.Views.Utils.intToString (floor mxp) ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
                 ]
             , div [ class "w-full flex items-center gap-2" ]
                 [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
