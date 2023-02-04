@@ -135,6 +135,8 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                         Just amount ->
                             [ li [ class "flex items-center gap-2" ]
                                 [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString amount ]
+                                , Icon.gold
+                                    |> Icon.toHtml
                                 , span [] [ text "Gold" ]
                                 ]
                             ]
@@ -167,6 +169,8 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                             (\amount resource ->
                                 li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
                                     [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString amount ]
+                                    , (Resource.getStats resource).icon
+                                        |> Icon.toHtml
                                     , span [] [ text <| (Resource.getStats resource).title ]
                                     ]
                             )

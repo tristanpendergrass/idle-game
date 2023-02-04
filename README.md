@@ -51,6 +51,7 @@ $ npm test -- --watch
 - [ ] Refactor gold to be a non-negative type
 - [ ] Set up elm-review
   - [ ] Add custom rule to replace String.fromInt with Utils.intToString
+- [ ] Load pictures in sprite sheet at init and dont show app until loaded
 
 ### Fundamentals
 - [ ] Activity detail sidebar
