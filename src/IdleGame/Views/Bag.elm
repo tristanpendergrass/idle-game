@@ -19,18 +19,24 @@ render game =
                 stats =
                     Resource.getStats resource
             in
-            li [ class "flex gap-1" ]
-                [ div [ class "border-2 border-primary bg-primary/50 rounded" ]
-                    [ stats.icon
-                        |> Icon.withSize Icon.Large
-                        |> Icon.toHtml
+            li []
+                [ div [ class "t-column gap-4" ]
+                    [ div [ class "border-2 border-primary bg-primary/50 rounded relative" ]
+                        [ stats.icon
+                            |> Icon.withSize Icon.Large
+                            |> Icon.toHtml
+
+                        -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
+                        , div [ class "t-absolute-center-x -bottom-5" ]
+                            [ span [ class "px-4 bg-base-100 text-base-content border border-primary-content rounded-xl text-sm font-semibold" ] [ text <| String.fromInt quantity ]
+                            ]
+                        ]
+                    , span [ class "inline-block truncate" ] [ text stats.title ]
                     ]
-                , span [ class "w-full text-lg truncate" ] [ text stats.title ]
-                , span [ class "text-lg font-semibold" ] [ text <| String.fromInt quantity ]
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ div [ class "w-full flex justify-start items-center" ]
+        [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex items-center gap-1 px-2 py-1 rounded" ]
                 [ span [ class "text-lg truncate" ]
                     [ Icon.gold
@@ -40,7 +46,8 @@ render game =
                 , span [ class "text-log font-semibold" ] [ text <| String.fromInt game.gold ]
                 ]
             ]
-        , ul [ class "w-full grid gap-x-8 gap-y-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
+        , div [ class "divider" ] []
+        , ul [ class "w-full grid gap-x-8 gap-y-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
             (Resource.mapResources listItem game.resources)
         ]
 
