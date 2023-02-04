@@ -178,3 +178,16 @@ mapResources fn resources =
                 in
                 fn amount resource
             )
+
+
+toList : Amounts -> List ( Kind, Int )
+toList resources =
+    allResources
+        |> List.map
+            (\resource ->
+                let
+                    amount =
+                        (getStats resource).getter resources
+                in
+                ( resource, amount )
+            )
