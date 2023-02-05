@@ -68,7 +68,7 @@ getStats kind =
         CleanStables ->
             { kind = CleanStables
             , title = "Clean Stables"
-            , imgSrc = "/stable.png"
+            , imgSrc = "/chores/stable.png"
             , getter = .cleanStables
             , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
             , outcome =
@@ -83,7 +83,7 @@ getStats kind =
         CleanBigBubba ->
             { kind = CleanBigBubba
             , title = "Clean Big Bubba's Stall"
-            , imgSrc = "/bubba2.png"
+            , imgSrc = "/chores/bubba2.png"
             , getter = .cleanBigBubba
             , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
             , outcome =
@@ -98,7 +98,7 @@ getStats kind =
         SweepChimneys ->
             { kind = SweepChimneys
             , title = "Sweep Chimneys"
-            , imgSrc = "/sweepChimneys.png"
+            , imgSrc = "/chores/chimney.png"
             , getter = .sweepChimneys
             , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
             , outcome =
@@ -113,7 +113,7 @@ getStats kind =
         WaterGreenhousePlants ->
             { kind = WaterGreenhousePlants
             , title = "Water Greenhouse Plants"
-            , imgSrc = "/waterGreenhousePlants.png"
+            , imgSrc = "/chores/greenhouse_3.png"
             , getter = .waterGreenhousePlants
             , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
             , outcome =
@@ -128,7 +128,7 @@ getStats kind =
         WashAndIronRobes ->
             { kind = WashAndIronRobes
             , title = "Wash and Iron Robes"
-            , imgSrc = "/washAndIronRobes.png"
+            , imgSrc = "/chores/washRobes.png"
             , getter = .washRobes
             , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
             , outcome =
@@ -143,7 +143,7 @@ getStats kind =
         OrganizePotionIngredients ->
             { kind = OrganizePotionIngredients
             , title = "Organize Potion Ingredients"
-            , imgSrc = "/organizePotionIngredients.png"
+            , imgSrc = "/chores/potionIngredients_2.png"
             , getter = .organizePotionIngredients
             , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
             , outcome =
@@ -158,7 +158,7 @@ getStats kind =
         RepairInstruments ->
             { kind = RepairInstruments
             , title = "Repair Instruments"
-            , imgSrc = "/repairInstruments.png"
+            , imgSrc = "/chores/repairInstruments.png"
             , getter = .repairInstruments
             , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
             , outcome =
@@ -173,7 +173,7 @@ getStats kind =
         FlushDrainDemons ->
             { kind = FlushDrainDemons
             , title = "Flush the Drain Demons"
-            , imgSrc = "/flushDrainDemons.png"
+            , imgSrc = "/chores/drainDemons.png"
             , getter = .flushDrainDemons
             , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
             , outcome =
@@ -188,7 +188,7 @@ getStats kind =
         OrganizeSpellBooks ->
             { kind = OrganizeSpellBooks
             , title = "Organize Spell Books"
-            , imgSrc = "/organizeSpellBooks.png"
+            , imgSrc = "/chores/spellBooks.png"
             , getter = .organizeSpellBooks
             , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
             , outcome =

@@ -33,9 +33,10 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
-    , choresXp = 0
 
+    -- , choresXp = 0
     -- , choresMxp = 0
+    , choresXp = 14391160
     , choresMxp = 4500000 / 2
     , activeChore = Nothing
     , choresData =
@@ -69,7 +70,7 @@ choreUnlockRequirements =
     , ( Chore.OrganizePotionIngredients, 55 )
     , ( Chore.RepairInstruments, 65 )
     , ( Chore.FlushDrainDemons, 75 )
-    , ( Chore.OrganizePotionIngredients, 90 )
+    , ( Chore.OrganizeSpellBooks, 90 )
     ]
 
 

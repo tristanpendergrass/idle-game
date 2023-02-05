@@ -194,39 +194,39 @@ gold =
 
 manure : Icon
 manure =
-    createIconPublic "/manure.png"
+    createIconPublic "/resources/manure.png"
 
 
 soot : Icon
 soot =
-    createIconPublic "/soot_2.png"
+    createIconPublic "/resources/soot_2.png"
 
 
 greenhouseDirt : Icon
 greenhouseDirt =
-    createIconPublic "/greenhouseDirt.png"
+    createIconPublic "/resources/greenhouseDirt.png"
 
 
 washWater : Icon
 washWater =
-    createIconPublic "/washWater.png"
+    createIconPublic "/resources/washWater.png"
 
 
 emptyBottle : Icon
 emptyBottle =
-    createIconPublic "/emptyBottle.png"
+    createIconPublic "/resources/emptyBottle.png"
 
 
 scrap : Icon
 scrap =
-    createIconPublic "/scrap.png"
+    createIconPublic "/resources/scrap.png"
 
 
 ectoplasm : Icon
 ectoplasm =
-    createIconPublic "/ectoplasm_2.png"
+    createIconPublic "/resources/ectoplasm_2.png"
 
 
 parchment : Icon
 parchment =
-    createIconPublic "/parchment.png"
+    createIconPublic "/resources/parchment.png"
