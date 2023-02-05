@@ -4,6 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
+import IdleGame.Chore as Chore
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -69,7 +70,7 @@ type FrontendMsg
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Item
       -- Chores
-    | ToggleActiveChore IdleGame.GameTypes.ChoreKind
+    | ToggleActiveChore Chore.Kind
 
 
 type ToBackend

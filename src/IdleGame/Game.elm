@@ -1,5 +1,6 @@
 module IdleGame.Game exposing (..)
 
+import IdleGame.Chore as Chore
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -21,29 +22,12 @@ type alias Game =
     { seed : Random.Seed
     , choresXp : Float
     , choresMxp : Float
-    , activeChore : Maybe ( ChoreKind, Timer )
-    , choresData : ChoresData
+    , activeChore : Maybe ( Chore.Kind, Timer )
+    , choresData : Chore.AllChoreStates
     , gold : Int
     , resources : Resource.Amounts
     , shopItems : ShopItems
     }
-
-
-type alias ChoresData =
-    { cleanStables : ChoreData
-    , cleanBigBubba : ChoreData
-    , sweepChimneys : ChoreData
-    , waterGreenhousePlants : ChoreData
-    , washRobes : ChoreData
-    , organizePotionIngredients : ChoreData
-    , repairInstruments : ChoreData
-    , flushDrainDemons : ChoreData
-    , organizeSpellBooks : ChoreData
-    }
-
-
-type alias ChoreData =
-    { mxp : Float }
 
 
 create : Random.Seed -> Game
@@ -73,19 +57,19 @@ create seed =
 
 type ChoresListItem
     = LockedChore Int
-    | ChoreItem ChoreKind
+    | ChoreItem Chore.Kind
 
 
 choreUnlockRequirements =
-    [ ( CleanStables, 1 )
-    , ( CleanBigBubba, 10 )
-    , ( SweepChimneys, 25 )
-    , ( WaterGreenhousePlants, 35 )
-    , ( WashAndIronRobes, 45 )
-    , ( OrganizePotionIngredients, 55 )
-    , ( RepairInstruments, 65 )
-    , ( FlushDrainDemons, 75 )
-    , ( OrganizePotionIngredients, 90 )
+    [ ( Chore.CleanStables, 1 )
+    , ( Chore.CleanBigBubba, 10 )
+    , ( Chore.SweepChimneys, 25 )
+    , ( Chore.WaterGreenhousePlants, 35 )
+    , ( Chore.WashAndIronRobes, 45 )
+    , ( Chore.OrganizePotionIngredients, 55 )
+    , ( Chore.RepairInstruments, 65 )
+    , ( Chore.FlushDrainDemons, 75 )
+    , ( Chore.OrganizePotionIngredients, 90 )
     ]
 
 
@@ -116,27 +100,7 @@ getChoreListItems { choresXp } =
 -- Chores
 
 
-type alias ChoreStats =
-    -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
-    { kind : ChoreKind
-    , title : String
-    , imgSrc : String
-    , getter : ChoresData -> ChoreData
-    , setter : (ChoreData -> ChoreData) -> ChoresData -> ChoresData
-    , outcome : ChoreOutcome
-    }
-
-
-type alias ChoreOutcome =
-    { xp : Float
-    , duration : Float
-    , extraResourceProbability : Float
-    , extraResource : Resource.Kind
-    , gold : Int
-    }
-
-
-getEvent : ChoreStats -> Event
+getEvent : Chore.Stats -> Event
 getEvent { kind, outcome } =
     let
         { xp, extraResourceProbability, extraResource, gold } =
@@ -153,159 +117,11 @@ getEvent { kind, outcome } =
         }
 
 
-getStats : ChoreKind -> ChoreStats
-getStats kind =
-    case kind of
-        CleanStables ->
-            { kind = CleanStables
-            , title = "Clean Stables"
-            , imgSrc = "/stable.png"
-            , getter = .cleanStables
-            , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
-            , outcome =
-                { xp = 10
-                , duration = 3000
-                , extraResourceProbability = 0.25
-                , extraResource = Resource.Manure
-                , gold = 1
-                }
-            }
-
-        CleanBigBubba ->
-            { kind = CleanBigBubba
-            , title = "Clean Big Bubba's Stall"
-            , imgSrc = "/bubba2.png"
-            , getter = .cleanBigBubba
-            , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
-            , outcome =
-                { xp = 15
-                , duration = 4000
-                , extraResourceProbability = 0.75
-                , extraResource = Resource.Manure
-                , gold = 5
-                }
-            }
-
-        SweepChimneys ->
-            { kind = SweepChimneys
-            , title = "Sweep Chimneys"
-            , imgSrc = "/sweepChimneys.png"
-            , getter = .sweepChimneys
-            , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
-            , outcome =
-                { xp = 22
-                , duration = 5000
-                , extraResourceProbability = 0.5
-                , extraResource = Resource.Soot
-                , gold = 10
-                }
-            }
-
-        WaterGreenhousePlants ->
-            { kind = WaterGreenhousePlants
-            , title = "Water Greenhouse Plants"
-            , imgSrc = "/waterGreenhousePlants.png"
-            , getter = .waterGreenhousePlants
-            , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
-            , outcome =
-                { xp = 30
-                , duration = 6000
-                , extraResourceProbability = 0.6
-                , extraResource = Resource.GreenhouseDirt
-                , gold = 20
-                }
-            }
-
-        WashAndIronRobes ->
-            { kind = WashAndIronRobes
-            , title = "Wash and Iron Robes"
-            , imgSrc = "/washAndIronRobes.png"
-            , getter = .washRobes
-            , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
-            , outcome =
-                { xp = 40
-                , duration = 8000
-                , extraResourceProbability = 0.2
-                , extraResource = Resource.WashWater
-                , gold = 35
-                }
-            }
-
-        OrganizePotionIngredients ->
-            { kind = OrganizePotionIngredients
-            , title = "Organize Potion Ingredients"
-            , imgSrc = "/organizePotionIngredients.png"
-            , getter = .organizePotionIngredients
-            , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
-            , outcome =
-                { xp = 60
-                , duration = 10000
-                , extraResourceProbability = 0.1
-                , extraResource = Resource.EmptyBottle
-                , gold = 50
-                }
-            }
-
-        RepairInstruments ->
-            { kind = RepairInstruments
-            , title = "Repair Instruments"
-            , imgSrc = "/repairInstruments.png"
-            , getter = .repairInstruments
-            , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
-            , outcome =
-                { xp = 80
-                , duration = 12000
-                , extraResourceProbability = 0.25
-                , extraResource = Resource.Scrap
-                , gold = 75
-                }
-            }
-
-        FlushDrainDemons ->
-            { kind = FlushDrainDemons
-            , title = "Flush the Drain Demons"
-            , imgSrc = "/flushDrainDemons.png"
-            , getter = .flushDrainDemons
-            , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
-            , outcome =
-                { xp = 100
-                , duration = 20000
-                , extraResourceProbability = 0.5
-                , extraResource = Resource.Ectoplasm
-                , gold = 175
-                }
-            }
-
-        OrganizeSpellBooks ->
-            { kind = OrganizeSpellBooks
-            , title = "Organize Spell Books"
-            , imgSrc = "/organizeSpellBooks.png"
-            , getter = .organizeSpellBooks
-            , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
-            , outcome =
-                { xp = 180
-                , duration = 15000
-                , extraResourceProbability = 0.1
-                , extraResource = Resource.Parchment
-                , gold = 190
-                }
-            }
-
-
-incrementChoreMxp : Float -> ChoreKind -> ChoresData -> ChoresData
-incrementChoreMxp amount kind choresData =
-    let
-        stats =
-            getStats kind
-    in
-    stats.setter (\choreData -> { choreData | mxp = choreData.mxp + amount }) choresData
-
-
 type alias ActivityStatus =
     Maybe Timer
 
 
-toggleActiveChore : ChoreKind -> Game -> Game
+toggleActiveChore : Chore.Kind -> Game -> Game
 toggleActiveChore toggleType game =
     let
         newActiveChore =
@@ -323,7 +139,7 @@ toggleActiveChore toggleType game =
     { game | activeChore = newActiveChore }
 
 
-setActiveChore : Maybe ( ChoreKind, Timer.Timer ) -> Game -> Game
+setActiveChore : Maybe ( Chore.Kind, Timer.Timer ) -> Game -> Game
 setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
@@ -342,7 +158,7 @@ tick game =
                             Timer.tick timer
 
                         chore =
-                            getStats choreType
+                            Chore.getStats choreType
 
                         activeChore =
                             Just ( choreType, newTimer )
@@ -453,7 +269,7 @@ applyEffect effect game =
         GainChoreMxp { multiplier } kind ->
             let
                 { mxp } =
-                    (getStats kind).getter game.choresData
+                    (Chore.getStats kind).getter game.choresData
             in
             game
                 |> addMxp kind (mxp * multiplier)
@@ -483,14 +299,14 @@ addXp resource amount game =
             { game | choresXp = game.choresXp + amount }
 
 
-addMxp : ChoreKind -> Float -> Game -> Game
+addMxp : Chore.Kind -> Float -> Game -> Game
 addMxp kind amount game =
     let
         fn { mxp } =
             { mxp = mxp + amount }
 
         stats =
-            getStats kind
+            Chore.getStats kind
     in
     { game | choresData = stats.setter fn game.choresData }
 
@@ -542,7 +358,7 @@ gainXp amount skill =
     Effect { type_ = GainXp { base = amount, multiplier = 1 } skill, tags = [ Xp, skillTag ] }
 
 
-gainChoreMxp : ChoreKind -> Effect
+gainChoreMxp : Chore.Kind -> Effect
 gainChoreMxp chore =
     Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp, Chores ] }
 
@@ -699,7 +515,7 @@ getChoreUnlocksMods game =
                 EveryTenLevels bonus ->
                     bonus
 
-        choreUnlocksFor : (ChoresData -> ChoreData) -> Tag -> Mod
+        choreUnlocksFor : (Chore.AllChoreStates -> Chore.State) -> Tag -> Mod
         choreUnlocksFor getter tag =
             let
                 masteryLevel =
@@ -712,8 +528,8 @@ getChoreUnlocksMods game =
                 |> withMultiplier repetitions
                 |> modWithTags [ tag ]
     in
-    [ choreUnlocksFor .cleanStables (ChoreTag CleanStables)
-    , choreUnlocksFor .cleanBigBubba (ChoreTag CleanBigBubba)
+    [ choreUnlocksFor .cleanStables (ChoreTag Chore.CleanStables)
+    , choreUnlocksFor .cleanBigBubba (ChoreTag Chore.CleanBigBubba)
     ]
 
 

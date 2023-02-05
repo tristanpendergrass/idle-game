@@ -4,6 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Chore as Chore
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
@@ -72,8 +73,8 @@ render game =
 renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
-        IdleGame.Game.ChoreItem type_ ->
-            renderChore game (IdleGame.Game.getStats type_)
+        IdleGame.Game.ChoreItem kind ->
+            renderChore game (Chore.getStats kind)
 
         IdleGame.Game.LockedChore level ->
             renderLockedChore level
@@ -89,14 +90,14 @@ getChoresSkillXp effect =
             Nothing
 
 
-getChoreMxp : IdleGame.GameTypes.ChoreKind -> IdleGame.Game.ChoresData -> Effect -> Maybe Float
+getChoreMxp : Chore.Kind -> Chore.AllChoreStates -> Effect -> Maybe Float
 getChoreMxp kind choresData effect =
     case getType effect of
         GainChoreMxp { multiplier } t ->
             if t == kind then
                 let
                     { mxp } =
-                        (IdleGame.Game.getStats kind).getter choresData
+                        (Chore.getStats kind).getter choresData
                 in
                 Just (mxp * multiplier)
 
@@ -112,7 +113,7 @@ choreHeight =
     "h-[390px]"
 
 
-renderChoreXpReward : Game -> IdleGame.GameTypes.ChoreKind -> ModdedEvent -> Html FrontendMsg
+renderChoreXpReward : Game -> Chore.Kind -> ModdedEvent -> Html FrontendMsg
 renderChoreXpReward game choreType (ModdedEvent eventData) =
     let
         skillXpLabel =
@@ -144,14 +145,14 @@ probabilityToInt x =
     floor (x * 100)
 
 
-renderChore : Game -> IdleGame.Game.ChoreStats -> Html FrontendMsg
+renderChore : Game -> Chore.Stats -> Html FrontendMsg
 renderChore game chore =
     let
         { kind, title, outcome } =
             chore
 
         stats =
-            IdleGame.Game.getStats kind
+            Chore.getStats kind
 
         handleClick =
             ToggleActiveChore kind
