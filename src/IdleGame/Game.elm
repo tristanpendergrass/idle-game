@@ -153,16 +153,16 @@ tick game =
                 Nothing ->
                     ( game.activeChore, [] )
 
-                Just ( choreType, timer ) ->
+                Just ( choreKind, timer ) ->
                     let
                         ( newTimer, completions ) =
                             Timer.tick timer
 
                         chore =
-                            Chore.getStats choreType
+                            Chore.getStats choreKind
 
                         activeChore =
-                            Just ( choreType, newTimer )
+                            Just ( choreKind, newTimer )
 
                         newEvents =
                             []
