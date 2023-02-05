@@ -38,8 +38,9 @@ $ npm test -- --watch
 - [x] Improve experience when calculating long amount of time
 - [x] "Coming soon" for other skills
 - [x] Shop
-- [ ] Icons for things
+- [x] Icons for things
 - [ ] Develop Mod that speeds up interval
+- [ ] Show speed on chores
 - [ ] Finalize values for all things
 - [x] Visuals for chores
 
@@ -68,3 +69,4 @@ $ npm test -- --watch
 ### Glitz
 - [ ] Progress bar animations
 - [ ] Format numbers correctly with commas etc. in Time Passes modal
+- [ ] Close modals on space/escape

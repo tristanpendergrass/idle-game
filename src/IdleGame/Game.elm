@@ -166,15 +166,12 @@ tick game =
                             timer
                                 |> Timer.increment choreDuration Timer.tickDuration
 
-                        chore =
-                            Chore.getStats choreKind
-
                         activeChore =
                             Just ( choreKind, newTimer )
 
                         newEvents =
                             []
-                                ++ List.repeat completions (getEvent chore)
+                                ++ List.repeat completions (getEvent choreStats)
                     in
                     ( activeChore
                     , newEvents

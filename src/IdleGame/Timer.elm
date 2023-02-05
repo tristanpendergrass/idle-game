@@ -28,7 +28,7 @@ create =
 
 percentComplete : Timer -> Float
 percentComplete (Timer { current }) =
-    current
+    current * 100
 
 
 tickDuration : Float
