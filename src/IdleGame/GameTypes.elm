@@ -3,10 +3,16 @@ module IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 
 
-type ChoreType
+type ChoreKind
     = CleanStables
     | CleanBigBubba
-    | GatherFirewood
+    | SweepChimneys
+    | WaterGreenhousePlants
+    | WashAndIronRobes
+    | OrganizePotionIngredients
+    | RepairInstruments
+    | FlushDrainDemons
+    | OrganizeSpellBooks
 
 
 type Toast

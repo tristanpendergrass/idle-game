@@ -13,11 +13,11 @@
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Code atlas.canvas",
+                "file": "Chores.canvas",
                 "viewState": {
-                  "x": 0,
-                  "y": 0,
-                  "zoom": 0,
+                  "x": -235.92732778198337,
+                  "y": 55.336260408781214,
+                  "zoom": -0.2171719987127596,
                   "snapToGrid": false
                 }
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Code atlas.canvas",
+                "file": "Chores.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -142,7 +142,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Code atlas.canvas",
+                "file": "Chores.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -165,7 +165,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Code atlas.canvas"
+                "file": "Chores.canvas"
               }
             }
           }
@@ -188,11 +188,12 @@
   },
   "active": "fb7a5e036f678b3c",
   "lastOpenFiles": [
+    "Chores.md",
+    "Code atlas.canvas",
     "Chores.canvas",
     "Skill - Portal bags.md",
     "Combat.md",
     "School tuition.md",
-    "Chores.md",
     "Events.md",
     "Tick flowchart.canvas",
     "Mastery Unlocks.md",

@@ -73,7 +73,7 @@ renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
         IdleGame.Game.ChoreItem type_ ->
-            renderChore game (IdleGame.Game.getChore type_)
+            renderChore game (IdleGame.Game.getStats type_)
 
         IdleGame.Game.LockedChore level ->
             renderLockedChore level
@@ -89,16 +89,16 @@ getChoresSkillXp effect =
             Nothing
 
 
-getChoreMxp : IdleGame.GameTypes.ChoreType -> IdleGame.Game.ChoresData -> Effect -> Maybe Float
-getChoreMxp choreType choresData effect =
+getChoreMxp : IdleGame.GameTypes.ChoreKind -> IdleGame.Game.ChoresData -> Effect -> Maybe Float
+getChoreMxp kind choresData effect =
     case getType effect of
         GainChoreMxp { multiplier } t ->
-            if t == choreType then
+            if t == kind then
                 let
-                    base =
-                        IdleGame.Game.getMxp choreType choresData
+                    { mxp } =
+                        (IdleGame.Game.getStats kind).getter choresData
                 in
-                Just (base * multiplier)
+                Just (mxp * multiplier)
 
             else
                 Nothing
@@ -112,7 +112,7 @@ choreHeight =
     "h-[390px]"
 
 
-renderChoreXpReward : Game -> IdleGame.GameTypes.ChoreType -> ModdedEvent -> Html FrontendMsg
+renderChoreXpReward : Game -> IdleGame.GameTypes.ChoreKind -> ModdedEvent -> Html FrontendMsg
 renderChoreXpReward game choreType (ModdedEvent eventData) =
     let
         skillXpLabel =
@@ -144,19 +144,22 @@ probabilityToInt x =
     floor (x * 100)
 
 
-renderChore : Game -> IdleGame.Game.Chore -> Html FrontendMsg
+renderChore : Game -> IdleGame.Game.ChoreStats -> Html FrontendMsg
 renderChore game chore =
     let
-        { type_, title, outcome } =
+        { kind, title, outcome } =
             chore
 
+        stats =
+            IdleGame.Game.getStats kind
+
         handleClick =
-            ToggleActiveChore type_
+            ToggleActiveChore kind
 
         maybeTimer =
             case game.activeChore of
                 Just ( activeType, timer ) ->
-                    if type_ == activeType then
+                    if kind == activeType then
                         Just timer
 
                     else
@@ -173,8 +176,8 @@ renderChore game chore =
             IdleGame.Game.getEvent chore
                 |> IdleGame.Event.applyModsToEvent allMods
 
-        mastery =
-            IdleGame.Game.getMastery type_ game.choresData
+        { mxp } =
+            stats.getter game.choresData
 
         renderGold amount =
             div [ class "flex items-center gap-1" ]
@@ -214,11 +217,11 @@ renderChore game chore =
                 , div [ class "divider" ] []
 
                 -- Chore XP rewards
-                , renderChoreXpReward game chore.type_ moddedEvent
+                , renderChoreXpReward game chore.kind moddedEvent
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mastery) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mxp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mastery * 100) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mxp * 100) ++ "%") ] []
                         ]
                     ]
                 ]

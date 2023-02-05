@@ -69,7 +69,7 @@ type FrontendMsg
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Item
       -- Chores
-    | ToggleActiveChore IdleGame.GameTypes.ChoreType
+    | ToggleActiveChore IdleGame.GameTypes.ChoreKind
 
 
 type ToBackend
