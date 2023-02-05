@@ -15,6 +15,7 @@ renderDrawer game activeTab =
     let
         underConstructionIcon =
             Icon.underConstruction
+                |> Icon.withSize Icon.Small
                 |> Icon.toHtml
 
         renderTab : { tab : Tab, underConstruction : Bool } -> Html FrontendMsg
