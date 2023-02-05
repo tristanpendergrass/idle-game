@@ -13,7 +13,6 @@ import IdleGame.Timer
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils
 import IdleGame.XpFormulas
-import IdleGame.ZIndexes exposing (zIndexes)
 import List.Extra
 import Types exposing (..)
 
@@ -210,7 +209,7 @@ renderChore game chore =
         [ figure []
             [ img [ src chore.imgSrc, class "w-full h-24 object-cover" ] [] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column h-full z-9", zIndexes.cardBody ]
+            [ div [ class "t-column h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
                 [ h2 [ class "card-title text-lg text-center h-[3rem]" ] [ text title ]
                 , renderGold chore.outcome.gold
@@ -235,7 +234,7 @@ renderChore game chore =
                 Just percentComplete ->
                     div
                         [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
-                        , zIndexes.activityProgressBar
+                        , IdleGame.Views.Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat percentComplete ++ "%")
                         ]
                         []
@@ -256,7 +255,7 @@ renderLockedChore level =
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column h-full gap-4", zIndexes.cardBody ]
+            [ div [ class "t-column h-full gap-4", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
@@ -269,6 +268,6 @@ renderLockedChore level =
 
 renderBottomRight : Html FrontendMsg
 renderBottomRight =
-    div [ class "absolute bottom-[2rem] right-[2rem]", zIndexes.bottomRightMenu ]
+    div [ class "absolute bottom-[2rem] right-[2rem]", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
         [ button [ class "btn btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
         ]

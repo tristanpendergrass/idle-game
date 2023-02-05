@@ -23,7 +23,6 @@ import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
 import IdleGame.Views.Utils
-import IdleGame.ZIndexes exposing (zIndexes)
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
@@ -432,7 +431,7 @@ toastConfig : Toast.Config FrontendMsg
 toastConfig =
     Toast.config ToastMsg
         -- attributes applied to the toast tray
-        |> Toast.withTrayAttributes [ class "toast-tray", zIndexes.toast ]
+        |> Toast.withTrayAttributes [ class "toast-tray", IdleGame.Views.Utils.zIndexes.toast ]
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
         |> Toast.withTransitionAttributes [ class "toast--fade-out" ]

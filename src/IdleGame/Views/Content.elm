@@ -12,7 +12,7 @@ import IdleGame.Views.Chores
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
-import IdleGame.ZIndexes exposing (zIndexes)
+import IdleGame.Views.Utils
 import Types exposing (..)
 
 
@@ -28,8 +28,8 @@ renderContent game activeTab =
         { title, icon } =
             Tab.getConfig activeTab
     in
-    div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem" ]
-        [ div [ class "sticky top-0 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm", zIndexes.drawerContent ]
+    div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem", IdleGame.Views.Utils.zIndexes.drawerContent ]
+        [ div [ class "sticky top-0 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm", IdleGame.Views.Utils.zIndexes.navbar ]
             -- TOP NAV
             [ nav [ class "navbar w-full bg-primary text-primary-content" ]
                 -- Menu to open sidebar
