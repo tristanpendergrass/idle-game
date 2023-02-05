@@ -157,6 +157,7 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
                                 li [ class "flex items-center gap-2" ]
                                     [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString displayAmount ]
                                     , span [] [ text title ]
+                                    , IdleGame.Views.Utils.skillXpBadge
                                     , if originalLevel /= currentLevel then
                                         span [] [ text <| "(Level " ++ IdleGame.Views.Utils.intToString originalLevel ++ " -> " ++ IdleGame.Views.Utils.intToString currentLevel ++ ")" ]
 

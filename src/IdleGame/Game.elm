@@ -423,7 +423,7 @@ getTimePassesData originalGame currentGame =
                 []
 
             else
-                [ { title = "Chores XP", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
+                [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
 
         goldGains =
             if currentGame.gold > originalGame.gold then

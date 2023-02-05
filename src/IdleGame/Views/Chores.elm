@@ -133,9 +133,9 @@ renderChoreXpReward game choreType (ModdedEvent eventData) =
                     "N/A"
     in
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-        [ div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
+        [ IdleGame.Views.Utils.skillXpBadge
         , span [ class "font-bold col-span-4" ] [ text skillXpLabel ]
-        , div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
+        , IdleGame.Views.Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ] [ text mxpLabel ]
         ]
 
