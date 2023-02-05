@@ -5,14 +5,9 @@ module IdleGame.Timer exposing
     , percentComplete
     , tick
     , tickDuration
-    , timerDecoder
     )
 
 import Json.Decode as D
-
-
-
--- An animation should know when it started, what percentage it is through, be able to update, do something on reaching end, know whether to repeat
 
 
 type Timer
@@ -55,11 +50,3 @@ increment duration (Timer { current, length }) =
             remainderBy length sum
     in
     ( Timer { current = newCurrent, length = length }, completions )
-
-
-timerDecoder : D.Decoder Timer
-timerDecoder =
-    D.map2
-        (\current length -> Timer { current = current, length = length })
-        D.int
-        D.int
