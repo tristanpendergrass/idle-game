@@ -7,7 +7,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game, MasteryUnlocks)
-import IdleGame.Notification as Notification exposing (Notification)
+import IdleGame.GameTypes exposing (..)
+import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -16,10 +17,12 @@ import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
+import IdleGame.Views.Utils
 import IdleGame.ZIndexes exposing (zIndexes)
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
@@ -284,17 +287,17 @@ update msg model =
                                         ( ng, n ++ nn )
                                     )
 
-                            oldSnapshot : Snapshot ( Game, List Notification )
+                            oldSnapshot : Snapshot ( Game, List Toast )
                             oldSnapshot =
                                 snapshot
                                     |> Snapshot.map (\g -> ( g, [] ))
 
-                            updatedSnapshot : Snapshot ( Game, List Notification )
+                            updatedSnapshot : Snapshot ( Game, List Toast )
                             updatedSnapshot =
                                 oldSnapshot
                                     |> Snapshot.tickUntil tick now
 
-                            ( _, notifications ) =
+                            ( _, toasts ) =
                                 Snapshot.getValue updatedSnapshot
 
                             newGameState =
@@ -302,7 +305,7 @@ update msg model =
                                     |> Snapshot.map Tuple.first
 
                             notificationCmds =
-                                List.map (Notification.toToast >> AddToast >> delay 0) notifications
+                                List.map (AddToast >> delay 0) toasts
                         in
                         ( { model
                             | gameState = Playing newGameState
@@ -419,11 +422,11 @@ subscriptions _ =
         ]
 
 
-viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info String -> Html FrontendMsg
+viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info Toast -> Html FrontendMsg
 viewToast attributes toast =
     Html.div
         attributes
-        [ Html.text toast.content ]
+        [ toastToHtml toast.content ]
 
 
 toastConfig : Toast.Config FrontendMsg
@@ -434,6 +437,28 @@ toastConfig =
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
         |> Toast.withTransitionAttributes [ class "toast--fade-out" ]
+
+
+toastToHtml : Toast -> Html msg
+toastToHtml notification =
+    case notification of
+        GainedGold amount ->
+            div [ class "flex gap-1 items-center" ]
+                [ span [] [ text <| "+" ++ IdleGame.Views.Utils.intToString amount ]
+                , Icon.gold
+                    |> Icon.toHtml
+                ]
+
+        GainedResource amount resource ->
+            let
+                stats =
+                    Resource.getStats resource
+            in
+            div [ class "flex gap-1 items-center" ]
+                [ span [] [ text <| "+" ++ IdleGame.Views.Utils.intToString amount ]
+                , stats.icon
+                    |> Icon.toHtml
+                ]
 
 
 view : FrontendModel -> Document FrontendMsg

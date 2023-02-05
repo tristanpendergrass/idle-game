@@ -2,7 +2,6 @@ module IdleGame.Game exposing (..)
 
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Notification as Notification exposing (Notification)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
@@ -252,7 +251,7 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-tick : Game -> ( Game, List Notification )
+tick : Game -> ( Game, List Toast )
 tick game =
     let
         ( newActiveChore, events ) =
@@ -296,7 +295,7 @@ tick game =
             modifiedEvents
                 |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
 
-        gameGenerator : Generator ( Game, List Notification )
+        gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
                 |> setActiveChore newActiveChore
@@ -308,15 +307,15 @@ tick game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-effectReducer : Effect -> Generator ( Game, List Notification ) -> Generator ( Game, List Notification )
+effectReducer : Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 effectReducer effect gen =
     gen
         |> Random.andThen
             (\( game, notifications ) ->
                 applyEffect effect game
                     |> Random.map
-                        (\( newGame, newNotifications ) ->
-                            ( newGame, notifications ++ newNotifications )
+                        (\( newGame, newToasts ) ->
+                            ( newGame, notifications ++ newToasts )
                         )
             )
 
@@ -348,7 +347,7 @@ floatGenerator { base, multiplier } =
     Random.constant <| base * multiplier
 
 
-applyEffect : Effect -> Game -> Generator ( Game, List Notification )
+applyEffect : Effect -> Game -> Generator ( Game, List Toast )
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
@@ -389,14 +388,14 @@ applyEffect effect game =
                 |> Random.map (\amount -> addGold amount game)
 
 
-addResource : Resource.Kind -> Int -> Game -> ( Game, List Notification )
+addResource : Resource.Kind -> Int -> Game -> ( Game, List Toast )
 addResource resource amount game =
     ( { game
         | resources =
             game.resources
                 |> Resource.addResource resource amount
       }
-    , [ Notification.GainedResource amount resource ]
+    , [ GainedResource amount resource ]
     )
 
 
@@ -422,23 +421,23 @@ addMasteryPoolXp amount game =
     { game | choresMxp = game.choresMxp + amount }
 
 
-addGold : Int -> Game -> ( Game, List Notification )
+addGold : Int -> Game -> ( Game, List Toast )
 addGold amount game =
-    ( { game | gold = game.gold + amount }, [ Notification.GainedGold amount ] )
+    ( { game | gold = game.gold + amount }, [ GainedGold amount ] )
 
 
-applyEvent : ModdedEvent -> Game -> Random.Generator ( Game, List Notification )
+applyEvent : ModdedEvent -> Game -> Random.Generator ( Game, List Toast )
 applyEvent (ModdedEvent eventData) game =
     let
-        reducer : Effect -> Generator ( Game, List Notification ) -> Generator ( Game, List Notification )
+        reducer : Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
         reducer effect gen =
             gen
                 |> Random.andThen
                     (\( accumGame, notifications ) ->
                         applyEffect effect accumGame
                             |> Random.map
-                                (\( newGame, newNotifications ) ->
-                                    ( newGame, notifications ++ newNotifications )
+                                (\( newGame, newToasts ) ->
+                                    ( newGame, notifications ++ newToasts )
                                 )
                     )
     in

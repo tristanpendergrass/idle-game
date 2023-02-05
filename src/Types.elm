@@ -5,7 +5,8 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import IdleGame.Game exposing (Game)
-import IdleGame.GameTypes
+import IdleGame.GameTypes exposing (..)
+import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -31,7 +32,7 @@ type FrontendGameState
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
-    , tray : Toast.Tray String
+    , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
     , activeTab : Tab
     , isVisible : Bool
@@ -56,7 +57,7 @@ type FrontendMsg
     | UrlClicked UrlRequest
     | UrlChanged Url
     | ToastMsg Toast.Msg
-    | AddToast String
+    | AddToast Toast
     | HandleFastForward Posix
     | HandleAnimationFrame Time.Posix
     | HandleAnimationFrameDelta Float
