@@ -60,7 +60,7 @@ init url key =
       , activeTab = Tab.Chores
       , isVisible = True
       , activeModal = Nothing
-      , saveGameTimer = Timer.create 1000
+      , saveGameTimer = Timer.create
       , gameState = Initializing
       }
     , Cmd.none
@@ -239,8 +239,7 @@ update msg model =
                 Playing snapshot ->
                     let
                         ( newTimer, saveGameTimerTriggered ) =
-                            -- Note the rounding from (floor delta). Our save game timer will not happen exactly as often as it's supposed to and that's alright I guess...
-                            Timer.increment (floor delta) model.saveGameTimer
+                            Timer.increment delta 1000 model.saveGameTimer
 
                         shouldSaveGame =
                             saveGameTimerTriggered > 0

@@ -3,50 +3,52 @@ module IdleGame.Timer exposing
     , create
     , increment
     , percentComplete
-    , tick
     , tickDuration
     )
 
-import Json.Decode as D
+
+type alias Duration =
+    Float
+
+
+type alias PercentComplete =
+    Float
 
 
 type Timer
     = Timer
-        { current : Int
-        , length : Int
+        { current : PercentComplete
         }
 
 
-create : Int -> Timer
-create length =
-    Timer { current = 0, length = length }
+create : Timer
+create =
+    Timer { current = 0 }
 
 
 percentComplete : Timer -> Float
-percentComplete (Timer { current, length }) =
-    toFloat current / toFloat length * 100.0
+percentComplete (Timer { current }) =
+    current
 
 
-tickDuration : Int
+tickDuration : Float
 tickDuration =
     15
 
 
-tick : Timer -> ( Timer, Int )
-tick =
-    increment tickDuration
-
-
-increment : Int -> Timer -> ( Timer, Int )
-increment duration (Timer { current, length }) =
+increment : Duration -> Duration -> Timer -> ( Timer, Int )
+increment totalDuration delta (Timer { current }) =
     let
+        additionalPercent =
+            delta / totalDuration
+
         sum =
-            current + duration
+            current + additionalPercent
 
         completions =
-            sum // length
+            floor (sum / 1.0)
 
         newCurrent =
-            remainderBy length sum
+            (sum / 1.0) - toFloat (floor (sum / 1.0))
     in
-    ( Timer { current = newCurrent, length = length }, completions )
+    ( Timer { current = newCurrent }, completions )

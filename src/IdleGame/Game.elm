@@ -132,10 +132,10 @@ toggleActiveChore toggleType game =
                         Nothing
 
                     else
-                        Just ( toggleType, Timer.create 2000 )
+                        Just ( toggleType, Timer.create )
 
                 Nothing ->
-                    Just ( toggleType, Timer.create 2000 )
+                    Just ( toggleType, Timer.create )
     in
     { game | activeChore = newActiveChore }
 
@@ -155,8 +155,16 @@ tick game =
 
                 Just ( choreKind, timer ) ->
                     let
+                        choreStats =
+                            Chore.getStats choreKind
+
+                        choreDuration =
+                            -- TODO: apply mods
+                            choreStats.outcome.duration
+
                         ( newTimer, completions ) =
-                            Timer.tick timer
+                            timer
+                                |> Timer.increment choreDuration Timer.tickDuration
 
                         chore =
                             Chore.getStats choreKind
