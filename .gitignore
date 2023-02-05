@@ -6,3 +6,4 @@ node_modules
 dist
 temp
 .parcel-cache
+notes/.obsidian
