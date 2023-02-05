@@ -1,4 +1,4 @@
-module XpFormulas_test exposing (..)
+module IdleGame.XpFormulas_test exposing (..)
 
 import Expect exposing (..)
 import IdleGame.XpFormulas exposing (skillLevel, skillLevelPercent)
