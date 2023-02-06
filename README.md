@@ -40,7 +40,7 @@ $ npm test -- --watch
 - [x] Shop
 - [x] Icons for things
 - [ ] Develop Mod that speeds up interval
-- [ ] Show speed on chores
+- [x] Show speed on chores
 - [ ] Finalize values for all things
 - [x] Visuals for chores
 
