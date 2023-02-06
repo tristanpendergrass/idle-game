@@ -9,8 +9,6 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
 import Random exposing (Generator)
-import Set exposing (Set)
-import Svg.Attributes exposing (in_)
 import Tuple
 
 
@@ -22,7 +20,7 @@ type alias Game =
     { seed : Random.Seed
     , choresXp : Float
     , choresMxp : Float
-    , activeChore : Maybe ( Chore.Kind, Timer )
+    , activeChore : Maybe ( ChoreKind, Timer )
     , choresData : Chore.AllChoreStates
     , gold : Int
     , resources : Resource.Amounts
@@ -58,19 +56,19 @@ create seed =
 
 type ChoresListItem
     = LockedChore Int
-    | ChoreItem Chore.Kind
+    | ChoreItem ChoreKind
 
 
 choreUnlockRequirements =
-    [ ( Chore.CleanStables, 1 )
-    , ( Chore.CleanBigBubba, 10 )
-    , ( Chore.SweepChimneys, 25 )
-    , ( Chore.WaterGreenhousePlants, 35 )
-    , ( Chore.WashAndIronRobes, 45 )
-    , ( Chore.OrganizePotionIngredients, 55 )
-    , ( Chore.RepairInstruments, 65 )
-    , ( Chore.FlushDrainDemons, 75 )
-    , ( Chore.OrganizeSpellBooks, 90 )
+    [ ( CleanStables, 1 )
+    , ( CleanBigBubba, 10 )
+    , ( SweepChimneys, 25 )
+    , ( WaterGreenhousePlants, 35 )
+    , ( WashAndIronRobes, 45 )
+    , ( OrganizePotionIngredients, 55 )
+    , ( RepairInstruments, 65 )
+    , ( FlushDrainDemons, 75 )
+    , ( OrganizeSpellBooks, 90 )
     ]
 
 
@@ -122,7 +120,7 @@ type alias ActivityStatus =
     Maybe Timer
 
 
-toggleActiveChore : Chore.Kind -> Game -> Game
+toggleActiveChore : ChoreKind -> Game -> Game
 toggleActiveChore toggleType game =
     let
         newActiveChore =
@@ -140,7 +138,7 @@ toggleActiveChore toggleType game =
     { game | activeChore = newActiveChore }
 
 
-setActiveChore : Maybe ( Chore.Kind, Timer.Timer ) -> Game -> Game
+setActiveChore : Maybe ( ChoreKind, Timer.Timer ) -> Game -> Game
 setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
@@ -305,7 +303,7 @@ addXp resource amount game =
             { game | choresXp = game.choresXp + amount }
 
 
-addMxp : Chore.Kind -> Float -> Game -> Game
+addMxp : ChoreKind -> Float -> Game -> Game
 addMxp kind amount game =
     let
         fn { mxp } =
@@ -364,7 +362,7 @@ gainXp amount skill =
     Effect { type_ = GainXp { base = amount, multiplier = 1 } skill, tags = [ Xp, skillTag ] }
 
 
-gainChoreMxp : Chore.Kind -> Effect
+gainChoreMxp : ChoreKind -> Effect
 gainChoreMxp chore =
     Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp, Chores ] }
 
@@ -534,8 +532,8 @@ getChoreUnlocksMods game =
                 |> withMultiplier repetitions
                 |> modWithTags [ tag ]
     in
-    [ choreUnlocksFor .cleanStables (ChoreTag Chore.CleanStables)
-    , choreUnlocksFor .cleanBigBubba (ChoreTag Chore.CleanBigBubba)
+    [ choreUnlocksFor .cleanStables (ChoreTag CleanStables)
+    , choreUnlocksFor .cleanBigBubba (ChoreTag CleanBigBubba)
     ]
 
 
@@ -543,7 +541,32 @@ getShopItemMods : Game -> List Mod
 getShopItemMods game =
     game.shopItems
         |> ShopItems.toOwnedItems
-        |> List.map ShopItems.getMod
+        |> List.map ShopItems.getReward
+        |> List.filterMap
+            (\reward ->
+                case reward of
+                    ShopItems.ShopItemMod mod ->
+                        Just mod
+
+                    _ ->
+                        Nothing
+            )
+
+
+getShopItemIntervalMods : Game -> List IntervalMod
+getShopItemIntervalMods game =
+    game.shopItems
+        |> ShopItems.toOwnedItems
+        |> List.map ShopItems.getReward
+        |> List.filterMap
+            (\reward ->
+                case reward of
+                    ShopItems.ShopItemIntervalMod mod ->
+                        Just mod
+
+                    _ ->
+                        Nothing
+            )
 
 
 getAllMods : Game -> List Mod
@@ -557,12 +580,6 @@ getAllMods game =
 
 
 -- Interval Mods
-
-
-type alias IntervalMod =
-    { kind : Chore.Kind
-    , percentChange : Float -- e.g. 0.25 -> 25% faster
-    }
 
 
 getAllIntervalMods : Game -> List IntervalMod

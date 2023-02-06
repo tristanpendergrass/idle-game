@@ -1,6 +1,7 @@
 module IdleGame.ShopItems exposing (..)
 
 import IdleGame.Event as Event exposing (Event)
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
@@ -49,16 +50,23 @@ hasItem item (ShopItems ownedItems) =
             ownedItems.item2
 
 
-getMod : Item -> Event.Mod
-getMod item =
+type Reward
+    = ShopItemMod Event.Mod
+    | ShopItemIntervalMod IntervalMod
+
+
+getReward : Item -> Reward
+getReward item =
     case item of
         Item1 ->
             Event.choresXpBuff 0.75
                 |> Event.withSource Event.ShopItem
+                |> ShopItemMod
 
         Item2 ->
             Event.choresXpBuff 0.75
                 |> Event.withSource Event.ShopItem
+                |> ShopItemMod
 
 
 create : ShopItems
@@ -109,7 +117,7 @@ toList (ShopItems ownedItems) =
                     Item1 ->
                         { item = Item1
                         , title = "Item 1"
-                        , description = (getMod item).label
+                        , description = "Foobar"
                         , icon = Icon.bag
                         , price = getPrice item
                         , owned = ownedItems.item1
@@ -118,7 +126,7 @@ toList (ShopItems ownedItems) =
                     Item2 ->
                         { item = Item2
                         , title = "Item 2"
-                        , description = (getMod item).label
+                        , description = "Foobar 2"
                         , icon = Icon.botany
                         , price = getPrice item
                         , owned = ownedItems.item2

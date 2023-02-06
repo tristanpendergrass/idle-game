@@ -7,7 +7,7 @@ import Html.Events exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
-import IdleGame.GameTypes
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Timer
 import IdleGame.Views.Icon as Icon
@@ -90,7 +90,7 @@ getChoresSkillXp effect =
             Nothing
 
 
-getChoreMxp : Chore.Kind -> Chore.AllChoreStates -> Effect -> Maybe Float
+getChoreMxp : ChoreKind -> Chore.AllChoreStates -> Effect -> Maybe Float
 getChoreMxp kind choresData effect =
     case getType effect of
         GainChoreMxp { multiplier } t ->
@@ -113,7 +113,7 @@ choreHeight =
     "h-[455px]"
 
 
-renderChoreXpReward : Game -> Chore.Kind -> ModdedEvent -> Html FrontendMsg
+renderChoreXpReward : Game -> ChoreKind -> ModdedEvent -> Html FrontendMsg
 renderChoreXpReward game choreType (ModdedEvent eventData) =
     let
         skillXpLabel =

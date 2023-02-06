@@ -70,7 +70,7 @@ type FrontendMsg
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Item
       -- Chores
-    | ToggleActiveChore Chore.Kind
+    | ToggleActiveChore ChoreKind
 
 
 type ToBackend

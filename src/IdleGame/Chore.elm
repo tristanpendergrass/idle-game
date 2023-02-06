@@ -4,18 +4,6 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 
 
-type Kind
-    = CleanStables
-    | CleanBigBubba
-    | SweepChimneys
-    | WaterGreenhousePlants
-    | WashAndIronRobes
-    | OrganizePotionIngredients
-    | RepairInstruments
-    | FlushDrainDemons
-    | OrganizeSpellBooks
-
-
 type alias State =
     { mxp : Float }
 
@@ -35,7 +23,7 @@ type alias AllChoreStates =
 
 type alias Stats =
     -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
-    { kind : Kind
+    { kind : ChoreKind
     , title : String
     , imgSrc : String
     , getter : AllChoreStates -> State
@@ -53,7 +41,7 @@ type alias ChoreOutcome =
     }
 
 
-incrementChoreMxp : Float -> Kind -> AllChoreStates -> AllChoreStates
+incrementChoreMxp : Float -> ChoreKind -> AllChoreStates -> AllChoreStates
 incrementChoreMxp amount kind choresData =
     let
         stats =
@@ -62,7 +50,7 @@ incrementChoreMxp amount kind choresData =
     stats.setter (\choreData -> { choreData | mxp = choreData.mxp + amount }) choresData
 
 
-getStats : Kind -> Stats
+getStats : ChoreKind -> Stats
 getStats kind =
     case kind of
         CleanStables ->

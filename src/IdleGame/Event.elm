@@ -1,6 +1,6 @@
 module IdleGame.Event exposing (..)
 
-import IdleGame.Chore as Chore
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Utils
 
@@ -13,7 +13,7 @@ type Tag
     = Chores
     | Xp
     | Mxp
-    | ChoreTag Chore.Kind
+    | ChoreTag ChoreKind
 
 
 type Skill
@@ -51,7 +51,7 @@ type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Float, multiplier : Float } Skill
-    | GainChoreMxp { multiplier : Float } Chore.Kind
+    | GainChoreMxp { multiplier : Float } ChoreKind
     | GainGold { base : Int, doublingChance : Float }
 
 
