@@ -2727,15 +2727,6 @@ html {
   line-height: 1.25rem;
 }
 
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-}
-
 .checkbox:focus-visible {
   outline: 2px solid hsl(var(--bc));
   outline-offset: 2px;
@@ -3535,10 +3526,6 @@ body[dir="rtl"] .checkbox:checked,
   line-height: 1.5rem;
 }
 
-.card-normal .card-title {
-  margin-bottom: 0.75rem;
-}
-
 .menu-compact :where(li > *) {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -3647,12 +3634,12 @@ body[dir="rtl"] .checkbox:checked,
   z-index: 40;
 }
 
-.col-span-8 {
-  grid-column: span 8 / span 8;
-}
-
 .col-span-4 {
   grid-column: span 4 / span 4;
+}
+
+.col-span-8 {
+  grid-column: span 8 / span 8;
 }
 
 .inline-block {
@@ -3691,8 +3678,8 @@ body[dir="rtl"] .checkbox:checked,
   height: 0.5rem;
 }
 
-.h-\[390px\] {
-  height: 390px;
+.h-\[455px\] {
+  height: 455px;
 }
 
 .h-24 {
@@ -3701,10 +3688,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-full {
   height: 100%;
-}
-
-.h-\[3rem\] {
-  height: 3rem;
 }
 
 .h-16 {
@@ -3878,16 +3861,16 @@ body[dir="rtl"] .checkbox:checked,
   justify-items: center;
 }
 
+.gap-1 {
+  gap: 0.25rem;
+}
+
 .gap-2 {
   gap: 0.5rem;
 }
 
 .gap-4 {
   gap: 1rem;
-}
-
-.gap-1 {
-  gap: 0.25rem;
 }
 
 .gap-x-8 {
@@ -4101,6 +4084,11 @@ body[dir="rtl"] .checkbox:checked,
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .text-xs {
@@ -4407,6 +4395,11 @@ body[dir="rtl"] .checkbox:checked,
 
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 
   .md\:text-3xl {

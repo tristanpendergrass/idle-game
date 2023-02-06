@@ -1,7 +1,7 @@
-module IdleGame.Views.TimePasses_test exposing (..)
+module IdleGame.Views.Utils_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.Views.TimePasses exposing (getDurationString)
+import IdleGame.Views.Utils exposing (getDurationString)
 import Test exposing (..)
 
 

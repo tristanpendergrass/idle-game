@@ -21,108 +21,11 @@ resourceIcon =
         |> FeatherIcons.withStrokeWidth 4
 
 
-getDurationString : Int -> String
-getDurationString millis =
-    let
-        parts =
-            getDurationStringParts millis
-    in
-    case parts of
-        [] ->
-            "0 seconds"
-
-        _ ->
-            String.join ", " parts
-
-
-second : Int
-second =
-    1000
-
-
-minute : Int
-minute =
-    60 * second
-
-
-hour : Int
-hour =
-    60 * minute
-
-
-day : Int
-day =
-    24 * hour
-
-
-getDurationStringParts : Int -> List String
-getDurationStringParts millis =
-    let
-        wholeDays =
-            millis // day
-
-        wholeHours =
-            millis // hour
-
-        wholeMinutes =
-            millis // minute
-
-        wholeSeconds =
-            millis // second
-    in
-    if wholeDays > 0 then
-        let
-            displayUnit =
-                if wholeDays > 1 then
-                    "days"
-
-                else
-                    "day"
-        in
-        (IdleGame.Views.Utils.intToString wholeDays ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // day) * day))
-
-    else if wholeHours > 0 then
-        let
-            displayUnit =
-                if wholeHours > 1 then
-                    "hours"
-
-                else
-                    "hour"
-        in
-        (IdleGame.Views.Utils.intToString wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
-
-    else if wholeMinutes > 0 then
-        let
-            displayUnit =
-                if wholeMinutes > 1 then
-                    "minutes"
-
-                else
-                    "minute"
-        in
-        (IdleGame.Views.Utils.intToString wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
-
-    else if wholeSeconds > 0 then
-        let
-            displayUnit =
-                if wholeSeconds > 1 then
-                    "seconds"
-
-                else
-                    "second"
-        in
-        [ IdleGame.Views.Utils.intToString wholeSeconds ++ " " ++ displayUnit ]
-
-    else
-        []
-
-
 render : Posix -> TimePassesData -> Html FrontendMsg
 render timePassed { xpGains, goldGains, resourcesDiff } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
-        , span [ class "text-sm italic" ] [ text <| "(" ++ getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , div []
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []

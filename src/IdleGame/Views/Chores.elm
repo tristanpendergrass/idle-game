@@ -10,6 +10,7 @@ import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes
 import IdleGame.Resource as Resource
 import IdleGame.Timer
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils
 import IdleGame.XpFormulas
@@ -109,7 +110,7 @@ getChoreMxp kind choresData effect =
 
 choreHeight : String
 choreHeight =
-    "h-[390px]"
+    "h-[455px]"
 
 
 renderChoreXpReward : Game -> Chore.Kind -> ModdedEvent -> Html FrontendMsg
@@ -179,22 +180,26 @@ renderChore game chore =
         { mxp } =
             stats.getter game.choresData
 
+        renderDuration : Float -> Html msg
+        renderDuration duration =
+            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.getDurationString (floor duration) ]
+
         renderGold amount =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text ("+" ++ IdleGame.Views.Utils.intToString amount) ]
-                    , span [ class "font-semibold" ] [ text "Gold" ]
+                    [ span [] [ text (IdleGame.Views.Utils.intToString amount) ]
+                    , Icon.gold
+                        |> Icon.toHtml
                     ]
                 ]
 
-        renderResource amount resource =
-            div [ class "flex items-center gap-1" ]
-                [ span [] [ text ("+" ++ IdleGame.Views.Utils.intToString amount) ]
-                , span [ class "font-semibold" ] [ text resource ]
-                ]
+        renderResource : Resource.Kind -> Html FrontendMsg
+        renderResource resource =
+            (Resource.getStats resource).icon
+                |> Icon.toHtml
 
         renderSuccessCondition probability child =
-            div [ class "flex items-center gap-1" ]
+            div [ class "flex items-center gap-2" ]
                 [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (IdleGame.Views.Utils.intToString probability ++ "%") ]
                 , div [] [ text ":" ]
                 , child
@@ -209,11 +214,12 @@ renderChore game chore =
         [ figure []
             [ img [ src chore.imgSrc, class "w-full h-24 object-cover" ] [] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
+            [ div [ class "t-column gap-2 h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
-                [ h2 [ class "card-title text-lg text-center h-[3rem]" ] [ text title ]
+                [ h2 [ class "text-base md:text-lg text-center" ] [ text title ]
+                , renderDuration chore.outcome.duration
                 , renderGold chore.outcome.gold
-                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource 1 (Resource.getStats outcome.extraResource).title)
+                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource outcome.extraResource)
                 , div [ class "divider" ] []
 
                 -- Chore XP rewards
