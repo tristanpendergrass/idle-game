@@ -37,7 +37,7 @@ getPrice item =
             5
 
         Item2 ->
-            100000
+            10
 
 
 hasItem : Item -> ShopItems -> Bool
@@ -64,9 +64,7 @@ getReward item =
                 |> ShopItemMod
 
         Item2 ->
-            Event.choresXpBuff 0.75
-                |> Event.withSource Event.ShopItem
-                |> ShopItemMod
+            ShopItemIntervalMod { kind = CleanStables, percentChange = 1.0 }
 
 
 create : ShopItems

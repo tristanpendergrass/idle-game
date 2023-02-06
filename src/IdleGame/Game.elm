@@ -143,6 +143,17 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
+applyIntervalMods : List IntervalMod -> Float -> Float
+applyIntervalMods mods duration =
+    let
+        multiplier =
+            mods
+                |> List.map .percentChange
+                |> List.foldl (+) 1
+    in
+    duration / multiplier
+
+
 tick : Game -> ( Game, List Toast )
 tick game =
     let
@@ -156,9 +167,14 @@ tick game =
                         choreStats =
                             Chore.getStats choreKind
 
+                        mods =
+                            getAllIntervalMods game
+                                |> List.filter (\{ kind } -> kind == choreKind)
+
                         choreDuration =
                             -- TODO: apply mods
                             choreStats.outcome.duration
+                                |> applyIntervalMods mods
 
                         ( newTimer, completions ) =
                             timer
