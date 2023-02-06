@@ -44,6 +44,9 @@ $ npm test -- --watch
 - [ ] Finalize values for all things
 - [x] Visuals for chores
 
+## Release 1.5
+- [ ] Build up foundation by picking items from Release 2's Tech stuff and Fundamentals
+
 ## Release 2
 ### Tech stuff
 - [ ] Dev Panel
@@ -55,6 +58,8 @@ $ npm test -- --watch
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 
 ### Fundamentals
+- [ ] Show what mods there are on an effect/interval and where they came from
+- [ ] Allow shop items to have requirements besides gold. Resources and level requirements
 - [ ] Activity detail sidebar
 	- [ ] desktop
 	- [ ] mobile

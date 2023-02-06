@@ -553,3 +553,19 @@ getAllMods game =
         -- ++ getChoreMasteryPoolMods game
         -- ++ getChoreUnlocksMods game
         ++ getShopItemMods game
+
+
+
+-- Interval Mods
+
+
+type alias IntervalMod =
+    { kind : Chore.Kind
+    , percentChange : Float -- e.g. 0.25 -> 25% faster
+    }
+
+
+getAllIntervalMods : Game -> List IntervalMod
+getAllIntervalMods game =
+    []
+        ++ getShopItemIntervalMods game
