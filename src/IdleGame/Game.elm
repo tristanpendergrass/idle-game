@@ -31,11 +31,11 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
+    , choresXp = 0
+    , choresMxp = 0
 
-    -- , choresXp = 0
-    -- , choresMxp = 0
-    , choresXp = 14391160
-    , choresMxp = 4500000 / 2
+    -- , choresXp = 14391160
+    -- , choresMxp = 4500000 / 2
     , activeChore = Nothing
     , choresData =
         { cleanStables = { mxp = 0 }
@@ -48,7 +48,7 @@ create seed =
         , flushDrainDemons = { mxp = 0 }
         , organizeSpellBooks = { mxp = 0 }
         }
-    , gold = 0
+    , gold = 100000
     , resources = Resource.createResources
     , shopItems = ShopItems.create
     }
@@ -288,11 +288,20 @@ applyEffect effect game =
 
         GainChoreMxp { multiplier } kind ->
             let
+                choreStats =
+                    Chore.getStats kind
+
                 { mxp } =
-                    (Chore.getStats kind).getter game.choresData
+                    choreStats.getter game.choresData
+
+                currentMasteryLevel =
+                    IdleGame.XpFormulas.skillLevel mxp
+
+                grantedMxp =
+                    toFloat currentMasteryLevel * choreStats.outcome.duration
             in
             game
-                |> addMxp kind (mxp * multiplier)
+                |> addMxp kind (grantedMxp * multiplier)
                 |> addMasteryPoolXp (mxp * multiplier / 2)
                 |> (\newGame -> Random.constant ( newGame, [] ))
 
