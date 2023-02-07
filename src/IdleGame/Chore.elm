@@ -4,6 +4,20 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 
 
+allKinds : List ChoreKind
+allKinds =
+    [ CleanStables
+    , CleanBigBubba
+    , SweepChimneys
+    , WaterGreenhousePlants
+    , WashAndIronRobes
+    , OrganizePotionIngredients
+    , RepairInstruments
+    , FlushDrainDemons
+    , OrganizeSpellBooks
+    ]
+
+
 type alias State =
     { mxp : Float }
 

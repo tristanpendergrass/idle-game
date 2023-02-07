@@ -1,5 +1,6 @@
 module IdleGame.ShopItems exposing (..)
 
+import IdleGame.Chore as Chore
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon, howToWater, readingGlasses)
@@ -42,7 +43,7 @@ type alias Stats =
 
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod { kind = CleanStables, percentChange = 0.1 }
+    ShopItemIntervalMod [ { kind = CleanStables, percentChange = 0.1 } ]
 
 
 getStats : Kind -> Stats
@@ -53,7 +54,11 @@ getStats kind =
             , icon = Icon.shovel
             , price = 50
             , unlockLevel = 1
-            , reward = dummyReward
+            , reward =
+                ShopItemIntervalMod
+                    [ { kind = CleanStables, percentChange = 0.05 }
+                    , { kind = CleanBigBubba, percentChange = 0.05 }
+                    ]
             , getter = .shovel
             , setter = \owned ownedItems -> { ownedItems | shovel = owned }
             }
@@ -63,7 +68,7 @@ getStats kind =
             , icon = Icon.howToWater
             , price = 1000
             , unlockLevel = 35
-            , reward = dummyReward
+            , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
             , getter = .howToWater
             , setter = \owned ownedItems -> { ownedItems | howToWater = owned }
             }
@@ -73,7 +78,9 @@ getStats kind =
             , icon = Icon.keyring
             , price = 1500
             , unlockLevel = 1
-            , reward = dummyReward
+            , reward =
+                ShopItemIntervalMod
+                    (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Chore.allKinds)
             , getter = .keyring
             , setter = \owned ownedItems -> { ownedItems | keyring = owned }
             }
@@ -83,7 +90,15 @@ getStats kind =
             , icon = Icon.readingGlasses
             , price = 3000
             , unlockLevel = 55
-            , reward = dummyReward
+            , reward =
+                ShopItemMod
+                    (Event.choresMxpBuff 0.2
+                        |> Event.withSource Event.ShopItem
+                        |> Event.modWithTags
+                            [ Event.ChoreTag OrganizePotionIngredients
+                            , Event.ChoreTag OrganizeSpellBooks
+                            ]
+                    )
             , getter = .readingGlasses
             , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
             }
@@ -93,7 +108,13 @@ getStats kind =
             , icon = Icon.coatWithHiddenPockets
             , price = 5000
             , unlockLevel = 1
-            , reward = dummyReward
+            , reward =
+                ShopItemMod
+                    (Event.successBuff 0.75
+                        |> Event.withSource Event.ShopItem
+                        |> Event.modWithTags
+                            [ Event.ChoreTag RepairInstruments ]
+                    )
             , getter = .coatWithHiddenPockets
             , setter = \owned ownedItems -> { ownedItems | coatWithHiddenPockets = owned }
             }
@@ -114,7 +135,7 @@ type ShopItems
 
 type Reward
     = ShopItemMod Event.Mod
-    | ShopItemIntervalMod IntervalMod
+    | ShopItemIntervalMod (List IntervalMod)
 
 
 create : ShopItems

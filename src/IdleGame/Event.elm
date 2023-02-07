@@ -301,6 +301,24 @@ mxpTransformer buff effectMultiplier effect =
             NoChange
 
 
+increaseSuccessTransformer : Float -> Transformer
+increaseSuccessTransformer buff effectMultiplier effect =
+    case getType effect of
+        VariableSuccess params ->
+            let
+                newSuccessProbability =
+                    (params.successProbability + (buff * toFloat effectMultiplier))
+                        |> max 1.0
+
+                newEffectType =
+                    VariableSuccess { params | successProbability = newSuccessProbability }
+            in
+            ChangeEffect (setType newEffectType effect)
+
+        _ ->
+            NoChange
+
+
 xpModLabel : Float -> String
 xpModLabel multiplier =
     "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% XP"
@@ -309,6 +327,11 @@ xpModLabel multiplier =
 mxpModLabel : Float -> String
 mxpModLabel multiplier =
     "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Mastery XP"
+
+
+successProbabilityModLabel : Float -> String
+successProbabilityModLabel buff =
+    "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
 
 
 devGlobalXpBuff : Mod
@@ -336,6 +359,16 @@ choresMxpBuff buff =
     { tags = []
     , label = mxpModLabel buff
     , transformer = mxpTransformer buff
+    , source = AdminCrimes
+    , multiplier = 1
+    }
+
+
+successBuff : Float -> Mod
+successBuff buff =
+    { tags = []
+    , label = successProbabilityModLabel buff
+    , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
     , multiplier = 1
     }

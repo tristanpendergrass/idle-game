@@ -577,12 +577,13 @@ getShopItemIntervalMods game =
         |> List.filterMap
             (\reward ->
                 case reward of
-                    ShopItems.ShopItemIntervalMod mod ->
-                        Just mod
+                    ShopItems.ShopItemIntervalMod mods ->
+                        Just mods
 
                     _ ->
                         Nothing
             )
+        |> List.concat
 
 
 getAllMods : Game -> List Mod
