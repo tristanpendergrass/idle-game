@@ -110,7 +110,7 @@ getChoreMxp kind choresData effect =
 
 choreHeight : String
 choreHeight =
-    "h-[455px]"
+    "h-[425px] xl:h-[405px]"
 
 
 renderChoreXpReward : Game -> ChoreKind -> ModdedEvent -> Html FrontendMsg
@@ -216,7 +216,7 @@ renderChore game chore =
         , div [ class "relative card-body" ]
             [ div [ class "t-column gap-2 h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
-                [ h2 [ class "text-base md:text-lg text-center" ] [ text title ]
+                [ h2 [ class "text-sm font-semibold md:text-lg text-center" ] [ text title ]
                 , renderDuration chore.outcome.duration
                 , renderGold chore.outcome.gold
                 , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource outcome.extraResource)

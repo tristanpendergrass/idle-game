@@ -3710,6 +3710,14 @@ body[dir="rtl"] .checkbox:checked,
   height: 3rem;
 }
 
+.h-\[435px\] {
+  height: 435px;
+}
+
+.h-\[425px\] {
+  height: 425px;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
@@ -4389,6 +4397,14 @@ body[dir="rtl"] .checkbox:checked,
 }
 
 @media (min-width: 768px) {
+  .md\:h-\[405px\] {
+    height: 405px;
+  }
+
+  .md\:h-\[420px\] {
+    height: 420px;
+  }
+
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4419,6 +4435,12 @@ body[dir="rtl"] .checkbox:checked,
 
   .lg\:gap-4 {
     gap: 1rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:h-\[405px\] {
+    height: 405px;
   }
 }
 

@@ -75,3 +75,4 @@ $ npm test -- --watch
 - [ ] Progress bar animations
 - [ ] Format numbers correctly with commas etc. in Time Passes modal
 - [ ] Close modals on space/escape
+- [ ] Design audit following https://anthonyhobday.com/sideprojects/saferules/
