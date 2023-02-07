@@ -75,8 +75,8 @@ getStats kind =
             , getter = .cleanBigBubba
             , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
             , outcome =
-                { xp = 15
-                , duration = 4000
+                { xp = 25
+                , duration = 6000
                 , extraResourceProbability = 0.75
                 , extraResource = Resource.Manure
                 , gold = 5
@@ -90,8 +90,8 @@ getStats kind =
             , getter = .sweepChimneys
             , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
             , outcome =
-                { xp = 22
-                , duration = 5000
+                { xp = 37
+                , duration = 8000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Soot
                 , gold = 10
@@ -105,11 +105,11 @@ getStats kind =
             , getter = .waterGreenhousePlants
             , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
             , outcome =
-                { xp = 30
-                , duration = 6000
+                { xp = 12
+                , duration = 2000
                 , extraResourceProbability = 0.6
                 , extraResource = Resource.GreenhouseDirt
-                , gold = 20
+                , gold = 8
                 }
             }
 
@@ -120,7 +120,7 @@ getStats kind =
             , getter = .washRobes
             , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
             , outcome =
-                { xp = 40
+                { xp = 50
                 , duration = 8000
                 , extraResourceProbability = 0.2
                 , extraResource = Resource.WashWater
@@ -135,11 +135,11 @@ getStats kind =
             , getter = .organizePotionIngredients
             , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
             , outcome =
-                { xp = 60
-                , duration = 10000
+                { xp = 165
+                , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.EmptyBottle
-                , gold = 50
+                , gold = 10
                 }
             }
 
@@ -150,11 +150,11 @@ getStats kind =
             , getter = .repairInstruments
             , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
             , outcome =
-                { xp = 80
+                { xp = 75
                 , duration = 12000
                 , extraResourceProbability = 0.25
                 , extraResource = Resource.Scrap
-                , gold = 75
+                , gold = 125
                 }
             }
 
@@ -165,11 +165,11 @@ getStats kind =
             , getter = .flushDrainDemons
             , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
             , outcome =
-                { xp = 100
-                , duration = 20000
+                { xp = 90
+                , duration = 10000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Ectoplasm
-                , gold = 175
+                , gold = 90
                 }
             }
 
@@ -180,10 +180,10 @@ getStats kind =
             , getter = .organizeSpellBooks
             , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
             , outcome =
-                { xp = 180
-                , duration = 15000
+                { xp = 210
+                , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.Parchment
-                , gold = 190
+                , gold = 250
                 }
             }
