@@ -68,7 +68,7 @@ type FrontendMsg
     | OpenMasteryCheckpointsModal
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
-    | HandleShopItemClick ShopItems.Item
+    | HandleShopItemClick ShopItems.Kind
       -- Chores
     | ToggleActiveChore ChoreKind
 

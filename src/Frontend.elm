@@ -364,22 +364,25 @@ update msg model =
             , Cmd.none
             )
 
-        HandleShopItemClick item ->
+        HandleShopItemClick kind ->
             ( model
                 |> mapGame
                     (\game ->
                         let
-                            price =
-                                ShopItems.getPrice item
+                            stats =
+                                ShopItems.getStats kind
 
                             canAfford =
-                                price <= game.gold
+                                stats.price <= game.gold
 
                             dontOwnItemYet =
-                                not (ShopItems.hasItem item game.shopItems)
+                                not <| ShopItems.isOwned kind game.shopItems
                         in
                         if canAfford && dontOwnItemYet then
-                            { game | gold = game.gold - price, shopItems = ShopItems.addItem item game.shopItems }
+                            { game
+                                | gold = game.gold - stats.price
+                                , shopItems = ShopItems.addItem kind game.shopItems
+                            }
 
                         else
                             game

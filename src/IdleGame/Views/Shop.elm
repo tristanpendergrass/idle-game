@@ -27,38 +27,41 @@ render game =
                 [ text <| IdleGame.Views.Utils.intToString price
                 ]
 
-        renderShopItem : ShopItems.ViewItem -> Html FrontendMsg
-        renderShopItem { item, icon, title, price, description, owned } =
+        renderShopItem : ShopItems.ShopItems -> ShopItems.Kind -> Html FrontendMsg
+        renderShopItem shopItems kind =
             let
+                stats =
+                    ShopItems.getStats kind
+
+                owned =
+                    ShopItems.isOwned kind shopItems
+
                 shakeOnClick =
-                    not owned && price > game.gold
+                    not owned && stats.price > game.gold
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer"
                 , classList [ ( "bubble-pop", not shakeOnClick ), ( "bubble-shake", shakeOnClick ) ]
-                , onClick <| HandleShopItemClick item
+                , onClick <| HandleShopItemClick kind
                 ]
                 [ div [ class "avatar" ]
                     [ div [ class "w-24 rounded-full" ]
-                        [ icon
+                        [ stats.icon
                             |> Icon.toHtml
                         ]
                     ]
                 , div [ class "flex-1 t-column" ]
-                    [ span [ class "font-bold" ] [ text title ]
-                    , span [] [ text description ]
+                    [ span [ class "font-bold" ] [ text stats.title ]
+                    , span [] [ text "Foobar" ]
                     ]
                 , if owned then
                     ownedLabel
 
                   else
-                    priceLabel price
+                    priceLabel stats.price
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            (game.shopItems
-                |> ShopItems.toList
-                |> List.map renderShopItem
-            )
+            (List.map (renderShopItem game.shopItems) ShopItems.allKinds)
         ]

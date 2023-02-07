@@ -2,16 +2,25 @@ module IdleGame.ShopItems exposing (..)
 
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon exposing (Icon, howToWater, readingGlasses)
+import List.Extra
 
 
-type Item
-    = Item1
-    | Item2
+type Kind
+    = Shovel
+    | HowToWater
+    | Keyring
+    | ReadingGlasses
+    | CoatWithHiddenPockets
+
+
+allKinds : List Kind
+allKinds =
+    [ Shovel, HowToWater, Keyring, ReadingGlasses, CoatWithHiddenPockets ]
 
 
 type alias ViewItem =
-    { item : Item
+    { kind : Kind
     , title : String
     , description : String
     , icon : Icon
@@ -20,9 +29,82 @@ type alias ViewItem =
     }
 
 
+type alias Stats =
+    { title : String
+    , icon : Icon
+    , price : Int
+    , unlockLevel : Int
+    , reward : Reward
+    , getter : OwnedItems -> Bool
+    , setter : Bool -> OwnedItems -> OwnedItems
+    }
+
+
+dummyReward : Reward
+dummyReward =
+    ShopItemIntervalMod { kind = CleanStables, percentChange = 0.1 }
+
+
+getStats : Kind -> Stats
+getStats kind =
+    case kind of
+        Shovel ->
+            { title = "Shovel"
+            , icon = Icon.shovel
+            , price = 50
+            , unlockLevel = 1
+            , reward = dummyReward
+            , getter = .shovel
+            , setter = \owned ownedItems -> { ownedItems | shovel = owned }
+            }
+
+        HowToWater ->
+            { title = "How to Dual-wield Watering Cans"
+            , icon = Icon.howToWater
+            , price = 1000
+            , unlockLevel = 35
+            , reward = dummyReward
+            , getter = .howToWater
+            , setter = \owned ownedItems -> { ownedItems | howToWater = owned }
+            }
+
+        Keyring ->
+            { title = "Keyring"
+            , icon = Icon.keyring
+            , price = 1500
+            , unlockLevel = 1
+            , reward = dummyReward
+            , getter = .keyring
+            , setter = \owned ownedItems -> { ownedItems | keyring = owned }
+            }
+
+        ReadingGlasses ->
+            { title = "Reading Glasses"
+            , icon = Icon.readingGlasses
+            , price = 3000
+            , unlockLevel = 55
+            , reward = dummyReward
+            , getter = .readingGlasses
+            , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
+            }
+
+        CoatWithHiddenPockets ->
+            { title = "Coat With Hidden Pockets"
+            , icon = Icon.coatWithHiddenPockets
+            , price = 5000
+            , unlockLevel = 1
+            , reward = dummyReward
+            , getter = .coatWithHiddenPockets
+            , setter = \owned ownedItems -> { ownedItems | coatWithHiddenPockets = owned }
+            }
+
+
 type alias OwnedItems =
-    { item1 : Bool
-    , item2 : Bool
+    { shovel : Bool
+    , howToWater : Bool
+    , keyring : Bool
+    , readingGlasses : Bool
+    , coatWithHiddenPockets : Bool
     }
 
 
@@ -30,103 +112,34 @@ type ShopItems
     = ShopItems OwnedItems
 
 
-getPrice : Item -> Int
-getPrice item =
-    case item of
-        Item1 ->
-            5
-
-        Item2 ->
-            10
-
-
-hasItem : Item -> ShopItems -> Bool
-hasItem item (ShopItems ownedItems) =
-    case item of
-        Item1 ->
-            ownedItems.item1
-
-        Item2 ->
-            ownedItems.item2
-
-
 type Reward
     = ShopItemMod Event.Mod
     | ShopItemIntervalMod IntervalMod
 
 
-getReward : Item -> Reward
-getReward item =
-    case item of
-        Item1 ->
-            Event.choresXpBuff 0.75
-                |> Event.withSource Event.ShopItem
-                |> ShopItemMod
-
-        Item2 ->
-            ShopItemIntervalMod { kind = CleanStables, percentChange = 1.0 }
-
-
 create : ShopItems
 create =
-    ShopItems { item1 = False, item2 = False }
+    ShopItems
+        { shovel = False
+        , howToWater = False
+        , keyring = False
+        , readingGlasses = False
+        , coatWithHiddenPockets = False
+        }
 
 
-addItem : Item -> ShopItems -> ShopItems
-addItem item (ShopItems ownedItems) =
-    case item of
-        Item1 ->
-            ShopItems { ownedItems | item1 = True }
-
-        Item2 ->
-            ShopItems { ownedItems | item2 = True }
+addItem : Kind -> ShopItems -> ShopItems
+addItem kind (ShopItems ownedItems) =
+    (getStats kind).setter True ownedItems
+        |> ShopItems
 
 
-isOwned : Item -> ShopItems -> Bool
-isOwned item (ShopItems ownedItems) =
-    case item of
-        Item1 ->
-            ownedItems.item1
-
-        Item2 ->
-            ownedItems.item2
+isOwned : Kind -> ShopItems -> Bool
+isOwned kind (ShopItems ownedItems) =
+    (getStats kind).getter ownedItems
 
 
-toOwnedItems : ShopItems -> List Item
+toOwnedItems : ShopItems -> List Kind
 toOwnedItems shopItems =
-    [ Item1, Item2 ]
-        |> List.foldl
-            (\item accum ->
-                if isOwned item shopItems then
-                    item :: accum
-
-                else
-                    accum
-            )
-            []
-
-
-toList : ShopItems -> List ViewItem
-toList (ShopItems ownedItems) =
-    [ Item1, Item2 ]
-        |> List.map
-            (\item ->
-                case item of
-                    Item1 ->
-                        { item = Item1
-                        , title = "Item 1"
-                        , description = "Foobar"
-                        , icon = Icon.bag
-                        , price = getPrice item
-                        , owned = ownedItems.item1
-                        }
-
-                    Item2 ->
-                        { item = Item2
-                        , title = "Item 2"
-                        , description = "Foobar 2"
-                        , icon = Icon.botany
-                        , price = getPrice item
-                        , owned = ownedItems.item2
-                        }
-            )
+    allKinds
+        |> List.filter (\kind -> isOwned kind shopItems)

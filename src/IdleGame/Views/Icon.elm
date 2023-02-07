@@ -230,3 +230,28 @@ ectoplasm =
 parchment : Icon
 parchment =
     createIconPublic "/resources/parchment.png"
+
+
+shovel : Icon
+shovel =
+    createIconPublic "/resources/shovel.png"
+
+
+howToWater : Icon
+howToWater =
+    createIconPublic "/resources/howToWater.png"
+
+
+keyring : Icon
+keyring =
+    createIconPublic "/resources/keyring.png"
+
+
+readingGlasses : Icon
+readingGlasses =
+    createIconPublic "/resources/readingGlasses.png"
+
+
+coatWithHiddenPockets : Icon
+coatWithHiddenPockets =
+    createIconPublic "/resources/coatWithHiddenPockets.png"

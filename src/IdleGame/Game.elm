@@ -557,7 +557,7 @@ getShopItemMods : Game -> List Mod
 getShopItemMods game =
     game.shopItems
         |> ShopItems.toOwnedItems
-        |> List.map ShopItems.getReward
+        |> List.map (\shopItem -> (ShopItems.getStats shopItem).reward)
         |> List.filterMap
             (\reward ->
                 case reward of
@@ -573,7 +573,7 @@ getShopItemIntervalMods : Game -> List IntervalMod
 getShopItemIntervalMods game =
     game.shopItems
         |> ShopItems.toOwnedItems
-        |> List.map ShopItems.getReward
+        |> List.map (\shopItem -> (ShopItems.getStats shopItem).reward)
         |> List.filterMap
             (\reward ->
                 case reward of
