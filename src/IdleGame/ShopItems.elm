@@ -3,21 +3,21 @@ module IdleGame.ShopItems exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Views.Icon as Icon exposing (Icon, howToWater, readingGlasses)
+import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
 
 
 type Kind
     = Shovel
-    | HowToWater
+    | BeginnerDualWielding
     | Keyring
     | ReadingGlasses
-    | CoatWithHiddenPockets
+    | OversizedBag
 
 
 allKinds : List Kind
 allKinds =
-    [ Shovel, HowToWater, Keyring, ReadingGlasses, CoatWithHiddenPockets ]
+    [ Shovel, BeginnerDualWielding, Keyring, ReadingGlasses, OversizedBag ]
 
 
 type alias ViewItem =
@@ -63,14 +63,14 @@ getStats kind =
             , setter = \owned ownedItems -> { ownedItems | shovel = owned }
             }
 
-        HowToWater ->
-            { title = "How to Dual-wield Watering Cans"
-            , icon = Icon.howToWater
+        BeginnerDualWielding ->
+            { title = "Beginner Dual Wielding"
+            , icon = Icon.book
             , price = 1000
             , unlockLevel = 35
             , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
-            , getter = .howToWater
-            , setter = \owned ownedItems -> { ownedItems | howToWater = owned }
+            , getter = .beginnerDualWielding
+            , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
             }
 
         Keyring ->
@@ -103,9 +103,9 @@ getStats kind =
             , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
             }
 
-        CoatWithHiddenPockets ->
-            { title = "Coat With Hidden Pockets"
-            , icon = Icon.coatWithHiddenPockets
+        OversizedBag ->
+            { title = "OversizedBag"
+            , icon = Icon.oversizedBag
             , price = 5000
             , unlockLevel = 1
             , reward =
@@ -115,17 +115,17 @@ getStats kind =
                         |> Event.modWithTags
                             [ Event.ChoreTag RepairInstruments ]
                     )
-            , getter = .coatWithHiddenPockets
-            , setter = \owned ownedItems -> { ownedItems | coatWithHiddenPockets = owned }
+            , getter = .oversizedBag
+            , setter = \owned ownedItems -> { ownedItems | oversizedBag = owned }
             }
 
 
 type alias OwnedItems =
     { shovel : Bool
-    , howToWater : Bool
+    , beginnerDualWielding : Bool
     , keyring : Bool
     , readingGlasses : Bool
-    , coatWithHiddenPockets : Bool
+    , oversizedBag : Bool
     }
 
 
@@ -142,10 +142,10 @@ create : ShopItems
 create =
     ShopItems
         { shovel = False
-        , howToWater = False
+        , beginnerDualWielding = False
         , keyring = False
         , readingGlasses = False
-        , coatWithHiddenPockets = False
+        , oversizedBag = False
         }
 
 

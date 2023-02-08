@@ -20,11 +20,15 @@ render game =
                 ]
 
         priceLabel price =
-            div
-                [ class "flex-0 px-2 py-1 font-bold"
-                , classList [ ( "text-error", price > game.gold ) ]
-                ]
-                [ text <| IdleGame.Views.Utils.intToString price
+            div [ class "flex items-center gap-1" ]
+                [ Icon.gold
+                    |> Icon.toHtml
+                , div
+                    [ class "font-bold"
+                    , classList [ ( "text-error", price > game.gold ) ]
+                    ]
+                    [ text <| IdleGame.Views.Utils.intToString price
+                    ]
                 ]
 
         renderShopItem : ShopItems.ShopItems -> ShopItems.Kind -> Html FrontendMsg

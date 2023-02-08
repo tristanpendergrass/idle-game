@@ -204,7 +204,7 @@ soot =
 
 greenhouseDirt : Icon
 greenhouseDirt =
-    createIconPublic "/resources/greenhouseDirt.png"
+    createIconPublic "/resources/greenhouseDirt_2.png"
 
 
 washWater : Icon
@@ -234,24 +234,24 @@ parchment =
 
 shovel : Icon
 shovel =
-    createIconPublic "/resources/shovel.png"
+    createIconPublic "/shopItems/shovel.png"
 
 
-howToWater : Icon
-howToWater =
-    createIconPublic "/resources/howToWater.png"
+book : Icon
+book =
+    createIconPublic "/shopItems/book.png"
 
 
 keyring : Icon
 keyring =
-    createIconPublic "/resources/keyring.png"
+    createIconPublic "/shopItems/keyring.png"
 
 
 readingGlasses : Icon
 readingGlasses =
-    createIconPublic "/resources/readingGlasses.png"
+    createIconPublic "/shopItems/readingGlasses.png"
 
 
-coatWithHiddenPockets : Icon
-coatWithHiddenPockets =
-    createIconPublic "/resources/coatWithHiddenPockets.png"
+oversizedBag : Icon
+oversizedBag =
+    createIconPublic "/shopItems/oversizedBag.png"
