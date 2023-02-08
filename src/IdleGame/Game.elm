@@ -172,7 +172,6 @@ tick game =
                                 |> List.filter (\{ kind } -> kind == choreKind)
 
                         choreDuration =
-                            -- TODO: apply mods
                             choreStats.outcome.duration
                                 |> applyIntervalMods mods
 
@@ -264,6 +263,7 @@ applyEffect : Effect -> Game -> Generator ( Game, List Toast )
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
+            -- Important! Keep the application here in sync with Views.Chores.elm
             successGenerator successProbability
                 |> Random.andThen
                     (\succeeded ->
@@ -279,14 +279,17 @@ applyEffect effect game =
                     )
 
         GainResource quantity resource ->
+            -- Important! Keep the application here in sync with Views.Chores.elm
             intGenerator quantity
                 |> Random.map (\amount -> addResource resource amount game)
 
         GainXp quantity skill ->
+            -- Important! Keep the application here in sync with Views.Chores.elm
             floatGenerator quantity
                 |> Random.map (\amount -> ( addXp skill amount game, [] ))
 
         GainChoreMxp { multiplier } kind ->
+            -- Important! Keep the application here in sync with Views.Chores.elm
             let
                 choreStats =
                     Chore.getStats kind
@@ -298,7 +301,7 @@ applyEffect effect game =
                     IdleGame.XpFormulas.skillLevel mxp
 
                 grantedMxp =
-                    toFloat currentMasteryLevel * choreStats.outcome.duration
+                    toFloat currentMasteryLevel * (choreStats.outcome.duration / 1000)
             in
             game
                 |> addMxp kind (grantedMxp * multiplier)
@@ -306,6 +309,7 @@ applyEffect effect game =
                 |> (\newGame -> Random.constant ( newGame, [] ))
 
         GainGold quantity ->
+            -- Important! Keep the application here in sync with Views.Chores.elm
             intGenerator quantity
                 |> Random.map (\amount -> addGold amount game)
 
@@ -348,27 +352,6 @@ addMasteryPoolXp amount game =
 addGold : Int -> Game -> ( Game, List Toast )
 addGold amount game =
     ( { game | gold = game.gold + amount }, [ GainedGold amount ] )
-
-
-applyEvent : ModdedEvent -> Game -> Random.Generator ( Game, List Toast )
-applyEvent (ModdedEvent eventData) game =
-    let
-        reducer : Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-        reducer effect gen =
-            gen
-                |> Random.andThen
-                    (\( accumGame, notifications ) ->
-                        applyEffect effect accumGame
-                            |> Random.map
-                                (\( newGame, newToasts ) ->
-                                    ( newGame, notifications ++ newToasts )
-                                )
-                    )
-    in
-    List.foldl
-        reducer
-        (Random.constant ( game, [] ))
-        eventData.effects
 
 
 gainResource : Int -> Resource.Kind -> Effect

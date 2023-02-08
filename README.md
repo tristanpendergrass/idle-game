@@ -44,7 +44,7 @@ $ npm test -- --watch
 - [ ] Finalize values for all things
 - [x] Visuals for chores
 
-## Release 1.5
+## Release 1.1
 - [ ] Build up foundation by picking items from Release 2's Tech stuff and Fundamentals
 
 ## Release 2
@@ -56,6 +56,8 @@ $ npm test -- --watch
 - [ ] Set up elm-review
   - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
+- [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
+  - [ ] Same with Modded duration in Chores.elm
 
 ### Fundamentals
 - [ ] Show what mods there are on an effect/interval and where they came from

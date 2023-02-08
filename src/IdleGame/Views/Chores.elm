@@ -6,10 +6,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Event exposing (..)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game exposing (Game, getChoreListItems)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.Timer
+import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils
@@ -70,18 +70,35 @@ render game =
         ]
 
 
-renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
-renderChoreListItem game item =
-    case item of
-        IdleGame.Game.ChoreItem kind ->
-            renderChore game (Chore.getStats kind)
-
-        IdleGame.Game.LockedChore level ->
-            renderLockedChore level
+type alias ChoreEffectsView =
+    { gold : Int, skillXp : Float, mxp : Float, resource : Resource.Kind, probability : Float }
 
 
-getChoresSkillXp : Effect -> Maybe Float
-getChoresSkillXp effect =
+getChoreEfffectsView : Game -> List Effect -> Maybe ChoreEffectsView
+getChoreEfffectsView game effects =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    let
+        gold =
+            List.Extra.findMap getChoreGold effects
+
+        xp =
+            List.Extra.findMap getChoreXp effects
+
+        mxp =
+            List.Extra.findMap (getChoreMxp game) effects
+
+        resource =
+            List.Extra.findMap getChoreResource effects
+
+        probability =
+            List.Extra.findMap getChoreProbability effects
+    in
+    Maybe.map5 ChoreEffectsView gold xp mxp resource probability
+
+
+getChoreXp : Effect -> Maybe Float
+getChoreXp effect =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
         GainXp { base, multiplier } ChoresSkill ->
             Just (base * multiplier)
@@ -90,22 +107,144 @@ getChoresSkillXp effect =
             Nothing
 
 
-getChoreMxp : ChoreKind -> Chore.AllChoreStates -> Effect -> Maybe Float
-getChoreMxp kind choresData effect =
+getChoreMxp : Game -> Effect -> Maybe Float
+getChoreMxp game effect =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainChoreMxp { multiplier } t ->
-            if t == kind then
-                let
-                    { mxp } =
-                        (Chore.getStats kind).getter choresData
-                in
-                Just (mxp * multiplier)
+        GainChoreMxp { multiplier } kind ->
+            let
+                choreStats =
+                    Chore.getStats kind
 
-            else
-                Nothing
+                { mxp } =
+                    choreStats.getter game.choresData
+
+                currentMasteryLevel =
+                    IdleGame.XpFormulas.skillLevel mxp
+
+                grantedMxp =
+                    toFloat currentMasteryLevel * (choreStats.outcome.duration / 1000) * (1 + multiplier)
+            in
+            Just grantedMxp
 
         _ ->
             Nothing
+
+
+getChoreGold : Effect -> Maybe Int
+getChoreGold effect =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    case getType effect of
+        GainGold { base } ->
+            Just base
+
+        _ ->
+            Nothing
+
+
+getChoreResource : Effect -> Maybe Resource.Kind
+getChoreResource effect =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    case getType effect of
+        VariableSuccess { successEffects } ->
+            successEffects
+                |> List.Extra.findMap
+                    (\innerEffect ->
+                        case getType innerEffect of
+                            GainResource _ kind ->
+                                Just kind
+
+                            _ ->
+                                Nothing
+                    )
+
+        _ ->
+            Nothing
+
+
+getChoreProbability : Effect -> Maybe Float
+getChoreProbability effect =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    case getType effect of
+        VariableSuccess { successProbability } ->
+            Just successProbability
+
+        _ ->
+            Nothing
+
+
+getModdedDuration : Game -> ChoreKind -> Float
+getModdedDuration game choreKind =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    let
+        stats =
+            Chore.getStats choreKind
+
+        mods =
+            IdleGame.Game.getAllIntervalMods game
+                |> List.filter (\{ kind } -> kind == choreKind)
+
+        choreDuration =
+            stats.outcome.duration
+                |> IdleGame.Game.applyIntervalMods mods
+    in
+    choreDuration
+
+
+renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
+renderChoreListItem game item =
+    case item of
+        IdleGame.Game.ChoreItem kind ->
+            let
+                stats =
+                    Chore.getStats kind
+
+                moddedEvent : ModdedEvent
+                moddedEvent =
+                    IdleGame.Game.getEvent stats
+                        |> IdleGame.Event.applyModsToEvent (IdleGame.Game.getAllMods game)
+
+                effects =
+                    case moddedEvent of
+                        IdleGame.Event.ModdedEvent eventData ->
+                            eventData.effects
+
+                maybeTimer =
+                    case game.activeChore of
+                        Just ( activeType, timer ) ->
+                            if kind == activeType then
+                                Just timer
+
+                            else
+                                Nothing
+
+                        Nothing ->
+                            Nothing
+
+                moddedDuration : Float
+                moddedDuration =
+                    getModdedDuration game kind
+            in
+            case getChoreEfffectsView game effects of
+                Nothing ->
+                    div [] []
+
+                Just { gold, skillXp, mxp, resource, probability } ->
+                    renderChore
+                        { title = stats.title
+                        , handleClick = ToggleActiveChore kind
+                        , maybeTimer = maybeTimer
+                        , duration = moddedDuration
+                        , imgSrc = stats.imgSrc
+                        , gold = gold
+                        , extraResourceProbability = probability
+                        , extraResource = resource
+                        , skillXp = skillXp
+                        , mxp = mxp
+                        }
+
+        IdleGame.Game.LockedChore level ->
+            renderLockedChore level
 
 
 choreHeight : String
@@ -113,81 +252,36 @@ choreHeight =
     "h-[425px] xl:h-[405px]"
 
 
-renderChoreXpReward : Game -> ChoreKind -> ModdedEvent -> Html FrontendMsg
-renderChoreXpReward game choreType (ModdedEvent eventData) =
-    let
-        skillXpLabel =
-            case List.Extra.findMap getChoresSkillXp eventData.effects of
-                Just skillXp ->
-                    IdleGame.Views.Utils.intToString (floor skillXp)
-
-                Nothing ->
-                    "N/A"
-
-        mxpLabel =
-            case List.Extra.findMap (getChoreMxp choreType game.choresData) eventData.effects of
-                Just skillXp ->
-                    IdleGame.Views.Utils.intToString (floor skillXp)
-
-                Nothing ->
-                    "N/A"
-    in
-    div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-        [ IdleGame.Views.Utils.skillXpBadge
-        , span [ class "font-bold col-span-4" ] [ text skillXpLabel ]
-        , IdleGame.Views.Utils.masteryXpBadge
-        , span [ class "font-bold col-span-4" ] [ text mxpLabel ]
-        ]
-
-
 probabilityToInt : Float -> Int
 probabilityToInt x =
     floor (x * 100)
 
 
-renderChore : Game -> Chore.Stats -> Html FrontendMsg
-renderChore game chore =
+type alias ChoreItemView =
+    { title : String
+    , handleClick : FrontendMsg
+    , maybeTimer : Maybe Timer
+    , duration : Float
+    , imgSrc : String
+    , gold : Int
+    , extraResourceProbability : Float
+    , extraResource : Resource.Kind
+    , skillXp : Float
+    , mxp : Float
+    }
+
+
+renderChore : ChoreItemView -> Html FrontendMsg
+renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResource, extraResourceProbability, skillXp, mxp } =
     let
-        { kind, title, outcome } =
-            chore
-
-        stats =
-            Chore.getStats kind
-
-        handleClick =
-            ToggleActiveChore kind
-
-        maybeTimer =
-            case game.activeChore of
-                Just ( activeType, timer ) ->
-                    if kind == activeType then
-                        Just timer
-
-                    else
-                        Nothing
-
-                Nothing ->
-                    Nothing
-
-        allMods =
-            IdleGame.Game.getAllMods game
-
-        moddedEvent : ModdedEvent
-        moddedEvent =
-            IdleGame.Game.getEvent chore
-                |> IdleGame.Event.applyModsToEvent allMods
-
-        { mxp } =
-            stats.getter game.choresData
-
-        renderDuration : Float -> Html msg
-        renderDuration duration =
+        renderDuration : Html msg
+        renderDuration =
             div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.getDurationString (floor duration) ]
 
-        renderGold amount =
+        renderGold =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text (IdleGame.Views.Utils.intToString amount) ]
+                    [ span [] [ text (IdleGame.Views.Utils.intToString gold) ]
                     , Icon.gold
                         |> Icon.toHtml
                     ]
@@ -198,11 +292,19 @@ renderChore game chore =
             (Resource.getStats resource).icon
                 |> Icon.toHtml
 
-        renderSuccessCondition probability child =
+        renderSuccessCondition child =
             div [ class "flex items-center gap-2" ]
-                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (IdleGame.Views.Utils.intToString probability ++ "%") ]
+                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (IdleGame.Views.Utils.intToString (probabilityToInt extraResourceProbability) ++ "%") ]
                 , div [] [ text ":" ]
                 , child
+                ]
+
+        renderXp =
+            div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
+                [ IdleGame.Views.Utils.skillXpBadge
+                , span [ class "font-bold col-span-4" ] [ text (IdleGame.Views.Utils.intToString (floor skillXp)) ]
+                , IdleGame.Views.Utils.masteryXpBadge
+                , span [ class "font-bold col-span-4" ] [ text (IdleGame.Views.Utils.intToString (floor mxp)) ]
                 ]
     in
     div
@@ -212,18 +314,18 @@ renderChore game chore =
         ]
         -- Chore image
         [ figure []
-            [ img [ src chore.imgSrc, class "w-full h-24 object-cover" ] [] ]
+            [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
         , div [ class "relative card-body" ]
             [ div [ class "t-column gap-2 h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
-                [ h2 [ class "text-sm font-semibold md:text-lg text-center" ] [ text title ]
-                , renderDuration chore.outcome.duration
-                , renderGold chore.outcome.gold
-                , renderSuccessCondition (probabilityToInt chore.outcome.extraResourceProbability) (renderResource outcome.extraResource)
+                [ h2 [ class "text-sm  md:text-lg text-center" ] [ text title ]
+                , renderDuration
+                , renderGold
+                , renderSuccessCondition (renderResource extraResource)
                 , div [ class "divider" ] []
 
                 -- Chore XP rewards
-                , renderChoreXpReward game chore.kind moddedEvent
+                , renderXp
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mxp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
@@ -233,7 +335,7 @@ renderChore game chore =
                 ]
 
             -- Chore progress bar
-            , case Maybe.map IdleGame.Timer.percentComplete maybeTimer of
+            , case Maybe.map Timer.percentComplete maybeTimer of
                 Nothing ->
                     div [] []
 
