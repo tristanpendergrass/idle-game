@@ -9,6 +9,7 @@ type Size
     = Small
     | Medium
     | Large
+    | ExtraLarge
 
 
 type alias Params =
@@ -42,19 +43,6 @@ withSize size =
     mapParams (\params -> { params | size = size })
 
 
-sizeToPx : Size -> Float
-sizeToPx size =
-    case size of
-        Small ->
-            12
-
-        Medium ->
-            24
-
-        Large ->
-            48
-
-
 sizeToRem : Size -> Float
 sizeToRem size =
     case size of
@@ -66,6 +54,9 @@ sizeToRem size =
 
         Large ->
             3.0
+
+        ExtraLarge ->
+            6.0
 
 
 sizeToTailwindClass : Size -> String
@@ -79,6 +70,9 @@ sizeToTailwindClass size =
 
         Large ->
             "w-12 h-12"
+
+        ExtraLarge ->
+            "w-24 h-24"
 
 
 toHtml : Icon -> Html msg
@@ -255,3 +249,8 @@ readingGlasses =
 oversizedBag : Icon
 oversizedBag =
     createIconPublic "/shopItems/oversizedBag.png"
+
+
+unknownItem : Icon
+unknownItem =
+    createIconFeather FeatherIcons.lock

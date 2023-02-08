@@ -6,14 +6,19 @@ import Html.Events exposing (..)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.Views.Chores exposing (renderLockedChore)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
+import IdleGame.XpFormulas as XpFormulas
 import Types exposing (..)
 
 
 render : Game -> Html FrontendMsg
 render game =
     let
+        choresSkillLevel =
+            XpFormulas.skillLevel game.choresXp
+
         ownedLabel =
             div [ class "flex-0 px-2 py-1 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]
                 [ text "Owned"
@@ -48,15 +53,12 @@ render game =
                 , classList [ ( "bubble-pop", not shakeOnClick ), ( "bubble-shake", shakeOnClick ) ]
                 , onClick <| HandleShopItemClick kind
                 ]
-                [ div [ class "avatar" ]
-                    [ div [ class "w-24 rounded-full" ]
-                        [ stats.icon
-                            |> Icon.toHtml
-                        ]
-                    ]
+                [ stats.icon
+                    |> Icon.withSize Icon.ExtraLarge
+                    |> Icon.toHtml
                 , div [ class "flex-1 t-column" ]
                     [ span [ class "font-bold" ] [ text stats.title ]
-                    , span [] [ text "Foobar" ]
+                    , span [] [ text stats.description ]
                     ]
                 , if owned then
                     ownedLabel
@@ -64,8 +66,37 @@ render game =
                   else
                     priceLabel stats.price
                 ]
+
+        renderLockedShopItem : Int -> Html FrontendMsg
+        renderLockedShopItem levelNeeded =
+            div
+                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bg-error text-error-content"
+                , class "bubble-shake"
+                ]
+                [ div [ class "w-24 h-24 flex items-center justify-center" ]
+                    [ Icon.unknownItem
+                        |> Icon.toHtml
+                    ]
+                , div [ class "flex-1 t-column" ]
+                    [ span [ class "font-bold" ] [ text "???" ]
+                    , span [] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
+                    ]
+                ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            (List.map (renderShopItem game.shopItems) ShopItems.allKinds)
+            (List.map
+                (\kind ->
+                    let
+                        unlockLevel =
+                            (ShopItems.getStats kind).unlockLevel
+                    in
+                    if unlockLevel > choresSkillLevel then
+                        renderLockedShopItem unlockLevel
+
+                    else
+                        renderShopItem game.shopItems kind
+                )
+                ShopItems.allKinds
+            )
         ]

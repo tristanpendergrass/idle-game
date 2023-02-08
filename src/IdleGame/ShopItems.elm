@@ -1,5 +1,6 @@
 module IdleGame.ShopItems exposing (..)
 
+import Html exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
@@ -17,17 +18,7 @@ type Kind
 
 allKinds : List Kind
 allKinds =
-    [ Shovel, BeginnerDualWielding, Keyring, ReadingGlasses, OversizedBag ]
-
-
-type alias ViewItem =
-    { kind : Kind
-    , title : String
-    , description : String
-    , icon : Icon
-    , price : Int
-    , owned : Bool
-    }
+    [ Shovel, BeginnerDualWielding, ReadingGlasses, OversizedBag, Keyring ]
 
 
 type alias Stats =
@@ -36,6 +27,7 @@ type alias Stats =
     , price : Int
     , unlockLevel : Int
     , reward : Reward
+    , description : String
     , getter : OwnedItems -> Bool
     , setter : Bool -> OwnedItems -> OwnedItems
     }
@@ -59,6 +51,7 @@ getStats kind =
                     [ { kind = CleanStables, percentChange = 0.05 }
                     , { kind = CleanBigBubba, percentChange = 0.05 }
                     ]
+            , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
             , getter = .shovel
             , setter = \owned ownedItems -> { ownedItems | shovel = owned }
             }
@@ -69,6 +62,7 @@ getStats kind =
             , price = 1000
             , unlockLevel = 35
             , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
+            , description = "+100% faster at Water Greenhouse Plants"
             , getter = .beginnerDualWielding
             , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
             }
@@ -81,6 +75,7 @@ getStats kind =
             , reward =
                 ShopItemIntervalMod
                     (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Chore.allKinds)
+            , description = "+10% faster at All Chores"
             , getter = .keyring
             , setter = \owned ownedItems -> { ownedItems | keyring = owned }
             }
@@ -99,6 +94,7 @@ getStats kind =
                             , Event.ChoreTag OrganizeSpellBooks
                             ]
                     )
+            , description = "+20% Mastery XP from Organize Potion Ingredients and Organize Spell Books"
             , getter = .readingGlasses
             , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
             }
@@ -107,7 +103,7 @@ getStats kind =
             { title = "OversizedBag"
             , icon = Icon.oversizedBag
             , price = 5000
-            , unlockLevel = 1
+            , unlockLevel = 65
             , reward =
                 ShopItemMod
                     (Event.successBuff 0.75
@@ -115,6 +111,7 @@ getStats kind =
                         |> Event.modWithTags
                             [ Event.ChoreTag RepairInstruments ]
                     )
+            , description = "Always receive item from Repair Instruments"
             , getter = .oversizedBag
             , setter = \owned ownedItems -> { ownedItems | oversizedBag = owned }
             }
