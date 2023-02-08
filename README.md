@@ -39,10 +39,11 @@ $ npm test -- --watch
 - [x] "Coming soon" for other skills
 - [x] Shop
 - [x] Icons for things
-- [ ] Develop Mod that speeds up interval
+- [x] Develop Mod that speeds up interval
 - [x] Show speed on chores
-- [ ] Finalize values for all things
+- [x] Finalize values for all things
 - [x] Visuals for chores
+- [ ] Final polish
 
 ## Release 1.1
 - [ ] Build up foundation by picking items from Release 2's Tech stuff and Fundamentals

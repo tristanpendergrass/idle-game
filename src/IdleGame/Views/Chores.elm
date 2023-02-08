@@ -241,6 +241,7 @@ renderChoreListItem game item =
                         , extraResource = resource
                         , skillXp = skillXp
                         , mxp = mxp
+                        , mxpCurrentValue = (stats.getter game.choresData).mxp
                         }
 
         IdleGame.Game.LockedChore level ->
@@ -268,11 +269,12 @@ type alias ChoreItemView =
     , extraResource : Resource.Kind
     , skillXp : Float
     , mxp : Float
+    , mxpCurrentValue : Float
     }
 
 
 renderChore : ChoreItemView -> Html FrontendMsg
-renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResource, extraResourceProbability, skillXp, mxp } =
+renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
     let
         renderDuration : Html msg
         renderDuration =
@@ -329,7 +331,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResou
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mxp) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mxp * 100) ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mxpCurrentValue * 100) ++ "%") ] []
                         ]
                     ]
                 ]
