@@ -1,12 +1,12 @@
 module IdleGame.Views.Utils_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.Views.Utils exposing (getDurationString)
+import IdleGame.Views.Utils exposing (floatToString, getDurationString)
 import Test exposing (..)
 
 
-suite : Test
-suite =
+getDurationStringSuite : Test
+getDurationStringSuite =
     describe "getDurationString"
         [ test "works on two days" <|
             \_ ->
@@ -51,4 +51,18 @@ suite =
                 0
                     |> getDurationString
                     |> Expect.equal "0 seconds"
+        ]
+
+
+floatToStringSuite : Test
+floatToStringSuite =
+    describe "floatToString"
+        [ test "shows with no decimal points if its a round number" <|
+            \_ ->
+                floatToString 3
+                    |> Expect.equal "3"
+        , test "shows out to two decimal places" <|
+            \_ ->
+                floatToString 3.2525
+                    |> Expect.equal "3.25"
         ]

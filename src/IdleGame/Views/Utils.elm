@@ -19,6 +19,19 @@ intToString num =
     FormatNumber.format localeForInts (toFloat num)
 
 
+floatToString : Float -> String
+floatToString =
+    let
+        localeForFloats : FormatNumber.Locales.Locale
+        localeForFloats =
+            FormatNumber.Locales.usLocale
+                |> (\usLocale ->
+                        { usLocale | decimals = FormatNumber.Locales.Max 2 }
+                   )
+    in
+    FormatNumber.format localeForFloats
+
+
 skillXpBadge : Html msg
 skillXpBadge =
     div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]

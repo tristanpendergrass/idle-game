@@ -23,7 +23,7 @@ timerTest =
                 Timer.create
                     |> Timer.increment 1000 500
                     |> (\( newTimer, _ ) -> Timer.percentComplete newTimer)
-                    |> isAboutEqualTo 0.5
+                    |> isAboutEqualTo 50
         , test "tracks one completion" <|
             \_ ->
                 Timer.create
@@ -35,7 +35,7 @@ timerTest =
                 Timer.create
                     |> Timer.increment 1000 1300
                     |> (\( newTimer, _ ) -> Timer.percentComplete newTimer)
-                    |> isAboutEqualTo 0.3
+                    |> isAboutEqualTo 30
         , test "tracks multiple completions" <|
             \_ ->
                 Timer.create
