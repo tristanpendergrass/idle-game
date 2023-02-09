@@ -123,7 +123,9 @@ getChoreMxp game effect =
                     IdleGame.XpFormulas.skillLevel mxp
 
                 grantedMxp =
-                    toFloat currentMasteryLevel * (choreStats.outcome.duration / 1000) * (1 + multiplier)
+                    toFloat currentMasteryLevel
+                        * (choreStats.outcome.duration / 1000)
+                        * Debug.log "multiplier" multiplier
             in
             Just grantedMxp
 
@@ -201,7 +203,7 @@ renderChoreListItem game item =
 
                 moddedEvent : ModdedEvent
                 moddedEvent =
-                    IdleGame.Game.getEvent stats
+                    Debug.log "event" (IdleGame.Game.getEvent stats)
                         |> IdleGame.Event.applyModsToEvent (IdleGame.Game.getAllMods game)
 
                 effects =

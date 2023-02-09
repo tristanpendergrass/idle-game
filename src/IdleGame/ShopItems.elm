@@ -87,13 +87,17 @@ getStats kind =
             , unlockLevel = 55
             , reward =
                 ShopItemMod
-                    (Event.choresMxpBuff 0.2
+                    [ Event.choresMxpBuff 0.2
                         |> Event.withSource Event.ShopItem
                         |> Event.modWithTags
                             [ Event.ChoreTag OrganizePotionIngredients
-                            , Event.ChoreTag OrganizeSpellBooks
                             ]
-                    )
+                    , Event.choresMxpBuff 0.2
+                        |> Event.withSource Event.ShopItem
+                        |> Event.modWithTags
+                            [ Event.ChoreTag OrganizeSpellBooks
+                            ]
+                    ]
             , description = "+20% Mastery XP from Organize Potion Ingredients and Organize Spell Books"
             , getter = .readingGlasses
             , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
@@ -106,11 +110,11 @@ getStats kind =
             , unlockLevel = 65
             , reward =
                 ShopItemMod
-                    (Event.successBuff 0.75
+                    [ Event.successBuff 0.75
                         |> Event.withSource Event.ShopItem
                         |> Event.modWithTags
                             [ Event.ChoreTag RepairInstruments ]
-                    )
+                    ]
             , description = "Always receive item from Repair Instruments"
             , getter = .oversizedBag
             , setter = \owned ownedItems -> { ownedItems | oversizedBag = owned }
@@ -131,7 +135,7 @@ type ShopItems
 
 
 type Reward
-    = ShopItemMod Event.Mod
+    = ShopItemMod (List Event.Mod)
     | ShopItemIntervalMod (List IntervalMod)
 
 

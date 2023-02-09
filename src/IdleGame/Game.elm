@@ -31,10 +31,11 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
-    , choresXp = 0
-    , choresMxp = 0
 
-    -- , choresXp = 14391160
+    -- , choresXp = 0
+    , choresMxp = 0
+    , choresXp = 14391160
+
     -- , choresMxp = 4500000 / 2
     , activeChore = Nothing
     , choresData =
@@ -43,8 +44,8 @@ create seed =
         , sweepChimneys = { mxp = 0 }
         , waterGreenhousePlants = { mxp = 0 }
         , washRobes = { mxp = 0 }
-        , organizePotionIngredients = { mxp = 0 }
-        , repairInstruments = { mxp = 0 }
+        , organizePotionIngredients = { mxp = 4500000 }
+        , repairInstruments = { mxp = 4500000 }
         , flushDrainDemons = { mxp = 0 }
         , organizeSpellBooks = { mxp = 0 }
         }
@@ -200,7 +201,7 @@ tick game =
                         mods =
                             getAllMods game
                     in
-                    List.map (applyModsToEvent mods) events
+                    List.map (applyModsToEvent (Debug.log "mods" mods)) events
 
         effects : List Effect
         effects =
@@ -301,11 +302,13 @@ applyEffect effect game =
                     IdleGame.XpFormulas.skillLevel mxp
 
                 grantedMxp =
-                    toFloat currentMasteryLevel * (choreStats.outcome.duration / 1000)
+                    toFloat currentMasteryLevel
+                        * (choreStats.outcome.duration / 1000)
+                        * multiplier
             in
             game
-                |> addMxp kind (grantedMxp * multiplier)
-                |> addMasteryPoolXp (mxp * multiplier / 2)
+                |> addMxp kind grantedMxp
+                |> addMasteryPoolXp (grantedMxp / 2)
                 |> (\newGame -> Random.constant ( newGame, [] ))
 
         GainGold quantity ->
@@ -371,8 +374,8 @@ gainXp amount skill =
 
 
 gainChoreMxp : ChoreKind -> Effect
-gainChoreMxp chore =
-    Effect { type_ = GainChoreMxp { multiplier = 1 } chore, tags = [ Mxp, Chores ] }
+gainChoreMxp kind =
+    Effect { type_ = GainChoreMxp { multiplier = 1 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
 
 
 gainGold : Int -> Effect
@@ -553,12 +556,13 @@ getShopItemMods game =
         |> List.filterMap
             (\reward ->
                 case reward of
-                    ShopItems.ShopItemMod mod ->
-                        Just mod
+                    ShopItems.ShopItemMod mods ->
+                        Just mods
 
                     _ ->
                         Nothing
             )
+        |> List.concatMap (\a -> a)
 
 
 getShopItemIntervalMods : Game -> List IntervalMod
