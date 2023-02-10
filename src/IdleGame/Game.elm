@@ -1,6 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -22,7 +23,7 @@ type alias Game =
     , choresMxp : Float
     , activeChore : Maybe ( ChoreKind, Timer )
     , choresData : Chore.AllChoreStates
-    , gold : Int
+    , coin : Coin.Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
     }
@@ -49,7 +50,8 @@ create seed =
         , flushDrainDemons = { mxp = 0 }
         , organizeSpellBooks = { mxp = 0 }
         }
-    , gold = 100000
+    , coin =
+        Coin.create 100000
     , resources = Resource.createResources
     , shopItems = ShopItems.create
     }
@@ -103,7 +105,7 @@ getChoreListItems { choresXp } =
 getEvent : Chore.Stats -> Event
 getEvent { kind, outcome } =
     let
-        { xp, extraResourceProbability, extraResource, gold } =
+        { xp, extraResourceProbability, extraResource, coin } =
             outcome
     in
     Event
@@ -111,7 +113,7 @@ getEvent { kind, outcome } =
             [ gainXp xp ChoresSkill
             , gainChoreMxp kind
             , gainWithProbability extraResourceProbability [ gainResource 1 extraResource ]
-            , gainGold gold
+            , gainCoin coin
             ]
         , tags = [ Chores, ChoreTag kind ]
         }
@@ -311,10 +313,14 @@ applyEffect effect game =
                 |> addMasteryPoolXp (grantedMxp / 2)
                 |> (\newGame -> Random.constant ( newGame, [] ))
 
-        GainGold quantity ->
+        GainCoin quantity ->
             -- Important! Keep the application here in sync with Views.Chores.elm
-            intGenerator quantity
-                |> Random.map (\amount -> addGold amount game)
+            let
+                newCounter =
+                    Coin.multiplyBy quantity.multiplier quantity.base
+            in
+            addCoin newCounter game
+                |> Random.constant
 
 
 addResource : Resource.Kind -> Int -> Game -> ( Game, List Toast )
@@ -352,9 +358,9 @@ addMasteryPoolXp amount game =
     { game | choresMxp = game.choresMxp + amount }
 
 
-addGold : Int -> Game -> ( Game, List Toast )
-addGold amount game =
-    ( { game | gold = game.gold + amount }, [ GainedGold amount ] )
+addCoin : Coin.Counter -> Game -> ( Game, List Toast )
+addCoin amount game =
+    ( { game | coin = Coin.add game.coin amount }, [ GainedGold amount ] )
 
 
 gainResource : Int -> Resource.Kind -> Effect
@@ -378,9 +384,9 @@ gainChoreMxp kind =
     Effect { type_ = GainChoreMxp { multiplier = 1 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
 
 
-gainGold : Int -> Effect
-gainGold amount =
-    Effect { type_ = GainGold { base = amount, doublingChance = 1 }, tags = [] }
+gainCoin : Coin.Counter -> Effect
+gainCoin amount =
+    Effect { type_ = GainCoin { base = amount, multiplier = 1 }, tags = [] }
 
 
 gainWithProbability : Float -> List Effect -> Effect
@@ -419,7 +425,7 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , goldGains : Maybe Int
+    , goldGains : Maybe Coin.Counter
     , resourcesDiff : Resource.Diff
     }
 
@@ -435,8 +441,8 @@ getTimePassesData originalGame currentGame =
                 [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
 
         goldGains =
-            if currentGame.gold > originalGame.gold then
-                Just <| currentGame.gold - originalGame.gold
+            if Coin.getVal currentGame.coin > Coin.getVal originalGame.coin then
+                Just <| Coin.subtract currentGame.coin originalGame.coin
 
             else
                 Nothing

@@ -6,6 +6,7 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Coin as Coin
 import IdleGame.Game exposing (Game, MasteryUnlocks)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -372,15 +373,16 @@ update msg model =
                             stats =
                                 ShopItems.getStats kind
 
+                            canAfford : Bool
                             canAfford =
-                                stats.price <= game.gold
+                                Coin.getVal stats.price <= Coin.getVal game.coin
 
                             dontOwnItemYet =
                                 not <| ShopItems.isOwned kind game.shopItems
                         in
                         if canAfford && dontOwnItemYet then
                             { game
-                                | gold = game.gold - stats.price
+                                | coin = Coin.subtract game.coin stats.price
                                 , shopItems = ShopItems.addItem kind game.shopItems
                             }
 
@@ -445,7 +447,7 @@ toastToHtml notification =
     case notification of
         GainedGold amount ->
             div [ class "flex gap-1 items-center" ]
-                [ span [] [ text <| "+" ++ IdleGame.Views.Utils.intToString amount ]
+                [ span [] [ text <| "+" ++ Coin.toString amount ]
                 , Icon.gold
                     |> Icon.toHtml
                 ]

@@ -1,10 +1,9 @@
 module IdleGame.Views.Bag exposing (..)
 
-import FormatNumber
-import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Coin as Coin
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Resource as Resource
@@ -49,7 +48,7 @@ render game =
                         |> Icon.toHtml
                     ]
                 , span [ class "text-log font-semibold" ]
-                    [ text <| IdleGame.Views.Utils.intToString game.gold
+                    [ text <| Coin.toString game.coin
                     ]
                 ]
             ]

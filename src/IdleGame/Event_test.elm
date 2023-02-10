@@ -1,6 +1,7 @@
 module IdleGame.Event_test exposing (..)
 
 import Expect exposing (..)
+import IdleGame.Coin as Coin
 import IdleGame.Event exposing (..)
 import IdleGame.Resource as Resource
 import Test exposing (..)
@@ -93,8 +94,8 @@ getOneMoreGold =
         (\effectType ->
             -- Grants +1 gold when gold is gained
             case effectType of
-                GainGold { base, doublingChance } ->
-                    GainGold { base = base + 1, doublingChance = doublingChance }
+                GainCoin { base, multiplier } ->
+                    GainCoin { base = Coin.add base (Coin.create 1), multiplier = multiplier }
 
                 _ ->
                     effectType
@@ -108,9 +109,9 @@ testMods { mods, event, moddedEvent } =
         |> equal moddedEvent
 
 
-getGold : Int -> EffectType
-getGold amount =
-    GainGold { base = amount, doublingChance = 0 }
+getCoin : Int -> EffectType
+getCoin amount =
+    GainCoin { base = Coin.create amount, multiplier = 0 }
 
 
 getResource : Int -> Resource.Kind -> EffectType
@@ -283,9 +284,9 @@ suite =
             \_ ->
                 testMods
                     { mods = [ mockMod getOneMoreGold |> withMultiplier 2 ]
-                    , event = mockEvent [ getGold 1 ]
+                    , event = mockEvent [ getCoin 1 ]
                     , moddedEvent =
-                        mockModdedEvent [ getGold 3 ]
+                        mockModdedEvent [ getCoin 3 ]
                     }
         , test "multiplier of 2 repeats probability mod" <|
             \_ ->

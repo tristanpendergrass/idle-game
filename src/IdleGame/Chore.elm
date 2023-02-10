@@ -1,5 +1,6 @@
 module IdleGame.Chore exposing (..)
 
+import IdleGame.Coin as Coin
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 
@@ -51,7 +52,7 @@ type alias ChoreOutcome =
     , duration : Float
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
-    , gold : Int
+    , coin : Coin.Counter
     }
 
 
@@ -78,7 +79,7 @@ getStats kind =
                 , duration = 3000
                 , extraResourceProbability = 0.25
                 , extraResource = Resource.Manure
-                , gold = 1
+                , coin = Coin.create 1
                 }
             }
 
@@ -93,7 +94,7 @@ getStats kind =
                 , duration = 6000
                 , extraResourceProbability = 0.75
                 , extraResource = Resource.Manure
-                , gold = 5
+                , coin = Coin.create 5
                 }
             }
 
@@ -108,7 +109,7 @@ getStats kind =
                 , duration = 8000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Soot
-                , gold = 10
+                , coin = Coin.create 10
                 }
             }
 
@@ -123,7 +124,7 @@ getStats kind =
                 , duration = 2000
                 , extraResourceProbability = 0.6
                 , extraResource = Resource.GreenhouseDirt
-                , gold = 8
+                , coin = Coin.create 8
                 }
             }
 
@@ -138,7 +139,7 @@ getStats kind =
                 , duration = 8000
                 , extraResourceProbability = 0.2
                 , extraResource = Resource.WashWater
-                , gold = 35
+                , coin = Coin.create 35
                 }
             }
 
@@ -153,7 +154,7 @@ getStats kind =
                 , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.EmptyBottle
-                , gold = 10
+                , coin = Coin.create 10
                 }
             }
 
@@ -168,7 +169,7 @@ getStats kind =
                 , duration = 12000
                 , extraResourceProbability = 0.25
                 , extraResource = Resource.Scrap
-                , gold = 125
+                , coin = Coin.create 125
                 }
             }
 
@@ -183,7 +184,7 @@ getStats kind =
                 , duration = 10000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Ectoplasm
-                , gold = 90
+                , coin = Coin.create 90
                 }
             }
 
@@ -198,6 +199,6 @@ getStats kind =
                 , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.Parchment
-                , gold = 250
+                , coin = Coin.create 250
                 }
             }

@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game, getChoreListItems)
 import IdleGame.GameTypes exposing (..)
@@ -71,15 +72,15 @@ render game =
 
 
 type alias ChoreEffectsView =
-    { gold : Int, skillXp : Float, mxp : Float, resource : Resource.Kind, probability : Float }
+    { coin : Coin.Counter, skillXp : Float, mxp : Float, resource : Resource.Kind, probability : Float }
 
 
 getChoreEfffectsView : Game -> List Effect -> Maybe ChoreEffectsView
 getChoreEfffectsView game effects =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     let
-        gold =
-            List.Extra.findMap getChoreGold effects
+        coin =
+            List.Extra.findMap getChoreCoin effects
 
         xp =
             List.Extra.findMap getChoreXp effects
@@ -93,7 +94,7 @@ getChoreEfffectsView game effects =
         probability =
             List.Extra.findMap getChoreProbability effects
     in
-    Maybe.map5 ChoreEffectsView gold xp mxp resource probability
+    Maybe.map5 ChoreEffectsView coin xp mxp resource probability
 
 
 getChoreXp : Effect -> Maybe Float
@@ -133,12 +134,12 @@ getChoreMxp game effect =
             Nothing
 
 
-getChoreGold : Effect -> Maybe Int
-getChoreGold effect =
+getChoreCoin : Effect -> Maybe Coin.Counter
+getChoreCoin effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainGold { base } ->
-            Just base
+        GainCoin { base, multiplier } ->
+            Just <| Coin.multiplyBy multiplier base
 
         _ ->
             Nothing
@@ -231,14 +232,14 @@ renderChoreListItem game item =
                 Nothing ->
                     div [] []
 
-                Just { gold, skillXp, mxp, resource, probability } ->
+                Just { coin, skillXp, mxp, resource, probability } ->
                     renderChore
                         { title = stats.title
                         , handleClick = ToggleActiveChore kind
                         , maybeTimer = maybeTimer
                         , duration = moddedDuration
                         , imgSrc = stats.imgSrc
-                        , gold = gold
+                        , coin = coin
                         , extraResourceProbability = probability
                         , extraResource = resource
                         , skillXp = skillXp
@@ -266,7 +267,7 @@ type alias ChoreItemView =
     , maybeTimer : Maybe Timer
     , duration : Float
     , imgSrc : String
-    , gold : Int
+    , coin : Coin.Counter
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
     , skillXp : Float
@@ -276,7 +277,7 @@ type alias ChoreItemView =
 
 
 renderChore : ChoreItemView -> Html FrontendMsg
-renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
+renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
     let
         renderDuration : Html msg
         renderDuration =
@@ -285,7 +286,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, gold, extraResou
         renderGold =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text (IdleGame.Views.Utils.intToString gold) ]
+                    [ span [] [ text (Coin.toString coin) ]
                     , Icon.gold
                         |> Icon.toHtml
                     ]

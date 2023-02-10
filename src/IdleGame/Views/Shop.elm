@@ -3,10 +3,10 @@ module IdleGame.Views.Shop exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Coin as Coin
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
-import IdleGame.Views.Chores exposing (renderLockedChore)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
 import IdleGame.XpFormulas as XpFormulas
@@ -24,15 +24,16 @@ render game =
                 [ text "Owned"
                 ]
 
+        priceLabel : Coin.Counter -> Html FrontendMsg
         priceLabel price =
             div [ class "flex items-center gap-1" ]
                 [ Icon.gold
                     |> Icon.toHtml
                 , div
                     [ class "font-bold"
-                    , classList [ ( "text-error", price > game.gold ) ]
+                    , classList [ ( "text-error", Coin.getVal price > Coin.getVal game.coin ) ]
                     ]
-                    [ text <| IdleGame.Views.Utils.intToString price
+                    [ text <| Coin.toString price
                     ]
                 ]
 
@@ -46,7 +47,7 @@ render game =
                     ShopItems.isOwned kind shopItems
 
                 shakeOnClick =
-                    not owned && stats.price > game.gold
+                    not owned && Coin.getVal stats.price > Coin.getVal game.coin
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer"

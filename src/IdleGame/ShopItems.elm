@@ -2,6 +2,7 @@ module IdleGame.ShopItems exposing (..)
 
 import Html exposing (..)
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
@@ -24,7 +25,7 @@ allKinds =
 type alias Stats =
     { title : String
     , icon : Icon
-    , price : Int
+    , price : Coin.Counter
     , unlockLevel : Int
     , reward : Reward
     , description : String
@@ -44,7 +45,7 @@ getStats kind =
         Shovel ->
             { title = "Shovel"
             , icon = Icon.shovel
-            , price = 50
+            , price = Coin.create 50
             , unlockLevel = 1
             , reward =
                 ShopItemIntervalMod
@@ -59,7 +60,7 @@ getStats kind =
         BeginnerDualWielding ->
             { title = "Beginner Dual Wielding"
             , icon = Icon.book
-            , price = 1000
+            , price = Coin.create 1000
             , unlockLevel = 35
             , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
             , description = "+100% faster at Water Greenhouse Plants"
@@ -70,7 +71,7 @@ getStats kind =
         Keyring ->
             { title = "Keyring"
             , icon = Icon.keyring
-            , price = 1500
+            , price = Coin.create 1500
             , unlockLevel = 1
             , reward =
                 ShopItemIntervalMod
@@ -83,7 +84,7 @@ getStats kind =
         ReadingGlasses ->
             { title = "Reading Glasses"
             , icon = Icon.readingGlasses
-            , price = 3000
+            , price = Coin.create 3000
             , unlockLevel = 55
             , reward =
                 ShopItemMod
@@ -106,7 +107,7 @@ getStats kind =
         OversizedBag ->
             { title = "OversizedBag"
             , icon = Icon.oversizedBag
-            , price = 5000
+            , price = Coin.create 5000
             , unlockLevel = 65
             , reward =
                 ShopItemMod
