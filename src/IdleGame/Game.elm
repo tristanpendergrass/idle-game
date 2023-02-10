@@ -111,9 +111,14 @@ getEvent { kind, outcome } =
     Event
         { effects =
             [ gainXp xp ChoresSkill
+                |> withTags [ Chores ]
             , gainChoreMxp kind
-            , gainWithProbability extraResourceProbability [ gainResource 1 extraResource ]
+            , gainWithProbability extraResourceProbability
+                [ gainResource 1 extraResource |> withTags [ Chores ]
+                ]
+                |> withTags [ Chores ]
             , gainCoin coin
+                |> withTags [ Chores ]
             ]
         , tags = [ Chores, ChoreTag kind ]
         }
