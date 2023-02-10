@@ -45,8 +45,8 @@ create seed =
         , sweepChimneys = { mxp = 0 }
         , waterGreenhousePlants = { mxp = 0 }
         , washRobes = { mxp = 0 }
-        , organizePotionIngredients = { mxp = 4500000 }
-        , repairInstruments = { mxp = 4500000 }
+        , organizePotionIngredients = { mxp = 14391160 }
+        , repairInstruments = { mxp = 14391160 }
         , flushDrainDemons = { mxp = 0 }
         , organizeSpellBooks = { mxp = 0 }
         }

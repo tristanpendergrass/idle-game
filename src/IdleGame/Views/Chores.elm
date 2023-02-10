@@ -332,9 +332,13 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
                 -- Chore XP rewards
                 , renderXp
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mxp) ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| IdleGame.Views.Utils.intToString (IdleGame.XpFormulas.skillLevel mxpCurrentValue) ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mxpCurrentValue * 100) ++ "%") ] []
+                        [ div
+                            [ class "bg-secondary h-1.5 rounded-full"
+                            , attribute "style" ("width:" ++ String.fromFloat (IdleGame.XpFormulas.skillLevelPercent mxpCurrentValue * 100) ++ "%")
+                            ]
+                            []
                         ]
                     ]
                 ]
