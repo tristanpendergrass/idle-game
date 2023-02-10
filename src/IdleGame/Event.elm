@@ -314,6 +314,18 @@ mxpTransformer buff effectMultiplier effect =
             NoChange
 
 
+resourceTransformer : Float -> Transformer
+resourceTransformer buff effectMultiplier effect =
+    case getType effect of
+        GainResource { base, doublingChance } kind ->
+            effect
+                |> setType (GainResource { base = base, doublingChance = doublingChance + (buff * toFloat effectMultiplier) } kind)
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
 increaseSuccessTransformer : Float -> Transformer
 increaseSuccessTransformer buff effectMultiplier effect =
     case getType effect of
@@ -345,6 +357,11 @@ coinModLabel multiplier =
 mxpModLabel : Float -> String
 mxpModLabel multiplier =
     "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Mastery XP"
+
+
+resourceModLabel : Float -> String
+resourceModLabel buff =
+    "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
 
 
 successProbabilityModLabel : Float -> String
@@ -387,6 +404,16 @@ choresMxpBuff buff =
     { tags = []
     , label = mxpModLabel buff
     , transformer = mxpTransformer buff
+    , source = AdminCrimes
+    , multiplier = 1
+    }
+
+
+choresResourceBuff : Float -> Mod
+choresResourceBuff buff =
+    { tags = []
+    , label = resourceModLabel buff
+    , transformer = resourceTransformer buff
     , source = AdminCrimes
     , multiplier = 1
     }

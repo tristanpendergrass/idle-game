@@ -484,8 +484,8 @@ choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
 choreMasteryPoolCheckpoints =
     { ten = choresXpBuff 0.25
     , twentyFive = choresCoinBuff 0.15
-    , fifty = choresXpBuff 0.25
-    , ninetyFive = choresMxpBuff 0.1
+    , fifty = choresMxpBuff 0.25
+    , ninetyFive = choresResourceBuff 1.0
     }
 
 
