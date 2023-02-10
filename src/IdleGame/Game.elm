@@ -483,7 +483,7 @@ type MasteryUnlocks
 choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
 choreMasteryPoolCheckpoints =
     { ten = choresXpBuff 0.25
-    , twentyFive = choresMxpBuff 0.1
+    , twentyFive = choresCoinBuff 0.15
     , fifty = choresXpBuff 0.25
     , ninetyFive = choresMxpBuff 0.1
     }
@@ -592,7 +592,7 @@ getAllMods : Game -> List Mod
 getAllMods game =
     []
         -- ++ [ devGlobalXpBuff ]
-        -- ++ getChoreMasteryPoolMods game
+        ++ getChoreMasteryPoolMods game
         -- ++ getChoreUnlocksMods game
         ++ getShopItemMods game
 

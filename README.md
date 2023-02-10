@@ -59,6 +59,7 @@ $ npm test -- --watch
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
   - [ ] Same with Modded duration in Chores.elm
+- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions
 
 ### Fundamentals
 - [ ] Show what mods there are on an effect/interval and where they came from

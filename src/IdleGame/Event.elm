@@ -290,6 +290,18 @@ xpTransformer buff effectMultiplier effect =
             NoChange
 
 
+coinTransformer : Float -> Transformer
+coinTransformer buff effectMultiplier effect =
+    case getType effect of
+        GainCoin { base, multiplier } ->
+            effect
+                |> setType (GainCoin { base = base, multiplier = multiplier + (buff * toFloat effectMultiplier) })
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
 mxpTransformer : Float -> Transformer
 mxpTransformer buff effectMultiplier effect =
     case getType effect of
@@ -325,6 +337,11 @@ xpModLabel multiplier =
     "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% XP"
 
 
+coinModLabel : Float -> String
+coinModLabel multiplier =
+    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Coin"
+
+
 mxpModLabel : Float -> String
 mxpModLabel multiplier =
     "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Mastery XP"
@@ -350,6 +367,16 @@ choresXpBuff buff =
     { tags = [ Chores, Xp ]
     , label = xpModLabel buff
     , transformer = xpTransformer buff
+    , source = AdminCrimes
+    , multiplier = 1
+    }
+
+
+choresCoinBuff : Float -> Mod
+choresCoinBuff buff =
+    { tags = [ Chores ]
+    , label = coinModLabel buff
+    , transformer = coinTransformer buff
     , source = AdminCrimes
     , multiplier = 1
     }
