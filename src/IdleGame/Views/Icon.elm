@@ -181,8 +181,8 @@ underConstruction =
     createIconFeather FeatherIcons.tool
 
 
-gold : Icon
-gold =
+coin : Icon
+coin =
     createIconPublic "/coin.png"
 
 

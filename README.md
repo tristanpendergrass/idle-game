@@ -34,7 +34,7 @@ $ npm test -- --watch
 - [x] Improve Time passes modal
   - [x] Add all resources to list of things to show
   - [x] Show Levels gained not just XP
-  - [x] Show Gold gained
+  - [x] Show coin gained
 - [x] Improve experience when calculating long amount of time
 - [x] "Coming soon" for other skills
 - [x] Shop
@@ -53,7 +53,7 @@ $ npm test -- --watch
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
-- [ ] Refactor gold to be a non-negative type
+- [ ] Refactor coin to be a non-negative type
 - [ ] Set up elm-review
   - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
@@ -62,7 +62,7 @@ $ npm test -- --watch
 
 ### Fundamentals
 - [ ] Show what mods there are on an effect/interval and where they came from
-- [ ] Allow shop items to have requirements besides gold. Resources and level requirements
+- [ ] Allow shop items to have requirements besides coin. Resources and level requirements
 - [ ] Activity detail sidebar
 	- [ ] desktop
 	- [ ] mobile

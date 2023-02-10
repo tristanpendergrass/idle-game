@@ -283,11 +283,11 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
         renderDuration =
             div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString (duration / 1000) ++ " seconds" ]
 
-        renderGold =
+        rendercoin =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
                     [ span [] [ text (Coin.toString coin) ]
-                    , Icon.gold
+                    , Icon.coin
                         |> Icon.toHtml
                     ]
                 ]
@@ -325,7 +325,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
                 -- Chore title
                 [ h2 [ class "text-sm  md:text-lg text-center" ] [ text title ]
                 , renderDuration
-                , renderGold
+                , rendercoin
                 , renderSuccessCondition (renderResource extraResource)
                 , div [ class "divider" ] []
 

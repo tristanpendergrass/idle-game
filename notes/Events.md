@@ -161,8 +161,8 @@ Forget about mods for second, how do we represent the Effects of an action that 
 * Attempt to smelt some ore
 	* 50% chance of failure, deterministic loss of 1 ore
 	* 50% chance of success, deterministic gain of 1 ingot, loss of 1 ore
-		* 50% chance of gold due to gaining ingot
-			* 50% chance of ruby due to gaining gold
+		* 50% chance of coin due to gaining ingot
+			* 50% chance of ruby due to gaining coin
 
 ```
 Effects =
@@ -180,7 +180,7 @@ smeltIngot =
 buffedSmeltIngot =
 	[ (0.5, GainResource -1 Ore)
 	, (0.5, [ GainResource -1 Ore, ...,
-		[ (0.1, [ GainGold 1 ])
+		[ (0.1, [ Gaincoin 1 ])
 		]
 		])
 	]

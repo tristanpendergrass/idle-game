@@ -88,11 +88,11 @@ manureGiver multiplier effect =
             NoChange
 
 
-getOneMoreGold : Transformer
-getOneMoreGold =
+getOneMorecoin : Transformer
+getOneMorecoin =
     useSimpleTransformer
         (\effectType ->
-            -- Grants +1 gold when gold is gained
+            -- Grants +1 coin when coin is gained
             case effectType of
                 GainCoin { base, multiplier } ->
                     GainCoin { base = Coin.add base (Coin.create 1), multiplier = multiplier }
@@ -283,7 +283,7 @@ suite =
         , test "multiplier of 2 repeats mod" <|
             \_ ->
                 testMods
-                    { mods = [ mockMod getOneMoreGold |> withMultiplier 2 ]
+                    { mods = [ mockMod getOneMorecoin |> withMultiplier 2 ]
                     , event = mockEvent [ getCoin 1 ]
                     , moddedEvent =
                         mockModdedEvent [ getCoin 3 ]

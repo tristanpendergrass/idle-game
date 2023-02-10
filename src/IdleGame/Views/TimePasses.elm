@@ -23,7 +23,7 @@ resourceIcon =
 
 
 render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, goldGains, resourcesDiff } =
+render timePassed { xpGains, coinGains, resourcesDiff } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
@@ -32,16 +32,16 @@ render timePassed { xpGains, goldGains, resourcesDiff } =
             , div [ class "divider" ] []
             , ul [ class "t-column font-semibold" ]
                 (List.concat
-                    [ case goldGains of
+                    [ case coinGains of
                         Nothing ->
                             []
 
                         Just amount ->
                             [ li [ class "flex items-center gap-2" ]
                                 [ span [ class "text-success" ] [ text <| Coin.toString amount ]
-                                , Icon.gold
+                                , Icon.coin
                                     |> Icon.toHtml
-                                , span [] [ text "Gold" ]
+                                , span [] [ text "coin" ]
                                 ]
                             ]
                     , xpGains

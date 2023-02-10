@@ -27,7 +27,7 @@ render game =
         priceLabel : Coin.Counter -> Html FrontendMsg
         priceLabel price =
             div [ class "flex items-center gap-1" ]
-                [ Icon.gold
+                [ Icon.coin
                     |> Icon.toHtml
                 , div
                     [ class "font-bold"

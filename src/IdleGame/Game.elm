@@ -360,7 +360,7 @@ addMasteryPoolXp amount game =
 
 addCoin : Coin.Counter -> Game -> ( Game, List Toast )
 addCoin amount game =
-    ( { game | coin = Coin.add game.coin amount }, [ GainedGold amount ] )
+    ( { game | coin = Coin.add game.coin amount }, [ Gainedcoin amount ] )
 
 
 gainResource : Int -> Resource.Kind -> Effect
@@ -425,7 +425,7 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , goldGains : Maybe Coin.Counter
+    , coinGains : Maybe Coin.Counter
     , resourcesDiff : Resource.Diff
     }
 
@@ -440,7 +440,7 @@ getTimePassesData originalGame currentGame =
             else
                 [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
 
-        goldGains =
+        coinGains =
             if Coin.getVal currentGame.coin > Coin.getVal originalGame.coin then
                 Just <| Coin.subtract currentGame.coin originalGame.coin
 
@@ -456,7 +456,7 @@ getTimePassesData originalGame currentGame =
     if hasNewData then
         Just
             { xpGains = xpGains
-            , goldGains = goldGains
+            , coinGains = coinGains
             , resourcesDiff = resourcesDiff
             }
 

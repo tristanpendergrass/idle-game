@@ -43,7 +43,7 @@ render game =
         [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex items-center gap-1 px-2 py-1 rounded bg-accent text-accent-content" ]
                 [ span [ class "text-lg truncate" ]
-                    [ Icon.gold
+                    [ Icon.coin
                         |> Icon.withSize Icon.Large
                         |> Icon.toHtml
                     ]

@@ -445,10 +445,10 @@ toastConfig =
 toastToHtml : Toast -> Html msg
 toastToHtml notification =
     case notification of
-        GainedGold amount ->
+        Gainedcoin amount ->
             div [ class "flex gap-1 items-center" ]
                 [ span [] [ text <| "+" ++ Coin.toString amount ]
-                , Icon.gold
+                , Icon.coin
                     |> Icon.toHtml
                 ]
 
