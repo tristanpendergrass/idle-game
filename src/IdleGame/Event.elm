@@ -411,7 +411,7 @@ choresMxpBuff buff =
 
 choresResourceBuff : Float -> Mod
 choresResourceBuff buff =
-    { tags = []
+    { tags = [ Chores ]
     , label = resourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes
