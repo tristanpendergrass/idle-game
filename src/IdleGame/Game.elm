@@ -542,23 +542,24 @@ getChoreUnlocksMods game =
             case choreMasteryUnlocks of
                 EveryTenLevels bonus ->
                     bonus
-
-        choreUnlocksFor : (Chore.AllChoreStates -> Chore.State) -> Tag -> Mod
-        choreUnlocksFor getter tag =
-            let
-                masteryLevel =
-                    IdleGame.XpFormulas.skillLevel (getter game.choresData).mxp
-
-                repetitions =
-                    masteryLevel // 10
-            in
-            baseBonus
-                |> withMultiplier repetitions
-                |> modWithTags [ tag ]
     in
-    [ choreUnlocksFor .cleanStables (ChoreTag CleanStables)
-    , choreUnlocksFor .cleanBigBubba (ChoreTag CleanBigBubba)
-    ]
+    Chore.allKinds
+        |> List.map
+            (\kind ->
+                let
+                    getter =
+                        (Chore.getStats kind).getter
+
+                    masteryLevel =
+                        IdleGame.XpFormulas.skillLevel (getter game.choresData).mxp
+
+                    repetitions =
+                        masteryLevel // 10
+                in
+                baseBonus
+                    |> withMultiplier repetitions
+                    |> modWithTags [ ChoreTag kind ]
+            )
 
 
 getShopItemMods : Game -> List Mod
