@@ -490,7 +490,9 @@ choreMasteryPoolCheckpoints =
     { ten = choresXpBuff 0.25
     , twentyFive = choresCoinBuff 0.15
     , fifty = choresMxpBuff 0.25
-    , ninetyFive = choresResourceBuff 1.0
+    , ninetyFive =
+        choresResourceBuff 1.0
+            |> includeVariableEffects
     }
 
 
