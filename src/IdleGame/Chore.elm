@@ -94,7 +94,7 @@ getStats kind =
                 , duration = 6000
                 , extraResourceProbability = 0.75
                 , extraResource = Resource.Manure
-                , coin = Coin.create 5
+                , coin = Coin.create 3
                 }
             }
 
@@ -109,7 +109,7 @@ getStats kind =
                 , duration = 8000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Soot
-                , coin = Coin.create 10
+                , coin = Coin.create 6
                 }
             }
 
@@ -124,7 +124,7 @@ getStats kind =
                 , duration = 2000
                 , extraResourceProbability = 0.6
                 , extraResource = Resource.GreenhouseDirt
-                , coin = Coin.create 8
+                , coin = Coin.create 2
                 }
             }
 
@@ -139,7 +139,7 @@ getStats kind =
                 , duration = 8000
                 , extraResourceProbability = 0.2
                 , extraResource = Resource.WashWater
-                , coin = Coin.create 35
+                , coin = Coin.create 9
                 }
             }
 
@@ -154,7 +154,7 @@ getStats kind =
                 , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.EmptyBottle
-                , coin = Coin.create 10
+                , coin = Coin.create 12
                 }
             }
 
@@ -169,7 +169,7 @@ getStats kind =
                 , duration = 12000
                 , extraResourceProbability = 0.25
                 , extraResource = Resource.Scrap
-                , coin = Coin.create 125
+                , coin = Coin.create 20
                 }
             }
 
@@ -184,7 +184,7 @@ getStats kind =
                 , duration = 10000
                 , extraResourceProbability = 0.5
                 , extraResource = Resource.Ectoplasm
-                , coin = Coin.create 90
+                , coin = Coin.create 14
                 }
             }
 
@@ -199,6 +199,6 @@ getStats kind =
                 , duration = 20000
                 , extraResourceProbability = 0.1
                 , extraResource = Resource.Parchment
-                , coin = Coin.create 250
+                , coin = Coin.create 30
                 }
             }
