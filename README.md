@@ -26,7 +26,7 @@ $ npm test -- --watch
 
 # Todos
 
-## Release 1
+## Version 0.1
 - [x] Mastery for items checkpoints
 - [x] Bag tab
 - [x] Grant items from chores
@@ -45,10 +45,10 @@ $ npm test -- --watch
 - [x] Visuals for chores
 - [ ] Final polish
 
-## Release 1.1
+## Version 0.1.1
 - [ ] Build up foundation by picking items from Release 2's Tech stuff and Fundamentals
 
-## Release 2
+## Version 0.2
 ### Tech stuff
 - [ ] Dev Panel
 	- [ ] Add time
@@ -59,7 +59,8 @@ $ npm test -- --watch
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
   - [ ] Same with Modded duration in Chores.elm
-- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions
+- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
+- [ ] Remove tags from Event, should only come from effects
 
 ### Fundamentals
 - [ ] Show what mods there are on an effect/interval and where they came from
