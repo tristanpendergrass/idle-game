@@ -32,12 +32,15 @@ renderCheckpoint { number, label, isActive } =
         ]
 
 
-render : { masteryUnlocks : IdleGame.Game.MasteryUnlocks } -> Html FrontendMsg
+render : { masteryUnlocks : IdleGame.Game.MasteryUnlock } -> Html FrontendMsg
 render { masteryUnlocks } =
     let
         mod =
             case masteryUnlocks of
                 IdleGame.Game.EveryTenLevels m ->
+                    m
+
+                IdleGame.Game.AtLevel level m ->
                     m
     in
     div [ class "t-column gap-4" ]

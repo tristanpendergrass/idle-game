@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin
-import IdleGame.Game exposing (Game, MasteryUnlocks)
+import IdleGame.Game exposing (Game, MasteryUnlock)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)

@@ -39,7 +39,7 @@ mockMod transformer =
     , label = "Test"
     , transformer = transformer
     , source = AdminCrimes
-    , multiplier = 1
+    , howManyTimesToApplyMod = 1
     }
 
 
@@ -283,7 +283,7 @@ suite =
         , test "multiplier of 2 repeats mod" <|
             \_ ->
                 testMods
-                    { mods = [ mockMod getOneMorecoin |> withMultiplier 2 ]
+                    { mods = [ mockMod getOneMorecoin |> withHowManyTimesToApplyMod 2 ]
                     , event = mockEvent [ getCoin 1 ]
                     , moddedEvent =
                         mockModdedEvent [ getCoin 3 ]
@@ -291,7 +291,7 @@ suite =
         , test "multiplier of 2 repeats probability mod" <|
             \_ ->
                 testMods
-                    { mods = [ mockMod (probabilityIncreaser 0.1) |> withMultiplier 2 ]
+                    { mods = [ mockMod (probabilityIncreaser 0.1) |> withHowManyTimesToApplyMod 2 ]
                     , event = mockEvent [ smeltSoot 0.5 ]
                     , moddedEvent = mockModdedEvent [ smeltSoot 0.7 ]
                     }
@@ -300,7 +300,7 @@ suite =
                 testMods
                     { mods =
                         [ mockMod manureGiver
-                            |> withMultiplier 2
+                            |> withHowManyTimesToApplyMod 2
                             |> includeVariableEffects
                         ]
                     , event = mockEvent [ smeltSoot 0.5 ]

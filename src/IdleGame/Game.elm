@@ -34,10 +34,9 @@ create seed =
     { seed = seed
 
     -- , choresXp = 0
-    , choresMxp = 0
+    -- , choresMxp = 0
     , choresXp = 14391160
-
-    -- , choresMxp = 4500000 / 2
+    , choresMxp = 0
     , activeChore = Nothing
     , choresData =
         { cleanStables = { mxp = 0 }
@@ -45,8 +44,8 @@ create seed =
         , sweepChimneys = { mxp = 0 }
         , waterGreenhousePlants = { mxp = 0 }
         , washRobes = { mxp = 0 }
-        , organizePotionIngredients = { mxp = 14391160 }
-        , repairInstruments = { mxp = 14391160 }
+        , organizePotionIngredients = { mxp = 0 }
+        , repairInstruments = { mxp = 0 }
         , flushDrainDemons = { mxp = 0 }
         , organizeSpellBooks = { mxp = 0 }
         }
@@ -111,14 +110,15 @@ getEvent { kind, outcome } =
     Event
         { effects =
             [ gainXp xp ChoresSkill
-                |> withTags [ Chores ]
+                |> withTags [ Chores, ChoreTag kind ]
             , gainChoreMxp kind
+                |> withTags [ Chores, ChoreTag kind ]
             , gainWithProbability extraResourceProbability
                 [ gainResource 1 extraResource |> withTags [ Chores ]
                 ]
-                |> withTags [ Chores ]
+                |> withTags [ Chores, ChoreTag kind ]
             , gainCoin coin
-                |> withTags [ Chores ]
+                |> withTags [ Chores, ChoreTag kind ]
             ]
         , tags = [ Chores, ChoreTag kind ]
         }
@@ -481,10 +481,6 @@ type alias MasteryPoolCheckpoints =
     }
 
 
-type MasteryUnlocks
-    = EveryTenLevels Mod
-
-
 choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
 choreMasteryPoolCheckpoints =
     { ten = choresXpBuff 0.25
@@ -494,11 +490,6 @@ choreMasteryPoolCheckpoints =
         choresResourceBuff 1.0
             |> includeVariableEffects
     }
-
-
-choreMasteryUnlocks : MasteryUnlocks
-choreMasteryUnlocks =
-    EveryTenLevels (choresMxpBuff 1.0)
 
 
 getChoreMasteryPoolMods : Game -> List Mod
@@ -535,30 +526,40 @@ getChoreMasteryPoolMods game =
         []
 
 
+
+-- Mastery thresholds for specific chores
+
+
+type MasteryUnlock
+    = EveryTenLevels Mod
+    | AtLevel Int Mod
+
+
+choreMasteryUnlocks : MasteryUnlock
+choreMasteryUnlocks =
+    EveryTenLevels (choresMxpBuff 1.0)
+
+
 getChoreUnlocksMods : Game -> List Mod
 getChoreUnlocksMods game =
-    let
-        baseBonus =
-            case choreMasteryUnlocks of
-                EveryTenLevels bonus ->
-                    bonus
-    in
     Chore.allKinds
-        |> List.map
+        |> List.concatMap
             (\kind ->
                 let
-                    getter =
-                        (Chore.getStats kind).getter
+                    stats =
+                        Chore.getStats kind
 
                     masteryLevel =
-                        IdleGame.XpFormulas.skillLevel (getter game.choresData).mxp
+                        IdleGame.XpFormulas.skillLevel (stats.getter game.choresData).mxp
 
-                    repetitions =
-                        masteryLevel // 10
+                    everyTenLevelsMod =
+                        successBuff 0.05
+                            |> withHowManyTimesToApplyMod (masteryLevel // 10)
+                            -- repeat once for each ten levels
+                            |> modWithTags [ Chores, ChoreTag kind ]
                 in
-                baseBonus
-                    |> withMultiplier repetitions
-                    |> modWithTags [ ChoreTag kind ]
+                [ Debug.log "everyTenLevelsMod" everyTenLevelsMod
+                ]
             )
 
 
@@ -600,9 +601,10 @@ getAllMods : Game -> List Mod
 getAllMods game =
     []
         -- ++ [ devGlobalXpBuff ]
-        ++ getChoreMasteryPoolMods game
-        -- ++ getChoreUnlocksMods game
-        ++ getShopItemMods game
+        -- ++ getChoreMasteryPoolMods game
+        ++ getChoreUnlocksMods game
+        -- ++ getShopItemMods game
+        ++ []
 
 
 
