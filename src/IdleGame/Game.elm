@@ -530,16 +530,6 @@ getChoreMasteryPoolMods game =
 -- Mastery thresholds for specific chores
 
 
-type MasteryUnlock
-    = EveryTenLevels Mod
-    | AtLevel Int Mod
-
-
-choreMasteryUnlocks : MasteryUnlock
-choreMasteryUnlocks =
-    EveryTenLevels (choresMxpBuff 1.0)
-
-
 getChoreUnlocksMods : Game -> List Mod
 getChoreUnlocksMods game =
     Chore.allKinds
@@ -597,13 +587,43 @@ getShopItemIntervalMods game =
         |> List.concat
 
 
+getChoreUnlocksIntervalMods : Game -> List IntervalMod
+getChoreUnlocksIntervalMods game =
+    Chore.allKinds
+        |> List.map
+            (\kind ->
+                let
+                    stats =
+                        Chore.getStats kind
+
+                    masteryLevel : Int
+                    masteryLevel =
+                        (stats.getter game.choresData).mxp
+                            |> IdleGame.XpFormulas.skillLevel
+
+                    timesToApplyMod =
+                        if masteryLevel >= 99 then
+                            2
+
+                        else if masteryLevel >= 50 then
+                            1
+
+                        else
+                            0
+                in
+                { kind = kind
+                , percentChange = timesToApplyMod * 0.1
+                }
+            )
+
+
 getAllMods : Game -> List Mod
 getAllMods game =
     []
         -- ++ [ devGlobalXpBuff ]
-        -- ++ getChoreMasteryPoolMods game
+        ++ getChoreMasteryPoolMods game
         ++ getChoreUnlocksMods game
-        -- ++ getShopItemMods game
+        ++ getShopItemMods game
         ++ []
 
 
@@ -615,3 +635,5 @@ getAllIntervalMods : Game -> List IntervalMod
 getAllIntervalMods game =
     []
         ++ getShopItemIntervalMods game
+        ++ getChoreUnlocksIntervalMods game
+        ++ []

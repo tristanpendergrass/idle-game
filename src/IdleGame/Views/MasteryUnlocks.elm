@@ -32,22 +32,21 @@ renderCheckpoint { number, label, isActive } =
         ]
 
 
-render : { masteryUnlocks : IdleGame.Game.MasteryUnlock } -> Html FrontendMsg
-render { masteryUnlocks } =
-    let
-        mod =
-            case masteryUnlocks of
-                IdleGame.Game.EveryTenLevels m ->
-                    m
-
-                IdleGame.Game.AtLevel level m ->
-                    m
-    in
+render : Html FrontendMsg
+render =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-lg font-bold" ] [ text "Chores Mastery Unlocks" ]
         , div [ class "flex gap-1" ]
-            [ span [] [ text <| "Every 10 levels provides" ]
-            , span [ class "text-success" ] [ text mod.label ]
+            [ span [ class "underline" ] [ text <| "Every 10 levels:" ]
+            , span [ class "text-success" ] [ text "+5% chance to gain items" ]
+            ]
+        , div [ class "flex gap-1" ]
+            [ span [ class "underline" ] [ text <| "50:" ]
+            , span [ class "text-success" ] [ text "+10% faster at this chore" ]
+            ]
+        , div [ class "flex gap-1" ]
+            [ span [ class "underline" ] [ text <| "99:" ]
+            , span [ class "text-success" ] [ text "+10% faster at this chore" ]
             ]
         , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

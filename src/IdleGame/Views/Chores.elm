@@ -281,7 +281,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
     let
         renderDuration : Html msg
         renderDuration =
-            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString (duration / 1000) ++ " seconds" ]
+            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (duration / 1000) ++ " seconds" ]
 
         rendercoin =
             div [ class "flex items-center gap-1" ]

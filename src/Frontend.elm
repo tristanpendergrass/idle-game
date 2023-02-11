@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin
-import IdleGame.Game exposing (Game, MasteryUnlock)
+import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -554,7 +554,7 @@ view model =
                             Just ChoreItemUnlocksModal ->
                                 let
                                     children =
-                                        IdleGame.Views.MasteryUnlocks.render { masteryUnlocks = IdleGame.Game.choreMasteryUnlocks }
+                                        IdleGame.Views.MasteryUnlocks.render
                                 in
                                 [ IdleGame.Views.ModalWrapper.create children
                                     |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"

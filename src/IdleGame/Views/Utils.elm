@@ -19,14 +19,14 @@ intToString num =
     FormatNumber.format localeForInts (toFloat num)
 
 
-floatToString : Float -> String
-floatToString =
+floatToString : Int -> Float -> String
+floatToString decimals =
     let
         localeForFloats : FormatNumber.Locales.Locale
         localeForFloats =
             FormatNumber.Locales.usLocale
                 |> (\usLocale ->
-                        { usLocale | decimals = FormatNumber.Locales.Max 2 }
+                        { usLocale | decimals = FormatNumber.Locales.Max decimals }
                    )
     in
     FormatNumber.format localeForFloats
