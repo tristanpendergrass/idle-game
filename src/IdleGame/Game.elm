@@ -36,10 +36,10 @@ create seed =
     -- , choresXp = 0
     -- , choresMxp = 0
     , choresXp = 14391160
-    , choresMxp = 0
+    , choresMxp = 4500000
     , activeChore = Nothing
     , choresData =
-        { cleanStables = { mxp = 0 }
+        { cleanStables = { mxp = 14391160 }
         , cleanBigBubba = { mxp = 0 }
         , sweepChimneys = { mxp = 0 }
         , waterGreenhousePlants = { mxp = 0 }
@@ -558,7 +558,7 @@ getChoreUnlocksMods game =
                             -- repeat once for each ten levels
                             |> modWithTags [ Chores, ChoreTag kind ]
                 in
-                [ Debug.log "everyTenLevelsMod" everyTenLevelsMod
+                [ everyTenLevelsMod
                 ]
             )
 

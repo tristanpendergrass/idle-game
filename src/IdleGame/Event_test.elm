@@ -295,6 +295,13 @@ suite =
                     , event = mockEvent [ smeltSoot 0.5 ]
                     , moddedEvent = mockModdedEvent [ smeltSoot 0.7 ]
                     }
+        , test "multiplier of 0 makes mod not apply" <|
+            \_ ->
+                testMods
+                    { mods = [ mockMod (probabilityIncreaser 0.1) |> withHowManyTimesToApplyMod 0 ]
+                    , event = mockEvent [ smeltSoot 0.5 ]
+                    , moddedEvent = mockModdedEvent [ smeltSoot 0.5 ]
+                    }
         , test "multiplier of 2 works with includeVariableEffects" <|
             \_ ->
                 testMods

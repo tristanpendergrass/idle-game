@@ -189,7 +189,7 @@ useSimpleTransformer =
 
 
 useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
-useSimpleTransformerHelp depth transformFn multiplier effect =
+useSimpleTransformerHelp depth transformFn howManyTimesToApplyMod effect =
     let
         newEffectType =
             transformFn (getType effect)
@@ -198,8 +198,11 @@ useSimpleTransformerHelp depth transformFn multiplier effect =
             effect
                 |> setType newEffectType
     in
-    if multiplier > 1 && depth < 20 then
-        useSimpleTransformerHelp (depth + 1) transformFn (multiplier - 1) newEffect
+    if howManyTimesToApplyMod > 1 && depth < 20 then
+        useSimpleTransformerHelp (depth + 1) transformFn (howManyTimesToApplyMod - 1) newEffect
+
+    else if howManyTimesToApplyMod == 0 then
+        NoChange
 
     else
         ChangeEffect newEffect
@@ -332,8 +335,8 @@ increaseSuccessTransformer buff howManyTimesToApplyMod effect =
         VariableSuccess params ->
             let
                 newSuccessProbability =
-                    (params.successProbability + (buff * toFloat howManyTimesToApplyMod))
-                        |> max 1.0
+                    (params.successProbability + buff * toFloat howManyTimesToApplyMod)
+                        |> min 1.0
 
                 newEffectType =
                     VariableSuccess { params | successProbability = newSuccessProbability }
