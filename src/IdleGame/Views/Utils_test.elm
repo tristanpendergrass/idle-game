@@ -59,10 +59,10 @@ floatToStringSuite =
     describe "floatToString"
         [ test "shows with no decimal points if its a round number" <|
             \_ ->
-                floatToString 3
+                floatToString 2 3
                     |> Expect.equal "3"
         , test "shows out to two decimal places" <|
             \_ ->
-                floatToString 3.2525
+                floatToString 2 3.2525
                     |> Expect.equal "3.25"
         ]
