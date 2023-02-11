@@ -60,7 +60,7 @@ getStats kind =
         BeginnerDualWielding ->
             { title = "Beginner Dual Wielding"
             , icon = Icon.book
-            , price = Coin.create 1000
+            , price = Coin.create 6000
             , unlockLevel = 35
             , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
             , description = "+100% faster at Water Greenhouse Plants"
@@ -71,7 +71,7 @@ getStats kind =
         Keyring ->
             { title = "Keyring"
             , icon = Icon.keyring
-            , price = Coin.create 1500
+            , price = Coin.create 10000
             , unlockLevel = 1
             , reward =
                 ShopItemIntervalMod
