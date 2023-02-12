@@ -37,16 +37,11 @@ update msg model =
                 ( seedForGame, newSeed ) =
                     Random.step Random.independentSeed model.seed
 
-                someTimeAgo : Posix
-                someTimeAgo =
-                    Time.Extra.add Time.Extra.Minute -10 Time.utc now
-
                 snapshot : Snapshot Game
                 snapshot =
                     Dict.get sessionId model.sessionGameMap
                         |> Maybe.withDefault
                             (Snapshot.fromTuple ( now, IdleGame.Game.create seedForGame ))
-                        |> Snapshot.setTime someTimeAgo
             in
             ( model
                 |> setSeed newSeed
