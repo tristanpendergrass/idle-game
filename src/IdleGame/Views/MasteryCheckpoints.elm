@@ -28,7 +28,7 @@ renderCheckpoint { number, label, isActive } =
                     ""
             ]
             [ text <| IdleGame.Views.Utils.intToString number ++ "%" ]
-        , div [ class "flex-grow" ] [ text label ]
+        , div [ class "flex-grow text-success" ] [ text label ]
         ]
 
 
