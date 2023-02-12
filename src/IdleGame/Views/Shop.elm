@@ -45,13 +45,9 @@ render game =
 
                 owned =
                     ShopItems.isOwned kind shopItems
-
-                shakeOnClick =
-                    not owned && Coin.getVal stats.price > Coin.getVal game.coin
             in
             div
-                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer"
-                , classList [ ( "bubble-pop", not shakeOnClick ), ( "bubble-shake", shakeOnClick ) ]
+                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
                 , onClick <| HandleShopItemClick kind
                 ]
                 [ stats.icon
@@ -72,7 +68,6 @@ render game =
         renderLockedShopItem levelNeeded =
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bg-error text-error-content"
-                , class "bubble-shake"
                 ]
                 [ div [ class "w-24 h-24 flex items-center justify-center" ]
                     [ Icon.unknownItem
