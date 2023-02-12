@@ -80,7 +80,20 @@ render game =
                 ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
+        [ div [ class "w-full flex justify-center items-center" ]
+            [ div [ class "flex items-center gap-1 px-2 py-1 rounded bg-accent text-accent-content" ]
+                [ span [ class "text-lg truncate" ]
+                    [ Icon.coin
+                        |> Icon.withSize Icon.Large
+                        |> Icon.toHtml
+                    ]
+                , span [ class "text-log font-semibold" ]
+                    [ text <| Coin.toString game.coin
+                    ]
+                ]
+            ]
+        , div [ class "divider" ] []
+        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map
                 (\kind ->
                     let
