@@ -365,7 +365,7 @@ addMasteryPoolXp amount game =
 
 addCoin : Coin.Counter -> Game -> ( Game, List Toast )
 addCoin amount game =
-    ( { game | coin = Coin.add game.coin amount }, [ Gainedcoin amount ] )
+    ( { game | coin = Coin.add game.coin amount }, [ GainedCoin amount ] )
 
 
 gainResource : Int -> Resource.Kind -> Effect

@@ -17,7 +17,7 @@ type ChoreKind
 
 
 type Toast
-    = Gainedcoin Coin.Counter
+    = GainedCoin Coin.Counter
     | GainedResource Int Resource.Kind
 
 

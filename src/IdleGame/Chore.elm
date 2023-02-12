@@ -86,7 +86,7 @@ getStats kind =
         CleanBigBubba ->
             { kind = CleanBigBubba
             , title = "Clean Big Bubba's Stall"
-            , imgSrc = "/chores/bubba2.png"
+            , imgSrc = "/chores/bubba4.png"
             , getter = .cleanBigBubba
             , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
             , outcome =

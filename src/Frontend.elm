@@ -167,8 +167,8 @@ update msg model =
         AddToast content ->
             Toast.expireIn 3000 content
                 -- Toast.persistent content
-                -- NOTE: Number passed to withExistTransition should match the transition duration of class "toast" in index.css
-                |> Toast.withExitTransition 700
+                -- NOTE: Number passed to withExitTransition should match the transition duration of class "toast" in index.css
+                |> Toast.withExitTransition 900
                 |> Toast.add model.tray
                 |> Toast.tuple ToastMsg model
 
@@ -439,13 +439,13 @@ toastConfig =
         |> Toast.withTrayAttributes [ class "toast-tray", IdleGame.Views.Utils.zIndexes.toast ]
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
-        |> Toast.withTransitionAttributes [ class "toast--fade-out" ]
+        |> Toast.withExitAttributes [ class "toast--fade-out" ]
 
 
 toastToHtml : Toast -> Html msg
 toastToHtml notification =
     case notification of
-        Gainedcoin amount ->
+        GainedCoin amount ->
             div [ class "flex gap-1 items-center" ]
                 [ span [] [ text <| "+" ++ Coin.toString amount ]
                 , Icon.coin
