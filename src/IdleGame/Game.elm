@@ -32,14 +32,11 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
-
-    -- , choresXp = 0
-    -- , choresMxp = 0
-    , choresXp = 14391160
-    , choresMxp = 4500000
+    , choresXp = 0
+    , choresMxp = 0
     , activeChore = Nothing
     , choresData =
-        { cleanStables = { mxp = 14391160 }
+        { cleanStables = { mxp = 0 }
         , cleanBigBubba = { mxp = 0 }
         , sweepChimneys = { mxp = 0 }
         , waterGreenhousePlants = { mxp = 0 }
@@ -50,7 +47,7 @@ create seed =
         , organizeSpellBooks = { mxp = 0 }
         }
     , coin =
-        Coin.create 100000
+        Coin.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
     }
