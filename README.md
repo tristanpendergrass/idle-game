@@ -62,6 +62,7 @@ $ npm test -- --watch
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Remove tags from Event, should only come from effects
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
+- [ ] Find a way to unit test performance of tick
 
 ### Fundamentals
 - [ ] Show what mods there are on an effect/interval and where they came from
