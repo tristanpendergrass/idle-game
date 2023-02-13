@@ -570,6 +570,7 @@ getShopItemMods game =
 getShopItemIntervalMods : Game -> List IntervalMod
 getShopItemIntervalMods game =
     game.shopItems
+        |> (\x -> Debug.log "foobar inside getShopItemIntervalMods" x)
         |> ShopItems.toOwnedItems
         |> List.map (\shopItem -> (ShopItems.getStats shopItem).reward)
         |> List.filterMap
@@ -630,7 +631,15 @@ getAllMods game =
 
 getAllIntervalMods : Game -> List IntervalMod
 getAllIntervalMods game =
-    []
-        ++ getShopItemIntervalMods game
-        ++ getChoreUnlocksIntervalMods game
-        ++ []
+    let
+        shopItemIntervalMods =
+            getShopItemIntervalMods game
+
+        choreUnlockIntervalMods =
+            getChoreUnlocksIntervalMods game
+    in
+    Debug.log "foobar inside getAllIntervalMods"
+        List.concat
+        [ shopItemIntervalMods
+        , choreUnlockIntervalMods
+        ]
