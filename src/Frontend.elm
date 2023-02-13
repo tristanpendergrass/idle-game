@@ -328,11 +328,26 @@ update msg model =
                         )
 
                     Playing snapshot ->
+                        -- DEBUG code to force fast forward to take a long time
+                        let
+                            someTimeAgo : Posix
+                            someTimeAgo =
+                                Time.Extra.add Time.Extra.Minute -60 Time.utc (Snapshot.getTime snapshot)
+
+                            someTimeAgoSnapshot =
+                                Snapshot.setTime someTimeAgo snapshot
+                        in
                         ( model
                             |> setIsVisible True
-                            |> setGameState (FastForward { original = snapshot, current = snapshot })
+                            |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot })
                         , Task.perform HandleFastForward Time.now
                         )
+                -- Playing snapshot ->
+                --     ( model
+                --         |> setIsVisible True
+                --         |> setGameState (FastForward { original = snapshot, current = snapshot })
+                --     , Task.perform HandleFastForward Time.now
+                --     )
 
             else
                 ( model
@@ -406,11 +421,25 @@ updateFromBackend msg model =
         InitializeGame serverSnapshot ->
             case model.gameState of
                 Initializing ->
+                    -- DEBUG code to force fast forward to take a long time
+                    let
+                        someTimeAgo : Posix
+                        someTimeAgo =
+                            Time.Extra.add Time.Extra.Minute -60 Time.utc (Snapshot.getTime serverSnapshot)
+
+                        someTimeAgoSnapshot =
+                            Snapshot.setTime someTimeAgo serverSnapshot
+                    in
                     ( model
-                        |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot })
+                        |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot })
                     , Task.perform HandleFastForward Time.now
                     )
 
+                -- Initializing ->
+                --     ( model
+                --         |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot })
+                --     , Task.perform HandleFastForward Time.now
+                --     )
                 _ ->
                     -- If we receive an InitializeGame message from backend while already initialized we ignore it
                     noOp
