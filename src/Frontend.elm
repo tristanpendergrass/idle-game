@@ -187,7 +187,7 @@ update msg model =
                             Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
 
                         nextInterval =
-                            Time.Extra.add Time.Extra.Minute 10 Time.utc (Snapshot.getTime current)
+                            Time.Extra.add Time.Extra.Minute 2 Time.utc (Snapshot.getTime current)
                     in
                     -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
                     -- The amount of work to do is arbitrarily set at 10 minutes and the sleep period at 1 ms, which seems to work
@@ -202,7 +202,7 @@ update msg model =
                         ( model
                             |> setGameState
                                 (FastForward { original = original, current = newSnap })
-                        , Task.perform HandleFastForward (Process.sleep 1 |> Task.andThen (\_ -> Time.now))
+                        , Task.perform HandleFastForward (Process.sleep 1000 |> Task.andThen (\_ -> Time.now))
                         )
 
                     else
