@@ -25,10 +25,16 @@ type Modal
     | ChoreItemUnlocksModal
 
 
+type PreviousIntervalTimer
+    = NotStarted
+    | HaveStart Posix
+    | HaveStartAndEnd Posix Posix
+
+
 type FrontendGameState
     = Initializing
     | Playing (Snapshot Game)
-    | FastForward { original : Snapshot Game, current : Snapshot Game }
+    | FastForward { original : Snapshot Game, current : Snapshot Game, previousIntervalTimer : PreviousIntervalTimer }
 
 
 type alias FrontendModel =

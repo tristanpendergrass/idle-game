@@ -139,6 +139,21 @@ tickDuration =
     15
 
 
+sleepTime : Float
+sleepTime =
+    1000
+
+
+fastForwardTime : Int
+fastForwardTime =
+    1000 * 60
+
+
+getFastForwardPoint : Posix -> Posix
+getFastForwardPoint =
+    Time.Extra.add Time.Extra.Millisecond fastForwardTime Time.utc
+
+
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
     let
@@ -181,13 +196,13 @@ update msg model =
 
         HandleFastForward now ->
             case model.gameState of
-                FastForward { original, current } ->
+                FastForward { original, current, previousIntervalTimer } ->
                     let
                         tick =
                             Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
 
                         nextInterval =
-                            Time.Extra.add Time.Extra.Minute 1 Time.utc (Snapshot.getTime current)
+                            getFastForwardPoint (Snapshot.getTime current)
                     in
                     -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
                     -- The amount of work to do is arbitrarily set at 10 minutes and the sleep period at 1 ms, which seems to work
@@ -198,10 +213,21 @@ update msg model =
                         let
                             newSnap =
                                 Snapshot.tickUntil tick nextInterval current
+
+                            newPreviousIntervalTimer =
+                                case previousIntervalTimer of
+                                    NotStarted ->
+                                        HaveStart now
+
+                                    HaveStart start ->
+                                        HaveStartAndEnd start now
+
+                                    HaveStartAndEnd _ end ->
+                                        HaveStartAndEnd end now
                         in
                         ( model
                             |> setGameState
-                                (FastForward { original = original, current = newSnap })
+                                (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer })
                         , Task.perform HandleFastForward (Process.sleep 1000 |> Task.andThen (\_ -> Time.now))
                         )
 
@@ -339,7 +365,7 @@ update msg model =
                         in
                         ( model
                             |> setIsVisible True
-                            |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot })
+                            |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot, previousIntervalTimer = NotStarted })
                         , Task.perform HandleFastForward Time.now
                         )
                 -- Playing snapshot ->
@@ -431,7 +457,7 @@ updateFromBackend msg model =
                             Snapshot.setTime someTimeAgo serverSnapshot
                     in
                     ( model
-                        |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot })
+                        |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot, previousIntervalTimer = NotStarted })
                     , Task.perform HandleFastForward Time.now
                     )
 
@@ -508,13 +534,29 @@ view model =
             Initializing ->
                 css
 
-            FastForward _ ->
+            FastForward { previousIntervalTimer } ->
                 css
                     ++ [ div
                             [ class "w-screen h-screen flex flex-col gap-2 items-center justify-center"
                             ]
                             [ div [] [ text "Fast Forwarding..." ]
                             , progress [ class "progress progress-primary w-56" ] []
+                            , case previousIntervalTimer of
+                                NotStarted ->
+                                    div [] [ text "Starting calculation..." ]
+
+                                HaveStart _ ->
+                                    div [] [ text "Starting calculation..." ]
+
+                                HaveStartAndEnd start end ->
+                                    let
+                                        diff =
+                                            Time.posixToMillis end - Time.posixToMillis start
+
+                                        millisPerMilli =
+                                            (toFloat fastForwardTime - sleepTime) / toFloat diff
+                                    in
+                                    div [] [ text <| "Speed (ms/ms): " ++ String.fromInt (floor millisPerMilli) ]
                             ]
                        ]
 
