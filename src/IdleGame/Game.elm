@@ -162,6 +162,9 @@ applyIntervalMods mods duration =
 tick : Game -> ( Game, List Toast )
 tick game =
     let
+        allIntervalMods =
+            getAllIntervalMods game
+
         ( newActiveChore, events ) =
             case game.activeChore of
                 Nothing ->
@@ -173,7 +176,7 @@ tick game =
                             Chore.getStats choreKind
 
                         mods =
-                            getAllIntervalMods game
+                            allIntervalMods
                                 |> List.filter (\{ kind } -> kind == choreKind)
 
                         choreDuration =
