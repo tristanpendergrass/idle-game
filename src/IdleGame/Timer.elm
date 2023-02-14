@@ -3,7 +3,6 @@ module IdleGame.Timer exposing
     , create
     , increment
     , percentComplete
-    , tickDuration
     )
 
 
@@ -29,11 +28,6 @@ create =
 percentComplete : Timer -> Float
 percentComplete (Timer { current }) =
     current * 100
-
-
-tickDuration : Float
-tickDuration =
-    15
 
 
 increment : Duration -> Duration -> Timer -> ( Timer, Int )

@@ -134,11 +134,6 @@ setSaveGameTimer timer model =
     { model | saveGameTimer = timer }
 
 
-tickDuration : Int
-tickDuration =
-    15
-
-
 sleepTime : Float
 sleepTime =
     1000
@@ -152,6 +147,15 @@ fastForwardTime =
 getFastForwardPoint : Posix -> Posix
 getFastForwardPoint =
     Time.Extra.add Time.Extra.Millisecond fastForwardTime Time.utc
+
+
+tickDuration : Float
+tickDuration =
+    15
+
+
+fastForwardTickDuration =
+    1000
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -199,7 +203,7 @@ update msg model =
                 FastForward { original, current, previousIntervalTimer } ->
                     let
                         tick =
-                            Snapshot.createTick tickDuration (IdleGame.Game.tick >> Tuple.first)
+                            Snapshot.createTick fastForwardTickDuration (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
 
                         nextInterval =
                             getFastForwardPoint (Snapshot.getTime current)
@@ -304,10 +308,10 @@ update msg model =
                         let
                             tick =
                                 Snapshot.createTick tickDuration
-                                    (\( g, n ) ->
+                                    (\d ( g, n ) ->
                                         let
                                             ( ng, nn ) =
-                                                IdleGame.Game.tick g
+                                                IdleGame.Game.tick d g
                                         in
                                         ( ng, n ++ nn )
                                     )
@@ -451,7 +455,7 @@ updateFromBackend msg model =
                     let
                         someTimeAgo : Posix
                         someTimeAgo =
-                            Time.Extra.add Time.Extra.Minute -60000 Time.utc (Snapshot.getTime serverSnapshot)
+                            Time.Extra.add Time.Extra.Hour -8 Time.utc (Snapshot.getTime serverSnapshot)
 
                         someTimeAgoSnapshot =
                             Snapshot.setTime someTimeAgo serverSnapshot

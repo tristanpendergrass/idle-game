@@ -17,14 +17,14 @@ import Time.Extra
 
 
 type Tick t
-    = Tick Int (t -> t)
+    = Tick Float (Float -> t -> t)
 
 
 type Snapshot t
     = Snapshot ( Posix, t )
 
 
-createTick : Int -> (t -> t) -> Tick t
+createTick : Float -> (Float -> t -> t) -> Tick t
 createTick =
     Tick
 
@@ -59,12 +59,12 @@ setValue state (Snapshot ( time, _ )) =
     Snapshot ( time, state )
 
 
-getDuration : Tick t -> Int
+getDuration : Tick t -> Float
 getDuration (Tick duration _) =
     duration
 
 
-getFunction : Tick t -> (t -> t)
+getFunction : Tick t -> (Float -> t -> t)
 getFunction (Tick _ fn) =
     fn
 
@@ -78,7 +78,7 @@ tickUntil tick endTime snapshot =
         timeOfNextTick =
             snapshot
                 |> getTime
-                |> Time.Extra.add Time.Extra.Millisecond tickDuration Time.utc
+                |> Time.Extra.add Time.Extra.Millisecond (floor tickDuration) Time.utc
                 |> Time.posixToMillis
 
         shouldTick : Bool
@@ -90,7 +90,7 @@ tickUntil tick endTime snapshot =
             newValue =
                 snapshot
                     |> getValue
-                    |> getFunction tick
+                    |> getFunction tick tickDuration
 
             newSnapshot =
                 Snapshot ( Time.millisToPosix timeOfNextTick, newValue )
