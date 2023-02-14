@@ -159,8 +159,8 @@ applyIntervalMods mods duration =
     duration / multiplier
 
 
-tick : Game -> ( Game, List Toast )
-tick game =
+tick : Float -> Game -> ( Game, List Toast )
+tick tickDuration game =
     let
         allIntervalMods =
             getAllIntervalMods game
@@ -185,7 +185,7 @@ tick game =
 
                         ( newTimer, completions ) =
                             timer
-                                |> Timer.increment choreDuration Timer.tickDuration
+                                |> Timer.increment choreDuration tickDuration
 
                         activeChore =
                             Just ( choreKind, newTimer )
