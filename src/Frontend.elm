@@ -136,7 +136,7 @@ setSaveGameTimer timer model =
 
 sleepTime : Float
 sleepTime =
-    1000
+    1
 
 
 fastForwardTime : Int
@@ -149,13 +149,35 @@ getFastForwardPoint =
     Time.Extra.add Time.Extra.Millisecond fastForwardTime Time.utc
 
 
-tickDuration : Float
-tickDuration =
-    15
+{-| A standard tick for using to progress the game in an animation frame.
+-}
+standardTick : Snapshot.Tick ( Game, List Toast )
+standardTick =
+    Snapshot.createTick 15
+        (\duration ( oldGame, oldToasts ) ->
+            let
+                ( newGame, newToasts ) =
+                    IdleGame.Game.tick duration oldGame
+            in
+            ( newGame, oldToasts ++ newToasts )
+        )
 
 
-fastForwardTickDuration =
-    1000
+{-| A performant tick for using when you need to progress the game quickly and don't care about animation at all.
+
+The tradeoffs are:
+a) with a larger interval between ticks there's a higher chance that e.g. a timer completes twice in one tick. This potentially causes inaccuracy when
+calculating bonuses the player earned after actions completing
+
+b) animations won't look right if the tick duration is longer than an animation frame in the browser whic this one is
+
+This tick also discards the notifications of Game.tick.
+
+-}
+performantTick : Snapshot.Tick Game
+performantTick =
+    Snapshot.createTick 1000
+        (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -202,9 +224,6 @@ update msg model =
             case model.gameState of
                 FastForward { original, current, previousIntervalTimer } ->
                     let
-                        tick =
-                            Snapshot.createTick fastForwardTickDuration (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
-
                         nextInterval =
                             getFastForwardPoint (Snapshot.getTime current)
                     in
@@ -216,7 +235,7 @@ update msg model =
                         -- run calculation part ways then sleep
                         let
                             newSnap =
-                                Snapshot.tickUntil tick nextInterval current
+                                Snapshot.tickUntil performantTick nextInterval current
 
                             newPreviousIntervalTimer =
                                 case previousIntervalTimer of
@@ -232,14 +251,14 @@ update msg model =
                         ( model
                             |> setGameState
                                 (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer })
-                        , Task.perform HandleFastForward (Process.sleep 1 |> Task.andThen (\_ -> Time.now))
+                        , Task.perform HandleFastForward (Process.sleep sleepTime |> Task.andThen (\_ -> Time.now))
                         )
 
                     else
                         -- run calculation to completion
                         let
                             newSnap =
-                                Snapshot.tickUntil tick now current
+                                Snapshot.tickUntil performantTick now current
                         in
                         ( model
                             |> setGameState
@@ -307,14 +326,7 @@ update msg model =
                     else
                         let
                             tick =
-                                Snapshot.createTick tickDuration
-                                    (\d ( g, n ) ->
-                                        let
-                                            ( ng, nn ) =
-                                                IdleGame.Game.tick d g
-                                        in
-                                        ( ng, n ++ nn )
-                                    )
+                                standardTick
 
                             oldSnapshot : Snapshot ( Game, List Toast )
                             oldSnapshot =
