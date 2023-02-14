@@ -554,7 +554,7 @@ view model =
                                             Time.posixToMillis end - Time.posixToMillis start
 
                                         millisPerMilli =
-                                            (toFloat fastForwardTime - sleepTime) / toFloat diff
+                                            toFloat fastForwardTime / toFloat diff
                                     in
                                     div [] [ text <| "Speed (ms/ms): " ++ String.fromInt (floor millisPerMilli) ]
                             ]
