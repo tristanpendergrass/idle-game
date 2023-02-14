@@ -228,7 +228,7 @@ update msg model =
                         ( model
                             |> setGameState
                                 (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer })
-                        , Task.perform HandleFastForward (Process.sleep 1000 |> Task.andThen (\_ -> Time.now))
+                        , Task.perform HandleFastForward (Process.sleep 1 |> Task.andThen (\_ -> Time.now))
                         )
 
                     else
