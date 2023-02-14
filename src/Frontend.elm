@@ -146,7 +146,7 @@ sleepTime =
 
 fastForwardTime : Int
 fastForwardTime =
-    1000 * 60
+    1000 * 60 * 10
 
 
 getFastForwardPoint : Posix -> Posix
