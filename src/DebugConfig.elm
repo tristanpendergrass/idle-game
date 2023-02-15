@@ -16,7 +16,7 @@ flags =
 devFlags : Flags
 devFlags =
     { showFastForwardSpeed = True
-    , extraFastForwardTime = 1000 * 60 * 60 * 8000 -- 8 hours
+    , extraFastForwardTime = 1000 * 60 * 60 * 8 -- 8 hours
     }
 
 
