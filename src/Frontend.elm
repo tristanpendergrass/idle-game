@@ -137,7 +137,7 @@ setSaveGameTimer timer model =
 
 sleepTime : Float
 sleepTime =
-    1000
+    1
 
 
 fastForwardTime : Int
