@@ -50,6 +50,7 @@ $ npm test -- --watch
 
 ## Version 0.2
 ### Tech stuff
+- [ ] Fix performance by insuring no calls to intToString in game tick
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing

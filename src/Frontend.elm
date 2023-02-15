@@ -3,6 +3,7 @@ module Frontend exposing (app)
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation as Nav
+import DebugConfig
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -136,7 +137,7 @@ setSaveGameTimer timer model =
 
 sleepTime : Float
 sleepTime =
-    1
+    1000
 
 
 fastForwardTime : Int
@@ -176,7 +177,7 @@ This tick also discards the notifications of Game.tick.
 -}
 performantTick : Snapshot.Tick Game
 performantTick =
-    Snapshot.createTick 1000
+    Snapshot.createTick 2000
         (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
 
 
@@ -227,12 +228,8 @@ update msg model =
                         nextInterval =
                             getFastForwardPoint (Snapshot.getTime current)
                     in
-                    -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
-                    -- The amount of work to do is arbitrarily set at 10 minutes and the sleep period at 1 ms, which seems to work
-                    -- Can play with these numbers in future if not satisfactory
-                    -- Test with CPU slowdown 6x!! It really shows the weakness and why we might want an adaptive strategy in the future!
                     if Time.posixToMillis nextInterval < Time.posixToMillis now then
-                        -- run calculation part ways then sleep
+                        -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
                         let
                             newSnap =
                                 Snapshot.tickUntil performantTick nextInterval current
@@ -463,11 +460,11 @@ updateFromBackend msg model =
         InitializeGame serverSnapshot ->
             case model.gameState of
                 Initializing ->
-                    -- DEBUG code to force fast forward to take a long time
                     let
                         someTimeAgo : Posix
                         someTimeAgo =
-                            Time.Extra.add Time.Extra.Hour -8 Time.utc (Snapshot.getTime serverSnapshot)
+                            -- DEBUG code to force fast forward to take a long time
+                            Time.Extra.add Time.Extra.Millisecond (-1 * DebugConfig.flags.extraFastForwardTime) Time.utc (Snapshot.getTime serverSnapshot)
 
                         someTimeAgoSnapshot =
                             Snapshot.setTime someTimeAgo serverSnapshot
@@ -557,22 +554,26 @@ view model =
                             ]
                             [ div [] [ text "Fast Forwarding..." ]
                             , progress [ class "progress progress-primary w-56" ] []
-                            , case previousIntervalTimer of
-                                NotStarted ->
-                                    div [] [ text "Starting calculation..." ]
+                            , if DebugConfig.flags.showFastForwardSpeed then
+                                case previousIntervalTimer of
+                                    NotStarted ->
+                                        div [] [ text "Starting calculation..." ]
 
-                                HaveStart _ ->
-                                    div [] [ text "Starting calculation..." ]
+                                    HaveStart _ ->
+                                        div [] [ text "Starting calculation..." ]
 
-                                HaveStartAndEnd start end ->
-                                    let
-                                        diff =
-                                            Time.posixToMillis end - Time.posixToMillis start
+                                    HaveStartAndEnd start end ->
+                                        let
+                                            diff =
+                                                Time.posixToMillis end - Time.posixToMillis start
 
-                                        millisPerMilli =
-                                            toFloat fastForwardTime / toFloat diff
-                                    in
-                                    div [] [ text <| "Speed (ms/ms): " ++ String.fromInt (floor millisPerMilli) ]
+                                            millisPerMilli =
+                                                toFloat fastForwardTime / (toFloat diff - sleepTime)
+                                        in
+                                        div [] [ text <| "Speed (ms/ms): " ++ String.fromInt (floor millisPerMilli) ]
+
+                              else
+                                div [] []
                             ]
                        ]
 
