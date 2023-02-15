@@ -367,26 +367,11 @@ update msg model =
                         )
 
                     Playing snapshot ->
-                        -- DEBUG code to force fast forward to take a long time
-                        let
-                            someTimeAgo : Posix
-                            someTimeAgo =
-                                Time.Extra.add Time.Extra.Minute -60 Time.utc (Snapshot.getTime snapshot)
-
-                            someTimeAgoSnapshot =
-                                Snapshot.setTime someTimeAgo snapshot
-                        in
                         ( model
                             |> setIsVisible True
-                            |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot, previousIntervalTimer = NotStarted })
+                            |> setGameState (FastForward { original = snapshot, current = snapshot, previousIntervalTimer = NotStarted })
                         , Task.perform HandleFastForward Time.now
                         )
-                -- Playing snapshot ->
-                --     ( model
-                --         |> setIsVisible True
-                --         |> setGameState (FastForward { original = snapshot, current = snapshot })
-                --     , Task.perform HandleFastForward Time.now
-                --     )
 
             else
                 ( model
