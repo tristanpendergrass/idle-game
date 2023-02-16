@@ -43,14 +43,13 @@ $ npm test -- --watch
 - [x] Show speed on chores
 - [x] Finalize values for all things
 - [x] Visuals for chores
-- [ ] Final polish
+- [x] Final polish
 
 ## Version 0.1.1
-- [ ] Build up foundation by picking items from Release 2's Tech stuff and Fundamentals
+- [ ] Fix performance by insuring no calls to intToString in game tick
 
 ## Version 0.2
 ### Tech stuff
-- [ ] Fix performance by insuring no calls to intToString in game tick
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
