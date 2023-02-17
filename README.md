@@ -46,7 +46,11 @@ $ npm test -- --watch
 - [x] Final polish
 
 ## Version 0.1.1
-- [ ] Fix performance by insuring no calls to intToString in game tick
+- [ ] Move things that should be in Game/ to Game/
+- [ ] Make release checklist. - change dev flags to prod flags, update version number in sidebar
+- [ ] Fix some icons not showing in prod for items (soot2?)
+- [x] Fix performance by insuring no calls to intToString in game tick
+- [ ] Add dev flag to randomize color scheme between light and dark rather than use the correct one so that i see it both ways more often
 
 ## Version 0.2
 ### Tech stuff
@@ -73,6 +77,8 @@ $ npm test -- --watch
 - [ ] Activity status bar at bottom for mobile
 - [ ] Move Item Mastery (M) info to detail sidebar
 - [ ] Show Time Passes during Fast Forward with real time change
+- [ ] Add change log section
+  - [ ] Add notification that shows that update happened
 
 ### Features
 - [ ] Skill 2

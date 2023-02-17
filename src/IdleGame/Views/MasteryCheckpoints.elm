@@ -4,6 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Event as Event
 import IdleGame.Game
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils
@@ -13,7 +14,7 @@ import Round
 import Types exposing (..)
 
 
-renderCheckpoint : { number : Int, label : String, isActive : Bool } -> Html FrontendMsg
+renderCheckpoint : { number : Int, label : Event.ModLabel, isActive : Bool } -> Html FrontendMsg
 renderCheckpoint { number, label, isActive } =
     div
         [ class "flex w-full items-center gap-4 p-2"
@@ -28,7 +29,7 @@ renderCheckpoint { number, label, isActive } =
                     ""
             ]
             [ text <| IdleGame.Views.Utils.intToString number ++ "%" ]
-        , div [ class "flex-grow text-success" ] [ text label ]
+        , div [ class "flex-grow text-success" ] [ text <| Event.modLabelToString label ]
         ]
 
 

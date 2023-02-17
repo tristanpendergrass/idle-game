@@ -36,7 +36,7 @@ mockModdedEvent effects =
 mockMod : Transformer -> Mod
 mockMod transformer =
     { tags = []
-    , label = "Test"
+    , label = XpModLabel 1
     , transformer = transformer
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1

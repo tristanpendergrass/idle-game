@@ -8,7 +8,7 @@ type alias Flags =
 
 
 flags =
-    prodFlags
+    devFlags
 
 
 devFlags : Flags

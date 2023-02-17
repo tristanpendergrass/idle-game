@@ -79,7 +79,7 @@ setType newType (Effect data) =
 
 type alias Mod =
     { tags : List Tag
-    , label : String
+    , label : ModLabel
     , transformer : Transformer
     , howManyTimesToApplyMod : Int
     , source : ModSource
@@ -347,35 +347,10 @@ increaseSuccessTransformer buff howManyTimesToApplyMod effect =
             NoChange
 
 
-xpModLabel : Float -> String
-xpModLabel multiplier =
-    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% XP"
-
-
-coinModLabel : Float -> String
-coinModLabel multiplier =
-    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Coin"
-
-
-mxpModLabel : Float -> String
-mxpModLabel multiplier =
-    "+" ++ IdleGame.Views.Utils.intToString (floor (multiplier * 100)) ++ "% Mastery XP"
-
-
-resourceModLabel : Float -> String
-resourceModLabel buff =
-    "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
-
-
-successProbabilityModLabel : Float -> String
-successProbabilityModLabel buff =
-    "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
-
-
 devGlobalXpBuff : Mod
 devGlobalXpBuff =
     { tags = [ Xp ]
-    , label = xpModLabel 1.0
+    , label = XpModLabel 1
     , transformer = xpTransformer 1.0
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
@@ -385,7 +360,7 @@ devGlobalXpBuff =
 choresXpBuff : Float -> Mod
 choresXpBuff buff =
     { tags = [ Chores, Xp ]
-    , label = xpModLabel buff
+    , label = XpModLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
@@ -395,7 +370,7 @@ choresXpBuff buff =
 choresCoinBuff : Float -> Mod
 choresCoinBuff buff =
     { tags = [ Chores ]
-    , label = coinModLabel buff
+    , label = CoinModLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
@@ -405,7 +380,7 @@ choresCoinBuff buff =
 choresMxpBuff : Float -> Mod
 choresMxpBuff buff =
     { tags = []
-    , label = mxpModLabel buff
+    , label = MxpModLabel buff
     , transformer = mxpTransformer buff
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
@@ -415,7 +390,7 @@ choresMxpBuff buff =
 choresResourceBuff : Float -> Mod
 choresResourceBuff buff =
     { tags = [ Chores ]
-    , label = resourceModLabel buff
+    , label = ResourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
@@ -425,8 +400,35 @@ choresResourceBuff buff =
 successBuff : Float -> Mod
 successBuff buff =
     { tags = []
-    , label = successProbabilityModLabel buff
+    , label = SuccessModLabel buff
     , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
     , howManyTimesToApplyMod = 1
     }
+
+
+type ModLabel
+    = XpModLabel Float
+    | MxpModLabel Float
+    | ResourceModLabel Float
+    | SuccessModLabel Float
+    | CoinModLabel Float
+
+
+modLabelToString : ModLabel -> String
+modLabelToString modLabel =
+    case modLabel of
+        XpModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% XP"
+
+        MxpModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Mastery XP"
+
+        ResourceModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
+
+        SuccessModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
+
+        CoinModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Coin"

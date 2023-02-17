@@ -622,9 +622,9 @@ getAllMods : Game -> List Mod
 getAllMods game =
     []
         -- ++ [ devGlobalXpBuff ]
-        ++ getChoreMasteryPoolMods game
+        -- ++ getChoreMasteryPoolMods game
         ++ getChoreUnlocksMods game
-        ++ getShopItemMods game
+        -- ++ getShopItemMods game
         ++ []
 
 
