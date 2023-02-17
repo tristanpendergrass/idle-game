@@ -7,7 +7,7 @@ import DebugConfig
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -414,14 +414,14 @@ update msg model =
 
                             canAfford : Bool
                             canAfford =
-                                Coin.getVal stats.price <= Coin.getVal game.coin
+                                Counter.getVal stats.price <= Counter.getVal game.coin
 
                             dontOwnItemYet =
                                 not <| ShopItems.isOwned kind game.shopItems
                         in
                         if canAfford && dontOwnItemYet then
                             { game
-                                | coin = Coin.subtract game.coin stats.price
+                                | coin = Counter.subtract game.coin stats.price
                                 , shopItems = ShopItems.addItem kind game.shopItems
                             }
 
@@ -500,7 +500,7 @@ toastToHtml notification =
     case notification of
         GainedCoin amount ->
             div [ class "flex gap-1 items-center" ]
-                [ span [] [ text <| "+" ++ Coin.toString amount ]
+                [ span [] [ text <| "+" ++ Counter.toString amount ]
                 , Icon.coin
                     |> Icon.toHtml
                 ]

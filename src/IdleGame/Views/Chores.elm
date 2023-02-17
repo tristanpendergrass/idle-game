@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chore as Chore
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game, getChoreListItems)
 import IdleGame.GameTypes exposing (..)
@@ -72,7 +72,7 @@ render game =
 
 
 type alias ChoreEffectsView =
-    { coin : Coin.Counter, skillXp : Float, mxp : Float, resource : Resource.Kind, probability : Float }
+    { coin : Counter, skillXp : Float, mxp : Float, resource : Resource.Kind, probability : Float }
 
 
 getChoreEfffectsView : Game -> List Effect -> Maybe ChoreEffectsView
@@ -134,12 +134,12 @@ getChoreMxp game effect =
             Nothing
 
 
-getChoreCoin : Effect -> Maybe Coin.Counter
+getChoreCoin : Effect -> Maybe Counter
 getChoreCoin effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
         GainCoin { base, multiplier } ->
-            Just <| Coin.multiplyBy multiplier base
+            Just <| Counter.multiplyBy multiplier base
 
         _ ->
             Nothing
@@ -267,7 +267,7 @@ type alias ChoreItemView =
     , maybeTimer : Maybe Timer
     , duration : Float
     , imgSrc : String
-    , coin : Coin.Counter
+    , coin : Counter
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
     , skillXp : Float
@@ -286,7 +286,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
         rendercoin =
             div [ class "flex items-center gap-1" ]
                 [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text (Coin.toString coin) ]
+                    [ span [] [ text (Counter.toString coin) ]
                     , Icon.coin
                         |> Icon.toHtml
                     ]

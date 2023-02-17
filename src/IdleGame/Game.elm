@@ -1,7 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import IdleGame.Chore as Chore
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -23,7 +23,7 @@ type alias Game =
     , choresMxp : Float
     , activeChore : Maybe ( ChoreKind, Timer )
     , choresData : Chore.AllChoreStates
-    , coin : Coin.Counter
+    , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
     }
@@ -47,7 +47,7 @@ create seed =
         , organizeSpellBooks = { mxp = 0 }
         }
     , coin =
-        Coin.create 0
+        Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
     }
@@ -322,7 +322,7 @@ applyEffect effect game =
             -- Important! Keep the application here in sync with Views.Chores.elm
             let
                 newCounter =
-                    Coin.multiplyBy quantity.multiplier quantity.base
+                    Counter.multiplyBy quantity.multiplier quantity.base
             in
             addCoin newCounter game
                 |> Random.constant
@@ -363,9 +363,9 @@ addMasteryPoolXp amount game =
     { game | choresMxp = game.choresMxp + amount }
 
 
-addCoin : Coin.Counter -> Game -> ( Game, List Toast )
+addCoin : Counter -> Game -> ( Game, List Toast )
 addCoin amount game =
-    ( { game | coin = Coin.add game.coin amount }, [ GainedCoin amount ] )
+    ( { game | coin = Counter.add game.coin amount }, [ GainedCoin amount ] )
 
 
 gainResource : Int -> Resource.Kind -> Effect
@@ -389,7 +389,7 @@ gainChoreMxp kind =
     Effect { type_ = GainChoreMxp { multiplier = 1 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
 
 
-gainCoin : Coin.Counter -> Effect
+gainCoin : Counter -> Effect
 gainCoin amount =
     Effect { type_ = GainCoin { base = amount, multiplier = 1 }, tags = [] }
 
@@ -430,7 +430,7 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , coinGains : Maybe Coin.Counter
+    , coinGains : Maybe Counter
     , resourcesDiff : Resource.Diff
     }
 
@@ -446,8 +446,8 @@ getTimePassesData originalGame currentGame =
                 [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
 
         coinGains =
-            if Coin.getVal currentGame.coin > Coin.getVal originalGame.coin then
-                Just <| Coin.subtract currentGame.coin originalGame.coin
+            if Counter.getVal currentGame.coin > Counter.getVal originalGame.coin then
+                Just <| Counter.subtract currentGame.coin originalGame.coin
 
             else
                 Nothing

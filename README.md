@@ -46,7 +46,6 @@ $ npm test -- --watch
 - [x] Final polish
 
 ## Version 0.1.1
-- [ ] Move things that should be in Game/ to Game/
 - [ ] Make release checklist. - change dev flags to prod flags, update version number in sidebar
 - [ ] Fix some icons not showing in prod for items (soot2?)
 - [x] Fix performance by insuring no calls to intToString in game tick
@@ -57,7 +56,6 @@ $ npm test -- --watch
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
-- [ ] Refactor coin to be a non-negative type
 - [ ] Set up elm-review
   - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded

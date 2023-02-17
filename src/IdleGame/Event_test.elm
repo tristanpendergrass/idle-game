@@ -1,7 +1,7 @@
 module IdleGame.Event_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Resource as Resource
 import Test exposing (..)
@@ -95,7 +95,7 @@ getOneMorecoin =
             -- Grants +1 coin when coin is gained
             case effectType of
                 GainCoin { base, multiplier } ->
-                    GainCoin { base = Coin.add base (Coin.create 1), multiplier = multiplier }
+                    GainCoin { base = Counter.add base (Counter.create 1), multiplier = multiplier }
 
                 _ ->
                     effectType
@@ -111,7 +111,7 @@ testMods { mods, event, moddedEvent } =
 
 getCoin : Int -> EffectType
 getCoin amount =
-    GainCoin { base = Coin.create amount, multiplier = 0 }
+    GainCoin { base = Counter.create amount, multiplier = 0 }
 
 
 getResource : Int -> Resource.Kind -> EffectType

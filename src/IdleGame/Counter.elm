@@ -1,4 +1,4 @@
-module IdleGame.Coin exposing (..)
+module IdleGame.Counter exposing (..)
 
 import IdleGame.Views.Utils
 

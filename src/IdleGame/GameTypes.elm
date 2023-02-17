@@ -1,6 +1,6 @@
 module IdleGame.GameTypes exposing (..)
 
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Resource as Resource
 
 
@@ -17,7 +17,7 @@ type ChoreKind
 
 
 type Toast
-    = GainedCoin Coin.Counter
+    = GainedCoin Counter
     | GainedResource Int Resource.Kind
 
 

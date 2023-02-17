@@ -1,6 +1,6 @@
 module IdleGame.Event exposing (..)
 
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Utils
@@ -53,7 +53,7 @@ type EffectType
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Float, multiplier : Float } Skill
     | GainChoreMxp { multiplier : Float } ChoreKind
-    | GainCoin { base : Coin.Counter, multiplier : Float }
+    | GainCoin { base : Counter, multiplier : Float }
 
 
 type Effect

@@ -1,6 +1,6 @@
 module IdleGame.Chore exposing (..)
 
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 
@@ -52,7 +52,7 @@ type alias ChoreOutcome =
     , duration : Float
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
-    , coin : Coin.Counter
+    , coin : Counter
     }
 
 
@@ -76,7 +76,7 @@ cleanStablesStats =
         , duration = 3000
         , extraResourceProbability = 0.25
         , extraResource = Resource.Manure
-        , coin = Coin.create 1
+        , coin = Counter.create 1
         }
     }
 
@@ -92,7 +92,7 @@ cleanBigBubbaStats =
         , duration = 6000
         , extraResourceProbability = 0.75
         , extraResource = Resource.Manure
-        , coin = Coin.create 3
+        , coin = Counter.create 3
         }
     }
 
@@ -108,7 +108,7 @@ sweepChimneysStats =
         , duration = 8000
         , extraResourceProbability = 0.5
         , extraResource = Resource.Soot
-        , coin = Coin.create 6
+        , coin = Counter.create 6
         }
     }
 
@@ -124,7 +124,7 @@ waterGreenhousePlantsStats =
         , duration = 2000
         , extraResourceProbability = 0.6
         , extraResource = Resource.GreenhouseDirt
-        , coin = Coin.create 2
+        , coin = Counter.create 2
         }
     }
 
@@ -140,7 +140,7 @@ washAndIronRobesStats =
         , duration = 8000
         , extraResourceProbability = 0.2
         , extraResource = Resource.WashWater
-        , coin = Coin.create 9
+        , coin = Counter.create 9
         }
     }
 
@@ -156,7 +156,7 @@ organizePotionIngredientsStats =
         , duration = 20000
         , extraResourceProbability = 0.1
         , extraResource = Resource.EmptyBottle
-        , coin = Coin.create 12
+        , coin = Counter.create 12
         }
     }
 
@@ -172,7 +172,7 @@ repairInstrumentsStats =
         , duration = 12000
         , extraResourceProbability = 0.25
         , extraResource = Resource.Scrap
-        , coin = Coin.create 20
+        , coin = Counter.create 20
         }
     }
 
@@ -188,7 +188,7 @@ flushDrainDemonsStats =
         , duration = 10000
         , extraResourceProbability = 0.5
         , extraResource = Resource.Ectoplasm
-        , coin = Coin.create 14
+        , coin = Counter.create 14
         }
     }
 
@@ -204,7 +204,7 @@ organizeSpellBooksStats =
         , duration = 20000
         , extraResourceProbability = 0.1
         , extraResource = Resource.Parchment
-        , coin = Coin.create 30
+        , coin = Counter.create 30
         }
     }
 

@@ -2,7 +2,7 @@ module IdleGame.ShopItems exposing (..)
 
 import Html exposing (..)
 import IdleGame.Chore as Chore
-import IdleGame.Coin as Coin
+import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
@@ -25,7 +25,7 @@ allKinds =
 type alias Stats =
     { title : String
     , icon : Icon
-    , price : Coin.Counter
+    , price : Counter
     , unlockLevel : Int
     , reward : Reward
     , description : String
@@ -42,7 +42,7 @@ dummyReward =
 shovelStats =
     { title = "Shovel"
     , icon = Icon.shovel
-    , price = Coin.create 50
+    , price = Counter.create 50
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
@@ -58,7 +58,7 @@ shovelStats =
 beginnerDualWieldingStats =
     { title = "Beginner Dual Wielding"
     , icon = Icon.book
-    , price = Coin.create 6000
+    , price = Counter.create 6000
     , unlockLevel = 35
     , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
     , description = "+100% faster at Water Greenhouse Plants"
@@ -70,7 +70,7 @@ beginnerDualWieldingStats =
 keyringStats =
     { title = "Keyring"
     , icon = Icon.keyring
-    , price = Coin.create 10000
+    , price = Counter.create 10000
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
@@ -84,7 +84,7 @@ keyringStats =
 readingGlassesStats =
     { title = "Reading Glasses"
     , icon = Icon.readingGlasses
-    , price = Coin.create 3000
+    , price = Counter.create 3000
     , unlockLevel = 55
     , reward =
         ShopItemMod
@@ -108,7 +108,7 @@ readingGlassesStats =
 oversizedBagStats =
     { title = "OversizedBag"
     , icon = Icon.oversizedBag
-    , price = Coin.create 5000
+    , price = Counter.create 5000
     , unlockLevel = 65
     , reward =
         ShopItemMod
