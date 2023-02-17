@@ -98,9 +98,12 @@ getChoreListItems { choresXp } =
 -- Chores
 
 
-getEvent : Chore.Stats -> Event
-getEvent { kind, outcome } =
+getEvent : ChoreKind -> Event
+getEvent kind =
     let
+        outcome =
+            (Chore.getStats kind).outcome
+
         { xp, extraResourceProbability, extraResource, coin } =
             outcome
     in
@@ -192,7 +195,7 @@ tick tickDuration game =
 
                         newEvents =
                             []
-                                ++ List.repeat completions (getEvent choreStats)
+                                ++ List.repeat completions (getEvent choreKind)
                     in
                     ( activeChore
                     , newEvents

@@ -37,9 +37,7 @@ type alias AllChoreStates =
 
 
 type alias Stats =
-    -- TODO: the type_ should not be here, otherwise it's possible in the model to store a chore of the wrong type under a key
-    { kind : ChoreKind
-    , title : String
+    { title : String
     , imgSrc : String
     , getter : AllChoreStates -> State
     , setter : (State -> State) -> AllChoreStates -> AllChoreStates
@@ -66,8 +64,7 @@ incrementChoreMxp amount kind choresData =
 
 
 cleanStablesStats =
-    { kind = CleanStables
-    , title = "Clean Stables"
+    { title = "Clean Stables"
     , imgSrc = "/chores/stable.png"
     , getter = .cleanStables
     , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
@@ -82,8 +79,7 @@ cleanStablesStats =
 
 
 cleanBigBubbaStats =
-    { kind = CleanBigBubba
-    , title = "Clean Big Bubba's Stall"
+    { title = "Clean Big Bubba's Stall"
     , imgSrc = "/chores/bubba4.png"
     , getter = .cleanBigBubba
     , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
@@ -98,8 +94,7 @@ cleanBigBubbaStats =
 
 
 sweepChimneysStats =
-    { kind = SweepChimneys
-    , title = "Sweep Chimneys"
+    { title = "Sweep Chimneys"
     , imgSrc = "/chores/chimney.png"
     , getter = .sweepChimneys
     , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
@@ -114,8 +109,7 @@ sweepChimneysStats =
 
 
 waterGreenhousePlantsStats =
-    { kind = WaterGreenhousePlants
-    , title = "Water Greenhouse Plants"
+    { title = "Water Greenhouse Plants"
     , imgSrc = "/chores/greenhouse_3.png"
     , getter = .waterGreenhousePlants
     , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
@@ -130,8 +124,7 @@ waterGreenhousePlantsStats =
 
 
 washAndIronRobesStats =
-    { kind = WashAndIronRobes
-    , title = "Wash and Iron Robes"
+    { title = "Wash and Iron Robes"
     , imgSrc = "/chores/washRobes.png"
     , getter = .washRobes
     , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
@@ -146,8 +139,7 @@ washAndIronRobesStats =
 
 
 organizePotionIngredientsStats =
-    { kind = OrganizePotionIngredients
-    , title = "Organize Potion Ingredients"
+    { title = "Organize Potion Ingredients"
     , imgSrc = "/chores/potionIngredients_2.png"
     , getter = .organizePotionIngredients
     , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
@@ -162,8 +154,7 @@ organizePotionIngredientsStats =
 
 
 repairInstrumentsStats =
-    { kind = RepairInstruments
-    , title = "Repair Instruments"
+    { title = "Repair Instruments"
     , imgSrc = "/chores/repairInstruments.png"
     , getter = .repairInstruments
     , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
@@ -178,8 +169,7 @@ repairInstrumentsStats =
 
 
 flushDrainDemonsStats =
-    { kind = FlushDrainDemons
-    , title = "Flush the Drain Demons"
+    { title = "Flush the Drain Demons"
     , imgSrc = "/chores/drainDemons.png"
     , getter = .flushDrainDemons
     , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
@@ -194,8 +184,7 @@ flushDrainDemonsStats =
 
 
 organizeSpellBooksStats =
-    { kind = OrganizeSpellBooks
-    , title = "Organize Spell Books"
+    { title = "Organize Spell Books"
     , imgSrc = "/chores/spellBooks.png"
     , getter = .organizeSpellBooks
     , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }

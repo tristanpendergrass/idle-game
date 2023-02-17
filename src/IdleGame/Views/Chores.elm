@@ -7,7 +7,7 @@ import Html.Events exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
-import IdleGame.Game exposing (Game, getChoreListItems)
+import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
@@ -204,7 +204,7 @@ renderChoreListItem game item =
 
                 moddedEvent : ModdedEvent
                 moddedEvent =
-                    IdleGame.Game.getEvent stats
+                    IdleGame.Game.getEvent kind
                         |> IdleGame.Event.applyModsToEvent (IdleGame.Game.getAllMods game)
 
                 effects =

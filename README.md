@@ -50,6 +50,8 @@ $ npm test -- --watch
 - [ ] Fix some icons not showing in prod for items (soot2?)
 - [x] Fix performance by insuring no calls to intToString in game tick
 - [ ] Add dev flag to randomize color scheme between light and dark rather than use the correct one so that i see it both ways more often
+- [ ] Refactor Resource module's Amounts to use Dict with any key module. Same with ChoreData
+- [ ] Investigate using Testing Library with elm if possible
 
 ## Version 0.2
 ### Tech stuff
