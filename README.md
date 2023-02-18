@@ -47,11 +47,12 @@ $ npm test -- --watch
 
 ## Version 0.1.1
 - [ ] Make release checklist. - change dev flags to prod flags, update version number in sidebar
-- [ ] Fix some icons not showing in prod for items (soot2?)
+- [x] Fix some icons not showing in prod for items (soot2?)
 - [x] Fix performance by insuring no calls to intToString in game tick
 - [ ] Add dev flag to randomize color scheme between light and dark rather than use the correct one so that i see it both ways more often
 - [ ] Refactor Resource module's Amounts to use Dict with any key module. Same with ChoreData
 - [ ] Investigate using Testing Library with elm if possible
+- [x] Prevent skill level from exceeding 99
 
 ## Version 0.2
 ### Tech stuff

@@ -25,6 +25,15 @@ skillLevelTest =
             \_ ->
                 skillLevel 1154
                     |> Expect.equal 10
+        , test "returns correct skill level for 13034431 xp" <|
+            \_ ->
+                skillLevel 13034431
+                    |> Expect.equal 99
+        , test "returns correct skill level for 13034432 xp" <|
+            -- Tests that 99 is the maximum
+            \_ ->
+                skillLevel 13034432
+                    |> Expect.equal 99
         ]
 
 
