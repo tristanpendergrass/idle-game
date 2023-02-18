@@ -208,7 +208,7 @@ update msg model =
 
         AddToast content ->
             Toast.expireIn 3000 content
-                -- Toast.persistent content
+                -- Toast.persistent content -- this can be used for testing toast styles to make the toast not disappear
                 -- NOTE: Number passed to withExitTransition should match the transition duration of class "toast" in index.css
                 |> Toast.withExitTransition 900
                 |> Toast.add model.tray

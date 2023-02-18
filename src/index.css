@@ -65,10 +65,10 @@
 .toast-tray {
   @apply t-column gap-2;
   position: fixed;
-  bottom: 1em;
+  bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 80vw;
+  width: auto; /* Without width: auto the toast tray will have 100% width and block clicking things underneath */
 }
 
 .toast {

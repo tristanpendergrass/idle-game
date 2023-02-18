@@ -39,7 +39,7 @@ $ npm test -- --watch
 ## Version
 
 ## Version 0.1.2
-- [ ] Fix bug with notification container preventing clicking anything underneath
+- [x] Fix bug with notification container preventing clicking anything underneath
 - [ ] Additional stuff pull in from Tech stuff
 
 ## Version 0.2
