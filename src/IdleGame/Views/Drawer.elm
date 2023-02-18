@@ -66,7 +66,7 @@ renderDrawer game activeTab =
                         ]
                     , a [ href "/", class "link link-hover font-mono text-xs text-opacity-50 " ]
                         [ div [ class "tooltip tooltip-bottom", attribute "data-tip" "Patch notes" ]
-                            [ text "0.0.1" ]
+                            [ text "0.1.1" ]
                         ]
                     ]
 
