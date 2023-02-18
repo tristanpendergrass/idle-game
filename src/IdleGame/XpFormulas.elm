@@ -20,7 +20,7 @@ xpRequirements =
 
 skillLevel : Float -> Int
 skillLevel xp =
-    Debug.log "skill level" <| skillLevelHelp (Debug.log "xp" xp) 1
+    skillLevelHelp xp 1
 
 
 skillLevelPercent : Float -> Float
