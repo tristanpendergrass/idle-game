@@ -1,5 +1,7 @@
 module DebugConfig exposing (..)
 
+import Env
+
 
 type alias Flags =
     { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
@@ -7,8 +9,14 @@ type alias Flags =
     }
 
 
+flags : Flags
 flags =
-    prodFlags
+    case Env.mode of
+        Env.Development ->
+            devFlags
+
+        Env.Production ->
+            prodFlags
 
 
 devFlags : Flags
