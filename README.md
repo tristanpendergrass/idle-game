@@ -40,7 +40,9 @@ $ npm test -- --watch
 
 ## Version 0.1.2
 - [x] Fix bug with notification container preventing clicking anything underneath
-- [ ] Additional stuff pull in from Tech stuff
+- [ ] Create dev panel
+  - [ ] With option to turn off Time Passes modal
+  - [ ] With option to fast forward time
 
 ## Version 0.2
 ### Tech stuff

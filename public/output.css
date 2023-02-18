@@ -3514,6 +3514,10 @@ body[dir="rtl"] .checkbox:checked,
   visibility: visible;
 }
 
+.invisible {
+  visibility: hidden;
+}
+
 .fixed {
   position: fixed;
 }

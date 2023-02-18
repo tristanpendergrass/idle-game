@@ -31,10 +31,17 @@ type PreviousIntervalTimer
     | HaveStartAndEnd Posix Posix
 
 
+type alias FastForwardState =
+    { original : Snapshot Game
+    , current : Snapshot Game
+    , previousIntervalTimer : PreviousIntervalTimer
+    }
+
+
 type FrontendGameState
     = Initializing
     | Playing (Snapshot Game)
-    | FastForward { original : Snapshot Game, current : Snapshot Game, previousIntervalTimer : PreviousIntervalTimer }
+    | FastForward FastForwardState
 
 
 type alias FrontendModel =

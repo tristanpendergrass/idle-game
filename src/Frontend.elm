@@ -19,6 +19,7 @@ import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.Drawer
+import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
@@ -533,34 +534,28 @@ view model =
                 css
 
             FastForward { previousIntervalTimer } ->
+                let
+                    speed : IdleGame.Views.FastForward.Speed
+                    speed =
+                        case previousIntervalTimer of
+                            NotStarted ->
+                                IdleGame.Views.FastForward.SpeedCalculating
+
+                            HaveStart _ ->
+                                IdleGame.Views.FastForward.SpeedCalculating
+
+                            HaveStartAndEnd start end ->
+                                let
+                                    diff =
+                                        Time.posixToMillis end - Time.posixToMillis start
+
+                                    millisPerMilli =
+                                        toFloat fastForwardTime / (toFloat diff - sleepTime)
+                                in
+                                IdleGame.Views.FastForward.Speed millisPerMilli
+                in
                 css
-                    ++ [ div
-                            [ class "w-screen h-screen flex flex-col gap-2 items-center justify-center"
-                            ]
-                            [ div [] [ text "Fast Forwarding..." ]
-                            , progress [ class "progress progress-primary w-56" ] []
-                            , if DebugConfig.flags.showFastForwardSpeed then
-                                case previousIntervalTimer of
-                                    NotStarted ->
-                                        div [] [ text "Starting calculation..." ]
-
-                                    HaveStart _ ->
-                                        div [] [ text "Starting calculation..." ]
-
-                                    HaveStartAndEnd start end ->
-                                        let
-                                            diff =
-                                                Time.posixToMillis end - Time.posixToMillis start
-
-                                            millisPerMilli =
-                                                toFloat fastForwardTime / (toFloat diff - sleepTime)
-                                        in
-                                        div [] [ text <| "Speed (ms/ms): " ++ String.fromInt (floor millisPerMilli) ]
-
-                              else
-                                div [] []
-                            ]
-                       ]
+                    ++ [ IdleGame.Views.FastForward.render speed ]
 
             Playing snapshot ->
                 let
