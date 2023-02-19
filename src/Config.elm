@@ -1,4 +1,4 @@
-module DebugConfig exposing (..)
+module Config exposing (..)
 
 import Env
 

@@ -1,6 +1,6 @@
 module IdleGame.Views.FastForward exposing (..)
 
-import DebugConfig
+import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Types exposing (..)
@@ -18,7 +18,7 @@ render speed =
         ]
         [ div [] [ text "Fast Forwarding..." ]
         , progress [ class "progress progress-primary w-56" ] []
-        , div [ classList [ ( "invisible", not DebugConfig.flags.showFastForwardSpeed ) ] ]
+        , div [ classList [ ( "invisible", not Config.flags.showFastForwardSpeed ) ] ]
             [ case speed of
                 SpeedCalculating ->
                     div [] [ text "Calculating speed..." ]

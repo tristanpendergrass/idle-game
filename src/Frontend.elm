@@ -4,7 +4,7 @@ import Browser exposing (Document, UrlRequest(..))
 import Browser.Dom
 import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation as Nav
-import DebugConfig
+import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -465,7 +465,7 @@ updateFromBackend msg model =
                         someTimeAgo : Posix
                         someTimeAgo =
                             -- DEBUG code to force fast forward to take a long time
-                            Time.Extra.add Time.Extra.Millisecond (-1 * DebugConfig.flags.extraFastForwardTime) Time.utc (Snapshot.getTime serverSnapshot)
+                            Time.Extra.add Time.Extra.Millisecond (-1 * Config.flags.extraFastForwardTime) Time.utc (Snapshot.getTime serverSnapshot)
 
                         someTimeAgoSnapshot =
                             Snapshot.setTime someTimeAgo serverSnapshot
