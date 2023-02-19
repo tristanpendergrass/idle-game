@@ -52,11 +52,11 @@ renderDrawer game activeTab =
                     [ underConstructionIcon ]
                 ]
     in
-    div [ class "drawer-side", attribute "style" "scroll-behavior:smooth; scroll-padding-top:5rem" ]
+    div [ class "drawer-side", attribute "style" "scroll-behavior: smooth; scroll-padding-top:5rem" ]
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
             -- title row
-            [ div [ class "bg-base-200 sticky top-0 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
+            [ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center gap-2" ]
                     [ div [ class "flex-0 px-2" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl" ]
