@@ -581,7 +581,12 @@ view model =
                             bottomRightItems =
                                 div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
                                     ([]
-                                        ++ [ debugPanelButton ]
+                                        ++ (if Config.flags.showDebugPanel then
+                                                [ debugPanelButton ]
+
+                                            else
+                                                []
+                                           )
                                         ++ (case model.activeTab of
                                                 Tab.Chores ->
                                                     [ IdleGame.Views.Chores.renderBottomRight ]
