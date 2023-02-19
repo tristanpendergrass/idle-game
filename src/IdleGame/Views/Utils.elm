@@ -50,6 +50,7 @@ zIndexes =
     , navbar = class "z-20"
     , toast = class "z-20"
     , bottomRightMenu = class "z-30"
+    , drawerSide = class "z-30"
     , modalWrapper = class "z-40"
     , debugPanel = class "z-50"
     }

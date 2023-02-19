@@ -385,6 +385,4 @@ renderLockedChore level =
 
 renderBottomRight : Html FrontendMsg
 renderBottomRight =
-    div [ class "absolute bottom-[2rem] right-[2rem]", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
-        [ button [ class "btn btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
-        ]
+    button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]

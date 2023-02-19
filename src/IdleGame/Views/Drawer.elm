@@ -7,11 +7,12 @@ import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Utils as Utils
 import Types exposing (..)
 
 
-renderDrawer : Game -> Tab -> Html FrontendMsg
-renderDrawer game activeTab =
+renderDrawer : Bool -> Tab -> Html FrontendMsg
+renderDrawer isDrawerOpen activeTab =
     let
         underConstructionIcon =
             Icon.underConstruction
@@ -51,8 +52,15 @@ renderDrawer game activeTab =
                 , span [ class "flex-none" ]
                     [ underConstructionIcon ]
                 ]
+
+        zIndexAttributes =
+            if isDrawerOpen then
+                [ Utils.zIndexes.drawerSide ]
+
+            else
+                []
     in
-    div [ class "drawer-side", attribute "style" "scroll-behavior: smooth; scroll-padding-top:5rem" ]
+    div ([ class "drawer-side", attribute "style" "scroll-behavior: smooth; scroll-padding-top:5rem" ] ++ zIndexAttributes)
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
             -- title row
@@ -72,9 +80,8 @@ renderDrawer game activeTab =
 
                 -- Close drawer button
                 , label [ for "drawer", class "btn btn-square btn-ghost drawer-button lg:hidden" ]
-                    [ FeatherIcons.x
-                        |> FeatherIcons.withSize 20
-                        |> FeatherIcons.toHtml []
+                    [ Icon.close
+                        |> Icon.toHtml
                     ]
                 ]
             , div [ class "h-4" ] []

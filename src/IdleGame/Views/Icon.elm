@@ -106,6 +106,16 @@ createIconPublic iconSrc =
     IconPublic iconSrc defaultParams
 
 
+close : Icon
+close =
+    createIconFeather FeatherIcons.x
+
+
+debug : Icon
+debug =
+    createIconFeather FeatherIcons.tool
+
+
 menu : Icon
 menu =
     createIconFeather FeatherIcons.menu

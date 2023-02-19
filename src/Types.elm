@@ -46,6 +46,7 @@ type FrontendGameState
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , showDebugPanel : Bool
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
     , activeTab : Tab
@@ -73,7 +74,7 @@ type FrontendMsg
     | ToastMsg Toast.Msg
     | AddToast Toast
     | HandleFastForward Posix
-    | HandleAnimationFrame Time.Posix
+    | HandleAnimationFrame Posix
     | HandleAnimationFrameDelta Float
     | SetDrawerOpen Bool
     | HandleVisibilityChange Browser.Events.Visibility
@@ -84,6 +85,9 @@ type FrontendMsg
     | HandleShopItemClick ShopItems.Kind
       -- Chores
     | ToggleActiveChore ChoreKind
+      -- Debug Panel
+    | OpenDebugPanel
+    | CloseDebugPanel
 
 
 type ToBackend

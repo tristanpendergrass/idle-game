@@ -40,15 +40,12 @@ $ npm test -- --watch
 
 ## Version 0.1.2
 - [x] Fix bug with notification container preventing clicking anything underneath
-- [ ] Create dev panel
-  - [ ] With option to turn off Time Passes modal
-  - [ ] With option to fast forward time
-
-## Version 0.2
-### Tech stuff
 - [ ] Dev Panel
 	- [ ] Add time
 	- [ ] Toggle off Time Passes showing
+
+## Version 0.2
+### Tech stuff
 - [ ] Set up elm-review
   - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded

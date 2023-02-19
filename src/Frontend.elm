@@ -1,6 +1,7 @@
 module Frontend exposing (app)
 
 import Browser exposing (Document, UrlRequest(..))
+import Browser.Dom
 import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation as Nav
 import DebugConfig
@@ -18,7 +19,7 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
-import IdleGame.Views.DebugPanel
+import IdleGame.Views.DebugPanel as DebugPanel
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -58,6 +59,7 @@ delay ms msg =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init url key =
     ( { key = key
+      , showDebugPanel = False
       , tray = Toast.tray
       , isDrawerOpen = False
       , activeTab = Tab.Chores
@@ -207,6 +209,18 @@ update msg model =
 
         UrlChanged url ->
             noOp
+
+        OpenDebugPanel ->
+            ( { model | showDebugPanel = True }
+              -- We added this sleep + focus commands here to try to give focus to the debug panel after it's opened.
+              -- It doesn't work for some reason but keeping it here in case I ever figure out why not.
+            , Process.sleep 100
+                |> Task.andThen (\_ -> Browser.Dom.focus DebugPanel.panelId)
+                |> Task.attempt (\_ -> NoOp)
+            )
+
+        CloseDebugPanel ->
+            ( { model | showDebugPanel = False }, Cmd.none )
 
         AddToast content ->
             Toast.expireIn 3000 content
@@ -526,15 +540,12 @@ view model =
             -- There's an experimental technique to include styles in header instead of body https://dashboard.lamdera.app/docs/html-head
             -- We're not using it for now because it's experimental but might be useful if we want to eliminate the flicker from the css loading in
             node "link" [ rel "stylesheet", href "/output.css" ] []
-
-        debugPanel =
-            IdleGame.Views.DebugPanel.render model
     in
     { title = "Idle Game"
     , body =
         []
             ++ [ css ]
-            ++ [ debugPanel ]
+            ++ [ DebugPanel.render model ]
             ++ (case model.gameState of
                     Initializing ->
                         []
@@ -567,25 +578,25 @@ view model =
                             game =
                                 Snapshot.getValue snapshot
 
-                            bottomRightMenu =
-                                case model.activeTab of
-                                    Tab.Bag ->
-                                        Just IdleGame.Views.Bag.renderBottomRight
+                            bottomRightItems =
+                                div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
+                                    ([]
+                                        ++ [ debugPanelButton ]
+                                        ++ (case model.activeTab of
+                                                Tab.Chores ->
+                                                    [ IdleGame.Views.Chores.renderBottomRight ]
 
-                                    Tab.Chores ->
-                                        Just IdleGame.Views.Chores.renderBottomRight
+                                                _ ->
+                                                    []
+                                           )
+                                    )
 
-                                    _ ->
-                                        Nothing
+                            debugPanelButton =
+                                DebugPanel.renderOpenButton
                         in
                         []
-                            ++ (case bottomRightMenu of
-                                    Just content ->
-                                        [ content ]
-
-                                    Nothing ->
-                                        []
-                               )
+                            ++ [ bottomRightItems
+                               ]
                             ++ [ Toast.render viewToast model.tray toastConfig ]
                             ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
                                     [ input
@@ -597,7 +608,7 @@ view model =
                                         ]
                                         []
                                     , IdleGame.Views.Content.renderContent game model.activeTab
-                                    , IdleGame.Views.Drawer.renderDrawer game model.activeTab
+                                    , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                                     ]
                                ]
                             ++ (case model.activeModal of
