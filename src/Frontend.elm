@@ -18,6 +18,7 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
+import IdleGame.Views.DebugPanel
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -524,109 +525,114 @@ view model =
         css =
             -- There's an experimental technique to include styles in header instead of body https://dashboard.lamdera.app/docs/html-head
             -- We're not using it for now because it's experimental but might be useful if we want to eliminate the flicker from the css loading in
-            [ node "link" [ rel "stylesheet", href "/output.css" ] []
-            ]
+            node "link" [ rel "stylesheet", href "/output.css" ] []
+
+        debugPanel =
+            IdleGame.Views.DebugPanel.render model
     in
     { title = "Idle Game"
     , body =
-        case model.gameState of
-            Initializing ->
-                css
+        []
+            ++ [ css ]
+            ++ [ debugPanel ]
+            ++ (case model.gameState of
+                    Initializing ->
+                        []
 
-            FastForward { previousIntervalTimer } ->
-                let
-                    speed : IdleGame.Views.FastForward.Speed
-                    speed =
-                        case previousIntervalTimer of
-                            NotStarted ->
-                                IdleGame.Views.FastForward.SpeedCalculating
+                    FastForward { previousIntervalTimer } ->
+                        let
+                            speed : IdleGame.Views.FastForward.Speed
+                            speed =
+                                case previousIntervalTimer of
+                                    NotStarted ->
+                                        IdleGame.Views.FastForward.SpeedCalculating
 
-                            HaveStart _ ->
-                                IdleGame.Views.FastForward.SpeedCalculating
+                                    HaveStart _ ->
+                                        IdleGame.Views.FastForward.SpeedCalculating
 
-                            HaveStartAndEnd start end ->
-                                let
-                                    diff =
-                                        Time.posixToMillis end - Time.posixToMillis start
+                                    HaveStartAndEnd start end ->
+                                        let
+                                            diff =
+                                                Time.posixToMillis end - Time.posixToMillis start
 
-                                    millisPerMilli =
-                                        toFloat fastForwardTime / (toFloat diff - sleepTime)
-                                in
-                                IdleGame.Views.FastForward.Speed millisPerMilli
-                in
-                css
-                    ++ [ IdleGame.Views.FastForward.render speed ]
+                                            millisPerMilli =
+                                                toFloat fastForwardTime / (toFloat diff - sleepTime)
+                                        in
+                                        IdleGame.Views.FastForward.Speed millisPerMilli
+                        in
+                        [ IdleGame.Views.FastForward.render speed ]
 
-            Playing snapshot ->
-                let
-                    game =
-                        Snapshot.getValue snapshot
+                    Playing snapshot ->
+                        let
+                            game =
+                                Snapshot.getValue snapshot
 
-                    bottomRightMenu =
-                        case model.activeTab of
-                            Tab.Bag ->
-                                Just IdleGame.Views.Bag.renderBottomRight
+                            bottomRightMenu =
+                                case model.activeTab of
+                                    Tab.Bag ->
+                                        Just IdleGame.Views.Bag.renderBottomRight
 
-                            Tab.Chores ->
-                                Just IdleGame.Views.Chores.renderBottomRight
+                                    Tab.Chores ->
+                                        Just IdleGame.Views.Chores.renderBottomRight
 
-                            _ ->
-                                Nothing
-                in
-                css
-                    ++ (case bottomRightMenu of
-                            Just content ->
-                                [ content ]
+                                    _ ->
+                                        Nothing
+                        in
+                        []
+                            ++ (case bottomRightMenu of
+                                    Just content ->
+                                        [ content ]
 
-                            Nothing ->
-                                []
-                       )
-                    ++ [ Toast.render viewToast model.tray toastConfig ]
-                    ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
-                            [ input
-                                [ id "drawer"
-                                , type_ "checkbox"
-                                , class "drawer-toggle"
-                                , checked model.isDrawerOpen
-                                , onCheck SetDrawerOpen
-                                ]
-                                []
-                            , IdleGame.Views.Content.renderContent game model.activeTab
-                            , IdleGame.Views.Drawer.renderDrawer game model.activeTab
-                            ]
-                       ]
-                    ++ (case model.activeModal of
-                            Nothing ->
-                                []
+                                    Nothing ->
+                                        []
+                               )
+                            ++ [ Toast.render viewToast model.tray toastConfig ]
+                            ++ [ div [ class "bg-base-100 drawer drawer-mobile" ]
+                                    [ input
+                                        [ id "drawer"
+                                        , type_ "checkbox"
+                                        , class "drawer-toggle"
+                                        , checked model.isDrawerOpen
+                                        , onCheck SetDrawerOpen
+                                        ]
+                                        []
+                                    , IdleGame.Views.Content.renderContent game model.activeTab
+                                    , IdleGame.Views.Drawer.renderDrawer game model.activeTab
+                                    ]
+                               ]
+                            ++ (case model.activeModal of
+                                    Nothing ->
+                                        []
 
-                            Just (TimePassesModal timePassed timePassesData) ->
-                                let
-                                    children =
-                                        IdleGame.Views.TimePasses.render timePassed timePassesData
-                                in
-                                [ IdleGame.Views.ModalWrapper.create children
-                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
-                                    |> IdleGame.Views.ModalWrapper.render
-                                ]
+                                    Just (TimePassesModal timePassed timePassesData) ->
+                                        let
+                                            children =
+                                                IdleGame.Views.TimePasses.render timePassed timePassesData
+                                        in
+                                        [ IdleGame.Views.ModalWrapper.create children
+                                            |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
+                                            |> IdleGame.Views.ModalWrapper.render
+                                        ]
 
-                            Just ChoreMasteryCheckpointsModal ->
-                                let
-                                    children =
-                                        IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
-                                in
-                                [ IdleGame.Views.ModalWrapper.create children
-                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
-                                    |> IdleGame.Views.ModalWrapper.render
-                                ]
+                                    Just ChoreMasteryCheckpointsModal ->
+                                        let
+                                            children =
+                                                IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
+                                        in
+                                        [ IdleGame.Views.ModalWrapper.create children
+                                            |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                                            |> IdleGame.Views.ModalWrapper.render
+                                        ]
 
-                            Just ChoreItemUnlocksModal ->
-                                let
-                                    children =
-                                        IdleGame.Views.MasteryUnlocks.render
-                                in
-                                [ IdleGame.Views.ModalWrapper.create children
-                                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
-                                    |> IdleGame.Views.ModalWrapper.render
-                                ]
-                       )
+                                    Just ChoreItemUnlocksModal ->
+                                        let
+                                            children =
+                                                IdleGame.Views.MasteryUnlocks.render
+                                        in
+                                        [ IdleGame.Views.ModalWrapper.create children
+                                            |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                                            |> IdleGame.Views.ModalWrapper.render
+                                        ]
+                               )
+               )
     }

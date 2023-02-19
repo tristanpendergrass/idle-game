@@ -51,6 +51,7 @@ zIndexes =
     , toast = class "z-20"
     , bottomRightMenu = class "z-30"
     , modalWrapper = class "z-40"
+    , debugPanel = class "z-50"
     }
 
 

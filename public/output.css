@@ -3582,6 +3582,10 @@ body[dir="rtl"] .checkbox:checked,
   z-index: 40;
 }
 
+.z-50 {
+  z-index: 50;
+}
+
 .col-span-4 {
   grid-column: span 4 / span 4;
 }
@@ -3656,6 +3660,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-12 {
   height: 3rem;
+}
+
+.h-48 {
+  height: 12rem;
 }
 
 .max-h-\[90\%\] {
@@ -3876,6 +3884,10 @@ body[dir="rtl"] .checkbox:checked,
   border-top-width: 2px;
 }
 
+.border-t {
+  border-top-width: 1px;
+}
+
 .border-primary {
   --tw-border-opacity: 1;
   border-color: hsl(var(--p) / var(--tw-border-opacity));
@@ -3899,6 +3911,11 @@ body[dir="rtl"] .checkbox:checked,
 .border-info {
   --tw-border-opacity: 1;
   border-color: hsl(var(--in) / var(--tw-border-opacity));
+}
+
+.border-accent-content {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--ac) / var(--tw-border-opacity));
 }
 
 .bg-base-100 {
