@@ -8,6 +8,7 @@ import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Extra exposing (..)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -533,44 +534,58 @@ toastToHtml notification =
                 ]
 
 
-renderModal : Maybe Modal -> Game -> Maybe (Html FrontendMsg)
+renderModal : Maybe Modal -> Game -> Html FrontendMsg
 renderModal activeModal game =
     case activeModal of
         Nothing ->
-            Nothing
+            nothing
 
         Just (TimePassesModal timePassed timePassesData) ->
             let
                 children =
                     IdleGame.Views.TimePasses.render timePassed timePassesData
             in
-            Just
-                (IdleGame.Views.ModalWrapper.create children
-                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
-                    |> IdleGame.Views.ModalWrapper.render
-                )
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
+                |> IdleGame.Views.ModalWrapper.render
 
         Just ChoreMasteryCheckpointsModal ->
             let
                 children =
                     IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
             in
-            Just
-                (IdleGame.Views.ModalWrapper.create children
-                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
-                    |> IdleGame.Views.ModalWrapper.render
-                )
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                |> IdleGame.Views.ModalWrapper.render
 
         Just ChoreItemUnlocksModal ->
             let
                 children =
                     IdleGame.Views.MasteryUnlocks.render
             in
-            Just
-                (IdleGame.Views.ModalWrapper.create children
-                    |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
-                    |> IdleGame.Views.ModalWrapper.render
-                )
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                |> IdleGame.Views.ModalWrapper.render
+
+
+renderBottomRightItems : FrontendModel -> Html FrontendMsg
+renderBottomRightItems model =
+    div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
+        ([]
+            ++ (if Config.flags.showDebugPanel then
+                    [ DebugPanel.renderOpenButton ]
+
+                else
+                    []
+               )
+            ++ (case model.activeTab of
+                    Tab.Chores ->
+                        [ IdleGame.Views.Chores.renderBottomRight ]
+
+                    _ ->
+                        []
+               )
+        )
 
 
 view : FrontendModel -> Document FrontendMsg
@@ -583,11 +598,11 @@ view model =
     in
     { title = "Idle Game"
     , body =
-        [ Just css
-        , Just (DebugPanel.render model)
+        [ css
+        , DebugPanel.render model
         , case model.gameState of
             Initializing ->
-                Nothing
+                nothing
 
             FastForward { previousIntervalTimer } ->
                 let
@@ -610,56 +625,29 @@ view model =
                                 in
                                 IdleGame.Views.FastForward.Speed millisPerMilli
                 in
-                Just (IdleGame.Views.FastForward.render speed)
+                IdleGame.Views.FastForward.render speed
 
             Playing snapshot ->
                 let
                     game =
                         Snapshot.getValue snapshot
-
-                    bottomRightItems =
-                        div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
-                            ([]
-                                ++ (if Config.flags.showDebugPanel then
-                                        [ debugPanelButton ]
-
-                                    else
-                                        []
-                                   )
-                                ++ (case model.activeTab of
-                                        Tab.Chores ->
-                                            [ IdleGame.Views.Chores.renderBottomRight ]
-
-                                        _ ->
-                                            []
-                                   )
-                            )
-
-                    debugPanelButton =
-                        DebugPanel.renderOpenButton
                 in
-                Just
-                    (div []
-                        ([ Just bottomRightItems
-                         , Just (Toast.render viewToast model.tray toastConfig)
-                         , Just <|
-                            div [ class "bg-base-100 drawer drawer-mobile" ]
-                                [ input
-                                    [ id "drawer"
-                                    , type_ "checkbox"
-                                    , class "drawer-toggle"
-                                    , checked model.isDrawerOpen
-                                    , onCheck SetDrawerOpen
-                                    ]
-                                    []
-                                , IdleGame.Views.Content.renderContent game model.activeTab
-                                , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
-                                ]
-                         , renderModal model.activeModal game
-                         ]
-                            |> List.filterMap identity
-                        )
-                    )
+                div []
+                    [ renderBottomRightItems model
+                    , Toast.render viewToast model.tray toastConfig
+                    , div [ class "bg-base-100 drawer drawer-mobile" ]
+                        [ input
+                            [ id "drawer"
+                            , type_ "checkbox"
+                            , class "drawer-toggle"
+                            , checked model.isDrawerOpen
+                            , onCheck SetDrawerOpen
+                            ]
+                            []
+                        , IdleGame.Views.Content.renderContent game model.activeTab
+                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
+                        ]
+                    , renderModal model.activeModal game
+                    ]
         ]
-            |> List.filterMap identity
     }
