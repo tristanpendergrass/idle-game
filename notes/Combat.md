@@ -11,7 +11,13 @@ Monster mastery is gained when you defeat the monster. It is not gained when you
 ## Regeneration
 Happens after you lose a fight. Should a long time relative to the average length of a combat. Reason being that we want the incentive to win combat to greatly exceed the incentive to make combat fast at the expense of some chance of loss. That's not a fun tradeoff to be forced to think about.
 
-Stats related to regeneration:
+Items/spells can give bonuses related to regeneration:
 - Boost regen speed
 - Buff to next fight after a regen
 - Gain mastery vs the thing that caused you to regen during regen
+
+## "Conquered" reward
+The first time a monster is defeated you receive a Conquer reward:
+* Show a notification in the UI on the monster's tile. When clicked it says the monster was defeated and the player is granted a one time bonus. Could be extra of whatever they normally drop or a unique item.
+* Checkmark of some kind on the monster to show you've beaten it.
+The idea is that we can avoid what i felt in melvor was too much temptation to blow past all the different monsters that were available to train. Felt a little like i shouldn't bother to beat them and i would never remember if i even had.

@@ -40,6 +40,18 @@
             }
           },
           {
+            "id": "48ac8ee8522b9703",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Combat.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
             "id": "40daf146bcb167fb",
             "type": "leaf",
             "state": {
@@ -76,7 +88,7 @@
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -142,7 +154,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Chores.canvas",
+                "file": "Combat.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -159,7 +171,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Chores.canvas",
+                "file": "Combat.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -182,7 +194,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Chores.canvas"
+                "file": "Combat.md"
               }
             }
           }
@@ -203,17 +215,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "0b2c33b0735d07fa",
+  "active": "48ac8ee8522b9703",
   "lastOpenFiles": [
-    "Timer.md",
+    "Events.md",
+    "Fishing.md",
     "Chores.canvas",
+    "Timer.md",
     "Chores.md",
     "Code atlas.canvas",
     "Skill - Portal bags.md",
     "Combat.md",
     "School tuition.md",
-    "Events.md",
-    "Tick flowchart.canvas",
-    "Mastery Unlocks.md"
+    "Tick flowchart.canvas"
   ]
 }
