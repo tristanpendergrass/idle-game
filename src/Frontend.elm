@@ -68,6 +68,9 @@ init url key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
+
+      -- Debug panel
+      , showTimePasses = True
       }
     , Cmd.none
       -- , Cmd.batch
@@ -89,7 +92,21 @@ setIsVisible isVisible model =
 
 setActiveModal : Maybe Modal -> FrontendModel -> FrontendModel
 setActiveModal activeModal model =
-    { model | activeModal = activeModal }
+    let
+        -- This supports the DebugPanel's "Show Time Passes" checkbox
+        filteredActiveModal =
+            case activeModal of
+                Just (TimePassesModal _ _) ->
+                    if model.showTimePasses then
+                        activeModal
+
+                    else
+                        Nothing
+
+                _ ->
+                    activeModal
+    in
+    { model | activeModal = filteredActiveModal }
 
 
 createTimePassesModal : Snapshot Game -> Snapshot Game -> Maybe Modal
@@ -121,6 +138,11 @@ setIsDrawerOpen isOpen model =
 setGameState : FrontendGameState -> FrontendModel -> FrontendModel
 setGameState gameState model =
     { model | gameState = gameState }
+
+
+setShowTimePasses : Bool -> FrontendModel -> FrontendModel
+setShowTimePasses showTimePasses model =
+    { model | showTimePasses = showTimePasses }
 
 
 mapGame : (Game -> Game) -> FrontendModel -> FrontendModel
@@ -445,6 +467,32 @@ update msg model =
                         else
                             game
                     )
+            , Cmd.none
+            )
+
+        AddTime amount ->
+            case model.gameState of
+                Playing snapshot ->
+                    let
+                        -- TODO: reuse this logic in the someTimeAgo code from server
+                        current =
+                            Snapshot.dEBUG_addTime (-1 * amount) snapshot
+
+                        fastForwardState : FastForwardState
+                        fastForwardState =
+                            { original = current, current = current, previousIntervalTimer = NotStarted }
+                    in
+                    ( model
+                        |> setGameState (FastForward fastForwardState)
+                    , Task.perform HandleFastForward Time.now
+                    )
+
+                _ ->
+                    noOp
+
+        ToggleTimePasses newVal ->
+            ( model
+                |> setShowTimePasses newVal
             , Cmd.none
             )
 

@@ -2,6 +2,7 @@ module IdleGame.Snapshot exposing
     ( Snapshot
     , Tick
     , createTick
+    , dEBUG_addTime
     , fromTuple
     , getTime
     , getTimeDifference
@@ -106,3 +107,11 @@ getTimeDifference (Snapshot ( oldTime, _ )) (Snapshot ( newTime, _ )) =
     Time.posixToMillis newTime
         - Time.posixToMillis oldTime
         |> Time.millisToPosix
+
+
+{-| This function should only be referened from e.g. debug panel. It sets the time without updating the state.
+Under normal circumstances that would cause bugs where the game gets out of sync
+-}
+dEBUG_addTime : Float -> Snapshot t -> Snapshot t
+dEBUG_addTime duration (Snapshot ( time, state )) =
+    Snapshot ( Time.Extra.add Time.Extra.Millisecond (floor duration) Time.utc time, state )

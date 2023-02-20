@@ -3848,6 +3848,10 @@ body[dir="rtl"] .checkbox:checked,
   align-items: center;
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-end {
   justify-content: flex-end;
 }

@@ -26,19 +26,41 @@ renderOpenButton =
 
 render : FrontendModel -> Html FrontendMsg
 render model =
+    let
+        closeButton =
+            button [ onClick CloseDebugPanel, class "btn btn-ghost btn-icon" ]
+                [ Icon.close
+                    |> Icon.toHtml
+                ]
+
+        addTimeButton =
+            let
+                eightHours =
+                    1000 * 60 * 60 * 8
+            in
+            button [ onClick (AddTime eightHours), class "btn" ] [ text "Add 8 hrs" ]
+
+        toggleTimePassesCheckbox =
+            label
+                [ class "label cursor-pointer justify-start gap-2"
+                ]
+                [ input
+                    [ type_ "checkbox"
+                    , class "checkbox"
+                    , checked model.showTimePasses
+                    , onCheck ToggleTimePasses
+                    ]
+                    []
+                , span [] [ text "Show Time Passes" ]
+                ]
+    in
     div
-        [ class "fixed bottom-0 w-screen h-48 bg-accent text-accent-content border-t border-accent-content relative"
+        [ class "fixed bottom-0 w-screen h-48 bg-accent text-accent-content border-t border-accent-content relative p-2"
         , classList [ ( "hidden", not model.showDebugPanel ) ]
         , Utils.zIndexes.debugPanel
         , id panelId
         ]
-        [ div [ class "absolute top-0 right-0" ]
-            [ button
-                [ onClick CloseDebugPanel
-                , class "btn btn-ghost btn-icon"
-                ]
-                [ Icon.close
-                    |> Icon.toHtml
-                ]
-            ]
+        [ addTimeButton
+        , toggleTimePassesCheckbox
+        , div [ class "absolute top-0 right-0" ] [ closeButton ]
         ]

@@ -40,17 +40,18 @@ $ npm test -- --watch
 
 ## Version 0.1.2
 - [x] Fix bug with notification container preventing clicking anything underneath
-- [ ] Dev Panel
-	- [ ] Add time
-	- [ ] Toggle off Time Passes showing
+- [x] Dev Panel
+	- [x] Add time
+	- [x] Toggle off Time Passes showing
+- [ ] Set up elm-review
+  - [ ] Add custom rule to replace String.fromInt with Utils.intToString
+  - [ ] Add line item to Deploy checklist
+- [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
+  - [ ] Same with Modded duration in Chores.elm
 
 ## Version 0.2
 ### Tech stuff
-- [ ] Set up elm-review
-  - [ ] Add custom rule to replace String.fromInt with Utils.intToString
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
-- [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
-  - [ ] Same with Modded duration in Chores.elm
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Remove tags from Event, should only come from effects
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%

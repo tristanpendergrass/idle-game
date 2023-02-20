@@ -54,6 +54,9 @@ type alias FrontendModel =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
+
+    -- Debug panel
+    , showTimePasses : Bool
     }
 
 
@@ -88,6 +91,8 @@ type FrontendMsg
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
+    | AddTime Float
+    | ToggleTimePasses Bool
 
 
 type ToBackend
