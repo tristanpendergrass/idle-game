@@ -50,7 +50,7 @@ $ npm test -- --watch
 - [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
   - [ ] Same with Modded duration in Chores.elm
 - [ ] Refactor durations to be their own type (use the one from external package?)
-- [ ] Refactor to remove Snapshot.setTime
+- [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
 
 ## Version 0.2
 ### Tech stuff

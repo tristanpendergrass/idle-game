@@ -8,7 +8,6 @@ module IdleGame.Snapshot exposing
     , getTimeDifference
     , getValue
     , map
-    , setTime
     , tickUntil
     )
 
@@ -39,11 +38,6 @@ map fn (Snapshot ( time, state )) =
     Snapshot ( time, fn state )
 
 
-setTime : Posix -> Snapshot t -> Snapshot t
-setTime time (Snapshot ( _, state )) =
-    Snapshot ( time, state )
-
-
 getTime : Snapshot t -> Posix
 getTime (Snapshot ( time, _ )) =
     time
@@ -52,11 +46,6 @@ getTime (Snapshot ( time, _ )) =
 getValue : Snapshot t -> t
 getValue (Snapshot ( _, state )) =
     state
-
-
-setValue : t -> Snapshot t -> Snapshot t
-setValue state (Snapshot ( time, _ )) =
-    Snapshot ( time, state )
 
 
 getDuration : Tick t -> Float

@@ -503,25 +503,11 @@ updateFromBackend msg model =
         InitializeGame serverSnapshot ->
             case model.gameState of
                 Initializing ->
-                    let
-                        someTimeAgo : Posix
-                        someTimeAgo =
-                            -- DEBUG code to force fast forward to take a long time
-                            Time.Extra.add Time.Extra.Millisecond (-1 * Config.flags.extraFastForwardTime) Time.utc (Snapshot.getTime serverSnapshot)
-
-                        someTimeAgoSnapshot =
-                            Snapshot.setTime someTimeAgo serverSnapshot
-                    in
                     ( model
-                        |> setGameState (FastForward { original = someTimeAgoSnapshot, current = someTimeAgoSnapshot, previousIntervalTimer = NotStarted })
+                        |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot, previousIntervalTimer = NotStarted })
                     , Task.perform HandleFastForward Time.now
                     )
 
-                -- Initializing ->
-                --     ( model
-                --         |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot })
-                --     , Task.perform HandleFastForward Time.now
-                --     )
                 _ ->
                     -- If we receive an InitializeGame message from backend while already initialized we ignore it
                     ( model, Cmd.none )
