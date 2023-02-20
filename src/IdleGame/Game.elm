@@ -155,9 +155,11 @@ applyIntervalMods : List IntervalMod -> Float -> Float
 applyIntervalMods mods duration =
     let
         multiplier =
-            mods
+            (mods
                 |> List.map .percentChange
-                |> List.foldl (+) 1
+                |> List.sum
+            )
+                + 1
     in
     duration / multiplier
 
@@ -165,9 +167,6 @@ applyIntervalMods mods duration =
 tick : Float -> Game -> ( Game, List Toast )
 tick tickDuration game =
     let
-        allIntervalMods =
-            getAllIntervalMods game
-
         ( newActiveChore, events ) =
             case game.activeChore of
                 Nothing ->
@@ -175,6 +174,9 @@ tick tickDuration game =
 
                 Just ( choreKind, timer ) ->
                     let
+                        allIntervalMods =
+                            getAllIntervalMods game
+
                         choreStats =
                             Chore.getStats choreKind
 
@@ -194,8 +196,7 @@ tick tickDuration game =
                             Just ( choreKind, newTimer )
 
                         newEvents =
-                            []
-                                ++ List.repeat completions (getEvent choreKind)
+                            List.repeat completions (getEvent choreKind)
                     in
                     ( activeChore
                     , newEvents
@@ -448,13 +449,6 @@ getTimePassesData originalGame currentGame =
             else
                 [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
 
-        coinGains =
-            if Counter.getVal currentGame.coin > Counter.getVal originalGame.coin then
-                Just <| Counter.subtract currentGame.coin originalGame.coin
-
-            else
-                Nothing
-
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
 
@@ -462,6 +456,14 @@ getTimePassesData originalGame currentGame =
             not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff)
     in
     if hasNewData then
+        let
+            coinGains =
+                if Counter.getVal currentGame.coin > Counter.getVal originalGame.coin then
+                    Just <| Counter.subtract currentGame.coin originalGame.coin
+
+                else
+                    Nothing
+        in
         Just
             { xpGains = xpGains
             , coinGains = coinGains
@@ -570,7 +572,7 @@ getShopItemMods game =
                     _ ->
                         Nothing
             )
-        |> List.concatMap (\a -> a)
+        |> List.concat
 
 
 getShopItemIntervalMods : Game -> List IntervalMod
@@ -623,12 +625,9 @@ getChoreUnlocksIntervalMods game =
 
 getAllMods : Game -> List Mod
 getAllMods game =
-    []
-        -- ++ [ devGlobalXpBuff ]
-        -- ++ getChoreMasteryPoolMods game
+    getChoreMasteryPoolMods game
         ++ getChoreUnlocksMods game
-        -- ++ getShopItemMods game
-        ++ []
+        ++ getShopItemMods game
 
 
 

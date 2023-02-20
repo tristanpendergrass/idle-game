@@ -26,6 +26,7 @@ $ npm test -- --watch
 
 # Deployment
 [ ] Run unit tests (see above)
+[ ] Run `$ npx elm-review --fix`
 [ ] Edit README.md
   [ ] Move current version from Todos to Releases
   [ ] Create new section header for next version
@@ -43,11 +44,13 @@ $ npm test -- --watch
 - [x] Dev Panel
 	- [x] Add time
 	- [x] Toggle off Time Passes showing
-- [ ] Set up elm-review
-  - [ ] Add custom rule to replace String.fromInt with Utils.intToString
-  - [ ] Add line item to Deploy checklist
+- [x] Set up elm-review
+  - [x] Fix all errors
+  - [x] Add line item to Deploy checklist
 - [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
   - [ ] Same with Modded duration in Chores.elm
+- [ ] Refactor durations to be their own type (use the one from external package?)
+- [ ] Refactor to remove Snapshot.setTime
 
 ## Version 0.2
 ### Tech stuff

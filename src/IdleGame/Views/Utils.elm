@@ -95,15 +95,6 @@ getDurationStringParts millis =
     let
         wholeDays =
             millis // day
-
-        wholeHours =
-            millis // hour
-
-        wholeMinutes =
-            millis // minute
-
-        wholeSeconds =
-            millis // second
     in
     if wholeDays > 0 then
         let
@@ -116,38 +107,53 @@ getDurationStringParts millis =
         in
         (intToString wholeDays ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // day) * day))
 
-    else if wholeHours > 0 then
-        let
-            displayUnit =
-                if wholeHours > 1 then
-                    "hours"
-
-                else
-                    "hour"
-        in
-        (intToString wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
-
-    else if wholeMinutes > 0 then
-        let
-            displayUnit =
-                if wholeMinutes > 1 then
-                    "minutes"
-
-                else
-                    "minute"
-        in
-        (intToString wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
-
-    else if wholeSeconds > 0 then
-        let
-            displayUnit =
-                if wholeSeconds > 1 then
-                    "seconds"
-
-                else
-                    "second"
-        in
-        [ intToString wholeSeconds ++ " " ++ displayUnit ]
-
     else
-        []
+        let
+            wholeHours =
+                millis // hour
+        in
+        if wholeHours > 0 then
+            let
+                displayUnit =
+                    if wholeHours > 1 then
+                        "hours"
+
+                    else
+                        "hour"
+            in
+            (intToString wholeHours ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // hour) * hour))
+
+        else
+            let
+                wholeMinutes =
+                    millis // minute
+            in
+            if wholeMinutes > 0 then
+                let
+                    displayUnit =
+                        if wholeMinutes > 1 then
+                            "minutes"
+
+                        else
+                            "minute"
+                in
+                (intToString wholeMinutes ++ " " ++ displayUnit) :: getDurationStringParts (millis - ((millis // minute) * minute))
+
+            else
+                let
+                    wholeSeconds =
+                        millis // second
+                in
+                if wholeSeconds > 0 then
+                    let
+                        displayUnit =
+                            if wholeSeconds > 1 then
+                                "seconds"
+
+                            else
+                                "second"
+                    in
+                    [ intToString wholeSeconds ++ " " ++ displayUnit ]
+
+                else
+                    []

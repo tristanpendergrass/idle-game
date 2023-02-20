@@ -186,12 +186,9 @@ getModdedDuration game choreKind =
         mods =
             IdleGame.Game.getAllIntervalMods game
                 |> List.filter (\{ kind } -> kind == choreKind)
-
-        choreDuration =
-            stats.outcome.duration
-                |> IdleGame.Game.applyIntervalMods mods
     in
-    choreDuration
+    stats.outcome.duration
+        |> IdleGame.Game.applyIntervalMods mods
 
 
 renderChoreListItem : Game -> IdleGame.Game.ChoresListItem -> Html FrontendMsg
@@ -199,9 +196,6 @@ renderChoreListItem game item =
     case item of
         IdleGame.Game.ChoreItem kind ->
             let
-                stats =
-                    Chore.getStats kind
-
                 moddedEvent : ModdedEvent
                 moddedEvent =
                     IdleGame.Game.getEvent kind
@@ -211,28 +205,32 @@ renderChoreListItem game item =
                     case moddedEvent of
                         IdleGame.Event.ModdedEvent eventData ->
                             eventData.effects
-
-                maybeTimer =
-                    case game.activeChore of
-                        Just ( activeType, timer ) ->
-                            if kind == activeType then
-                                Just timer
-
-                            else
-                                Nothing
-
-                        Nothing ->
-                            Nothing
-
-                moddedDuration : Float
-                moddedDuration =
-                    getModdedDuration game kind
             in
             case getChoreEfffectsView game effects of
                 Nothing ->
                     div [] []
 
                 Just { coin, skillXp, mxp, resource, probability } ->
+                    let
+                        stats =
+                            Chore.getStats kind
+
+                        moddedDuration : Float
+                        moddedDuration =
+                            getModdedDuration game kind
+
+                        maybeTimer =
+                            case game.activeChore of
+                                Just ( activeType, timer ) ->
+                                    if kind == activeType then
+                                        Just timer
+
+                                    else
+                                        Nothing
+
+                                Nothing ->
+                                    Nothing
+                    in
                     renderChore
                         { title = stats.title
                         , handleClick = ToggleActiveChore kind

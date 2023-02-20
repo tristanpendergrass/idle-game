@@ -1,5 +1,6 @@
 module IdleGame.Timer exposing
-    ( Timer
+    ( Duration
+    , Timer
     , create
     , increment
     , percentComplete
@@ -40,9 +41,9 @@ increment totalDuration delta (Timer { current }) =
             current + additionalPercent
 
         completions =
-            floor (sum / 1.0)
+            floor sum
 
         newCurrent =
-            (sum / 1.0) - toFloat (floor (sum / 1.0))
+            sum - toFloat (floor sum)
     in
     ( Timer { current = newCurrent }, completions )

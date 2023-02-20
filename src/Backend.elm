@@ -29,9 +29,6 @@ setSnapshot sessionId snapshot model =
 update : BackendMsg -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 update msg model =
     case msg of
-        NoOpBackendMsg ->
-            ( model, Cmd.none )
-
         HandleConnectWithTime sessionId clientId now ->
             let
                 ( seedForGame, newSeed ) =
@@ -61,11 +58,8 @@ updateSessionGameMap fn model =
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
-updateFromFrontend sessionId clientId msg model =
+updateFromFrontend sessionId _ msg model =
     case msg of
-        NoOpToBackend ->
-            ( model, Cmd.none )
-
         Save clientGameState ->
             ( model
                 |> updateSessionGameMap (Dict.insert sessionId clientGameState)
@@ -75,9 +69,7 @@ updateFromFrontend sessionId clientId msg model =
 
 subscriptions : BackendModel -> Sub BackendMsg
 subscriptions _ =
-    Sub.batch
-        [ Lamdera.onConnect HandleConnect
-        ]
+    Lamdera.onConnect HandleConnect
 
 
 app =

@@ -9,7 +9,6 @@ module IdleGame.Snapshot exposing
     , getValue
     , map
     , setTime
-    , setValue
     , tickUntil
     )
 

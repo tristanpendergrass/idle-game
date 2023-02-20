@@ -58,7 +58,7 @@ delay ms msg =
 
 
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
-init url key =
+init _ key =
     ( { key = key
       , showDebugPanel = False
       , tray = Toast.tray
@@ -230,7 +230,7 @@ update msg model =
                     , Nav.load url
                     )
 
-        UrlChanged url ->
+        UrlChanged _ ->
             noOp
 
         OpenDebugPanel ->
@@ -499,14 +499,7 @@ update msg model =
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
-    let
-        noOp =
-            ( model, Cmd.none )
-    in
     case msg of
-        NoOpToFrontend ->
-            ( model, Cmd.none )
-
         InitializeGame serverSnapshot ->
             case model.gameState of
                 Initializing ->
@@ -531,7 +524,7 @@ updateFromBackend msg model =
                 --     )
                 _ ->
                     -- If we receive an InitializeGame message from backend while already initialized we ignore it
-                    noOp
+                    ( model, Cmd.none )
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
@@ -619,13 +612,12 @@ renderModal activeModal game =
 renderBottomRightItems : FrontendModel -> Html FrontendMsg
 renderBottomRightItems model =
     div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
-        ([]
-            ++ (if Config.flags.showDebugPanel then
-                    [ DebugPanel.renderOpenButton ]
+        ((if Config.flags.showDebugPanel then
+            [ DebugPanel.renderOpenButton ]
 
-                else
-                    []
-               )
+          else
+            []
+         )
             ++ (case model.activeTab of
                     Tab.Chores ->
                         [ IdleGame.Views.Chores.renderBottomRight ]
