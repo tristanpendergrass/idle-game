@@ -48,18 +48,24 @@ render timePassed { xpGains, coinGains, resourcesDiff } =
                         |> List.map
                             (\{ title, originalXp, currentXp } ->
                                 let
-                                    displayAmount =
-                                        (currentXp - originalXp)
-                                            |> floor
+                                    difference : Counter
+                                    difference =
+                                        Counter.subtract currentXp originalXp
 
+                                    originalLevel : Int
                                     originalLevel =
-                                        XpFormulas.skillLevel originalXp
+                                        originalXp
+                                            |> Counter.getValue
+                                            |> XpFormulas.skillLevel
 
+                                    currentLevel : Int
                                     currentLevel =
-                                        XpFormulas.skillLevel currentXp
+                                        currentXp
+                                            |> Counter.getValue
+                                            |> XpFormulas.skillLevel
                                 in
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString displayAmount ]
+                                    [ span [ class "text-success" ] [ text <| Counter.toString difference ]
                                     , span [] [ text title ]
                                     , IdleGame.Views.Utils.skillXpBadge
                                     , if originalLevel /= currentLevel then

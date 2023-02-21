@@ -453,7 +453,7 @@ update msg model =
 
                             canAfford : Bool
                             canAfford =
-                                Counter.getVal stats.price <= Counter.getVal game.coin
+                                Counter.getValue stats.price <= Counter.getValue game.coin
 
                             dontOwnItemYet =
                                 not <| ShopItems.isOwned kind game.shopItems
@@ -474,7 +474,6 @@ update msg model =
             case model.gameState of
                 Playing snapshot ->
                     let
-                        -- TODO: reuse this logic in the someTimeAgo code from server
                         current =
                             Snapshot.dEBUG_addTime (-1 * amount) snapshot
 

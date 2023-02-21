@@ -20,7 +20,7 @@ allKinds =
 
 
 type alias State =
-    { mxp : Float }
+    { mxp : Counter }
 
 
 type alias AllChoreStates =
@@ -46,21 +46,21 @@ type alias Stats =
 
 
 type alias ChoreOutcome =
-    { xp : Float
+    { xp : Int
     , duration : Float
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
-    , coin : Counter
+    , coin : Int
     }
 
 
-incrementChoreMxp : Float -> ChoreKind -> AllChoreStates -> AllChoreStates
+incrementChoreMxp : Counter -> ChoreKind -> AllChoreStates -> AllChoreStates
 incrementChoreMxp amount kind choresData =
     let
         stats =
             getStats kind
     in
-    stats.setter (\choreData -> { choreData | mxp = choreData.mxp + amount }) choresData
+    stats.setter (\choreData -> { choreData | mxp = Counter.add choreData.mxp amount }) choresData
 
 
 cleanStablesStats =
@@ -73,7 +73,7 @@ cleanStablesStats =
         , duration = 3000
         , extraResourceProbability = 0.25
         , extraResource = Resource.Manure
-        , coin = Counter.create 1
+        , coin = 1
         }
     }
 
@@ -88,7 +88,7 @@ cleanBigBubbaStats =
         , duration = 6000
         , extraResourceProbability = 0.75
         , extraResource = Resource.Manure
-        , coin = Counter.create 3
+        , coin = 3
         }
     }
 
@@ -103,7 +103,7 @@ sweepChimneysStats =
         , duration = 8000
         , extraResourceProbability = 0.5
         , extraResource = Resource.Soot
-        , coin = Counter.create 6
+        , coin = 6
         }
     }
 
@@ -118,7 +118,7 @@ waterGreenhousePlantsStats =
         , duration = 2000
         , extraResourceProbability = 0.6
         , extraResource = Resource.GreenhouseDirt
-        , coin = Counter.create 2
+        , coin = 2
         }
     }
 
@@ -133,7 +133,7 @@ washAndIronRobesStats =
         , duration = 8000
         , extraResourceProbability = 0.2
         , extraResource = Resource.WashWater
-        , coin = Counter.create 9
+        , coin = 9
         }
     }
 
@@ -148,7 +148,7 @@ organizePotionIngredientsStats =
         , duration = 20000
         , extraResourceProbability = 0.1
         , extraResource = Resource.EmptyBottle
-        , coin = Counter.create 12
+        , coin = 12
         }
     }
 
@@ -163,7 +163,7 @@ repairInstrumentsStats =
         , duration = 12000
         , extraResourceProbability = 0.25
         , extraResource = Resource.Scrap
-        , coin = Counter.create 20
+        , coin = 20
         }
     }
 
@@ -178,7 +178,7 @@ flushDrainDemonsStats =
         , duration = 10000
         , extraResourceProbability = 0.5
         , extraResource = Resource.Ectoplasm
-        , coin = Counter.create 14
+        , coin = 14
         }
     }
 
@@ -193,7 +193,7 @@ organizeSpellBooksStats =
         , duration = 20000
         , extraResourceProbability = 0.1
         , extraResource = Resource.Parchment
-        , coin = Counter.create 30
+        , coin = 30
         }
     }
 

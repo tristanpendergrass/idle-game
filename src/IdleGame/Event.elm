@@ -2,6 +2,7 @@ module IdleGame.Event exposing (..)
 
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Multiplicable as Multiplicable
 import IdleGame.Resource as Resource
 import IdleGame.Views.Utils
 
@@ -51,9 +52,9 @@ type ModdedEvent
 type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
-    | GainXp { base : Float, multiplier : Float } Skill
+    | GainXp Multiplicable.Multiplicable Skill
     | GainChoreMxp { multiplier : Float } ChoreKind
-    | GainCoin { base : Counter, multiplier : Float }
+    | GainCoin Multiplicable.Multiplicable
 
 
 type Effect
@@ -81,7 +82,7 @@ type alias Mod =
     { tags : List Tag
     , label : ModLabel
     , transformer : Transformer
-    , howManyTimesToApplyMod : Int
+    , repetitions : Int
     , source : ModSource
     }
 
@@ -189,7 +190,7 @@ useSimpleTransformer =
 
 
 useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
-useSimpleTransformerHelp depth transformFn howManyTimesToApplyMod effect =
+useSimpleTransformerHelp depth transformFn repetitions effect =
     let
         newEffectType =
             transformFn (getType effect)
@@ -198,10 +199,10 @@ useSimpleTransformerHelp depth transformFn howManyTimesToApplyMod effect =
             effect
                 |> setType newEffectType
     in
-    if howManyTimesToApplyMod > 1 && depth < 20 then
-        useSimpleTransformerHelp (depth + 1) transformFn (howManyTimesToApplyMod - 1) newEffect
+    if repetitions > 1 && depth < 20 then
+        useSimpleTransformerHelp (depth + 1) transformFn (repetitions - 1) newEffect
 
-    else if howManyTimesToApplyMod == 0 then
+    else if repetitions == 0 then
         NoChange
 
     else
@@ -211,7 +212,7 @@ useSimpleTransformerHelp depth transformFn howManyTimesToApplyMod effect =
 applyModToEffect : Mod -> ( Effect, List Effect ) -> ( Effect, List Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if effectHasTags mod.tags effectAccum then
-        case mod.transformer mod.howManyTimesToApplyMod effectAccum of
+        case mod.transformer mod.repetitions effectAccum of
             NoChange ->
                 ( effectAccum, furtherEffectsAccum )
 
@@ -267,8 +268,8 @@ withMods mods event =
 
 
 withHowManyTimesToApplyMod : Int -> Mod -> Mod
-withHowManyTimesToApplyMod howManyTimesToApplyMod mod =
-    { mod | howManyTimesToApplyMod = howManyTimesToApplyMod }
+withHowManyTimesToApplyMod repetitions mod =
+    { mod | repetitions = repetitions }
 
 
 withSource : ModSource -> Mod -> Mod
@@ -282,11 +283,19 @@ modWithTags tags mod =
 
 
 xpTransformer : Float -> Transformer
-xpTransformer buff howManyTimeToApplyMod effect =
+xpTransformer buff repetitions effect =
     case getType effect of
-        GainXp { base, multiplier } skill ->
+        GainXp quantity skill ->
+            let
+                adjustedBuff =
+                    buff * toFloat repetitions
+
+                adjustedMultiplicable =
+                    quantity
+                        |> Multiplicable.addMultiplier adjustedBuff
+            in
             effect
-                |> setType (GainXp { base = base, multiplier = multiplier + (buff * toFloat howManyTimeToApplyMod) } skill)
+                |> setType (GainXp adjustedMultiplicable skill)
                 |> ChangeEffect
 
         _ ->
@@ -294,11 +303,19 @@ xpTransformer buff howManyTimeToApplyMod effect =
 
 
 coinTransformer : Float -> Transformer
-coinTransformer buff howManyTimesToApplyMod effect =
+coinTransformer buff repetitions effect =
     case getType effect of
-        GainCoin { base, multiplier } ->
+        GainCoin quantity ->
+            let
+                adjustedBuff =
+                    buff * toFloat repetitions
+
+                adjustedMultiplicable =
+                    quantity
+                        |> Multiplicable.addMultiplier adjustedBuff
+            in
             effect
-                |> setType (GainCoin { base = base, multiplier = multiplier + (buff * toFloat howManyTimesToApplyMod) })
+                |> setType (GainCoin adjustedMultiplicable)
                 |> ChangeEffect
 
         _ ->
@@ -306,11 +323,15 @@ coinTransformer buff howManyTimesToApplyMod effect =
 
 
 mxpTransformer : Float -> Transformer
-mxpTransformer buff howManyTimesToApplyMod effect =
+mxpTransformer buff repetitions effect =
     case getType effect of
         GainChoreMxp { multiplier } chore ->
+            let
+                adjustedBuff =
+                    buff * toFloat repetitions
+            in
             effect
-                |> setType (GainChoreMxp { multiplier = multiplier + (buff * toFloat howManyTimesToApplyMod) } chore)
+                |> setType (GainChoreMxp { multiplier = multiplier + adjustedBuff } chore)
                 |> ChangeEffect
 
         _ ->
@@ -318,11 +339,11 @@ mxpTransformer buff howManyTimesToApplyMod effect =
 
 
 resourceTransformer : Float -> Transformer
-resourceTransformer buff howManyTimesToApplyMod effect =
+resourceTransformer buff repetitions effect =
     case getType effect of
         GainResource { base, doublingChance } kind ->
             effect
-                |> setType (GainResource { base = base, doublingChance = doublingChance + (buff * toFloat howManyTimesToApplyMod) } kind)
+                |> setType (GainResource { base = base, doublingChance = doublingChance + (buff * toFloat repetitions) } kind)
                 |> ChangeEffect
 
         _ ->
@@ -330,12 +351,12 @@ resourceTransformer buff howManyTimesToApplyMod effect =
 
 
 increaseSuccessTransformer : Float -> Transformer
-increaseSuccessTransformer buff howManyTimesToApplyMod effect =
+increaseSuccessTransformer buff repetitions effect =
     case getType effect of
         VariableSuccess params ->
             let
                 newSuccessProbability =
-                    (params.successProbability + buff * toFloat howManyTimesToApplyMod)
+                    (params.successProbability + buff * toFloat repetitions)
                         |> min 1.0
 
                 newEffectType =
@@ -353,7 +374,7 @@ devGlobalXpBuff =
     , label = XpModLabel 1
     , transformer = xpTransformer 1.0
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 
@@ -363,7 +384,7 @@ choresXpBuff buff =
     , label = XpModLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 
@@ -373,7 +394,7 @@ choresCoinBuff buff =
     , label = CoinModLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 
@@ -383,7 +404,7 @@ choresMxpBuff buff =
     , label = MxpModLabel buff
     , transformer = mxpTransformer buff
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 
@@ -393,7 +414,7 @@ choresResourceBuff buff =
     , label = ResourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 
@@ -403,7 +424,7 @@ successBuff buff =
     , label = SuccessModLabel buff
     , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
-    , howManyTimesToApplyMod = 1
+    , repetitions = 1
     }
 
 

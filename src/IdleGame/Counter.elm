@@ -1,4 +1,12 @@
-module IdleGame.Counter exposing (..)
+module IdleGame.Counter exposing
+    ( Counter
+    , add
+    , create
+    , getValue
+    , multiplyBy
+    , subtract
+    , toString
+    )
 
 import IdleGame.Views.Utils
 
@@ -22,8 +30,8 @@ subtract (Counter val1) (Counter val2) =
     Counter (val1 - val2)
 
 
-getVal : Counter -> Int
-getVal (Counter val) =
+getValue : Counter -> Int
+getValue (Counter val) =
     floor val
 
 
@@ -34,4 +42,4 @@ multiplyBy amount (Counter oldVal) =
 
 toString : Counter -> String
 toString =
-    getVal >> IdleGame.Views.Utils.intToString
+    getValue >> IdleGame.Views.Utils.intToString

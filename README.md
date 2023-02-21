@@ -47,9 +47,9 @@ $ npm test -- --watch
 - [x] Set up elm-review
   - [x] Fix all errors
   - [x] Add line item to Deploy checklist
-- [ ] Refactor Chore event so we don't duplicate logic like `toFloat currentMasteryLevel * choreStats.outcome.duration` between Chores.elm and Game.elm
+- [x] Refactor values that are floats to be Counters in most places
+- [x] Refactor GainChoreMxp logic in Game.elm and Chores.elm to a common spot so it's not duplicated
   - [ ] Same with Modded duration in Chores.elm
-- [ ] Refactor durations to be their own type (use the one from external package?)
 - [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
 
 ## Version 0.2

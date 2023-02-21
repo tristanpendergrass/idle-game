@@ -52,10 +52,6 @@ skillLevelPercentTest =
             \_ ->
                 skillLevelPercent 1154
                     |> Expect.equal 0
-        , test "returns correct skill level for 1153.99 xp" <|
-            \_ ->
-                skillLevelPercent 1153.9999999
-                    |> isAboutEqualTo 1.0
         , test "returns 1.0 for an xp value way above our max" <|
             \_ ->
                 skillLevelPercent 999999999

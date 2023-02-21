@@ -17,7 +17,9 @@ render : Game -> Html FrontendMsg
 render game =
     let
         choresSkillLevel =
-            XpFormulas.skillLevel game.choresXp
+            game.choresXp
+                |> Counter.getValue
+                |> XpFormulas.skillLevel
 
         ownedLabel =
             div [ class "flex-0 px-2 py-1 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]
@@ -31,7 +33,7 @@ render game =
                     |> Icon.toHtml
                 , div
                     [ class "font-bold"
-                    , classList [ ( "text-error", Counter.getVal price > Counter.getVal game.coin ) ]
+                    , classList [ ( "text-error", Counter.getValue price > Counter.getValue game.coin ) ]
                     ]
                     [ text <| Counter.toString price
                     ]

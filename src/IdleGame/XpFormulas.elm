@@ -18,21 +18,21 @@ xpRequirements =
 -- 13,034,431 : level 99
 
 
-skillLevel : Float -> Int
+skillLevel : Int -> Int
 skillLevel xp =
     skillLevelHelp xp 1
 
 
-skillLevelPercent : Float -> Float
+skillLevelPercent : Int -> Float
 skillLevelPercent xp =
     skillLevelPercentHelp xp 0
 
 
-skillLevelHelp : Float -> Int -> Int
+skillLevelHelp : Int -> Int -> Int
 skillLevelHelp xp prevLevel =
     case Array.get prevLevel xpRequirements of
         Just xpRequired ->
-            if toFloat xpRequired > xp then
+            if xpRequired > xp then
                 prevLevel
 
             else
@@ -42,7 +42,7 @@ skillLevelHelp xp prevLevel =
             prevLevel
 
 
-skillLevelPercentHelp : Float -> Int -> Float
+skillLevelPercentHelp : Int -> Int -> Float
 skillLevelPercentHelp xp i =
     let
         ( maybeCurrent, maybeNext ) =
@@ -50,8 +50,8 @@ skillLevelPercentHelp xp i =
     in
     case ( maybeCurrent, maybeNext ) of
         ( Just current, Just next ) ->
-            if xp < toFloat next then
-                (xp - toFloat current) / toFloat (next - current)
+            if xp < next then
+                toFloat (xp - current) / toFloat (next - current)
 
             else
                 skillLevelPercentHelp xp (i + 1)
@@ -60,6 +60,6 @@ skillLevelPercentHelp xp i =
             1.0
 
 
-masteryPoolPercent : Float -> Float
+masteryPoolPercent : Int -> Float
 masteryPoolPercent amount =
-    (amount / 4500000) * 100
+    (toFloat amount / 4500000) * 100
