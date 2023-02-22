@@ -1,5 +1,6 @@
 module IdleGame.Chore exposing (..)
 
+import Duration exposing (Duration)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -47,7 +48,7 @@ type alias Stats =
 
 type alias ChoreOutcome =
     { xp : Int
-    , duration : Float
+    , duration : Duration
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
     , coin : Int
@@ -63,6 +64,7 @@ incrementChoreMxp amount kind choresData =
     stats.setter (\choreData -> { choreData | mxp = Counter.add choreData.mxp amount }) choresData
 
 
+cleanStablesStats : Stats
 cleanStablesStats =
     { title = "Clean Stables"
     , imgSrc = "/chores/stable.png"
@@ -70,7 +72,7 @@ cleanStablesStats =
     , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
     , outcome =
         { xp = 10
-        , duration = 3000
+        , duration = Duration.seconds 3
         , extraResourceProbability = 0.25
         , extraResource = Resource.Manure
         , coin = 1
@@ -78,6 +80,7 @@ cleanStablesStats =
     }
 
 
+cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { title = "Clean Big Bubba's Stall"
     , imgSrc = "/chores/bubba4.png"
@@ -85,7 +88,7 @@ cleanBigBubbaStats =
     , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
     , outcome =
         { xp = 25
-        , duration = 6000
+        , duration = Duration.seconds 6
         , extraResourceProbability = 0.75
         , extraResource = Resource.Manure
         , coin = 3
@@ -93,6 +96,7 @@ cleanBigBubbaStats =
     }
 
 
+sweepChimneysStats : Stats
 sweepChimneysStats =
     { title = "Sweep Chimneys"
     , imgSrc = "/chores/chimney.png"
@@ -100,7 +104,7 @@ sweepChimneysStats =
     , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
     , outcome =
         { xp = 37
-        , duration = 8000
+        , duration = Duration.seconds 8
         , extraResourceProbability = 0.5
         , extraResource = Resource.Soot
         , coin = 6
@@ -108,6 +112,7 @@ sweepChimneysStats =
     }
 
 
+waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
     { title = "Water Greenhouse Plants"
     , imgSrc = "/chores/greenhouse_3.png"
@@ -115,7 +120,7 @@ waterGreenhousePlantsStats =
     , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
     , outcome =
         { xp = 12
-        , duration = 2000
+        , duration = Duration.seconds 2
         , extraResourceProbability = 0.6
         , extraResource = Resource.GreenhouseDirt
         , coin = 2
@@ -123,6 +128,7 @@ waterGreenhousePlantsStats =
     }
 
 
+washAndIronRobesStats : Stats
 washAndIronRobesStats =
     { title = "Wash and Iron Robes"
     , imgSrc = "/chores/washRobes.png"
@@ -130,7 +136,7 @@ washAndIronRobesStats =
     , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
     , outcome =
         { xp = 50
-        , duration = 8000
+        , duration = Duration.seconds 8
         , extraResourceProbability = 0.2
         , extraResource = Resource.WashWater
         , coin = 9
@@ -138,6 +144,7 @@ washAndIronRobesStats =
     }
 
 
+organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
     { title = "Organize Potion Ingredients"
     , imgSrc = "/chores/potionIngredients_2.png"
@@ -145,7 +152,7 @@ organizePotionIngredientsStats =
     , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
     , outcome =
         { xp = 165
-        , duration = 20000
+        , duration = Duration.seconds 20
         , extraResourceProbability = 0.1
         , extraResource = Resource.EmptyBottle
         , coin = 12
@@ -153,6 +160,7 @@ organizePotionIngredientsStats =
     }
 
 
+repairInstrumentsStats : Stats
 repairInstrumentsStats =
     { title = "Repair Instruments"
     , imgSrc = "/chores/repairInstruments.png"
@@ -160,7 +168,7 @@ repairInstrumentsStats =
     , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
     , outcome =
         { xp = 75
-        , duration = 12000
+        , duration = Duration.seconds 12
         , extraResourceProbability = 0.25
         , extraResource = Resource.Scrap
         , coin = 20
@@ -168,6 +176,7 @@ repairInstrumentsStats =
     }
 
 
+flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
     { title = "Flush the Drain Demons"
     , imgSrc = "/chores/drainDemons.png"
@@ -175,7 +184,7 @@ flushDrainDemonsStats =
     , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
     , outcome =
         { xp = 90
-        , duration = 10000
+        , duration = Duration.seconds 10
         , extraResourceProbability = 0.5
         , extraResource = Resource.Ectoplasm
         , coin = 14
@@ -183,6 +192,7 @@ flushDrainDemonsStats =
     }
 
 
+organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
     { title = "Organize Spell Books"
     , imgSrc = "/chores/spellBooks.png"
@@ -190,7 +200,7 @@ organizeSpellBooksStats =
     , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
     , outcome =
         { xp = 210
-        , duration = 20000
+        , duration = Duration.seconds 20
         , extraResourceProbability = 0.1
         , extraResource = Resource.Parchment
         , coin = 30

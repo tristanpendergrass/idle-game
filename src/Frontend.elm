@@ -5,6 +5,7 @@ import Browser.Dom
 import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation as Nav
 import Config
+import Duration exposing (Duration)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -181,7 +182,7 @@ getFastForwardPoint =
 -}
 standardTick : Snapshot.Tick ( Game, List Toast )
 standardTick =
-    Snapshot.createTick 15
+    Snapshot.createTick (Duration.milliseconds 15)
         (\duration ( oldGame, oldToasts ) ->
             let
                 ( newGame, newToasts ) =
@@ -204,7 +205,7 @@ This tick also discards the notifications of Game.tick.
 -}
 performantTick : Snapshot.Tick Game
 performantTick =
-    Snapshot.createTick 2000
+    Snapshot.createTick (Duration.seconds 2)
         (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
 
 
@@ -324,7 +325,7 @@ update msg model =
                 Playing snapshot ->
                     let
                         ( newTimer, saveGameTimerTriggered ) =
-                            Timer.increment delta 1000 model.saveGameTimer
+                            Timer.increment (Duration.seconds 1) (Duration.milliseconds delta) model.saveGameTimer
 
                         shouldSaveGame =
                             saveGameTimerTriggered > 0

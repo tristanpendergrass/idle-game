@@ -1,5 +1,6 @@
 module IdleGame.Game exposing (..)
 
+import Duration exposing (Duration)
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
@@ -10,6 +11,7 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
+import Quantity
 import Random exposing (Generator)
 import Tuple
 
@@ -152,7 +154,7 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-applyIntervalMods : List IntervalMod -> Float -> Float
+applyIntervalMods : List IntervalMod -> Duration -> Duration
 applyIntervalMods mods duration =
     let
         multiplier =
@@ -162,10 +164,10 @@ applyIntervalMods mods duration =
             )
                 + 1
     in
-    duration / multiplier
+    Quantity.divideBy multiplier duration
 
 
-getModdedDuration : Game -> ChoreKind -> Float
+getModdedDuration : Game -> ChoreKind -> Duration
 getModdedDuration game choreKind =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     let
@@ -180,7 +182,7 @@ getModdedDuration game choreKind =
         |> applyIntervalMods mods
 
 
-tick : Float -> Game -> ( Game, List Toast )
+tick : Duration -> Game -> ( Game, List Toast )
 tick tickDuration game =
     let
         ( newActiveChore, events ) =
@@ -288,7 +290,7 @@ calculateChoreMxp { multiplier, kind } game =
 
         grantedMxp =
             toFloat currentMasteryLevel
-                * (choreStats.outcome.duration / 1000)
+                * Duration.inSeconds choreStats.outcome.duration
                 * multiplier
                 |> floor
                 |> Counter.create

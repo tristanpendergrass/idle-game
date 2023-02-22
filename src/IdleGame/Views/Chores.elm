@@ -1,5 +1,6 @@
 module IdleGame.Views.Chores exposing (..)
 
+import Duration exposing (Duration)
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -196,7 +197,7 @@ renderChoreListItem game item =
                         stats =
                             Chore.getStats kind
 
-                        moddedDuration : Float
+                        moddedDuration : Duration
                         moddedDuration =
                             Game.getModdedDuration game kind
 
@@ -244,7 +245,7 @@ type alias ChoreItemView =
     { title : String
     , handleClick : FrontendMsg
     , maybeTimer : Maybe Timer
-    , duration : Float
+    , duration : Duration
     , imgSrc : String
     , coin : Counter
     , extraResourceProbability : Float
@@ -260,7 +261,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
     let
         renderDuration : Html msg
         renderDuration =
-            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (duration / 1000) ++ " seconds" ]
+            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
         rendercoin =
             div [ class "flex items-center gap-1" ]

@@ -11,19 +11,22 @@ module IdleGame.Snapshot exposing
     , tickUntil
     )
 
+import Duration exposing (Duration)
 import Time exposing (Posix)
 import Time.Extra
 
 
-type Tick t
-    = Tick Float (Float -> t -> t)
+type
+    Tick t
+    -- TODO: Check if the first Duration here is necessary
+    = Tick Duration (Duration -> t -> t)
 
 
 type Snapshot t
     = Snapshot ( Posix, t )
 
 
-createTick : Float -> (Float -> t -> t) -> Tick t
+createTick : Duration -> (Duration -> t -> t) -> Tick t
 createTick =
     Tick
 
@@ -48,12 +51,12 @@ getValue (Snapshot ( _, state )) =
     state
 
 
-getDuration : Tick t -> Float
-getDuration (Tick duration _) =
-    duration
+getDuration : Tick t -> Duration
+getDuration (Tick d _) =
+    d
 
 
-getFunction : Tick t -> (Float -> t -> t)
+getFunction : Tick t -> (Duration -> t -> t)
 getFunction (Tick _ fn) =
     fn
 
@@ -67,7 +70,7 @@ tickUntil tick endTime snapshot =
         timeOfNextTick =
             snapshot
                 |> getTime
-                |> Time.Extra.add Time.Extra.Millisecond (floor tickDuration) Time.utc
+                |> (\snapshotTime -> Duration.addTo snapshotTime tickDuration)
                 |> Time.posixToMillis
 
         shouldTick : Bool

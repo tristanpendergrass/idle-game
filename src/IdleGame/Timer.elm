@@ -1,14 +1,12 @@
 module IdleGame.Timer exposing
-    ( Duration
-    , Timer
+    ( Timer
     , create
     , increment
     , percentComplete
     )
 
-
-type alias Duration =
-    Float
+import Duration exposing (Duration)
+import Quantity
 
 
 type alias PercentComplete =
@@ -35,7 +33,7 @@ increment : Duration -> Duration -> Timer -> ( Timer, Int )
 increment totalDuration delta (Timer { current }) =
     let
         additionalPercent =
-            delta / totalDuration
+            Quantity.ratio delta totalDuration
 
         sum =
             current + additionalPercent
