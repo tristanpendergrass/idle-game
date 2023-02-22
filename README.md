@@ -28,31 +28,16 @@ $ npm test -- --watch
 [ ] Run unit tests (see above)
 [ ] Run `$ npx elm-review --fix`
 [ ] Edit README.md
-  [ ] Move current version from Todos to Releases
+  [ ] Move current version from Todos to Changelog
   [ ] Create new section header for next version
-  [ ] Commit
-[ ] Update current version in `Drawer.elm`
+[ ] Update current version in `Config.elm`
+[ ] Commit changes in git
 [ ] Run `$ lamdera check` and `$ lamdera deploy`
 [ ] Run `$ git tag {version}` and `$ git push --tags`
 
 # Todos
 
 ## Version
-
-## Version 0.1.2
-- [x] Fix bug with notification container preventing clicking anything underneath
-- [x] Dev Panel
-	- [x] Add time
-	- [x] Toggle off Time Passes showing
-- [x] Set up elm-review
-  - [x] Fix all errors
-  - [x] Add line item to Deploy checklist
-- [x] Refactor values that are floats to be Counters in most places
-- [x] Refactor GainChoreMxp logic in Game.elm and Chores.elm to a common spot so it's not duplicated
-  - [x] Same with Modded duration in Chores.elm
-- [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
-- [x] Remove tags from Event, should only come from effects
-- [x] Refactor to use elm-units for duration. Fixes bug for saving 1000 times per second instead of 1 time per second.
 
 ## Version 0.2
 ### Tech stuff
@@ -84,6 +69,21 @@ $ npm test -- --watch
 - [ ] Design audit following https://anthonyhobday.com/sideprojects/saferules/
 
 # Changelog
+
+## Version 0.1.2
+- [x] Fix bug with notification container preventing clicking anything underneath
+- [x] Dev Panel
+	- [x] Add time
+	- [x] Toggle off Time Passes showing
+- [x] Set up elm-review
+  - [x] Fix all errors
+  - [x] Add line item to Deploy checklist
+- [x] Refactor values that are floats to be Counters in most places
+- [x] Refactor GainChoreMxp logic in Game.elm and Chores.elm to a common spot so it's not duplicated
+  - [x] Same with Modded duration in Chores.elm
+- [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
+- [x] Remove tags from Event, should only come from effects
+- [x] Refactor to use elm-units for duration. Fixes bug for saving 1000 times per second instead of 1 time per second.
 
 ## Version 0.1.1
 - [x] Fix some icons not showing in prod for items (soot2?)

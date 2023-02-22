@@ -1,7 +1,6 @@
 module IdleGame.Multiplicable exposing
     ( Multiplicable
     , addMultiplier
-    , fromCounter
     , fromInt
     , toCounter
     )

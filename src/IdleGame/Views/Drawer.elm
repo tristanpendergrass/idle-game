@@ -1,5 +1,6 @@
 module IdleGame.Views.Drawer exposing (..)
 
+import Config
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -74,7 +75,7 @@ renderDrawer isDrawerOpen activeTab =
                         ]
                     , a [ href "/", class "link link-hover font-mono text-xs text-opacity-50 " ]
                         [ div [ class "tooltip tooltip-bottom", attribute "data-tip" "Patch notes" ]
-                            [ text "0.1.1" ]
+                            [ text Config.version ]
                         ]
                     ]
 

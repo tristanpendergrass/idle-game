@@ -3,6 +3,11 @@ module Config exposing (..)
 import Env
 
 
+version : String
+version =
+    "0.1.2"
+
+
 type alias Flags =
     { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
     , extraFastForwardTime : Int -- How many milliseconds to artificially add to the FastForward on init from backend
