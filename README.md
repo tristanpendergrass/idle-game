@@ -51,12 +51,12 @@ $ npm test -- --watch
 - [x] Refactor GainChoreMxp logic in Game.elm and Chores.elm to a common spot so it's not duplicated
   - [x] Same with Modded duration in Chores.elm
 - [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
+- [x] Remove tags from Event, should only come from effects
 
 ## Version 0.2
 ### Tech stuff
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
-- [ ] Remove tags from Event, should only come from effects
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick
 - [ ] Add dev flag to randomize color scheme between light and dark rather than use the correct one so that i see it both ways more often

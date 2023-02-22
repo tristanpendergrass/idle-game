@@ -122,7 +122,6 @@ getEvent kind =
             , gainCoin coin
                 |> withTags [ Chores, ChoreTag kind ]
             ]
-        , tags = [ Chores, ChoreTag kind ]
         }
 
 

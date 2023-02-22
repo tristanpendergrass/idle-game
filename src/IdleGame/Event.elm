@@ -33,7 +33,6 @@ type ModSource
 
 type alias EventData =
     { effects : List Effect
-    , tags : List Tag
     }
 
 
