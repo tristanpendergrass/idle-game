@@ -172,21 +172,6 @@ getChoreProbability effect =
             Nothing
 
 
-getModdedDuration : Game -> ChoreKind -> Float
-getModdedDuration game choreKind =
-    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    let
-        stats =
-            Chore.getStats choreKind
-
-        mods =
-            Game.getAllIntervalMods game
-                |> List.filter (\{ kind } -> kind == choreKind)
-    in
-    stats.outcome.duration
-        |> Game.applyIntervalMods mods
-
-
 renderChoreListItem : Game -> Game.ChoresListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
@@ -213,7 +198,7 @@ renderChoreListItem game item =
 
                         moddedDuration : Float
                         moddedDuration =
-                            getModdedDuration game kind
+                            Game.getModdedDuration game kind
 
                         maybeTimer =
                             case game.activeChore of

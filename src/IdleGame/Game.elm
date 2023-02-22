@@ -166,6 +166,21 @@ applyIntervalMods mods duration =
     duration / multiplier
 
 
+getModdedDuration : Game -> ChoreKind -> Float
+getModdedDuration game choreKind =
+    -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
+    let
+        stats =
+            Chore.getStats choreKind
+
+        mods =
+            getAllIntervalMods game
+                |> List.filter (\{ kind } -> kind == choreKind)
+    in
+    stats.outcome.duration
+        |> applyIntervalMods mods
+
+
 tick : Float -> Game -> ( Game, List Toast )
 tick tickDuration game =
     let
@@ -176,19 +191,8 @@ tick tickDuration game =
 
                 Just ( choreKind, timer ) ->
                     let
-                        allIntervalMods =
-                            getAllIntervalMods game
-
-                        choreStats =
-                            Chore.getStats choreKind
-
-                        mods =
-                            allIntervalMods
-                                |> List.filter (\{ kind } -> kind == choreKind)
-
                         choreDuration =
-                            choreStats.outcome.duration
-                                |> applyIntervalMods mods
+                            getModdedDuration game choreKind
 
                         ( newTimer, completions ) =
                             timer

@@ -49,7 +49,7 @@ $ npm test -- --watch
   - [x] Add line item to Deploy checklist
 - [x] Refactor values that are floats to be Counters in most places
 - [x] Refactor GainChoreMxp logic in Game.elm and Chores.elm to a common spot so it's not duplicated
-  - [ ] Same with Modded duration in Chores.elm
+  - [x] Same with Modded duration in Chores.elm
 - [x] Refactor to remove unsafe functions Snapshot.setTime and Snapshot.setValue
 
 ## Version 0.2
