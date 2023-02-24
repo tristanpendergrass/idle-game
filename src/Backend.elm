@@ -29,6 +29,9 @@ setSnapshot sessionId snapshot model =
 update : BackendMsg -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 update msg model =
     case msg of
+        NoOpBackend ->
+            ( model, Cmd.none )
+
         HandleConnectWithTime sessionId clientId now ->
             let
                 ( seedForGame, newSeed ) =
@@ -60,6 +63,9 @@ updateSessionGameMap fn model =
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 updateFromFrontend sessionId _ msg model =
     case msg of
+        NoOpToBackend ->
+            ( model, Cmd.none )
+
         Save clientGameState ->
             ( model
                 |> updateSessionGameMap (Dict.insert sessionId clientGameState)

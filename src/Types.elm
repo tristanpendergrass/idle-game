@@ -96,13 +96,16 @@ type FrontendMsg
 
 
 type ToBackend
-    = Save (Snapshot Game)
+    = NoOpToBackend
+    | Save (Snapshot Game)
 
 
 type BackendMsg
-    = HandleConnect SessionId ClientId
+    = NoOpBackend
+    | HandleConnect SessionId ClientId
     | HandleConnectWithTime SessionId ClientId Posix
 
 
 type ToFrontend
-    = InitializeGame (Snapshot Game)
+    = NoOpToFrontend
+    | InitializeGame (Snapshot Game)
