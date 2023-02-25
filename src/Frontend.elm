@@ -500,6 +500,9 @@ update msg model =
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
+        NoOpToFrontend ->
+            ( model, Cmd.none )
+
         InitializeGame serverSnapshot ->
             case model.gameState of
                 Initializing ->

@@ -90,13 +90,16 @@ type FrontendMsg
 
 
 type ToBackend
-    = Save (Evergreen.V6.IdleGame.Snapshot.Snapshot Evergreen.V6.IdleGame.Game.Game)
+    = NoOpToBackend
+    | Save (Evergreen.V6.IdleGame.Snapshot.Snapshot Evergreen.V6.IdleGame.Game.Game)
 
 
 type BackendMsg
-    = HandleConnect Lamdera.SessionId Lamdera.ClientId
+    = NoOpBackend
+    | HandleConnect Lamdera.SessionId Lamdera.ClientId
     | HandleConnectWithTime Lamdera.SessionId Lamdera.ClientId Time.Posix
 
 
 type ToFrontend
-    = InitializeGame (Evergreen.V6.IdleGame.Snapshot.Snapshot Evergreen.V6.IdleGame.Game.Game)
+    = NoOpToFrontend
+    | InitializeGame (Evergreen.V6.IdleGame.Snapshot.Snapshot Evergreen.V6.IdleGame.Game.Game)
