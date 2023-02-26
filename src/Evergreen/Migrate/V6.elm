@@ -262,7 +262,7 @@ toBackend : Old.ToBackend -> MsgMigration New.ToBackend New.BackendMsg
 toBackend old =
     case old of
         Old.NoOpToBackend ->
-            Debug.todo ""
+            MsgMigrated ( New.NoOpToBackend, Cmd.none )
 
         Old.Save oldSnapshot ->
             MsgMigrated ( New.Save (migrateGameSnapshot oldSnapshot), Cmd.none )
@@ -272,7 +272,7 @@ backendMsg : Old.BackendMsg -> MsgMigration New.BackendMsg New.BackendMsg
 backendMsg old =
     case old of
         Old.NoOpBackendMsg ->
-            Debug.todo ""
+            MsgMigrated ( New.NoOpBackend, Cmd.none )
 
         Old.HandleConnect sessionId clientId ->
             MsgMigrated ( New.HandleConnect sessionId clientId, Cmd.none )
@@ -285,7 +285,7 @@ toFrontend : Old.ToFrontend -> MsgMigration New.ToFrontend New.FrontendMsg
 toFrontend old =
     case old of
         Old.NoOpToFrontend ->
-            Debug.todo ""
+            MsgMigrated ( New.NoOpToFrontend, Cmd.none )
 
         Old.InitializeGame oldSnapshot ->
             MsgMigrated ( New.InitializeGame (migrateGameSnapshot oldSnapshot), Cmd.none )

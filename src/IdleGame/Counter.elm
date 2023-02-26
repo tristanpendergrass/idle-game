@@ -1,5 +1,5 @@
 module IdleGame.Counter exposing
-    ( Counter
+    ( Counter(..)
     , add
     , create
     , getValue

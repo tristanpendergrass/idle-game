@@ -1,5 +1,5 @@
 module IdleGame.Timer exposing
-    ( Timer
+    ( Timer(..)
     , create
     , increment
     , percentComplete

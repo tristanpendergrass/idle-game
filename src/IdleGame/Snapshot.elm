@@ -1,5 +1,5 @@
 module IdleGame.Snapshot exposing
-    ( Snapshot
+    ( Snapshot(..)
     , Tick
     , createTick
     , dEBUG_addTime
