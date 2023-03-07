@@ -52,6 +52,30 @@
             }
           },
           {
+            "id": "3a16522bf8d0bbfe",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Combat.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "0cafc5e188bb1a79",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Herbalism.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
             "id": "40daf146bcb167fb",
             "type": "leaf",
             "state": {
@@ -88,7 +112,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -154,7 +178,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Combat.md",
+                "file": "Herbalism.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -171,7 +195,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Combat.md",
+                "file": "Herbalism.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -194,7 +218,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Combat.md"
+                "file": "Herbalism.md"
               }
             }
           }
@@ -215,17 +239,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "48ac8ee8522b9703",
+  "active": "0cafc5e188bb1a79",
   "lastOpenFiles": [
+    "Random ideas.md",
+    "Combat.md",
     "Events.md",
+    "Herbalism.md",
     "Fishing.md",
     "Chores.canvas",
     "Timer.md",
     "Chores.md",
     "Code atlas.canvas",
-    "Skill - Portal bags.md",
-    "Combat.md",
-    "School tuition.md",
-    "Tick flowchart.canvas"
+    "Skill - Portal bags.md"
   ]
 }

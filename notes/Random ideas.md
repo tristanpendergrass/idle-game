@@ -1,0 +1,5 @@
+* I like that in farmside you create feed for different animals using any of your farm products. From wheat to coconuts any food can be used to create e.g. chicken feed. But some food has more value in creating a unit of food--
+    * You need 100 value to create a unit of food
+    * Wheat lends e.g. 10 value but a coconut a full 100. If something is added to the feeder that causes it to exceed 100 it "rolls over" value to the next produced feed.
+    * There are multiple different kinds of feed to produce-- chicken, cow, and sheep. If an animal likes a certain type of food it counts for more in its recipe-- e.g. maybe wheat counts for 15 in the chicken feed but only 10 in cow.
+    * This idea could be implemented for any number of resource consuming skills but feels especially good for animal feed for some reason. Could be human food too. Or potions.
