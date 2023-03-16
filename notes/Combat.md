@@ -25,7 +25,21 @@ The first time a monster is defeated you receive a First Conquest reward:
 * Checkmark of some kind on the monster to show you've beaten it.
 The idea is that we can avoid what i felt in melvor was too much temptation to blow past all the different monsters that were available to train. Felt a little like i shouldn't bother to beat them and i would never remember if i even had.
 
-# Concepts
+# Combat Spells
+## Types of spells
+Spells in combat should generally fall into one of several categories:
+* Damage spells. Ideal for pushing difficult content and required in most every loadout.
+* Healing/defense spells. Also mainly necessary for difficult content.
+* Support spells, buffs the others.
+* Meta spells, interact with the larger combat cyle in some way by buffing drops, buffing regen time, etc.
+## Cycle of usefulness
+Ideally combat spells go through the following pattern over time:
+* When first unlocked they are exciting to put in your rotation and allow you to improve your combat outcomes; either pushing higher level monsters or improving winrate/droprate of existing monsters.
+* Eventually they are outclassed by subsequently unlocked spells and are only useful on content you've outleveled. It would be a waste to use your most powerful spells on old content and you still have to farm old content for various reasons so the spell is still useful for that.
+* Eventually you've got enough spells that can slay old content that you don't need most of them. There should be ways of recycling or upcycling the spells for mats, with selling them for small amount of coin as a last resort.
+
+# Random concepts
 * Mana system like in Yi Xian
 * Take damage = get better stuff support spell. Useful for farming lower tier mobs later like in Returnal
-* Lackeys
+* Helpers and lackeys.
+    * One part meat shield, one part 

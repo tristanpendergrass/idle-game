@@ -69,7 +69,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Herbalism.md",
+                "file": "Combat.md",
                 "mode": "source",
                 "source": false
               }
@@ -178,7 +178,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Herbalism.md",
+                "file": "Combat.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -195,7 +195,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Herbalism.md",
+                "file": "Combat.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -218,7 +218,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Herbalism.md"
+                "file": "Combat.md"
               }
             }
           }
@@ -241,10 +241,10 @@
   },
   "active": "0cafc5e188bb1a79",
   "lastOpenFiles": [
+    "Herbalism.md",
     "Random ideas.md",
     "Combat.md",
     "Events.md",
-    "Herbalism.md",
     "Fishing.md",
     "Chores.canvas",
     "Timer.md",
