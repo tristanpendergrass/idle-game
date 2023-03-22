@@ -1,7 +1,7 @@
 Players have a roster of monsters to fight. When they choose to fight one the battle will proceed automatically. If the player wins they will get loot and experience, if they lose they will have to spend some time regenerating. In either case they will automatically fight the monster again afterwards and this will repeat indefinitely.
 
 ## Chance to win
-The key statistic of a combat you've left to idle is your win percentage: it could be 0% or 100% or anything in between based on your gear, the monster level, or any other circumstances. As the player you want this to be as high as possible as the loot from the monster is only dropped in the case that you win. 
+The key statistic of a combat you've left to idle is your win percentage: it could be 0% or 100% or anything in between based on your gear, the monster level, or any other circumstances. As the player you want this to be as high as possible as the loot from the monster is only dropped in the case that you win.
 
 ## Monster mastery
 Just as you gain mastery XP in activities, gain mxp per monster you fight. There will be thresholds of mastery points per monster and as you meet them it unlocks:
@@ -38,8 +38,11 @@ Ideally combat spells go through the following pattern over time:
 * Eventually they are outclassed by subsequently unlocked spells and are only useful on content you've outleveled. It would be a waste to use your most powerful spells on old content and you still have to farm old content for various reasons so the spell is still useful for that.
 * Eventually you've got enough spells that can slay old content that you don't need most of them. There should be ways of recycling or upcycling the spells for mats, with selling them for small amount of coin as a last resort.
 
+## Tags and Mastery
+Mastery in combat is not done on a per-monster basis but on a per-tag basis. Each monster would have one or more tags, e.g. Beast, Militia. When you fight monsters you get mastery xp in their tags and level up those tags. Tags have mastery thresholds just like skills do that expose weaknesses of the monsters that have that tag, or grant better rewards against that monster.
+
 # Random concepts
 * Mana system like in Yi Xian
 * Take damage = get better stuff support spell. Useful for farming lower tier mobs later like in Returnal
 * Helpers and lackeys.
-    * One part meat shield, one part 
+    * One part meat shield, one part
