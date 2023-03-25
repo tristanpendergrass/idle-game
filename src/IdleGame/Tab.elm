@@ -7,6 +7,7 @@ type Tab
     = ForbiddenKnowledge
     | Bag
     | Shop
+    | Adventuring
     | Chores
     | Explore
     | Mischief
@@ -42,6 +43,11 @@ getConfig tab =
         Shop ->
             { title = "Shop"
             , icon = Icon.shop
+            }
+
+        Adventuring ->
+            { title = "Adventuring"
+            , icon = Icon.adventuring
             }
 
         Chores ->

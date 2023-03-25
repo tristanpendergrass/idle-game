@@ -37,9 +37,10 @@ $ npm test -- --watch
 
 # Todos
 
-## Version
-
 ## Version 0.2
+- [ ] Combat proof of concept
+
+## Future
 ### Tech stuff
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
@@ -67,6 +68,7 @@ $ npm test -- --watch
 - [ ] Format numbers correctly with commas etc. in Time Passes modal
 - [ ] Close modals on space/escape
 - [ ] Design audit following https://anthonyhobday.com/sideprojects/saferules/
+- [ ] Money amount in Bag tab looks like a button -- remove background entirely?
 
 # Changelog
 

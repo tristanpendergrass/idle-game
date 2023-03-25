@@ -1,6 +1,7 @@
 module Config exposing (..)
 
 import Env
+import IdleGame.Tab as Tab exposing (Tab)
 
 
 version : String
@@ -12,6 +13,7 @@ type alias Flags =
     { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
     , extraFastForwardTime : Int -- How many milliseconds to artificially add to the FastForward on init from backend
     , showDebugPanel : Bool
+    , defaultTab : Tab
     }
 
 
@@ -30,6 +32,7 @@ devFlags =
     { showFastForwardSpeed = True
     , extraFastForwardTime = 1000 * 60 * 60 * 8 -- 8 hours
     , showDebugPanel = True
+    , defaultTab = Tab.Adventuring
     }
 
 
@@ -38,4 +41,5 @@ prodFlags =
     { showFastForwardSpeed = False
     , extraFastForwardTime = 0
     , showDebugPanel = False
+    , defaultTab = Tab.Chores
     }

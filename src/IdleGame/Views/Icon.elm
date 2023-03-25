@@ -131,6 +131,11 @@ shop =
     createIconFeather FeatherIcons.dollarSign
 
 
+adventuring : Icon
+adventuring =
+    createIconFeather FeatherIcons.gitlab
+
+
 chores : Icon
 chores =
     createIconFeather FeatherIcons.clipboard

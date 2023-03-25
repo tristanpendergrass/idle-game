@@ -89,6 +89,7 @@ renderDrawer isDrawerOpen activeTab =
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [ onClick (SetActiveTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
                 , li [ onClick (SetActiveTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                , li [ onClick (SetActiveTab Tab.Adventuring) ] [ renderTab { tab = Tab.Adventuring, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
