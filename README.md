@@ -39,6 +39,12 @@ $ npm test -- --watch
 
 ## Version 0.2
 - [ ] Combat proof of concept
+  - [x] Cycle through moves on timer
+  - [ ] Apply damage to health
+  - [ ] Shield mitigates damage
+  - [ ] Award an item or coin on kill of monster
+  - [ ] Show something in Time Passes
+  - [ ] Consume an item on every use of spell
 
 ## Future
 ### Tech stuff

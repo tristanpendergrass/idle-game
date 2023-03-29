@@ -60,9 +60,18 @@ moveHeightClass =
     class "h-12"
 
 
-renderPlayerMove : Int -> Adventuring.PlayerMove -> Html FrontendMsg
-renderPlayerMove index move =
-    div [ class "flex gap-1 items-center", moveHeightClass ]
+renderPlayerMove :
+    { index : Int
+    , move : Adventuring.PlayerMove
+    , isActive : Bool
+    }
+    -> Html FrontendMsg
+renderPlayerMove { index, move, isActive } =
+    div
+        [ class "flex gap-1 items-center"
+        , moveHeightClass
+        , classList [ ( "border border-accent", isActive ) ]
+        ]
         [ div [ class "dropdown" ]
             [ label [ tabindex 0, class "btn btn-circle m-1" ]
                 [ Icon.switch
@@ -123,13 +132,23 @@ renderMonsterMove =
 
 renderPlayerCol : Game -> Html FrontendMsg
 renderPlayerCol game =
+    let
+        isActive : Int -> Bool
+        isActive i =
+            case game.adventuring.combatTimer of
+                Nothing ->
+                    False
+
+                Just ( index, _ ) ->
+                    index == i
+    in
     div [ class "t-column gap-3" ]
         [ span [] [ text "Player" ]
         , renderAvatar Friend Icon.adventuring
         , renderHealthBar Friend
-        , renderPlayerMove 0 (Adventuring.getPlayerMove 0 game.adventuring)
-        , renderPlayerMove 1 (Adventuring.getPlayerMove 1 game.adventuring)
-        , renderPlayerMove 2 (Adventuring.getPlayerMove 2 game.adventuring)
+        , renderPlayerMove { index = 0, move = Adventuring.getPlayerMove 0 game.adventuring, isActive = isActive 0 }
+        , renderPlayerMove { index = 1, move = Adventuring.getPlayerMove 1 game.adventuring, isActive = isActive 1 }
+        , renderPlayerMove { index = 2, move = Adventuring.getPlayerMove 2 game.adventuring, isActive = isActive 2 }
         ]
 
 
@@ -148,7 +167,7 @@ renderMonsterCol game =
 render : Game -> Html FrontendMsg
 render game =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ div [ class "t-column w-full h-20" ]
+        [ div [ class "t-column w-full md:w-3/4 lg:w-1/2 h-20" ]
             (case game.adventuring.combatTimer of
                 Nothing ->
                     [ button [ class "btn btn-primary", onClick StartFight ] [ text "Fight!" ]
