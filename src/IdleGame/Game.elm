@@ -1,6 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.Adventuring as Adventuring
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
@@ -29,6 +30,7 @@ type alias Game =
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
+    , adventuring : Adventuring.State
     }
 
 
@@ -52,6 +54,7 @@ create seed =
     , coin = Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
+    , adventuring = Adventuring.createState
     }
 
 
@@ -154,6 +157,21 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
+startFight : Game -> Game
+startFight game =
+    { game | adventuring = Adventuring.startFight game.adventuring }
+
+
+stopFight : Game -> Game
+stopFight game =
+    { game | adventuring = Adventuring.stopFight game.adventuring }
+
+
+setPlayerMove : Int -> Adventuring.PlayerMove -> Game -> Game
+setPlayerMove index move game =
+    { game | adventuring = Adventuring.setPlayerMove index move game.adventuring }
+
+
 applyIntervalMods : List IntervalMod -> Duration -> Duration
 applyIntervalMods mods duration =
     let
@@ -180,6 +198,11 @@ getModdedDuration game choreKind =
     in
     stats.outcome.duration
         |> applyIntervalMods mods
+
+
+updateAdventuring : (Adventuring.State -> Adventuring.State) -> Game -> Game
+updateAdventuring fn game =
+    { game | adventuring = fn game.adventuring }
 
 
 tick : Duration -> Game -> ( Game, List Toast )
@@ -229,6 +252,7 @@ tick tickDuration game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
+                |> updateAdventuring (Adventuring.update tickDuration)
                 |> setActiveChore newActiveChore
                 |> (\g -> List.foldl effectReducer (Random.constant ( g, [] )) effects)
 

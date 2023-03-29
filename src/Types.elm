@@ -4,6 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
+import IdleGame.Adventuring as Adventuring
 import IdleGame.Chore as Chore
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -86,6 +87,10 @@ type FrontendMsg
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Kind
+      -- Adventuring
+    | StartFight
+    | StopFight
+    | SetPlayerMove Int Adventuring.PlayerMove
       -- Chores
     | ToggleActiveChore ChoreKind
       -- Debug Panel

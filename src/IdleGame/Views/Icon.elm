@@ -111,6 +111,21 @@ close =
     createIconFeather FeatherIcons.x
 
 
+switch : Icon
+switch =
+    createIconFeather FeatherIcons.rotateCcw
+
+
+damage : Icon
+damage =
+    createIconFeather FeatherIcons.droplet
+
+
+shield : Icon
+shield =
+    createIconFeather FeatherIcons.shield
+
+
 debug : Icon
 debug =
     createIconFeather FeatherIcons.tool
@@ -269,3 +284,8 @@ oversizedBag =
 unknownItem : Icon
 unknownItem =
     createIconFeather FeatherIcons.lock
+
+
+monster : Icon
+monster =
+    createIconPublic "/adventuring/gargoyle.png"

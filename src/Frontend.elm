@@ -10,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
+import IdleGame.Adventuring as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -18,7 +19,6 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
@@ -307,6 +307,24 @@ update msg model =
                 _ ->
                     -- Shouldn't normally happen
                     noOp
+
+        StartFight ->
+            ( model
+                |> mapGame IdleGame.Game.startFight
+            , Cmd.none
+            )
+
+        StopFight ->
+            ( model
+                |> mapGame IdleGame.Game.stopFight
+            , Cmd.none
+            )
+
+        SetPlayerMove index playerMove ->
+            ( model
+                |> mapGame (IdleGame.Game.setPlayerMove index playerMove)
+            , Cmd.none
+            )
 
         ToggleActiveChore toggleId ->
             ( model
