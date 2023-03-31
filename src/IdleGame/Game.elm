@@ -219,9 +219,31 @@ updateAdventuring delta game =
                     Timer.incrementUntilComplete moveDuration delta adventuringTimer
             in
             if Quantity.greaterThanZero timeRemaining then
-                updateAdventuring timeRemaining
+                let
+                    updatedState : Adventuring.State
+                    updatedState =
+                        Adventuring.increment game.adventuringState
+                in
+                if Adventuring.monsterDead updatedState then
                     { game
-                        | adventuringState = Adventuring.increment game.adventuringState
+                        | adventuringState = Adventuring.createState
+                        , adventuringTimer = Just Timer.create
+
+                        -- TODO - give player reward
+                    }
+
+                else if Adventuring.playerDead updatedState then
+                    { game
+                        | adventuringState = Adventuring.createState
+                        , adventuringTimer = Just Timer.create
+
+                        -- TODO - put player in regen state
+                    }
+
+                else
+                    -- Game continues
+                    { game
+                        | adventuringState = updatedState
                         , adventuringTimer = Just newTimer
                     }
 

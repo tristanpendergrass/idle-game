@@ -42,7 +42,7 @@ $ npm test -- --watch
   - [x] Cycle through moves on timer
   - [x] Apply damage to health
   - [x] Shield mitigates damage
-  - [ ] Award an item or coin on kill of monster
+  - [ ] Restart fight and award an item or coin on kill of monster
   - [ ] Put player in regeneration state if they are killed
   - [ ] Show something in Time Passes
   - [ ] Consume an item on every use of spell

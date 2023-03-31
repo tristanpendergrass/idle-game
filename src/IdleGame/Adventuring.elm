@@ -169,3 +169,13 @@ increment state =
         |> applyPlayerMove
         |> applyMonsterMove
         |> incrementMoveIndex
+
+
+monsterDead : State -> Bool
+monsterDead state =
+    state.monsterHealth <= 0
+
+
+playerDead : State -> Bool
+playerDead state =
+    state.playerHealth <= 0
