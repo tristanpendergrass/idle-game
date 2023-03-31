@@ -45,6 +45,7 @@ Mastery in combat is not done on a per-monster basis but on a per-tag basis. Eac
 * Deal small damage. Deal more for each consecutive instance of this spell that is cast
 * Support spell that increases loot from this combat. Or increases mxp gained if lose the combat.
 * Support spell that gives a chance to recover other spells used in this combat
+* Mirror the move of the opponent.
 
 # Tag ideas
 Monsters have tags that alter combat with them in some way.

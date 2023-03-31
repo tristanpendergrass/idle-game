@@ -38,8 +38,8 @@ renderAvatar loyalty icon =
         ]
 
 
-renderHealthBar : Loyalty -> Html FrontendMsg
-renderHealthBar loyalty =
+renderHealthBar : Int -> Loyalty -> Html FrontendMsg
+renderHealthBar health loyalty =
     div [ class "t-column" ]
         [ progress
             [ class "progress w-3/5"
@@ -49,11 +49,11 @@ renderHealthBar loyalty =
 
                 Foe ->
                     class "progress-error"
-            , attribute "value" "50"
+            , attribute "value" (String.fromInt health)
             , attribute "max" "100"
             ]
             []
-        , span [] [ text "HP: 50/100" ]
+        , span [] [ text <| "HP: " ++ String.fromInt health ++ "/100" ]
         ]
 
 
@@ -62,14 +62,14 @@ moveHeightClass =
     class "h-12"
 
 
-renderMove : Adventuring.Move -> Html FrontendMsg
-renderMove move =
+renderPlayerMove : Adventuring.PlayerMove -> Html FrontendMsg
+renderPlayerMove move =
     div [ class "flex gap-2 items-center", moveHeightClass ]
-        [ span [] [ text <| (Adventuring.getMoveStats move).title ]
+        [ span [] [ text <| (Adventuring.getPlayerMoveStats move).title ]
         , case move of
             Adventuring.Punch ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text "4" ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.punchDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
@@ -78,7 +78,7 @@ renderMove move =
 
             Adventuring.Firebolt ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text "6" ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.fireboltDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
@@ -87,16 +87,23 @@ renderMove move =
 
             Adventuring.Barrier ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text "6" ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.barrierBlock ]
                     , span [ class "text-info" ]
                         [ Icon.shield
                             |> Icon.toHtml
                         ]
                     ]
+        ]
 
+
+renderMonsterMove : Adventuring.MonsterMove -> Html FrontendMsg
+renderMonsterMove move =
+    div [ class "flex gap-2 items-center", moveHeightClass ]
+        [ span [] [ text <| (Adventuring.getMonsterMoveStats move).title ]
+        , case move of
             Adventuring.Claw ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text "4" ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.clawDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
@@ -105,13 +112,13 @@ renderMove move =
         ]
 
 
-renderPlayerMove :
+renderPlayerMoveRow :
     { index : Int
-    , move : Adventuring.Move
+    , move : Adventuring.PlayerMove
     , isActive : Bool
     }
     -> Html FrontendMsg
-renderPlayerMove { index, move, isActive } =
+renderPlayerMoveRow { index, move, isActive } =
     div
         [ class "flex gap-1 items-center"
         , moveHeightClass
@@ -128,13 +135,13 @@ renderPlayerMove { index, move, isActive } =
                 , li [ onClick <| SetPlayerMove index Adventuring.Barrier ] [ span [] [ text "Barrier" ] ]
                 ]
             ]
-        , renderMove move
+        , renderPlayerMove move
         ]
 
 
-renderMonsterMove : Html FrontendMsg
-renderMonsterMove =
-    renderMove Adventuring.Claw
+renderMonsterMoveRow : Html FrontendMsg
+renderMonsterMoveRow =
+    renderMonsterMove Adventuring.Claw
 
 
 renderPlayerCol : Game -> Html FrontendMsg
@@ -147,10 +154,10 @@ renderPlayerCol game =
     div [ class "t-column gap-3" ]
         [ span [] [ text "Player" ]
         , renderAvatar Friend Icon.adventuring
-        , renderHealthBar Friend
-        , renderPlayerMove { index = 0, move = Adventuring.getPlayerMove 0 game.adventuringState, isActive = isActive 0 }
-        , renderPlayerMove { index = 1, move = Adventuring.getPlayerMove 1 game.adventuringState, isActive = isActive 1 }
-        , renderPlayerMove { index = 2, move = Adventuring.getPlayerMove 2 game.adventuringState, isActive = isActive 2 }
+        , renderHealthBar game.adventuringState.playerHealth Friend
+        , renderPlayerMoveRow { index = 0, move = Adventuring.getPlayerMove 0 game.adventuringState, isActive = isActive 0 }
+        , renderPlayerMoveRow { index = 1, move = Adventuring.getPlayerMove 1 game.adventuringState, isActive = isActive 1 }
+        , renderPlayerMoveRow { index = 2, move = Adventuring.getPlayerMove 2 game.adventuringState, isActive = isActive 2 }
         ]
 
 
@@ -159,10 +166,10 @@ renderMonsterCol game =
     div [ class "t-column gap-3" ]
         [ span [] [ text "Lil Gargoyle" ]
         , renderAvatar Foe Icon.monster
-        , renderHealthBar Foe
-        , renderMonsterMove
-        , renderMonsterMove
-        , renderMonsterMove
+        , renderHealthBar game.adventuringState.monsterHealth Foe
+        , renderMonsterMoveRow
+        , renderMonsterMoveRow
+        , renderMonsterMoveRow
         ]
 
 

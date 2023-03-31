@@ -161,15 +161,15 @@ setActiveChore activeChore g =
 
 startFight : Game -> Game
 startFight game =
-    { game | adventuringTimer = Just Timer.create }
+    { game | adventuringTimer = Just Timer.create, adventuringState = Adventuring.createState }
 
 
 stopFight : Game -> Game
 stopFight game =
-    { game | adventuringTimer = Nothing }
+    { game | adventuringTimer = Nothing, adventuringState = Adventuring.createState }
 
 
-setPlayerMove : Int -> Adventuring.Move -> Game -> Game
+setPlayerMove : Int -> Adventuring.PlayerMove -> Game -> Game
 setPlayerMove index move game =
     { game | adventuringState = Adventuring.setPlayerMove index move game.adventuringState }
 
@@ -218,7 +218,7 @@ updateAdventuring delta game =
                 ( newTimer, timeRemaining ) =
                     Timer.incrementUntilComplete moveDuration delta adventuringTimer
             in
-            if Quantity.greaterThanZero (Debug.log "timeRemaining" timeRemaining) then
+            if Quantity.greaterThanZero timeRemaining then
                 updateAdventuring timeRemaining
                     { game
                         | adventuringState = Adventuring.increment game.adventuringState

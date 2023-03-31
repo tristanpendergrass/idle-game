@@ -40,8 +40,8 @@ $ npm test -- --watch
 ## Version 0.2
 - [ ] Combat proof of concept
   - [x] Cycle through moves on timer
-  - [ ] Apply damage to health
-  - [ ] Shield mitigates damage
+  - [x] Apply damage to health
+  - [x] Shield mitigates damage
   - [ ] Award an item or coin on kill of monster
   - [ ] Put player in regeneration state if they are killed
   - [ ] Show something in Time Passes
