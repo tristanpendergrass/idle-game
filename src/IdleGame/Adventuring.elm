@@ -5,18 +5,20 @@ import IdleGame.Timer as Timer exposing (Timer)
 import List.Extra
 
 
-type PlayerMove
+type Move
     = Punch
     | Firebolt
     | Barrier
+      -- Monster moves
+    | Claw
 
 
-type alias PlayerMoveStats =
+type alias MoveStats =
     { title : String }
 
 
-getPlayerMoveStats : PlayerMove -> PlayerMoveStats
-getPlayerMoveStats move =
+getMoveStats : Move -> MoveStats
+getMoveStats move =
     case move of
         Punch ->
             { title = "Punch" }
@@ -27,70 +29,52 @@ getPlayerMoveStats move =
         Barrier ->
             { title = "Barrier" }
 
+        Claw ->
+            { title = "Claw" }
 
-getPlayerMove : Int -> State -> PlayerMove
+
+getPlayerMove : Int -> State -> Move
 getPlayerMove index { playerMoves } =
     List.Extra.getAt index playerMoves
         |> Maybe.withDefault Punch
 
 
+getMonsterMove : Int -> State -> Move
+getMonsterMove index _ =
+    Claw
+
+
 type alias State =
-    { playerMoves : List PlayerMove
+    { playerMoves : List Move
+    , monsterMoves : List Move
     , playerHealth : Int
     , monsterHealth : Int
-    , combatTimer : Maybe ( Int, Timer )
+    , nextMoveIndex : Int
     }
 
 
 createState : State
 createState =
-    { playerMoves = [ Punch, Punch, Punch ]
+    { playerMoves = List.repeat numMoves Punch
+    , monsterMoves = List.repeat numMoves Claw
     , playerHealth = 100
     , monsterHealth = 100
-    , combatTimer = Nothing
+    , nextMoveIndex = 0
     }
 
 
-startFight : State -> State
-startFight state =
-    { state
-        | combatTimer = Just ( 0, Timer.create )
-    }
-
-
-stopFight : State -> State
-stopFight state =
-    { state
-        | combatTimer = Nothing
-    }
-
-
-setPlayerMove : Int -> PlayerMove -> State -> State
+setPlayerMove : Int -> Move -> State -> State
 setPlayerMove index move state =
     { state
         | playerMoves = List.Extra.setAt index move state.playerMoves
     }
 
 
-moveDuration : Duration
-moveDuration =
-    Duration.seconds 1.5
+numMoves : Int
+numMoves =
+    3
 
 
-update : Duration -> State -> State
-update delta state =
-    case state.combatTimer of
-        Just ( index, timer ) ->
-            let
-                ( newTimer, completions ) =
-                    Timer.increment moveDuration delta timer
-
-                newIndex =
-                    modBy 3 (index + completions)
-            in
-            { state
-                | combatTimer = Just ( newIndex, newTimer )
-            }
-
-        Nothing ->
-            state
+increment : State -> State
+increment state =
+    { state | nextMoveIndex = modBy numMoves (state.nextMoveIndex + 1) }

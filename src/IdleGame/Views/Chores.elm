@@ -18,6 +18,7 @@ import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils
 import IdleGame.XpFormulas
 import List.Extra
+import Percent exposing (Percent)
 import Types exposing (..)
 
 
@@ -344,7 +345,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
                     div
                         [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
                         , IdleGame.Views.Utils.zIndexes.activityProgressBar
-                        , attribute "style" ("width:" ++ String.fromFloat percentComplete ++ "%")
+                        , attribute "style" ("width:" ++ String.fromFloat (Percent.toNumber percentComplete) ++ "%")
                         ]
                         []
             ]

@@ -11,6 +11,8 @@ import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
+import Maybe.Extra
+import Percent exposing (Percent)
 import Types exposing (..)
 
 
@@ -60,9 +62,52 @@ moveHeightClass =
     class "h-12"
 
 
+renderMove : Adventuring.Move -> Html FrontendMsg
+renderMove move =
+    div [ class "flex gap-2 items-center", moveHeightClass ]
+        [ span [] [ text <| (Adventuring.getMoveStats move).title ]
+        , case move of
+            Adventuring.Punch ->
+                span [ class "flex items-center gap-1" ]
+                    [ span [ class "font-bold" ] [ text "4" ]
+                    , span [ class "text-error" ]
+                        [ Icon.damage
+                            |> Icon.toHtml
+                        ]
+                    ]
+
+            Adventuring.Firebolt ->
+                span [ class "flex items-center gap-1" ]
+                    [ span [ class "font-bold" ] [ text "6" ]
+                    , span [ class "text-error" ]
+                        [ Icon.damage
+                            |> Icon.toHtml
+                        ]
+                    ]
+
+            Adventuring.Barrier ->
+                span [ class "flex items-center gap-1" ]
+                    [ span [ class "font-bold" ] [ text "6" ]
+                    , span [ class "text-info" ]
+                        [ Icon.shield
+                            |> Icon.toHtml
+                        ]
+                    ]
+
+            Adventuring.Claw ->
+                span [ class "flex items-center gap-1" ]
+                    [ span [ class "font-bold" ] [ text "4" ]
+                    , span [ class "text-error" ]
+                        [ Icon.damage
+                            |> Icon.toHtml
+                        ]
+                    ]
+        ]
+
+
 renderPlayerMove :
     { index : Int
-    , move : Adventuring.PlayerMove
+    , move : Adventuring.Move
     , isActive : Bool
     }
     -> Html FrontendMsg
@@ -83,51 +128,13 @@ renderPlayerMove { index, move, isActive } =
                 , li [ onClick <| SetPlayerMove index Adventuring.Barrier ] [ span [] [ text "Barrier" ] ]
                 ]
             ]
-        , div [ class "flex gap-2 items-center", moveHeightClass ]
-            [ span [] [ text <| (Adventuring.getPlayerMoveStats move).title ]
-            , case move of
-                Adventuring.Punch ->
-                    span [ class "flex items-center gap-1" ]
-                        [ span [ class "font-bold" ] [ text "4" ]
-                        , span [ class "text-error" ]
-                            [ Icon.damage
-                                |> Icon.toHtml
-                            ]
-                        ]
-
-                Adventuring.Firebolt ->
-                    span [ class "flex items-center gap-1" ]
-                        [ span [ class "font-bold" ] [ text "6" ]
-                        , span [ class "text-error" ]
-                            [ Icon.damage
-                                |> Icon.toHtml
-                            ]
-                        ]
-
-                Adventuring.Barrier ->
-                    span [ class "flex items-center gap-1" ]
-                        [ span [ class "font-bold" ] [ text "6" ]
-                        , span [ class "text-info" ]
-                            [ Icon.shield
-                                |> Icon.toHtml
-                            ]
-                        ]
-            ]
+        , renderMove move
         ]
 
 
 renderMonsterMove : Html FrontendMsg
 renderMonsterMove =
-    div [ class "flex gap-2 items-center", moveHeightClass ]
-        [ span [] [ text "Claw:" ]
-        , span [ class "flex items-center gap-1" ]
-            [ span [ class "font-bold" ] [ text "4" ]
-            , span [ class "text-error" ]
-                [ Icon.damage
-                    |> Icon.toHtml
-                ]
-            ]
-        ]
+    renderMove Adventuring.Claw
 
 
 renderPlayerCol : Game -> Html FrontendMsg
@@ -135,20 +142,15 @@ renderPlayerCol game =
     let
         isActive : Int -> Bool
         isActive i =
-            case game.adventuring.combatTimer of
-                Nothing ->
-                    False
-
-                Just ( index, _ ) ->
-                    index == i
+            Maybe.Extra.isJust game.adventuringTimer && game.adventuringState.nextMoveIndex == i
     in
     div [ class "t-column gap-3" ]
         [ span [] [ text "Player" ]
         , renderAvatar Friend Icon.adventuring
         , renderHealthBar Friend
-        , renderPlayerMove { index = 0, move = Adventuring.getPlayerMove 0 game.adventuring, isActive = isActive 0 }
-        , renderPlayerMove { index = 1, move = Adventuring.getPlayerMove 1 game.adventuring, isActive = isActive 1 }
-        , renderPlayerMove { index = 2, move = Adventuring.getPlayerMove 2 game.adventuring, isActive = isActive 2 }
+        , renderPlayerMove { index = 0, move = Adventuring.getPlayerMove 0 game.adventuringState, isActive = isActive 0 }
+        , renderPlayerMove { index = 1, move = Adventuring.getPlayerMove 1 game.adventuringState, isActive = isActive 1 }
+        , renderPlayerMove { index = 2, move = Adventuring.getPlayerMove 2 game.adventuringState, isActive = isActive 2 }
         ]
 
 
@@ -168,14 +170,14 @@ render : Game -> Html FrontendMsg
 render game =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "t-column w-full md:w-3/4 lg:w-1/2 h-20" ]
-            (case game.adventuring.combatTimer of
+            (case game.adventuringTimer of
                 Nothing ->
                     [ button [ class "btn btn-primary", onClick StartFight ] [ text "Fight!" ]
                     ]
 
-                Just ( _, timer ) ->
+                Just timer ->
                     let
-                        percentComplete : Float
+                        percentComplete : Percent
                         percentComplete =
                             Timer.percentComplete timer
                     in
@@ -183,7 +185,7 @@ render game =
                     , progress
                         [ class "progress h-[2px]"
                         , Html.Attributes.max "100"
-                        , Html.Attributes.value (String.fromFloat percentComplete)
+                        , Html.Attributes.value (String.fromFloat (Percent.toNumber percentComplete))
                         ]
                         []
                     ]

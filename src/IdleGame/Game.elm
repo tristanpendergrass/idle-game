@@ -30,7 +30,8 @@ type alias Game =
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
-    , adventuring : Adventuring.State
+    , adventuringState : Adventuring.State
+    , adventuringTimer : Maybe Timer
     }
 
 
@@ -54,7 +55,8 @@ create seed =
     , coin = Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
-    , adventuring = Adventuring.createState
+    , adventuringState = Adventuring.createState
+    , adventuringTimer = Nothing
     }
 
 
@@ -159,17 +161,17 @@ setActiveChore activeChore g =
 
 startFight : Game -> Game
 startFight game =
-    { game | adventuring = Adventuring.startFight game.adventuring }
+    { game | adventuringTimer = Just Timer.create }
 
 
 stopFight : Game -> Game
 stopFight game =
-    { game | adventuring = Adventuring.stopFight game.adventuring }
+    { game | adventuringTimer = Nothing }
 
 
-setPlayerMove : Int -> Adventuring.PlayerMove -> Game -> Game
+setPlayerMove : Int -> Adventuring.Move -> Game -> Game
 setPlayerMove index move game =
-    { game | adventuring = Adventuring.setPlayerMove index move game.adventuring }
+    { game | adventuringState = Adventuring.setPlayerMove index move game.adventuringState }
 
 
 applyIntervalMods : List IntervalMod -> Duration -> Duration
@@ -200,13 +202,35 @@ getModdedDuration game choreKind =
         |> applyIntervalMods mods
 
 
-updateAdventuring : (Adventuring.State -> Adventuring.State) -> Game -> Game
-updateAdventuring fn game =
-    { game | adventuring = fn game.adventuring }
+moveDuration : Duration
+moveDuration =
+    Duration.seconds 1.5
+
+
+updateAdventuring : Duration -> Game -> Game
+updateAdventuring delta game =
+    case game.adventuringTimer of
+        Nothing ->
+            game
+
+        Just adventuringTimer ->
+            let
+                ( newTimer, timeRemaining ) =
+                    Timer.incrementUntilComplete moveDuration delta adventuringTimer
+            in
+            if Quantity.greaterThanZero (Debug.log "timeRemaining" timeRemaining) then
+                updateAdventuring timeRemaining
+                    { game
+                        | adventuringState = Adventuring.increment game.adventuringState
+                        , adventuringTimer = Just newTimer
+                    }
+
+            else
+                { game | adventuringTimer = Just newTimer }
 
 
 tick : Duration -> Game -> ( Game, List Toast )
-tick tickDuration game =
+tick delta game =
     let
         ( newActiveChore, events ) =
             case game.activeChore of
@@ -220,7 +244,7 @@ tick tickDuration game =
 
                         ( newTimer, completions ) =
                             timer
-                                |> Timer.increment choreDuration tickDuration
+                                |> Timer.increment choreDuration delta
 
                         activeChore =
                             Just ( choreKind, newTimer )
@@ -252,7 +276,7 @@ tick tickDuration game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
-                |> updateAdventuring (Adventuring.update tickDuration)
+                |> updateAdventuring delta
                 |> setActiveChore newActiveChore
                 |> (\g -> List.foldl effectReducer (Random.constant ( g, [] )) effects)
 

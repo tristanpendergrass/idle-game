@@ -41,6 +41,16 @@ Ideally combat spells go through the following pattern over time:
 ## Tags and Mastery
 Mastery in combat is not done on a per-monster basis but on a per-tag basis. Each monster would have one or more tags, e.g. Beast, Militia. When you fight monsters you get mastery xp in their tags and level up those tags. Tags have mastery thresholds just like skills do that expose weaknesses of the monsters that have that tag, or grant better rewards against that monster.
 
+# Spell ideas
+* Deal small damage. Deal more for each consecutive instance of this spell that is cast
+* Support spell that increases loot from this combat. Or increases mxp gained if lose the combat.
+* Support spell that gives a chance to recover other spells used in this combat
+
+# Tag ideas
+Monsters have tags that alter combat with them in some way.
+* Feral - each consecutive move that does damage does even more damage (incentivize to let them hit you once or twice then interrupt with a strong block)
+* Bounty - this monster i wanted by authorities. Not sure the effect ..
+
 # Random concepts
 * Mana system like in Yi Xian
 * Take damage = get better stuff support spell. Useful for farming lower tier mobs later like in Returnal

@@ -90,7 +90,7 @@ type FrontendMsg
       -- Adventuring
     | StartFight
     | StopFight
-    | SetPlayerMove Int Adventuring.PlayerMove
+    | SetPlayerMove Int Adventuring.Move
       -- Chores
     | ToggleActiveChore ChoreKind
       -- Debug Panel

@@ -43,8 +43,10 @@ $ npm test -- --watch
   - [ ] Apply damage to health
   - [ ] Shield mitigates damage
   - [ ] Award an item or coin on kill of monster
+  - [ ] Put player in regeneration state if they are killed
   - [ ] Show something in Time Passes
   - [ ] Consume an item on every use of spell
+  - [ ] Add spells to shop to help with combat
 
 ## Future
 ### Tech stuff

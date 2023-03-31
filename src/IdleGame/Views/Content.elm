@@ -17,12 +17,6 @@ import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-getActivityProgress : IdleGame.Game.ActivityStatus -> Maybe Float
-getActivityProgress activityStatus =
-    activityStatus
-        |> Maybe.map IdleGame.Timer.percentComplete
-
-
 renderContent : Game -> Tab -> Html FrontendMsg
 renderContent game activeTab =
     let
