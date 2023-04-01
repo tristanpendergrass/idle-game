@@ -51,6 +51,7 @@ Mastery in combat is not done on a per-monster basis but on a per-tag basis. Eac
 Monsters have tags that alter combat with them in some way.
 * Feral - each consecutive move that does damage does even more damage (incentivize to let them hit you once or twice then interrupt with a strong block)
 * Bounty - this monster i wanted by authorities. Not sure the effect ..
+* Wily - this monster randomly cycles through a few different move loadouts
 
 # Random concepts
 * Mana system like in Yi Xian

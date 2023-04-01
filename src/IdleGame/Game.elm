@@ -207,17 +207,43 @@ moveDuration =
     Duration.seconds 1.5
 
 
-updateAdventuring : Duration -> Game -> Game
+combatReward : Event
+combatReward =
+    Event { effects = [ gainCoin 25 ] }
+
+
+rewardPlayer : Game -> Generator ( Game, List Toast )
+rewardPlayer game =
+    let
+        modifiedCombatReward =
+            applyModsToEvent (getAllMods game) combatReward
+
+        effects : List Effect
+        effects =
+            case modifiedCombatReward of
+                ModdedEvent eventData ->
+                    eventData.effects
+    in
+    List.foldl effectReducer (Random.constant ( game, [] )) effects
+
+
+resetAdventuring : Game -> Game
+resetAdventuring game =
+    { game | adventuringState = Adventuring.createState, adventuringTimer = Just Timer.create }
+
+
+updateAdventuring : Duration -> Game -> Generator ( Game, List Toast )
 updateAdventuring delta game =
     case game.adventuringTimer of
         Nothing ->
-            game
+            Random.constant ( game, [] )
 
         Just adventuringTimer ->
             let
                 ( newTimer, timeRemaining ) =
                     Timer.incrementUntilComplete moveDuration delta adventuringTimer
             in
+            -- TODO: If timeRemaining is greater than 0 we need to recursively call this function and concat its result to the next result too
             if Quantity.greaterThanZero timeRemaining then
                 let
                     updatedState : Adventuring.State
@@ -225,30 +251,32 @@ updateAdventuring delta game =
                         Adventuring.increment game.adventuringState
                 in
                 if Adventuring.monsterDead updatedState then
-                    { game
-                        | adventuringState = Adventuring.createState
-                        , adventuringTimer = Just Timer.create
-
-                        -- TODO - give player reward
-                    }
+                    -- Player won
+                    game
+                        |> resetAdventuring
+                        |> rewardPlayer
 
                 else if Adventuring.playerDead updatedState then
-                    { game
-                        | adventuringState = Adventuring.createState
-                        , adventuringTimer = Just Timer.create
-
-                        -- TODO - put player in regen state
-                    }
+                    -- Player lost
+                    -- TODO - put player in regen state
+                    Random.constant
+                        ( game
+                            |> resetAdventuring
+                        , []
+                        )
 
                 else
                     -- Game continues
-                    { game
-                        | adventuringState = updatedState
-                        , adventuringTimer = Just newTimer
-                    }
+                    Random.constant
+                        ( { game
+                            | adventuringState = updatedState
+                            , adventuringTimer = Just newTimer
+                          }
+                        , []
+                        )
 
             else
-                { game | adventuringTimer = Just newTimer }
+                Random.constant ( { game | adventuringTimer = Just newTimer }, [] )
 
 
 tick : Duration -> Game -> ( Game, List Toast )
@@ -298,9 +326,9 @@ tick delta game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
-                |> updateAdventuring delta
                 |> setActiveChore newActiveChore
-                |> (\g -> List.foldl effectReducer (Random.constant ( g, [] )) effects)
+                |> updateAdventuring delta
+                |> (\g -> List.foldl effectReducer g effects)
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
