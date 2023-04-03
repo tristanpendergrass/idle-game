@@ -39,7 +39,7 @@ punchDamage =
 
 fireboltDamage : Int
 fireboltDamage =
-    9
+    20
 
 
 clawDamage : Int

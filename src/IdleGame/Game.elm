@@ -32,6 +32,8 @@ type alias Game =
     , shopItems : ShopItems
     , adventuringState : Adventuring.State
     , adventuringTimer : Maybe Timer
+    , combatsWon : Int
+    , combatsLost : Int
     }
 
 
@@ -57,6 +59,8 @@ create seed =
     , shopItems = ShopItems.create
     , adventuringState = Adventuring.createState
     , adventuringTimer = Nothing
+    , combatsWon = 0
+    , combatsLost = 0
     }
 
 
@@ -232,6 +236,16 @@ resetAdventuring game =
     { game | adventuringState = Adventuring.createState, adventuringTimer = Just Timer.create }
 
 
+incrementCombatsWon : Game -> Game
+incrementCombatsWon game =
+    { game | combatsWon = game.combatsWon + 1 }
+
+
+incrementCombatsLost : Game -> Game
+incrementCombatsLost game =
+    { game | combatsLost = game.combatsLost + 1 }
+
+
 updateAdventuring : Duration -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 updateAdventuring delta generator =
     generator
@@ -246,7 +260,7 @@ updateAdventuring delta generator =
                             ( newTimer, timeRemaining ) =
                                 Timer.incrementUntilComplete moveDuration delta timer
                         in
-                        if not (Quantity.greaterThanZero timeRemaining) then
+                        if timeRemaining == Quantity.zero then
                             -- TODO: try this code: if timeRemaining == Quantity.zero then
                             -- Timer hasn't ticked. Just increment it
                             Random.constant ( { game | adventuringTimer = Just newTimer }, toasts )
@@ -264,6 +278,7 @@ updateAdventuring delta generator =
                                     updatedGenerator =
                                         game
                                             |> resetAdventuring
+                                            |> incrementCombatsWon
                                             |> rewardPlayer
                                             |> Random.map (\( g, t ) -> ( g, toasts ++ t ))
                                 in
@@ -275,8 +290,8 @@ updateAdventuring delta generator =
                                     updatedGenerator =
                                         Random.constant
                                             ( game
-                                                -- TODO: Add regen
                                                 |> resetAdventuring
+                                                |> incrementCombatsLost
                                             , toasts
                                             )
                                 in
@@ -580,6 +595,8 @@ type alias TimePassesData =
     { xpGains : List TimePassesXpGain
     , coinGains : Maybe Counter
     , resourcesDiff : Resource.Diff
+    , combatsWonDiff : Int
+    , combatsLostDiff : Int
     }
 
 
@@ -596,8 +613,11 @@ getTimePassesData originalGame currentGame =
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
 
+        combatsWonDiff = currentGame.combatsWon - originalGame.combatsWon
+        combatsLostDiff = currentGame.combatsLost - originalGame.combatsLost
+
         hasNewData =
-            not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff)
+            not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff && combatsWonDiff == 0 && combatsLostDiff == 0)
     in
     if hasNewData then
         let
@@ -612,6 +632,8 @@ getTimePassesData originalGame currentGame =
             { xpGains = xpGains
             , coinGains = coinGains
             , resourcesDiff = resourcesDiff
+            , combatsWonDiff = combatsWonDiff
+            , combatsLostDiff = combatsLostDiff
             }
 
     else

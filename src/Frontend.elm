@@ -525,7 +525,13 @@ updateFromBackend msg model =
             case model.gameState of
                 Initializing ->
                     ( model
-                        |> setGameState (FastForward { original = serverSnapshot, current = serverSnapshot, previousIntervalTimer = NotStarted })
+                        |> setGameState ( FastForward { 
+                            original = serverSnapshot
+                            , current = serverSnapshot
+                            , previousIntervalTimer = NotStarted
+
+
+                            })
                     , Task.perform HandleFastForward Time.now
                     )
 
