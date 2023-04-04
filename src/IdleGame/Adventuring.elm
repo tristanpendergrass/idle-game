@@ -32,6 +32,16 @@ getPlayerMoveStats move =
             { title = "Barrier" }
 
 
+playerMaxHealth : Int
+playerMaxHealth =
+    100
+
+
+monsterMaxHealth : Int
+monsterMaxHealth =
+    100
+
+
 punchDamage : Int
 punchDamage =
     6
@@ -83,8 +93,8 @@ createState : State
 createState =
     { playerMoves = List.repeat numMoves Punch
     , monsterMoves = List.repeat numMoves Claw
-    , playerHealth = 100
-    , monsterHealth = 100
+    , playerHealth = playerMaxHealth
+    , monsterHealth = monsterMaxHealth
     , nextMoveIndex = 0
     }
 
@@ -179,3 +189,11 @@ monsterDead state =
 playerDead : State -> Bool
 playerDead state =
     state.playerHealth <= 0
+
+
+resetHealth : State -> State
+resetHealth state =
+    { state
+        | playerHealth = playerMaxHealth
+        , monsterHealth = monsterMaxHealth
+    }

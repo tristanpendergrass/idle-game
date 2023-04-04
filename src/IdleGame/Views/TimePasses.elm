@@ -22,11 +22,41 @@ resourceIcon =
         |> FeatherIcons.withStrokeWidth 4
 
 
+renderCombatsWon : Int -> Html FrontendMsg
+renderCombatsWon num =
+    li [ class "flex items-center gap-1" ]
+        [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString num ]
+        , span [] [ text "combats won" ]
+        ]
+
+
+renderCombatsLost : Int -> Html FrontendMsg
+renderCombatsLost num =
+    li [ class "flex items-center gap-1" ]
+        [ span [ class "text-error" ] [ text <| IdleGame.Views.Utils.intToString num ]
+        , span [] [ text "combats lost" ]
+        ]
+
+
 render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, coinGains, resourcesDiff } =
+render timePassed { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , ul [ class "t-column font-semibold" ]
+            (List.concat
+                [ if combatsWonDiff > 0 then
+                    [ renderCombatsWon combatsWonDiff ]
+
+                  else
+                    []
+                , if combatsLostDiff > 0 then
+                    [ renderCombatsLost combatsLostDiff ]
+
+                  else
+                    []
+                ]
+            )
         , div []
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []

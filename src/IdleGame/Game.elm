@@ -208,7 +208,7 @@ getModdedDuration game choreKind =
 
 moveDuration : Duration
 moveDuration =
-    Duration.seconds 1.5
+    Duration.seconds 3
 
 
 combatReward : Event
@@ -233,7 +233,7 @@ rewardPlayer game =
 
 resetAdventuring : Game -> Game
 resetAdventuring game =
-    { game | adventuringState = Adventuring.createState, adventuringTimer = Just Timer.create }
+    { game | adventuringState = Adventuring.resetHealth game.adventuringState, adventuringTimer = Just Timer.create }
 
 
 incrementCombatsWon : Game -> Game
@@ -613,8 +613,11 @@ getTimePassesData originalGame currentGame =
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
 
-        combatsWonDiff = currentGame.combatsWon - originalGame.combatsWon
-        combatsLostDiff = currentGame.combatsLost - originalGame.combatsLost
+        combatsWonDiff =
+            currentGame.combatsWon - originalGame.combatsWon
+
+        combatsLostDiff =
+            currentGame.combatsLost - originalGame.combatsLost
 
         hasNewData =
             not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff && combatsWonDiff == 0 && combatsLostDiff == 0)
