@@ -2,7 +2,54 @@ module IdleGame.Adventuring exposing (..)
 
 import Duration exposing (Duration)
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import List.Extra
+
+
+type
+    MonsterKind
+    -- Don't forget to update allMonsterKinds when updating this list!
+    = Charmstone
+    | Silkling
+    | Stalker
+
+
+allMonsterKinds : List MonsterKind
+allMonsterKinds =
+    [ Charmstone, Silkling, Stalker ]
+
+
+type alias MonsterStats =
+    { title : String
+    , avatar : Icon
+    , reward : Int
+    , moves : List MonsterMove
+    }
+
+
+getMonsterStats : MonsterKind -> MonsterStats
+getMonsterStats kind =
+    case kind of
+        Charmstone ->
+            { title = "Charmstone"
+            , avatar = Icon.charmstone
+            , reward = 10
+            , moves = List.repeat numMoves Claw
+            }
+
+        Silkling ->
+            { title = "Silkling"
+            , avatar = Icon.silkling
+            , reward = 15
+            , moves = List.repeat numMoves Claw
+            }
+
+        Stalker ->
+            { title = "Stalker"
+            , avatar = Icon.stalker
+            , reward = 20
+            , moves = List.repeat numMoves Claw
+            }
 
 
 type PlayerMove
@@ -82,17 +129,17 @@ getMonsterMove index _ =
 
 type alias State =
     { playerMoves : List PlayerMove
-    , monsterMoves : List MonsterMove
+    , monster : MonsterKind
     , playerHealth : Int
     , monsterHealth : Int
     , nextMoveIndex : Int
     }
 
 
-createState : State
-createState =
+createState : MonsterKind -> State
+createState monsterKind =
     { playerMoves = List.repeat numMoves Punch
-    , monsterMoves = List.repeat numMoves Claw
+    , monster = monsterKind
     , playerHealth = playerMaxHealth
     , monsterHealth = monsterMaxHealth
     , nextMoveIndex = 0
@@ -148,11 +195,16 @@ applyPlayerMove state =
                     state
 
 
+getMonsterMoves : State -> List MonsterMove
+getMonsterMoves { monster } =
+    (getMonsterStats monster).moves
+
+
 applyMonsterMove : State -> State
 applyMonsterMove state =
     let
         monsterMove =
-            List.Extra.getAt state.nextMoveIndex state.monsterMoves
+            List.Extra.getAt state.nextMoveIndex (getMonsterMoves state)
     in
     case monsterMove of
         Nothing ->

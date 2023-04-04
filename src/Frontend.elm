@@ -70,6 +70,7 @@ init _ key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
+      , selectedMonster = Adventuring.Charmstone
 
       -- Debug panel
       , showTimePasses = True
@@ -311,7 +312,7 @@ update msg model =
 
         StartFight ->
             ( model
-                |> mapGame IdleGame.Game.startFight
+                |> mapGame (IdleGame.Game.startFight model.selectedMonster)
             , Cmd.none
             )
 
@@ -324,6 +325,22 @@ update msg model =
         SetPlayerMove index playerMove ->
             ( model
                 |> mapGame (IdleGame.Game.setPlayerMove index playerMove)
+            , Cmd.none
+            )
+
+        SetMonster monster ->
+            ( { model
+                | selectedMonster = Debug.log "monster" monster
+                , gameState =
+                    case model.gameState of
+                        Playing snapshot ->
+                            snapshot
+                                |> Snapshot.map (IdleGame.Game.setCombatMonster monster)
+                                |> Playing
+
+                        _ ->
+                            model.gameState
+              }
             , Cmd.none
             )
 

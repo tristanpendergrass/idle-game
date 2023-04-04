@@ -125,8 +125,9 @@ renderPlayerMoveRow { index, move, isActive } =
         , classList [ ( "border border-accent", isActive ) ]
         ]
         [ div [ class "dropdown" ]
-            [ label [ tabindex 0, class "btn btn-circle m-1" ]
+            [ label [ tabindex 0, class "btn btn-circle btn-sm m-1" ]
                 [ Icon.switch
+                    |> Icon.withSize Icon.Small
                     |> Icon.toHtml
                 ]
             , ul [ tabindex 0, class "dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52" ]
@@ -139,9 +140,14 @@ renderPlayerMoveRow { index, move, isActive } =
         ]
 
 
-renderMonsterMoveRow : Html FrontendMsg
-renderMonsterMoveRow =
-    renderMonsterMove Adventuring.Claw
+renderMonsterMoveRow : Adventuring.MonsterMove -> Html FrontendMsg
+renderMonsterMoveRow move =
+    renderMonsterMove move
+
+
+titleHeightClass : Attribute FrontendMsg
+titleHeightClass =
+    class "h-10"
 
 
 renderPlayerCol : Game -> Html FrontendMsg
@@ -152,7 +158,7 @@ renderPlayerCol game =
             Maybe.Extra.isJust game.adventuringTimer && game.adventuringState.nextMoveIndex == i
     in
     div [ class "t-column gap-3" ]
-        [ span [] [ text "Player" ]
+        [ div [ class "flex items-center gap-1 uppercase font-semibold", titleHeightClass ] [ span [] [ text "Player" ] ]
         , renderAvatar Friend Icon.adventuring
         , renderHealthBar game.adventuringState.playerHealth Friend
         , renderPlayerMoveRow { index = 0, move = Adventuring.getPlayerMove 0 game.adventuringState, isActive = isActive 0 }
@@ -161,15 +167,38 @@ renderPlayerCol game =
         ]
 
 
+renderMonsterTitle : Adventuring.MonsterKind -> Html FrontendMsg
+renderMonsterTitle monster =
+    div [ class "dropdown", titleHeightClass ]
+        [ label [ class "btn btn-sm m-1 flex items-center gap-1", tabindex 0 ]
+            [ span [] [ text (Adventuring.getMonsterStats monster).title ]
+            , Icon.dropdown
+                |> Icon.withSize Icon.Small
+                |> Icon.toHtml
+            ]
+        , ul [ class "dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52", tabindex 0 ]
+            (Adventuring.allMonsterKinds
+                |> List.map
+                    (\kind ->
+                        li [] [ button [ onClick (SetMonster kind) ] [ text <| (Adventuring.getMonsterStats kind).title ] ]
+                    )
+            )
+        ]
+
+
 renderMonsterCol : Game -> Html FrontendMsg
 renderMonsterCol game =
+    let
+        monsterStats =
+            Adventuring.getMonsterStats game.adventuringState.monster
+    in
     div [ class "t-column gap-3" ]
-        [ span [] [ text "Lil Gargoyle" ]
-        , renderAvatar Foe Icon.monster
+        [ renderMonsterTitle game.adventuringState.monster
+        , renderAvatar Foe monsterStats.avatar
         , renderHealthBar game.adventuringState.monsterHealth Foe
-        , renderMonsterMoveRow
-        , renderMonsterMoveRow
-        , renderMonsterMoveRow
+        , renderMonsterMoveRow (Adventuring.getMonsterMove 0 game.adventuringState)
+        , renderMonsterMoveRow (Adventuring.getMonsterMove 1 game.adventuringState)
+        , renderMonsterMoveRow (Adventuring.getMonsterMove 2 game.adventuringState)
         ]
 
 

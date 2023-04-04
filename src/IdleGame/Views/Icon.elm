@@ -113,7 +113,7 @@ close =
 
 switch : Icon
 switch =
-    createIconFeather FeatherIcons.rotateCcw
+    createIconFeather FeatherIcons.book
 
 
 damage : Icon
@@ -286,6 +286,21 @@ unknownItem =
     createIconFeather FeatherIcons.lock
 
 
-monster : Icon
-monster =
-    createIconPublic "/adventuring/gargoyle.png"
+charmstone : Icon
+charmstone =
+    createIconPublic "/adventuring/charmstone.png"
+
+
+silkling : Icon
+silkling =
+    createIconPublic "/adventuring/silkling.png"
+
+
+stalker : Icon
+stalker =
+    createIconPublic "/adventuring/stalker.png"
+
+
+dropdown : Icon
+dropdown =
+    createIconFeather FeatherIcons.arrowDown

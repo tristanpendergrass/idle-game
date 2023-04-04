@@ -43,9 +43,11 @@ $ npm test -- --watch
   - [x] Apply damage to health
   - [x] Shield mitigates damage
   - [x] Restart fight and award an item or coin on kill of monster
-  - [ ] Show something in Time Passes
-  - [ ] Consume an item on every use of spell
-  - [ ] Add spells to shop to help with combat
+  - [x] Show something in Time Passes
+  - [x] Add a second monster and way to choose between them
+  - [ ] Show reward on monster screen
+  - [ ] Add different moves to different monsters
+  - [ ] Add spells optimal against that second monster
 
 ## Future
 ### Tech stuff

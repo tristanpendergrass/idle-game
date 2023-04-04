@@ -56,6 +56,7 @@ type alias FrontendModel =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
+    , selectedMonster : Adventuring.MonsterKind
 
     -- Debug panel
     , showTimePasses : Bool
@@ -92,6 +93,7 @@ type FrontendMsg
     | StartFight
     | StopFight
     | SetPlayerMove Int Adventuring.PlayerMove
+    | SetMonster Adventuring.MonsterKind
       -- Chores
     | ToggleActiveChore ChoreKind
       -- Debug Panel

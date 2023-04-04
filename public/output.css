@@ -3892,6 +3892,18 @@ body[dir="rtl"] .checkbox:checked,
   height: 1.5rem;
 }
 
+.h-8 {
+  height: 2rem;
+}
+
+.h-9 {
+  height: 2.25rem;
+}
+
+.h-10 {
+  height: 2.5rem;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }

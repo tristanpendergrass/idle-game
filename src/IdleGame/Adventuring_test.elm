@@ -26,12 +26,12 @@ adventuringTest =
     describe "Adventuring State"
         [ test "moving to next index works" <|
             \_ ->
-                Adventuring.createState
+                Adventuring.createState Adventuring.Charmstone
                     |> Adventuring.increment
                     |> expectMoveIndex 1
         , test "moving to next index works when at last index" <|
             \_ ->
-                Adventuring.createState
+                Adventuring.createState Adventuring.Charmstone
                     |> Adventuring.increment
                     |> Adventuring.increment
                     |> Adventuring.increment
@@ -39,13 +39,13 @@ adventuringTest =
         , skip <|
             test "monster loses health when hit by player" <|
                 \_ ->
-                    Adventuring.createState
+                    Adventuring.createState Adventuring.Charmstone
                         |> Adventuring.increment
                         |> expectPlayerHealth 94
         , skip <|
             test "player loses health when hit by monster" <|
                 \_ ->
-                    Adventuring.createState
+                    Adventuring.createState Adventuring.Charmstone
                         |> Adventuring.increment
                         |> expectMonsterHealth 94
         ]

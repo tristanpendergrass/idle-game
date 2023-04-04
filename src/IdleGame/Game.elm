@@ -57,7 +57,7 @@ create seed =
     , coin = Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
-    , adventuringState = Adventuring.createState
+    , adventuringState = Adventuring.createState Adventuring.Charmstone
     , adventuringTimer = Nothing
     , combatsWon = 0
     , combatsLost = 0
@@ -163,14 +163,19 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-startFight : Game -> Game
-startFight game =
-    { game | adventuringTimer = Just Timer.create, adventuringState = Adventuring.createState }
+setCombatMonster : Adventuring.MonsterKind -> Game -> Game
+setCombatMonster monster game =
+    { game | adventuringTimer = Nothing, adventuringState = Adventuring.createState monster }
+
+
+startFight : Adventuring.MonsterKind -> Game -> Game
+startFight monster game =
+    { game | adventuringTimer = Just Timer.create, adventuringState = Adventuring.createState monster }
 
 
 stopFight : Game -> Game
 stopFight game =
-    { game | adventuringTimer = Nothing, adventuringState = Adventuring.createState }
+    { game | adventuringTimer = Nothing, adventuringState = Adventuring.resetHealth game.adventuringState }
 
 
 setPlayerMove : Int -> Adventuring.PlayerMove -> Game -> Game
