@@ -1,5 +1,6 @@
 module IdleGame.Views.DebugPanel exposing (..)
 
+import Duration exposing (Duration)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -34,11 +35,7 @@ render model =
                 ]
 
         addTimeButton =
-            let
-                eightHours =
-                    1000 * 60 * 60 * 8
-            in
-            button [ onClick (AddTime eightHours), class "btn" ] [ text "Add 8 hrs" ]
+            button [ onClick (AddTime (Duration.hours 8)), class "btn" ] [ text "Add 8 hrs" ]
 
         toggleTimePassesCheckbox =
             label

@@ -33,6 +33,7 @@ import IdleGame.Views.Utils
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
+import Quantity exposing (Quantity)
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -494,7 +495,7 @@ update msg model =
                 Playing snapshot ->
                     let
                         current =
-                            Snapshot.dEBUG_addTime (-1 * amount) snapshot
+                            Snapshot.dEBUG_addTime (Quantity.negate amount) snapshot
 
                         fastForwardState : FastForwardState
                         fastForwardState =
@@ -522,16 +523,21 @@ updateFromBackend msg model =
             ( model, Cmd.none )
 
         InitializeGame serverSnapshot ->
+            let
+                adjustedServerSnapshot : Snapshot Game
+                adjustedServerSnapshot =
+                    Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
+            in
             case model.gameState of
                 Initializing ->
                     ( model
-                        |> setGameState ( FastForward { 
-                            original = serverSnapshot
-                            , current = serverSnapshot
-                            , previousIntervalTimer = NotStarted
-
-
-                            })
+                        |> setGameState
+                            (FastForward
+                                { original = adjustedServerSnapshot
+                                , current = adjustedServerSnapshot
+                                , previousIntervalTimer = NotStarted
+                                }
+                            )
                     , Task.perform HandleFastForward Time.now
                     )
 

@@ -1,8 +1,8 @@
-module Config exposing (..)
+module Config exposing (Flags, flags, version)
 
+import Duration exposing (Duration)
 import Env
 import IdleGame.Tab as Tab exposing (Tab)
-import Duration exposing (Duration)
 
 
 version : String
@@ -31,7 +31,7 @@ flags =
 devFlags : Flags
 devFlags =
     { showFastForwardSpeed = True
-    , extraFastForwardTime = Duration.hours 8
+    , extraFastForwardTime = Duration.hours 4
     , showDebugPanel = True
     , defaultTab = Tab.Adventuring
     }

@@ -4,6 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
+import Duration exposing (Duration)
 import IdleGame.Adventuring as Adventuring
 import IdleGame.Chore as Chore
 import IdleGame.Game exposing (Game)
@@ -96,7 +97,7 @@ type FrontendMsg
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
-    | AddTime Float
+    | AddTime Duration
     | ToggleTimePasses Bool
 
 
