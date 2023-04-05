@@ -3,6 +3,7 @@ module IdleGame.Counter exposing
     , add
     , create
     , getValue
+    , isZero
     , multiplyBy
     , subtract
     , toString
@@ -43,3 +44,8 @@ multiplyBy amount (Counter oldVal) =
 toString : Counter -> String
 toString =
     getValue >> IdleGame.Views.Utils.intToString
+
+
+isZero : Counter -> Bool
+isZero =
+    getValue >> (==) 0

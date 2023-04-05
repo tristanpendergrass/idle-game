@@ -10,7 +10,7 @@ import IdleGame.Game exposing (Game)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils
+import IdleGame.Views.Utils as Utils
 import Maybe.Extra
 import Percent exposing (Percent)
 import Types exposing (..)
@@ -219,7 +219,7 @@ renderMonsterCol game =
 
 renderCombatDivider : Html FrontendMsg
 renderCombatDivider =
-    div [ class "absolute z-0 w-full h-full flex justify-center" ]
+    div [ class "absolute w-full h-full flex justify-center", Utils.zIndexes.combatDivider ]
         [ div [ class "divider divider-horizontal h-full" ] [ text "vs" ]
         ]
 

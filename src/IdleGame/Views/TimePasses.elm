@@ -11,6 +11,7 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils
 import IdleGame.XpFormulas as XpFormulas
+import Maybe.Extra
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -38,8 +39,21 @@ renderCombatsLost num =
         ]
 
 
+hasGains : TimePassesData -> Bool
+hasGains { xpGains, coinGains, resourcesDiff } =
+    not <|
+        (List.isEmpty xpGains
+            && Resource.isEmptyDiff resourcesDiff
+            && Maybe.Extra.isNothing coinGains
+        )
+
+
 render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
+render timePassed timePassesData =
+    let
+        { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
+            timePassesData
+    in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
@@ -57,7 +71,7 @@ render timePassed { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLo
                     []
                 ]
             )
-        , div []
+        , div [ classList [ ( "hidden", not (hasGains timePassesData) ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []
             , ul [ class "t-column font-semibold" ]

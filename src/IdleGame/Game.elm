@@ -12,6 +12,7 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.XpFormulas
+import Maybe.Extra
 import Quantity
 import Random exposing (Generator)
 import Tuple
@@ -624,18 +625,24 @@ getTimePassesData originalGame currentGame =
         combatsLostDiff =
             currentGame.combatsLost - originalGame.combatsLost
 
+        coinGains : Maybe Counter
+        coinGains =
+            if Counter.getValue currentGame.coin > Counter.getValue originalGame.coin then
+                Just <| Counter.subtract currentGame.coin originalGame.coin
+
+            else
+                Nothing
+
         hasNewData =
-            not <| (List.isEmpty xpGains && Resource.isEmptyDiff resourcesDiff && combatsWonDiff == 0 && combatsLostDiff == 0)
+            not <|
+                (List.isEmpty xpGains
+                    && Resource.isEmptyDiff resourcesDiff
+                    && Maybe.Extra.isNothing coinGains
+                    && (combatsWonDiff == 0)
+                    && (combatsLostDiff == 0)
+                )
     in
     if hasNewData then
-        let
-            coinGains =
-                if Counter.getValue currentGame.coin > Counter.getValue originalGame.coin then
-                    Just <| Counter.subtract currentGame.coin originalGame.coin
-
-                else
-                    Nothing
-        in
         Just
             { xpGains = xpGains
             , coinGains = coinGains
