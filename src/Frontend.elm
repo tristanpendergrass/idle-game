@@ -330,7 +330,7 @@ update msg model =
 
         SetMonster monster ->
             ( { model
-                | selectedMonster = Debug.log "monster" monster
+                | selectedMonster = monster
                 , gameState =
                     case model.gameState of
                         Playing snapshot ->
