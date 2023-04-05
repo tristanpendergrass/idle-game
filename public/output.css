@@ -3529,6 +3529,34 @@ body[dir="rtl"] .checkbox:checked,
   padding: 0px;
 }
 
+.divider-horizontal {
+  flex-direction: column;
+}
+
+.divider-horizontal:before {
+  height: 100%;
+  width: 0.125rem;
+}
+
+.divider-horizontal:after {
+  height: 100%;
+  width: 0.125rem;
+}
+
+.divider-vertical {
+  flex-direction: row;
+}
+
+.divider-vertical:before {
+  height: 0.125rem;
+  width: 100%;
+}
+
+.divider-vertical:after {
+  height: 0.125rem;
+  width: 100%;
+}
+
 .steps-horizontal .step {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -3680,6 +3708,24 @@ body[dir="rtl"] .checkbox:checked,
   line-height: 1.5rem;
 }
 
+.divider-horizontal {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  height: auto;
+  width: 1rem;
+}
+
+.divider-vertical {
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  height: 1rem;
+  width: auto;
+}
+
 .menu-compact :where(li > *) {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -3774,6 +3820,34 @@ body[dir="rtl"] .checkbox:checked,
 
 .right-0 {
   right: 0px;
+}
+
+.right-\[-2rem\] {
+  right: -2rem;
+}
+
+.right-\[-6rem\] {
+  right: -6rem;
+}
+
+.-right-\[6rem\] {
+  right: -6rem;
+}
+
+.right-\[6px\] {
+  right: 6px;
+}
+
+.top-\[3px\] {
+  top: 3px;
+}
+
+.right-\[-50px\] {
+  right: -50px;
+}
+
+.right-\[-45px\] {
+  right: -45px;
 }
 
 .z-10 {

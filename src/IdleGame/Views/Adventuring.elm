@@ -169,7 +169,7 @@ renderPlayerCol game =
 
 renderMonsterTitle : Adventuring.MonsterKind -> Html FrontendMsg
 renderMonsterTitle monster =
-    div [ class "dropdown", titleHeightClass ]
+    div [ class "dropdown dropdown-end", titleHeightClass ]
         [ label [ class "btn btn-sm m-1 flex items-center gap-1", tabindex 0 ]
             [ span [] [ text (Adventuring.getMonsterStats monster).title ]
             , Icon.dropdown
@@ -186,6 +186,17 @@ renderMonsterTitle monster =
         ]
 
 
+renderMonsterReward : Counter -> Html FrontendMsg
+renderMonsterReward coin =
+    div [ class "flex items-center gap-1" ]
+        [ div [ class "flex items-center gap-1" ]
+            [ span [] [ text (Counter.toString coin) ]
+            , Icon.coin
+                |> Icon.toHtml
+            ]
+        ]
+
+
 renderMonsterCol : Game -> Html FrontendMsg
 renderMonsterCol game =
     let
@@ -194,11 +205,22 @@ renderMonsterCol game =
     in
     div [ class "t-column gap-3" ]
         [ renderMonsterTitle game.adventuringState.monster
-        , renderAvatar Foe monsterStats.avatar
+        , div [ class "relative" ]
+            [ renderAvatar Foe monsterStats.avatar
+            , div [ class "absolute bottom-0 right-[-45px]" ]
+                [ renderMonsterReward (Counter.create monsterStats.reward) ]
+            ]
         , renderHealthBar game.adventuringState.monsterHealth Foe
         , renderMonsterMoveRow (Adventuring.getMonsterMove 0 game.adventuringState)
         , renderMonsterMoveRow (Adventuring.getMonsterMove 1 game.adventuringState)
         , renderMonsterMoveRow (Adventuring.getMonsterMove 2 game.adventuringState)
+        ]
+
+
+renderCombatDivider : Html FrontendMsg
+renderCombatDivider =
+    div [ class "absolute z-0 w-full h-full flex justify-center" ]
+        [ div [ class "divider divider-horizontal h-full" ] [ text "vs" ]
         ]
 
 
@@ -226,9 +248,10 @@ render game =
                         []
                     ]
             )
-        , div [ class "grid grid-cols-2 gap-2 lg:gap-4 w-full h-full" ]
+        , div [ class "grid grid-cols-2 gap-2 lg:gap-4 w-full h-full relative" ]
             [ renderPlayerCol game
             , renderMonsterCol game
+            , renderCombatDivider
             ]
         ]
 

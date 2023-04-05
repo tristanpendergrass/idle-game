@@ -45,7 +45,7 @@ $ npm test -- --watch
   - [x] Restart fight and award an item or coin on kill of monster
   - [x] Show something in Time Passes
   - [x] Add a second monster and way to choose between them
-  - [ ] Show reward on monster screen
+  - [x] Show reward on monster screen
   - [ ] Add different moves to different monsters
   - [ ] Add spells optimal against that second monster
 
