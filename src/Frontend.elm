@@ -19,6 +19,7 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Adventuring
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
@@ -325,7 +326,8 @@ update msg model =
         SetPlayerMove index playerMove ->
             ( model
                 |> mapGame (IdleGame.Game.setPlayerMove index playerMove)
-            , Cmd.none
+            , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
+                |> Task.attempt (\_ -> NoOp)
             )
 
         SetMonster monster ->
@@ -341,7 +343,8 @@ update msg model =
                         _ ->
                             model.gameState
               }
-            , Cmd.none
+            , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
+                |> Task.attempt (\_ -> NoOp)
             )
 
         ToggleActiveChore toggleId ->

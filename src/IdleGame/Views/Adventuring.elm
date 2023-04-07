@@ -224,13 +224,19 @@ renderCombatDivider =
         ]
 
 
+fightButtonId : String
+fightButtonId =
+    -- This should always be present on the page as a place to put focus to close the dropdowns after selection
+    "fight-button"
+
+
 render : Game -> Html FrontendMsg
 render game =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "t-column w-full md:w-3/4 lg:w-1/2 h-20" ]
             (case game.adventuringTimer of
                 Nothing ->
-                    [ button [ class "btn btn-primary", onClick StartFight ] [ text "Fight!" ]
+                    [ button [ class "btn btn-primary", onClick StartFight, id fightButtonId ] [ text "Fight!" ]
                     ]
 
                 Just timer ->
@@ -239,7 +245,7 @@ render game =
                         percentComplete =
                             Timer.percentComplete timer
                     in
-                    [ button [ class "btn btn-circle", onClick StopFight ] [ Icon.close |> Icon.toHtml ]
+                    [ button [ class "btn btn-circle", onClick StopFight, id fightButtonId ] [ Icon.close |> Icon.toHtml ]
                     , progress
                         [ class "progress h-[2px]"
                         , Html.Attributes.max "100"

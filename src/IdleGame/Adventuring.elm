@@ -109,6 +109,16 @@ barrierBlock =
     12
 
 
+defaultPlayerMoves : List PlayerMove
+defaultPlayerMoves =
+    [ Punch, Punch, Punch ]
+
+
+defaultMonster : MonsterKind
+defaultMonster =
+    Charmstone
+
+
 getMonsterMoveStats : MonsterMove -> MoveStats
 getMonsterMoveStats move =
     case move of
@@ -116,18 +126,18 @@ getMonsterMoveStats move =
             { title = "Claw" }
 
 
-getPlayerMove : Int -> State -> PlayerMove
+getPlayerMove : Int -> CombatState -> PlayerMove
 getPlayerMove index { playerMoves } =
     List.Extra.getAt index playerMoves
         |> Maybe.withDefault Punch
 
 
-getMonsterMove : Int -> State -> MonsterMove
+getMonsterMove : Int -> CombatState -> MonsterMove
 getMonsterMove index _ =
     Claw
 
 
-type alias State =
+type alias CombatState =
     { playerMoves : List PlayerMove
     , monster : MonsterKind
     , playerHealth : Int
@@ -136,17 +146,17 @@ type alias State =
     }
 
 
-createState : MonsterKind -> State
-createState monsterKind =
-    { playerMoves = List.repeat numMoves Punch
-    , monster = monsterKind
+createState : { monster : MonsterKind, playerMoves : List PlayerMove } -> CombatState
+createState { monster, playerMoves } =
+    { playerMoves = playerMoves
+    , monster = monster
     , playerHealth = playerMaxHealth
     , monsterHealth = monsterMaxHealth
     , nextMoveIndex = 0
     }
 
 
-setPlayerMove : Int -> PlayerMove -> State -> State
+setPlayerMove : Int -> PlayerMove -> CombatState -> CombatState
 setPlayerMove index move state =
     { state
         | playerMoves = List.Extra.setAt index move state.playerMoves
@@ -158,22 +168,22 @@ numMoves =
     3
 
 
-incrementMoveIndex : State -> State
+incrementMoveIndex : CombatState -> CombatState
 incrementMoveIndex state =
     { state | nextMoveIndex = modBy numMoves (state.nextMoveIndex + 1) }
 
 
-updatePlayerHealth : Int -> State -> State
+updatePlayerHealth : Int -> CombatState -> CombatState
 updatePlayerHealth amount state =
     { state | playerHealth = state.playerHealth + amount }
 
 
-updateMonsterHealth : Int -> State -> State
+updateMonsterHealth : Int -> CombatState -> CombatState
 updateMonsterHealth amount state =
     { state | monsterHealth = state.monsterHealth + amount }
 
 
-applyPlayerMove : State -> State
+applyPlayerMove : CombatState -> CombatState
 applyPlayerMove state =
     let
         playerMove =
@@ -195,12 +205,12 @@ applyPlayerMove state =
                     state
 
 
-getMonsterMoves : State -> List MonsterMove
+getMonsterMoves : CombatState -> List MonsterMove
 getMonsterMoves { monster } =
     (getMonsterStats monster).moves
 
 
-applyMonsterMove : State -> State
+applyMonsterMove : CombatState -> CombatState
 applyMonsterMove state =
     let
         monsterMove =
@@ -225,7 +235,7 @@ applyMonsterMove state =
                     updatePlayerHealth (-1 * modifiedDamage) state
 
 
-increment : State -> State
+increment : CombatState -> CombatState
 increment state =
     state
         |> applyPlayerMove
@@ -233,17 +243,17 @@ increment state =
         |> incrementMoveIndex
 
 
-monsterDead : State -> Bool
+monsterDead : CombatState -> Bool
 monsterDead state =
     state.monsterHealth <= 0
 
 
-playerDead : State -> Bool
+playerDead : CombatState -> Bool
 playerDead state =
     state.playerHealth <= 0
 
 
-resetHealth : State -> State
+resetHealth : CombatState -> CombatState
 resetHealth state =
     { state
         | playerHealth = playerMaxHealth

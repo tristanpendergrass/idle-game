@@ -22,6 +22,17 @@ import Tuple
 -- Public
 
 
+type alias AdventuringIdleState =
+    { playerMoves : List Adventuring.PlayerMove
+    , monster : Adventuring.MonsterKind
+    }
+
+
+type AdventuringState
+    = InCombat Timer Adventuring.CombatState
+    | Idle AdventuringIdleState
+
+
 type alias Game =
     { seed : Random.Seed
     , choresXp : Counter
@@ -31,8 +42,7 @@ type alias Game =
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
-    , adventuringState : Adventuring.State
-    , adventuringTimer : Maybe Timer
+    , adventuringState : AdventuringState
     , combatsWon : Int
     , combatsLost : Int
     }
@@ -58,8 +68,7 @@ create seed =
     , coin = Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
-    , adventuringState = Adventuring.createState Adventuring.Charmstone
-    , adventuringTimer = Nothing
+    , adventuringState = Idle { playerMoves = Adventuring.defaultPlayerMoves, monster = Adventuring.defaultMonster }
     , combatsWon = 0
     , combatsLost = 0
     }
@@ -164,14 +173,54 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
+goIdle : AdventuringState -> AdventuringState
+goIdle state =
+    -- TODO : Break this logic out into Adventuring and move the combat logic from Adventuring to a Combat module
+    case state of
+        InCombat _ { playerMoves, monster } ->
+            Idle { playerMoves = playerMoves, monster = monster }
+
+        Idle _ ->
+            state
+
+
+goInCombat : AdventuringState -> AdventuringState
+goInCombat state =
+    case state of
+        InCombat _ _ ->
+            state
+
+        Idle { playerMoves, monster } ->
+            InCombat Timer.create (Adventuring.createState { monster = monster, playerMoves = playerMoves })
+
+
+setMonster : Adventuring.MonsterKind -> AdventuringState -> AdventuringState
+setMonster monster state =
+    case state of
+        InCombat timer combatState ->
+            InCombat timer { combatState | monster = monster }
+
+        Idle idleState ->
+            Idle { idleState | monster = monster }
+
+
 setCombatMonster : Adventuring.MonsterKind -> Game -> Game
 setCombatMonster monster game =
-    { game | adventuringTimer = Nothing, adventuringState = Adventuring.createState monster }
+    { game
+        | adventuringState =
+            game.adventuringState
+                |> goIdle
+                |> setMonster monster
+    }
 
 
 startFight : Adventuring.MonsterKind -> Game -> Game
 startFight monster game =
-    { game | adventuringTimer = Just Timer.create, adventuringState = Adventuring.createState monster }
+    let
+    case game.adventuringState of
+        Idle {playerMoves, monster} ->
+
+    { game | adventuringState = goInCombat game.adventuringState }
 
 
 stopFight : Game -> Game
@@ -274,7 +323,7 @@ updateAdventuring delta generator =
                         else
                             -- Timer finished at least once. Update the game state and check if the fight is over
                             let
-                                updatedState : Adventuring.State
+                                updatedState : Adventuring.CombatState
                                 updatedState =
                                     Adventuring.increment game.adventuringState
                             in
