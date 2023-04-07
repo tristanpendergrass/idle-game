@@ -139,6 +139,7 @@ getMonsterMove index _ =
 
 type alias CombatState =
     { playerMoves : List PlayerMove
+    , monsterMoves : List MonsterMove
     , monster : MonsterKind
     , playerHealth : Int
     , monsterHealth : Int
@@ -149,17 +150,11 @@ type alias CombatState =
 createState : { monster : MonsterKind, playerMoves : List PlayerMove } -> CombatState
 createState { monster, playerMoves } =
     { playerMoves = playerMoves
+    , monsterMoves = (getMonsterStats monster).moves
     , monster = monster
     , playerHealth = playerMaxHealth
     , monsterHealth = monsterMaxHealth
     , nextMoveIndex = 0
-    }
-
-
-setPlayerMove : Int -> PlayerMove -> CombatState -> CombatState
-setPlayerMove index move state =
-    { state
-        | playerMoves = List.Extra.setAt index move state.playerMoves
     }
 
 

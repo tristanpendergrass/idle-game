@@ -313,7 +313,8 @@ update msg model =
 
         StartFight ->
             ( model
-                |> mapGame (IdleGame.Game.startFight model.selectedMonster)
+                |> mapGame (IdleGame.Game.setCombatMonster model.selectedMonster)
+                |> mapGame IdleGame.Game.startFight
             , Cmd.none
             )
 

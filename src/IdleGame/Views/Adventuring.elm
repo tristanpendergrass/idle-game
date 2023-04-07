@@ -6,11 +6,12 @@ import Html.Events exposing (..)
 import IdleGame.Adventuring as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game as Game exposing (Game)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
+import List.Extra
 import Maybe.Extra
 import Percent exposing (Percent)
 import Types exposing (..)
@@ -112,12 +113,7 @@ renderMonsterMove move =
         ]
 
 
-renderPlayerMoveRow :
-    { index : Int
-    , move : Adventuring.PlayerMove
-    , isActive : Bool
-    }
-    -> Html FrontendMsg
+renderPlayerMoveRow : PlayerMoveInfo -> Html FrontendMsg
 renderPlayerMoveRow { index, move, isActive } =
     div
         [ class "flex gap-1 items-center"
@@ -150,20 +146,47 @@ titleHeightClass =
     class "h-10"
 
 
+type alias PlayerMoveInfo =
+    { index : Int
+    , move : Adventuring.PlayerMove
+    , isActive : Bool
+    }
+
+
 renderPlayerCol : Game -> Html FrontendMsg
 renderPlayerCol game =
     let
-        isActive : Int -> Bool
-        isActive i =
-            Maybe.Extra.isJust game.adventuringTimer && game.adventuringState.nextMoveIndex == i
+        moveInfo : Int -> PlayerMoveInfo
+        moveInfo i =
+            case game.adventuringState of
+                Game.Idle { playerMoves } ->
+                    { index = i
+                    , move = playerMoves |> List.Extra.getAt i |> Maybe.withDefault Adventuring.Punch
+                    , isActive = False
+                    }
+
+                Game.InCombat _ combatState ->
+                    { index = i
+                    , move = Adventuring.getPlayerMove i combatState
+                    , isActive = combatState.nextMoveIndex == i
+                    }
+
+        health : Int
+        health =
+            case game.adventuringState of
+                Game.Idle _ ->
+                    Adventuring.playerMaxHealth
+
+                Game.InCombat _ combatState ->
+                    combatState.playerHealth
     in
     div [ class "t-column gap-3" ]
         [ div [ class "flex items-center gap-1 uppercase font-semibold", titleHeightClass ] [ span [] [ text "Player" ] ]
         , renderAvatar Friend Icon.adventuring
-        , renderHealthBar game.adventuringState.playerHealth Friend
-        , renderPlayerMoveRow { index = 0, move = Adventuring.getPlayerMove 0 game.adventuringState, isActive = isActive 0 }
-        , renderPlayerMoveRow { index = 1, move = Adventuring.getPlayerMove 1 game.adventuringState, isActive = isActive 1 }
-        , renderPlayerMoveRow { index = 2, move = Adventuring.getPlayerMove 2 game.adventuringState, isActive = isActive 2 }
+        , renderHealthBar health Friend
+        , renderPlayerMoveRow (moveInfo 0)
+        , renderPlayerMoveRow (moveInfo 1)
+        , renderPlayerMoveRow (moveInfo 2)
         ]
 
 
@@ -200,20 +223,53 @@ renderMonsterReward coin =
 renderMonsterCol : Game -> Html FrontendMsg
 renderMonsterCol game =
     let
+        monsterKind : Adventuring.MonsterKind
+        monsterKind =
+            case game.adventuringState of
+                Game.Idle { monster } ->
+                    monster
+
+                Game.InCombat _ { monster } ->
+                    monster
+
+        monsterStats : Adventuring.MonsterStats
         monsterStats =
-            Adventuring.getMonsterStats game.adventuringState.monster
+            Adventuring.getMonsterStats monsterKind
+
+        health : Int
+        health =
+            case game.adventuringState of
+                Game.Idle _ ->
+                    Adventuring.monsterMaxHealth
+
+                Game.InCombat _ { monsterHealth } ->
+                    monsterHealth
+
+        moves : List Adventuring.MonsterMove
+        moves =
+            case game.adventuringState of
+                Game.Idle { monster } ->
+                    (Adventuring.getMonsterStats monster).moves
+
+                Game.InCombat _ { monsterMoves } ->
+                    monsterMoves
+
+        moveForIndex : Int -> Adventuring.MonsterMove
+        moveForIndex index =
+            List.Extra.getAt index moves
+                |> Maybe.withDefault Adventuring.Claw
     in
     div [ class "t-column gap-3" ]
-        [ renderMonsterTitle game.adventuringState.monster
+        [ renderMonsterTitle monsterKind
         , div [ class "relative" ]
             [ renderAvatar Foe monsterStats.avatar
             , div [ class "absolute bottom-0 right-[-45px]" ]
                 [ renderMonsterReward (Counter.create monsterStats.reward) ]
             ]
-        , renderHealthBar game.adventuringState.monsterHealth Foe
-        , renderMonsterMoveRow (Adventuring.getMonsterMove 0 game.adventuringState)
-        , renderMonsterMoveRow (Adventuring.getMonsterMove 1 game.adventuringState)
-        , renderMonsterMoveRow (Adventuring.getMonsterMove 2 game.adventuringState)
+        , renderHealthBar health Foe
+        , renderMonsterMoveRow (moveForIndex 0)
+        , renderMonsterMoveRow (moveForIndex 1)
+        , renderMonsterMoveRow (moveForIndex 2)
         ]
 
 
@@ -234,12 +290,12 @@ render : Game -> Html FrontendMsg
 render game =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "t-column w-full md:w-3/4 lg:w-1/2 h-20" ]
-            (case game.adventuringTimer of
-                Nothing ->
+            (case game.adventuringState of
+                Game.Idle _ ->
                     [ button [ class "btn btn-primary", onClick StartFight, id fightButtonId ] [ text "Fight!" ]
                     ]
 
-                Just timer ->
+                Game.InCombat timer _ ->
                     let
                         percentComplete : Percent
                         percentComplete =
