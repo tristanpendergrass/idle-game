@@ -3,7 +3,8 @@ module IdleGame.Views.Adventuring exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Adventuring as Adventuring
+import IdleGame.Adventuring as Adventuring exposing (Adventuring)
+import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
@@ -63,32 +64,32 @@ moveHeightClass =
     class "h-12"
 
 
-renderPlayerMove : Adventuring.PlayerMove -> Html FrontendMsg
+renderPlayerMove : Combat.PlayerMove -> Html FrontendMsg
 renderPlayerMove move =
     div [ class "flex gap-2 items-center", moveHeightClass ]
-        [ span [] [ text <| (Adventuring.getPlayerMoveStats move).title ]
+        [ span [] [ text <| (Combat.getPlayerMoveStats move).title ]
         , case move of
-            Adventuring.Punch ->
+            Combat.Punch ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.punchDamage ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Combat.punchDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
                         ]
                     ]
 
-            Adventuring.Firebolt ->
+            Combat.Firebolt ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.fireboltDamage ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Combat.fireboltDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
                         ]
                     ]
 
-            Adventuring.Barrier ->
+            Combat.Barrier ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.barrierBlock ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Combat.barrierBlock ]
                     , span [ class "text-info" ]
                         [ Icon.shield
                             |> Icon.toHtml
@@ -97,14 +98,14 @@ renderPlayerMove move =
         ]
 
 
-renderMonsterMove : Adventuring.MonsterMove -> Html FrontendMsg
+renderMonsterMove : Combat.MonsterMove -> Html FrontendMsg
 renderMonsterMove move =
     div [ class "flex gap-2 items-center", moveHeightClass ]
-        [ span [] [ text <| (Adventuring.getMonsterMoveStats move).title ]
+        [ span [] [ text <| (Combat.getMonsterMoveStats move).title ]
         , case move of
-            Adventuring.Claw ->
+            Combat.Claw ->
                 span [ class "flex items-center gap-1" ]
-                    [ span [ class "font-bold" ] [ text <| String.fromInt Adventuring.clawDamage ]
+                    [ span [ class "font-bold" ] [ text <| String.fromInt Combat.clawDamage ]
                     , span [ class "text-error" ]
                         [ Icon.damage
                             |> Icon.toHtml
@@ -113,7 +114,7 @@ renderMonsterMove move =
         ]
 
 
-renderPlayerMoveRow : PlayerMoveInfo -> Html FrontendMsg
+renderPlayerMoveRow : Adventuring.PlayerMoveInfo -> Html FrontendMsg
 renderPlayerMoveRow { index, move, isActive } =
     div
         [ class "flex gap-1 items-center"
@@ -127,16 +128,16 @@ renderPlayerMoveRow { index, move, isActive } =
                     |> Icon.toHtml
                 ]
             , ul [ tabindex 0, class "dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52" ]
-                [ li [ onClick <| SetPlayerMove index Adventuring.Punch ] [ span [] [ text "Punch" ] ]
-                , li [ onClick <| SetPlayerMove index Adventuring.Firebolt ] [ span [] [ text "Firebolt" ] ]
-                , li [ onClick <| SetPlayerMove index Adventuring.Barrier ] [ span [] [ text "Barrier" ] ]
+                [ li [ onClick <| HandlePlayerMoveSelect index Combat.Punch ] [ span [] [ text "Punch" ] ]
+                , li [ onClick <| HandlePlayerMoveSelect index Combat.Firebolt ] [ span [] [ text "Firebolt" ] ]
+                , li [ onClick <| HandlePlayerMoveSelect index Combat.Barrier ] [ span [] [ text "Barrier" ] ]
                 ]
             ]
         , renderPlayerMove move
         ]
 
 
-renderMonsterMoveRow : Adventuring.MonsterMove -> Html FrontendMsg
+renderMonsterMoveRow : Combat.MonsterMove -> Html FrontendMsg
 renderMonsterMoveRow move =
     renderMonsterMove move
 
@@ -146,39 +147,16 @@ titleHeightClass =
     class "h-10"
 
 
-type alias PlayerMoveInfo =
-    { index : Int
-    , move : Adventuring.PlayerMove
-    , isActive : Bool
-    }
-
-
-renderPlayerCol : Game -> Html FrontendMsg
-renderPlayerCol game =
+renderPlayerCol : Adventuring -> Html FrontendMsg
+renderPlayerCol adventuring =
     let
-        moveInfo : Int -> PlayerMoveInfo
+        moveInfo : Int -> Adventuring.PlayerMoveInfo
         moveInfo i =
-            case game.adventuringState of
-                Game.Idle { playerMoves } ->
-                    { index = i
-                    , move = playerMoves |> List.Extra.getAt i |> Maybe.withDefault Adventuring.Punch
-                    , isActive = False
-                    }
-
-                Game.InCombat _ combatState ->
-                    { index = i
-                    , move = Adventuring.getPlayerMove i combatState
-                    , isActive = combatState.nextMoveIndex == i
-                    }
+            Adventuring.getPlayerMoveInfo i adventuring
 
         health : Int
         health =
-            case game.adventuringState of
-                Game.Idle _ ->
-                    Adventuring.playerMaxHealth
-
-                Game.InCombat _ combatState ->
-                    combatState.playerHealth
+            Adventuring.getPlayerHealth adventuring
     in
     div [ class "t-column gap-3" ]
         [ div [ class "flex items-center gap-1 uppercase font-semibold", titleHeightClass ] [ span [] [ text "Player" ] ]
@@ -190,20 +168,20 @@ renderPlayerCol game =
         ]
 
 
-renderMonsterTitle : Adventuring.MonsterKind -> Html FrontendMsg
+renderMonsterTitle : Combat.MonsterKind -> Html FrontendMsg
 renderMonsterTitle monster =
     div [ class "dropdown dropdown-end", titleHeightClass ]
         [ label [ class "btn btn-sm m-1 flex items-center gap-1", tabindex 0 ]
-            [ span [] [ text (Adventuring.getMonsterStats monster).title ]
+            [ span [] [ text (Combat.getMonsterStats monster).title ]
             , Icon.dropdown
                 |> Icon.withSize Icon.Small
                 |> Icon.toHtml
             ]
         , ul [ class "dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52", tabindex 0 ]
-            (Adventuring.allMonsterKinds
+            (Combat.allMonsterKinds
                 |> List.map
                     (\kind ->
-                        li [] [ button [ onClick (SetMonster kind) ] [ text <| (Adventuring.getMonsterStats kind).title ] ]
+                        li [] [ button [ onClick (HandleMonsterSelect kind) ] [ text <| (Combat.getMonsterStats kind).title ] ]
                     )
             )
         ]
@@ -220,44 +198,29 @@ renderMonsterReward coin =
         ]
 
 
-renderMonsterCol : Game -> Html FrontendMsg
-renderMonsterCol game =
+renderMonsterCol : Adventuring -> Html FrontendMsg
+renderMonsterCol adventuring =
     let
-        monsterKind : Adventuring.MonsterKind
+        monsterKind : Combat.MonsterKind
         monsterKind =
-            case game.adventuringState of
-                Game.Idle { monster } ->
-                    monster
+            Adventuring.getMonster adventuring
 
-                Game.InCombat _ { monster } ->
-                    monster
-
-        monsterStats : Adventuring.MonsterStats
+        monsterStats : Combat.MonsterStats
         monsterStats =
-            Adventuring.getMonsterStats monsterKind
+            Combat.getMonsterStats monsterKind
 
         health : Int
         health =
-            case game.adventuringState of
-                Game.Idle _ ->
-                    Adventuring.monsterMaxHealth
+            Adventuring.getMonsterHealth adventuring
 
-                Game.InCombat _ { monsterHealth } ->
-                    monsterHealth
-
-        moves : List Adventuring.MonsterMove
+        moves : List Combat.MonsterMove
         moves =
-            case game.adventuringState of
-                Game.Idle { monster } ->
-                    (Adventuring.getMonsterStats monster).moves
+            Adventuring.getMonsterMoves adventuring
 
-                Game.InCombat _ { monsterMoves } ->
-                    monsterMoves
-
-        moveForIndex : Int -> Adventuring.MonsterMove
+        moveForIndex : Int -> Combat.MonsterMove
         moveForIndex index =
             List.Extra.getAt index moves
-                |> Maybe.withDefault Adventuring.Claw
+                |> Maybe.withDefault Combat.Claw
     in
     div [ class "t-column gap-3" ]
         [ renderMonsterTitle monsterKind
@@ -290,12 +253,12 @@ render : Game -> Html FrontendMsg
 render game =
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "t-column w-full md:w-3/4 lg:w-1/2 h-20" ]
-            (case game.adventuringState of
-                Game.Idle _ ->
+            (case game.adventuring of
+                Adventuring.Idle _ ->
                     [ button [ class "btn btn-primary", onClick StartFight, id fightButtonId ] [ text "Fight!" ]
                     ]
 
-                Game.InCombat timer _ ->
+                Adventuring.InCombat timer _ ->
                     let
                         percentComplete : Percent
                         percentComplete =
@@ -311,8 +274,8 @@ render game =
                     ]
             )
         , div [ class "grid grid-cols-2 gap-2 lg:gap-4 w-full h-full relative" ]
-            [ renderPlayerCol game
-            , renderMonsterCol game
+            [ renderPlayerCol game.adventuring
+            , renderMonsterCol game.adventuring
             , renderCombatDivider
             ]
         ]

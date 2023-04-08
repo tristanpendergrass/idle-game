@@ -10,7 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
-import IdleGame.Adventuring as Adventuring
+import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -71,7 +71,6 @@ init _ key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
-      , selectedMonster = Adventuring.Charmstone
 
       -- Debug panel
       , showTimePasses = True
@@ -313,7 +312,6 @@ update msg model =
 
         StartFight ->
             ( model
-                |> mapGame (IdleGame.Game.setCombatMonster model.selectedMonster)
                 |> mapGame IdleGame.Game.startFight
             , Cmd.none
             )
@@ -324,21 +322,20 @@ update msg model =
             , Cmd.none
             )
 
-        SetPlayerMove index playerMove ->
+        HandlePlayerMoveSelect index playerMove ->
             ( model
                 |> mapGame (IdleGame.Game.setPlayerMove index playerMove)
             , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
                 |> Task.attempt (\_ -> NoOp)
             )
 
-        SetMonster monster ->
+        HandleMonsterSelect monster ->
             ( { model
-                | selectedMonster = monster
-                , gameState =
+                | gameState =
                     case model.gameState of
                         Playing snapshot ->
                             snapshot
-                                |> Snapshot.map (IdleGame.Game.setCombatMonster monster)
+                                |> Snapshot.map (IdleGame.Game.setMonster monster)
                                 |> Playing
 
                         _ ->

@@ -5,8 +5,8 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
-import IdleGame.Adventuring as Adventuring
 import IdleGame.Chore as Chore
+import IdleGame.Combat as Adventuring
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
@@ -56,7 +56,6 @@ type alias FrontendModel =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
-    , selectedMonster : Adventuring.MonsterKind
 
     -- Debug panel
     , showTimePasses : Bool
@@ -92,8 +91,8 @@ type FrontendMsg
       -- Adventuring
     | StartFight
     | StopFight
-    | SetPlayerMove Int Adventuring.PlayerMove
-    | SetMonster Adventuring.MonsterKind
+    | HandlePlayerMoveSelect Int Adventuring.PlayerMove
+    | HandleMonsterSelect Adventuring.MonsterKind
       -- Chores
     | ToggleActiveChore ChoreKind
       -- Debug Panel

@@ -1,8 +1,9 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.Adventuring as Adventuring
+import IdleGame.Adventuring as Adventuring exposing (Adventuring)
 import IdleGame.Chore as Chore
+import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
@@ -23,17 +24,6 @@ import Tuple
 -- Public
 
 
-type alias AdventuringIdleState =
-    { playerMoves : List Adventuring.PlayerMove
-    , monster : Adventuring.MonsterKind
-    }
-
-
-type AdventuringState
-    = InCombat Timer Adventuring.CombatState
-    | Idle AdventuringIdleState
-
-
 type alias Game =
     { seed : Random.Seed
     , choresXp : Counter
@@ -43,7 +33,7 @@ type alias Game =
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
-    , adventuringState : AdventuringState
+    , adventuring : Adventuring
     , combatsWon : Int
     , combatsLost : Int
     }
@@ -69,7 +59,7 @@ create seed =
     , coin = Counter.create 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
-    , adventuringState = Idle { playerMoves = Adventuring.defaultPlayerMoves, monster = Adventuring.defaultMonster }
+    , adventuring = Adventuring.create
     , combatsWon = 0
     , combatsLost = 0
     }
@@ -174,101 +164,24 @@ setActiveChore activeChore g =
     { g | activeChore = activeChore }
 
 
-goIdle : AdventuringState -> AdventuringState
-goIdle state =
-    -- TODO : Break this logic out into Adventuring and move the combat logic from Adventuring to a Combat module
-    case state of
-        InCombat _ { playerMoves, monster } ->
-            Idle { playerMoves = playerMoves, monster = monster }
-
-        Idle _ ->
-            state
-
-
-goInCombat : AdventuringState -> AdventuringState
-goInCombat state =
-    case state of
-        InCombat _ _ ->
-            state
-
-        Idle { playerMoves, monster } ->
-            InCombat Timer.create (Adventuring.createState { monster = monster, playerMoves = playerMoves })
-
-
-setMonster : Adventuring.MonsterKind -> AdventuringState -> AdventuringState
-setMonster monster state =
-    case state of
-        InCombat timer combatState ->
-            InCombat timer { combatState | monster = monster }
-
-        Idle idleState ->
-            Idle { idleState | monster = monster }
-
-
-setCombatMonster : Adventuring.MonsterKind -> Game -> Game
-setCombatMonster newMonster game =
-    let
-        newAdventuringState : AdventuringState
-        newAdventuringState =
-            case game.adventuringState of
-                Idle idleState ->
-                    Idle { idleState | monster = newMonster }
-
-                InCombat _ { playerMoves } ->
-                    Idle { monster = newMonster, playerMoves = playerMoves }
-    in
-    { game | adventuringState = newAdventuringState }
+setMonster : Combat.MonsterKind -> Game -> Game
+setMonster newMonster game =
+    { game | adventuring = Adventuring.setMonster newMonster game.adventuring }
 
 
 startFight : Game -> Game
 startFight game =
-    let
-        newAdventuringState : AdventuringState
-        newAdventuringState =
-            case game.adventuringState of
-                InCombat _ _ ->
-                    game.adventuringState
-
-                Idle { playerMoves, monster } ->
-                    InCombat Timer.create (Adventuring.createState { monster = monster, playerMoves = playerMoves })
-    in
-    { game | adventuringState = newAdventuringState }
+    { game | adventuring = Adventuring.startFight game.adventuring }
 
 
 stopFight : Game -> Game
 stopFight game =
-    let
-        newAdventuringState : AdventuringState
-        newAdventuringState =
-            case game.adventuringState of
-                InCombat _ { monster, playerMoves } ->
-                    Idle { playerMoves = playerMoves, monster = monster }
-
-                Idle _ ->
-                    game.adventuringState
-    in
-    { game | adventuringState = newAdventuringState }
+    { game | adventuring = Adventuring.stopFight game.adventuring }
 
 
-setPlayerMove : Int -> Adventuring.PlayerMove -> Game -> Game
+setPlayerMove : Int -> Combat.PlayerMove -> Game -> Game
 setPlayerMove index move game =
-    let
-        newAdventuringState : AdventuringState
-        newAdventuringState =
-            case game.adventuringState of
-                InCombat _ combatState ->
-                    Idle
-                        { playerMoves = List.Extra.setAt index move combatState.playerMoves
-                        , monster = combatState.monster
-                        }
-
-                Idle idleState ->
-                    Idle
-                        { playerMoves = List.Extra.setAt index move idleState.playerMoves
-                        , monster = idleState.monster
-                        }
-    in
-    { game | adventuringState = newAdventuringState }
+    { game | adventuring = Adventuring.setPlayerMove index move game.adventuring }
 
 
 applyIntervalMods : List IntervalMod -> Duration -> Duration
@@ -299,11 +212,6 @@ getModdedDuration game choreKind =
         |> applyIntervalMods mods
 
 
-moveDuration : Duration
-moveDuration =
-    Duration.seconds 3
-
-
 combatReward : Event
 combatReward =
     Event { effects = [ gainCoin 25 ] }
@@ -324,22 +232,6 @@ rewardPlayer game =
     List.foldl effectReducer (Random.constant ( game, [] )) effects
 
 
-resetAdventuring : Game -> Game
-resetAdventuring game =
-    -- Called after monster or player dies to reset back to full hp
-    let
-        newAdventuringState : AdventuringState
-        newAdventuringState =
-            case game.adventuringState of
-                InCombat _ combatState ->
-                    InCombat Timer.create (Adventuring.resetHealth combatState)
-
-                Idle idleState ->
-                    Idle idleState
-    in
-    { game | adventuringState = newAdventuringState }
-
-
 incrementCombatsWon : Game -> Game
 incrementCombatsWon game =
     { game | combatsWon = game.combatsWon + 1 }
@@ -355,66 +247,43 @@ updateAdventuring delta generator =
     generator
         |> Random.andThen
             (\( game, toasts ) ->
-                case game.adventuringState of
-                    Idle _ ->
-                        Random.constant ( game, toasts )
+                Adventuring.update delta game.adventuring
+                    |> Random.andThen
+                        (\updateResult ->
+                            case updateResult of
+                                Adventuring.PlayerWon timeRemaining newAdventuring ->
+                                    let
+                                        updatedGenerator : Generator ( Game, List Toast )
+                                        updatedGenerator =
+                                            game
+                                                |> (\g -> { g | adventuring = newAdventuring })
+                                                |> incrementCombatsWon
+                                                |> rewardPlayer
+                                                |> Random.map (\( g, t ) -> ( g, toasts ++ t ))
+                                    in
+                                    updateAdventuring timeRemaining updatedGenerator
 
-                    InCombat timer combatState ->
-                        let
-                            ( newTimer, timeRemaining ) =
-                                Timer.incrementUntilComplete moveDuration delta timer
-                        in
-                        if timeRemaining == Quantity.zero then
-                            -- Timer hasn't completed. Just increment it
-                            Random.constant ( { game | adventuringState = InCombat newTimer combatState }, toasts )
-
-                        else
-                            -- Timer finished at least once. Update the game state and check if the fight is over
-                            let
-                                updatedCombatState : Adventuring.CombatState
-                                updatedCombatState =
-                                    Adventuring.increment combatState
-                            in
-                            if Adventuring.monsterDead updatedCombatState then
-                                -- Player won
-                                let
-                                    updatedGenerator : Generator ( Game, List Toast )
-                                    updatedGenerator =
-                                        game
-                                            |> resetAdventuring
-                                            |> incrementCombatsWon
-                                            |> rewardPlayer
-                                            |> Random.map (\( g, t ) -> ( g, toasts ++ t ))
-                                in
-                                updateAdventuring timeRemaining updatedGenerator
-
-                            else if Adventuring.playerDead updatedCombatState then
-                                -- Player lost
-                                let
-                                    updatedGenerator : Generator ( Game, List Toast )
-                                    updatedGenerator =
-                                        Random.constant
-                                            ( game
-                                                |> resetAdventuring
+                                Adventuring.MonsterWon timeRemaining newAdventuring ->
+                                    let
+                                        updatedGenerator : Generator ( Game, List Toast )
+                                        updatedGenerator =
+                                            game
+                                                |> (\g -> { g | adventuring = newAdventuring })
                                                 |> incrementCombatsLost
-                                            , toasts
-                                            )
-                                in
-                                updateAdventuring timeRemaining updatedGenerator
+                                                |> (\g -> Random.constant ( g, toasts ))
+                                    in
+                                    updateAdventuring timeRemaining updatedGenerator
 
-                            else
-                                -- completed the timer but the fight isn't over so recurse
-                                let
-                                    updatedGenerator : Generator ( Game, List Toast )
-                                    updatedGenerator =
-                                        Random.constant
-                                            ( { game
-                                                | adventuringState = InCombat newTimer updatedCombatState
-                                              }
-                                            , toasts
-                                            )
-                                in
-                                updateAdventuring timeRemaining updatedGenerator
+                                Adventuring.Continue newAdventuring ->
+                                    let
+                                        updatedGenerator : Generator ( Game, List Toast )
+                                        updatedGenerator =
+                                            game
+                                                |> (\g -> { g | adventuring = newAdventuring })
+                                                |> (\g -> Random.constant ( g, toasts ))
+                                    in
+                                    updatedGenerator
+                        )
             )
 
 

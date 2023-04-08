@@ -52,7 +52,7 @@ render model =
                 ]
     in
     div
-        [ class "fixed bottom-0 w-screen h-48 bg-accent text-accent-content border-t border-accent-content relative p-2"
+        [ class "fixed bottom-0 w-full h-48 bg-accent text-accent-content border-t border-accent-content relative p-2"
         , classList [ ( "hidden", not model.showDebugPanel ) ]
         , Utils.zIndexes.debugPanel
         , id panelId

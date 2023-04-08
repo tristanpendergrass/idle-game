@@ -1,256 +1,201 @@
 module IdleGame.Adventuring exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.Combat as Combat
 import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Views.Icon as Icon exposing (Icon)
 import List.Extra
+import Quantity exposing (Quantity)
+import Random exposing (Generator)
 
 
-type
-    MonsterKind
-    -- Don't forget to update allMonsterKinds when updating this list!
-    = Charmstone
-    | Silkling
-    | Stalker
+moveDuration : Duration
+moveDuration =
+    Duration.seconds 3
 
 
-allMonsterKinds : List MonsterKind
-allMonsterKinds =
-    [ Charmstone, Silkling, Stalker ]
+type Adventuring
+    = InCombat Timer Combat.State
+    | Idle IdleState
 
 
-type alias MonsterStats =
-    { title : String
-    , avatar : Icon
-    , reward : Int
-    , moves : List MonsterMove
+type alias IdleState =
+    { playerMoves : List Combat.PlayerMove
+    , monster : Combat.MonsterKind
     }
 
 
-getMonsterStats : MonsterKind -> MonsterStats
-getMonsterStats kind =
-    case kind of
-        Charmstone ->
-            { title = "Charmstone"
-            , avatar = Icon.charmstone
-            , reward = 10
-            , moves = List.repeat numMoves Claw
+create : Adventuring
+create =
+    Idle { playerMoves = Combat.defaultPlayerMoves, monster = Combat.defaultMonster }
+
+
+startFight : Adventuring -> Adventuring
+startFight adventuring =
+    case adventuring of
+        InCombat _ _ ->
+            adventuring
+
+        Idle { playerMoves, monster } ->
+            InCombat Timer.create (Combat.createState { monster = monster, playerMoves = playerMoves })
+
+
+stopFight : Adventuring -> Adventuring
+stopFight adventuring =
+    case adventuring of
+        InCombat _ { monster, playerMoves } ->
+            Idle { playerMoves = playerMoves, monster = monster }
+
+        Idle _ ->
+            adventuring
+
+
+{-| Sets adventuring state to Idle with the given monster selected
+If we ever need a method that sets the monster and keeps in combat we can create it.
+-}
+setMonster : Combat.MonsterKind -> Adventuring -> Adventuring
+setMonster newMonster adventuring =
+    case adventuring of
+        Idle idleState ->
+            Idle { idleState | monster = newMonster }
+
+        InCombat _ { playerMoves } ->
+            Idle { monster = newMonster, playerMoves = playerMoves }
+
+
+setPlayerMove : Int -> Combat.PlayerMove -> Adventuring -> Adventuring
+setPlayerMove index move adventuring =
+    case adventuring of
+        InCombat _ combatState ->
+            Idle
+                { playerMoves = List.Extra.setAt index move combatState.playerMoves
+                , monster = combatState.monster
+                }
+
+        Idle idleState ->
+            Idle
+                { idleState
+                    | playerMoves = List.Extra.setAt index move idleState.playerMoves
+                }
+
+
+{-| Resets an InCombat state to the way it would have been at the start of the fight. Idle remains Idle.
+-}
+reset : Adventuring -> Adventuring
+reset adventuring =
+    case adventuring of
+        InCombat _ combatState ->
+            InCombat Timer.create (Combat.resetHealth combatState)
+
+        Idle idleState ->
+            Idle idleState
+
+
+type UpdateResult
+    = PlayerWon Duration Adventuring -- in this scenario we yield flow back to the caller of update with the remaining duration. Update might need to be called again with remaining
+    | MonsterWon Duration Adventuring
+    | Continue Adventuring
+
+
+update : Duration -> Adventuring -> Generator UpdateResult
+update delta adventuring =
+    case adventuring of
+        Idle _ ->
+            Continue adventuring
+                |> Random.constant
+
+        InCombat timer combatState ->
+            let
+                ( newTimer, timeRemaining ) =
+                    Timer.incrementUntilComplete moveDuration delta timer
+            in
+            if timeRemaining == Quantity.zero then
+                -- Timer hasn't completed. Just increment it
+                Continue (InCombat newTimer combatState)
+                    |> Random.constant
+
+            else
+                -- Timer completed at least once
+                Combat.increment combatState
+                    |> Random.andThen
+                        (\updatedCombatState ->
+                            if Combat.monsterDead updatedCombatState then
+                                -- Player won
+                                InCombat newTimer updatedCombatState
+                                    |> reset
+                                    |> PlayerWon timeRemaining
+                                    |> Random.constant
+
+                            else if Combat.playerDead updatedCombatState then
+                                InCombat newTimer updatedCombatState
+                                    |> reset
+                                    |> MonsterWon timeRemaining
+                                    |> Random.constant
+
+                            else
+                                InCombat newTimer updatedCombatState
+                                    |> Continue
+                                    |> Random.constant
+                        )
+
+
+type alias PlayerMoveInfo =
+    { index : Int
+    , move : Combat.PlayerMove
+    , isActive : Bool
+    }
+
+
+getPlayerMoveInfo : Int -> Adventuring -> PlayerMoveInfo
+getPlayerMoveInfo index adventuring =
+    case adventuring of
+        Idle { playerMoves } ->
+            { index = index
+            , move = playerMoves |> List.Extra.getAt index |> Maybe.withDefault Combat.Punch
+            , isActive = False
             }
 
-        Silkling ->
-            { title = "Silkling"
-            , avatar = Icon.silkling
-            , reward = 15
-            , moves = List.repeat numMoves Claw
-            }
-
-        Stalker ->
-            { title = "Stalker"
-            , avatar = Icon.stalker
-            , reward = 20
-            , moves = List.repeat numMoves Claw
+        InCombat _ combatState ->
+            { index = index
+            , move = Combat.getPlayerMove index combatState
+            , isActive = combatState.nextMoveIndex == index
             }
 
 
-type PlayerMove
-    = Punch
-    | Firebolt
-    | Barrier
+getPlayerHealth : Adventuring -> Int
+getPlayerHealth adventuring =
+    case adventuring of
+        Idle _ ->
+            Combat.playerMaxHealth
+
+        InCombat _ combatState ->
+            combatState.playerHealth
 
 
-type MonsterMove
-    = Claw
+getMonster : Adventuring -> Combat.MonsterKind
+getMonster adventuring =
+    case adventuring of
+        Idle { monster } ->
+            monster
+
+        InCombat _ { monster } ->
+            monster
 
 
-type alias MoveStats =
-    { title : String }
+getMonsterHealth : Adventuring -> Int
+getMonsterHealth adventuring =
+    case adventuring of
+        Idle _ ->
+            Combat.monsterMaxHealth
+
+        InCombat _ { monsterHealth } ->
+            monsterHealth
 
 
-getPlayerMoveStats : PlayerMove -> MoveStats
-getPlayerMoveStats move =
-    case move of
-        Punch ->
-            { title = "Punch" }
+getMonsterMoves : Adventuring -> List Combat.MonsterMove
+getMonsterMoves adventuring =
+    case adventuring of
+        Idle { monster } ->
+            (Combat.getMonsterStats monster).moves
 
-        Firebolt ->
-            { title = "Firebolt" }
-
-        Barrier ->
-            { title = "Barrier" }
-
-
-playerMaxHealth : Int
-playerMaxHealth =
-    100
-
-
-monsterMaxHealth : Int
-monsterMaxHealth =
-    100
-
-
-punchDamage : Int
-punchDamage =
-    6
-
-
-fireboltDamage : Int
-fireboltDamage =
-    20
-
-
-clawDamage : Int
-clawDamage =
-    8
-
-
-barrierBlock : Int
-barrierBlock =
-    12
-
-
-defaultPlayerMoves : List PlayerMove
-defaultPlayerMoves =
-    [ Punch, Punch, Punch ]
-
-
-defaultMonster : MonsterKind
-defaultMonster =
-    Charmstone
-
-
-getMonsterMoveStats : MonsterMove -> MoveStats
-getMonsterMoveStats move =
-    case move of
-        Claw ->
-            { title = "Claw" }
-
-
-getPlayerMove : Int -> CombatState -> PlayerMove
-getPlayerMove index { playerMoves } =
-    List.Extra.getAt index playerMoves
-        |> Maybe.withDefault Punch
-
-
-getMonsterMove : Int -> CombatState -> MonsterMove
-getMonsterMove index _ =
-    Claw
-
-
-type alias CombatState =
-    { playerMoves : List PlayerMove
-    , monsterMoves : List MonsterMove
-    , monster : MonsterKind
-    , playerHealth : Int
-    , monsterHealth : Int
-    , nextMoveIndex : Int
-    }
-
-
-createState : { monster : MonsterKind, playerMoves : List PlayerMove } -> CombatState
-createState { monster, playerMoves } =
-    { playerMoves = playerMoves
-    , monsterMoves = (getMonsterStats monster).moves
-    , monster = monster
-    , playerHealth = playerMaxHealth
-    , monsterHealth = monsterMaxHealth
-    , nextMoveIndex = 0
-    }
-
-
-numMoves : Int
-numMoves =
-    3
-
-
-incrementMoveIndex : CombatState -> CombatState
-incrementMoveIndex state =
-    { state | nextMoveIndex = modBy numMoves (state.nextMoveIndex + 1) }
-
-
-updatePlayerHealth : Int -> CombatState -> CombatState
-updatePlayerHealth amount state =
-    { state | playerHealth = state.playerHealth + amount }
-
-
-updateMonsterHealth : Int -> CombatState -> CombatState
-updateMonsterHealth amount state =
-    { state | monsterHealth = state.monsterHealth + amount }
-
-
-applyPlayerMove : CombatState -> CombatState
-applyPlayerMove state =
-    let
-        playerMove =
-            List.Extra.getAt state.nextMoveIndex state.playerMoves
-    in
-    case playerMove of
-        Nothing ->
-            state
-
-        Just move ->
-            case move of
-                Punch ->
-                    updateMonsterHealth (-1 * punchDamage) state
-
-                Firebolt ->
-                    updateMonsterHealth (-1 * fireboltDamage) state
-
-                Barrier ->
-                    state
-
-
-getMonsterMoves : CombatState -> List MonsterMove
-getMonsterMoves { monster } =
-    (getMonsterStats monster).moves
-
-
-applyMonsterMove : CombatState -> CombatState
-applyMonsterMove state =
-    let
-        monsterMove =
-            List.Extra.getAt state.nextMoveIndex (getMonsterMoves state)
-    in
-    case monsterMove of
-        Nothing ->
-            state
-
-        Just move ->
-            case move of
-                Claw ->
-                    let
-                        modifiedDamage =
-                            case List.Extra.getAt state.nextMoveIndex state.playerMoves of
-                                Just Barrier ->
-                                    max 0 (clawDamage - barrierBlock)
-
-                                _ ->
-                                    clawDamage
-                    in
-                    updatePlayerHealth (-1 * modifiedDamage) state
-
-
-increment : CombatState -> CombatState
-increment state =
-    state
-        |> applyPlayerMove
-        |> applyMonsterMove
-        |> incrementMoveIndex
-
-
-monsterDead : CombatState -> Bool
-monsterDead state =
-    state.monsterHealth <= 0
-
-
-playerDead : CombatState -> Bool
-playerDead state =
-    state.playerHealth <= 0
-
-
-resetHealth : CombatState -> CombatState
-resetHealth state =
-    { state
-        | playerHealth = playerMaxHealth
-        , monsterHealth = monsterMaxHealth
-    }
+        InCombat _ { monsterMoves } ->
+            monsterMoves
