@@ -44,7 +44,7 @@ masteryXpBadge =
 
 zIndexes =
     -- Note that tailwind z-indexes only allow 0 through 50, in increments of 10. See https://tailwindcss.com/docs/z-index
-    { combatDivider = class "-z-10"
+    { combatDivider = class "z-0"
     , drawerContent = class "z-0"
     , cardBody = class "z-0"
     , activityProgressBar = class "z-10"

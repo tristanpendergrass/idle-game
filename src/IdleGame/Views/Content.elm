@@ -7,7 +7,7 @@ import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
-import IdleGame.Views.Adventuring
+import IdleGame.Views.Adventuring2
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -61,7 +61,7 @@ renderContent game activeTab =
                 IdleGame.Views.Shop.render game
 
             Tab.Adventuring ->
-                IdleGame.Views.Adventuring.render game
+                IdleGame.Views.Adventuring2.render game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

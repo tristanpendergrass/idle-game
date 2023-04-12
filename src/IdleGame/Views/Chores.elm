@@ -314,7 +314,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
         [ figure []
             [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column gap-2 h-full z-9", IdleGame.Views.Utils.zIndexes.cardBody ]
+            [ div [ class "t-column gap-2 h-full", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Chore title
                 [ h2 [ class "text-sm  md:text-lg text-center" ] [ text title ]
                 , renderDuration
