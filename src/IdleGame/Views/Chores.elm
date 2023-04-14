@@ -15,7 +15,7 @@ import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Placeholder
-import IdleGame.Views.Utils
+import IdleGame.Views.Utils as Utils
 import IdleGame.XpFormulas
 import List.Extra
 import Percent exposing (Percent)
@@ -29,7 +29,7 @@ render game =
             game.choresXp
                 |> Counter.getValue
                 |> IdleGame.XpFormulas.skillLevel
-                |> IdleGame.Views.Utils.intToString
+                |> Utils.intToString
 
         skillPercent =
             game.choresXp
@@ -44,7 +44,7 @@ render game =
                 |> Basics.min 100
 
         masteryPercentLabel =
-            IdleGame.Views.Utils.intToString (floor masteryPercent)
+            Utils.intToString (floor masteryPercent)
     in
     div [ class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
@@ -262,7 +262,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
     let
         renderDuration : Html msg
         renderDuration =
-            div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
+            div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
         rendercoin =
             div [ class "flex items-center gap-1" ]
@@ -280,16 +280,16 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
 
         renderSuccessCondition child =
             div [ class "flex items-center gap-2" ]
-                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (IdleGame.Views.Utils.intToString (probabilityToInt extraResourceProbability) ++ "%") ]
+                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (Utils.intToString (probabilityToInt extraResourceProbability) ++ "%") ]
                 , div [] [ text ":" ]
                 , child
                 ]
 
         renderXp =
             div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-                [ IdleGame.Views.Utils.skillXpBadge
+                [ Utils.skillXpBadge
                 , span [ class "font-bold col-span-4" ] [ text (Counter.toString skillXp) ]
-                , IdleGame.Views.Utils.masteryXpBadge
+                , Utils.masteryXpBadge
                 , span [ class "font-bold col-span-4" ] [ text (Counter.toString mxp) ]
                 ]
 
@@ -297,7 +297,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
             mxpCurrentValue
                 |> Counter.getValue
                 |> IdleGame.XpFormulas.skillLevel
-                |> IdleGame.Views.Utils.intToString
+                |> Utils.intToString
 
         masteryPercent =
             mxpCurrentValue
@@ -314,7 +314,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
         [ figure []
             [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column gap-2 h-full", IdleGame.Views.Utils.zIndexes.cardBody ]
+            [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
                 -- Chore title
                 [ h2 [ class "text-sm  md:text-lg text-center" ] [ text title ]
                 , renderDuration
@@ -344,7 +344,7 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
                 Just percentComplete ->
                     div
                         [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
-                        , IdleGame.Views.Utils.zIndexes.activityProgressBar
+                        , Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toNumber percentComplete) ++ "%")
                         ]
                         []
@@ -365,12 +365,12 @@ renderLockedChore level =
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column h-full gap-4", IdleGame.Views.Utils.zIndexes.cardBody ]
+            [ div [ class "t-column h-full gap-4", Utils.zIndexes.cardBody ]
                 -- Chore title
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
-                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ IdleGame.Views.Utils.intToString level ]
+                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ Utils.intToString level ]
                 ]
             ]
         ]
@@ -379,3 +379,20 @@ renderLockedChore level =
 renderBottomRight : Html FrontendMsg
 renderBottomRight =
     button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
+
+
+detailView : Html FrontendMsg
+detailView =
+    div [ class "t-column w-full h-full p-2" ]
+        [ div [ class "text-sm uppercase" ] [ text "Chores" ]
+        , button [ class "btn btn-primary" ] [ text "Start" ]
+        , figure []
+            [ img
+                [ src "chores/chimney.png"
+                , Utils.fullWidthIncludingPadding 0.5
+                , class "h-24 object-cover"
+                ]
+                []
+            ]
+        , div [] [ text "Sweep Chimneys" ]
+        ]

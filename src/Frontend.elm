@@ -76,11 +76,6 @@ init _ key =
       , showTimePasses = True
       }
     , Cmd.none
-      -- , Cmd.batch
-      --     [ delay 0 (AddToast "hello, world")
-      --     , delay 1000 (AddToast "hello, world 2")
-      --     , delay 2000 (AddToast "hello, world 3")
-      --     ]
     )
 
 
@@ -709,7 +704,7 @@ view model =
                     game =
                         Snapshot.getValue snapshot
                 in
-                div []
+                div [ class "flex h-screen relative" ]
                     [ renderBottomRightItems model
                     , Toast.render viewToast model.tray toastConfig
                     , div [ class "bg-base-100 drawer drawer-mobile" ]
@@ -724,6 +719,8 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
+                    , div [ class "w-50 h-full border-l-8 border-base-200 overflow-y-auto" ]
+                        [ IdleGame.Views.Chores.detailView ]
                     , renderModal model.activeModal game
                     ]
         ]

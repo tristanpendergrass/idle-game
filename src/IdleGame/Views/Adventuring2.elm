@@ -94,6 +94,8 @@ render game =
                 [ renderPlayerCol game
                 , renderMonsterCol game
                 , renderCombatDivider
+
+                -- , renderFightButton
                 ]
             ]
         , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4" ]
