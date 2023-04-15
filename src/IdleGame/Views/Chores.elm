@@ -84,8 +84,8 @@ type alias ChoreEffectsView =
     { coin : Counter, skillXp : Counter, mxp : Counter, resource : Resource.Kind, probability : Float }
 
 
-getChoreEfffectsView : Game -> List Effect -> Maybe ChoreEffectsView
-getChoreEfffectsView game effects =
+getChoreEffectsView : Game -> List Effect -> Maybe ChoreEffectsView
+getChoreEffectsView game effects =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     let
         coin =
@@ -179,17 +179,22 @@ renderChoreListItem game item =
     case item of
         Game.ChoreItem kind ->
             let
+                event : Event
+                event =
+                    Game.completeChoreEvent kind
+
+                mods : List Mod
+                mods =
+                    Game.getAllMods game
+
                 moddedEvent : ModdedEvent
                 moddedEvent =
-                    Game.getEvent kind
-                        |> IdleGame.Event.applyModsToEvent (Game.getAllMods game)
+                    IdleGame.Event.applyMods mods event
 
                 effects =
-                    case moddedEvent of
-                        IdleGame.Event.ModdedEvent eventData ->
-                            eventData.effects
+                    IdleGame.Event.getEffectsModded moddedEvent
             in
-            case getChoreEfffectsView game effects of
+            case getChoreEffectsView game effects of
                 Nothing ->
                     div [] []
 
@@ -215,7 +220,8 @@ renderChoreListItem game item =
                                     Nothing
                     in
                     renderChore
-                        { title = stats.title
+                        { kind = kind
+                        , title = stats.title
                         , handleClick = ToggleActiveChore kind
                         , maybeTimer = maybeTimer
                         , duration = moddedDuration
@@ -243,7 +249,8 @@ probabilityToInt x =
 
 
 type alias ChoreItemView =
-    { title : String
+    { kind : ChoreKind
+    , title : String
     , handleClick : FrontendMsg
     , maybeTimer : Maybe Timer
     , duration : Duration
@@ -257,22 +264,43 @@ type alias ChoreItemView =
     }
 
 
+
+-- Chore title
+
+
+choreImage : ChoreKind -> Html FrontendMsg
+choreImage kind =
+    img
+        [ src <| (Chore.getStats kind).imgSrc
+        , class "h-full w-full object-cover"
+        ]
+        []
+
+
+choreTitle : ChoreKind -> Html FrontendMsg
+choreTitle kind =
+    h2 [ class "text-sm  md:text-lg text-center" ] [ text (Chore.getStats kind).title ]
+
+
+choreDuration : Duration -> Html msg
+choreDuration duration =
+    div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
+
+
+choreCoin : Counter -> Html msg
+choreCoin coin =
+    div [ class "flex items-center gap-1" ]
+        [ div [ class "flex items-center gap-1" ]
+            [ span [] [ text (Counter.toString coin) ]
+            , Icon.coin
+                |> Icon.toHtml
+            ]
+        ]
+
+
 renderChore : ChoreItemView -> Html FrontendMsg
-renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
+renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
     let
-        renderDuration : Html msg
-        renderDuration =
-            div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
-
-        rendercoin =
-            div [ class "flex items-center gap-1" ]
-                [ div [ class "flex items-center gap-1" ]
-                    [ span [] [ text (Counter.toString coin) ]
-                    , Icon.coin
-                        |> Icon.toHtml
-                    ]
-                ]
-
         renderResource : Resource.Kind -> Html FrontendMsg
         renderResource resource =
             (Resource.getStats resource).icon
@@ -306,19 +334,21 @@ renderChore { title, handleClick, maybeTimer, duration, imgSrc, coin, extraResou
                 |> (*) 100
     in
     div
-        [ class "card border-t-2 border-orange-900 card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
+        [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
         , class choreHeight
         , onClick handleClick
         ]
         -- Chore image
-        [ figure []
-            [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
+        -- [ figure []
+        --     [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
+        [ div [ class "h-24 relative" ]
+            [ choreImage kind ]
         , div [ class "relative card-body" ]
             [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
                 -- Chore title
-                [ h2 [ class "text-sm  md:text-lg text-center" ] [ text title ]
-                , renderDuration
-                , rendercoin
+                [ choreTitle kind
+                , choreDuration duration
+                , choreCoin coin
                 , renderSuccessCondition (renderResource extraResource)
                 , div [ class "divider" ] []
 
@@ -381,18 +411,55 @@ renderBottomRight =
     button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
 
 
-detailView : Html FrontendMsg
-detailView =
+detailView : Game -> Html FrontendMsg
+detailView game =
+    case game.activeChore of
+        Nothing ->
+            detailViewNoSelection
+
+        Just ( choreKind, timer ) ->
+            detailViewSelection game choreKind timer
+
+
+detailViewNoSelection : Html FrontendMsg
+detailViewNoSelection =
     div [ class "t-column w-full h-full p-2" ]
+        []
+
+
+detailViewSelection : Game -> ChoreKind -> Timer -> Html FrontendMsg
+detailViewSelection game kind timer =
+    let
+        event : Event
+        event =
+            Game.completeChoreEvent kind
+
+        mods : List Mod
+        mods =
+            Game.getAllMods game
+
+        moddedEvent : ModdedEvent
+        moddedEvent =
+            IdleGame.Event.applyMods mods event
+
+        effects : List Effect
+        effects =
+            IdleGame.Event.getEffectsModded moddedEvent
+
+        { coin, skillXp, mxp, resource, probability } =
+            getChoreEffectsView game effects
+    in
+    div [ class "t-column w-full h-full p-2 relative" ]
         [ div [ class "text-sm uppercase" ] [ text "Chores" ]
         , button [ class "btn btn-primary" ] [ text "Start" ]
-        , figure []
-            [ img
-                [ src "chores/chimney.png"
-                , Utils.fullWidthIncludingPadding 0.5
-                , class "h-24 object-cover"
-                ]
-                []
+        , div
+            [ class "h-64 relative max-w-none"
+            , Utils.fullWidthIncludingPadding 0.5
             ]
-        , div [] [ text "Sweep Chimneys" ]
+            [ choreImage kind ]
+        , choreTitle kind
+        , choreDuration (Game.getModdedDuration game kind)
+        , coinCounter
+            |> Maybe.map choreCoin
+            |> Maybe.withDefault (div [] [])
         ]

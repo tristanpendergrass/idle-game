@@ -63,6 +63,11 @@ type Effect
         }
 
 
+getEffectsModded : ModdedEvent -> List Effect
+getEffectsModded (ModdedEvent { effects }) =
+    effects
+
+
 getType : Effect -> EffectType
 getType (Effect { type_ }) =
     type_
@@ -252,8 +257,8 @@ applyModsToEffect depth mods effect =
            )
 
 
-applyModsToEvent : List Mod -> Event -> ModdedEvent
-applyModsToEvent mods (Event eventData) =
+applyMods : List Mod -> Event -> ModdedEvent
+applyMods mods (Event eventData) =
     ModdedEvent
         { eventData
           -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
@@ -263,7 +268,7 @@ applyModsToEvent mods (Event eventData) =
 
 withMods : List Mod -> Event -> ModdedEvent
 withMods mods event =
-    applyModsToEvent mods event
+    applyMods mods event
 
 
 withHowManyTimesToApplyMod : Int -> Mod -> Mod

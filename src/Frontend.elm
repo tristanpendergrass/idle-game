@@ -719,8 +719,8 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
-                    , div [ class "w-50 h-full border-l-8 border-base-200 overflow-y-auto" ]
-                        [ IdleGame.Views.Chores.detailView ]
+                    , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
+                        [ IdleGame.Views.Chores.detailView game ]
                     , renderModal model.activeModal game
                     ]
         ]

@@ -3839,14 +3839,6 @@ body[dir="rtl"] .checkbox:checked,
   margin: 0.25rem;
 }
 
-.-ml-\[0\.5rem\] {
-  margin-left: -0.5rem;
-}
-
-.-mr-\[0\.5rem\] {
-  margin-right: -0.5rem;
-}
-
 .inline-block {
   display: inline-block;
 }
@@ -3865,6 +3857,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .hidden {
   display: none;
+}
+
+.h-screen {
+  height: 100vh;
 }
 
 .h-full {
@@ -3919,10 +3915,6 @@ body[dir="rtl"] .checkbox:checked,
   height: 1rem;
 }
 
-.h-screen {
-  height: 100vh;
-}
-
 .h-3 {
   height: 0.75rem;
 }
@@ -3931,12 +3923,28 @@ body[dir="rtl"] .checkbox:checked,
   height: 1.5rem;
 }
 
+.h-96 {
+  height: 24rem;
+}
+
+.h-60 {
+  height: 15rem;
+}
+
+.h-64 {
+  height: 16rem;
+}
+
+.h-72 {
+  height: 18rem;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
 
-.min-h-full {
-  min-height: 100%;
+.w-\[40rem\] {
+  width: 40rem;
 }
 
 .w-20 {
@@ -4139,10 +4147,6 @@ body[dir="rtl"] .checkbox:checked,
   overflow-x: hidden;
 }
 
-.overflow-y-scroll {
-  overflow-y: scroll;
-}
-
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4173,8 +4177,8 @@ body[dir="rtl"] .checkbox:checked,
   border-width: 2px;
 }
 
-.border-l-2 {
-  border-left-width: 2px;
+.border-l-8 {
+  border-left-width: 8px;
 }
 
 .border-t-2 {
@@ -4189,14 +4193,6 @@ body[dir="rtl"] .checkbox:checked,
   border-top-width: 1px;
 }
 
-.border-l-4 {
-  border-left-width: 4px;
-}
-
-.border-l-8 {
-  border-left-width: 8px;
-}
-
 .border-primary {
   --tw-border-opacity: 1;
   border-color: hsl(var(--p) / var(--tw-border-opacity));
@@ -4207,9 +4203,9 @@ body[dir="rtl"] .checkbox:checked,
   border-color: hsl(var(--s) / var(--tw-border-opacity));
 }
 
-.border-red-500 {
+.border-base-200 {
   --tw-border-opacity: 1;
-  border-color: rgb(239 68 68 / var(--tw-border-opacity));
+  border-color: hsl(var(--b2, var(--b1)) / var(--tw-border-opacity));
 }
 
 .border-accent {
@@ -4240,21 +4236,6 @@ body[dir="rtl"] .checkbox:checked,
 .border-accent-content {
   --tw-border-opacity: 1;
   border-color: hsl(var(--ac) / var(--tw-border-opacity));
-}
-
-.border-base-300 {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--b3, var(--b2)) / var(--tw-border-opacity));
-}
-
-.border-neutral {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--n) / var(--tw-border-opacity));
-}
-
-.border-base-200 {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--b2, var(--b1)) / var(--tw-border-opacity));
 }
 
 .bg-base-100 {

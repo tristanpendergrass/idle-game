@@ -169,4 +169,4 @@ fullWidthIncludingPadding rem =
         remString =
             String.fromFloat rem
     in
-    class <| "w-[calc(100% + " ++ remString ++ " * 2)] -ml-[" ++ remString ++ "] -mr-[" ++ remString ++ "] max-w-none"
+    attribute "style" ("width: calc(100% + " ++ remString ++ " * 2); margin-left: -" ++ remString ++ "rem; margin-right: -" ++ remString ++ "rem;")

@@ -112,8 +112,8 @@ getChoreListItems { choresXp } =
 -- Chores
 
 
-getEvent : ChoreKind -> Event
-getEvent kind =
+completeChoreEvent : ChoreKind -> Event
+completeChoreEvent kind =
     let
         outcome =
             (Chore.getStats kind).outcome
@@ -221,7 +221,7 @@ rewardPlayer : Game -> Generator ( Game, List Toast )
 rewardPlayer game =
     let
         modifiedCombatReward =
-            applyModsToEvent (getAllMods game) combatReward
+            applyMods (getAllMods game) combatReward
 
         effects : List Effect
         effects =
@@ -308,7 +308,7 @@ tick delta game =
                             Just ( choreKind, newTimer )
 
                         newEvents =
-                            List.repeat completions (getEvent choreKind)
+                            List.repeat completions (completeChoreEvent choreKind)
                     in
                     ( activeChore
                     , newEvents
@@ -324,7 +324,7 @@ tick delta game =
                         mods =
                             getAllMods game
                     in
-                    List.map (applyModsToEvent mods) events
+                    List.map (applyMods mods) events
 
         effects : List Effect
         effects =

@@ -33,7 +33,7 @@ devFlags =
     { showFastForwardSpeed = True
     , extraFastForwardTime = Duration.hours 4
     , showDebugPanel = True
-    , defaultTab = Tab.Adventuring
+    , defaultTab = Tab.Chores
     }
 
 
