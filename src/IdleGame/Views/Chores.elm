@@ -417,8 +417,34 @@ detailView game =
         Nothing ->
             detailViewNoSelection
 
-        Just ( choreKind, timer ) ->
-            detailViewSelection game choreKind timer
+        Just ( kind, timer ) ->
+            let
+                event : Event
+                event =
+                    Game.completeChoreEvent kind
+
+                mods : List Mod
+                mods =
+                    Game.getAllMods game
+
+                moddedEvent : ModdedEvent
+                moddedEvent =
+                    IdleGame.Event.applyMods mods event
+
+                effects : List Effect
+                effects =
+                    IdleGame.Event.getEffectsModded moddedEvent
+
+                maybeChoreEffectsView : Maybe ChoreEffectsView
+                maybeChoreEffectsView =
+                    getChoreEffectsView game effects
+            in
+            case maybeChoreEffectsView of
+                Just choreEffectsView ->
+                    detailViewSelection game kind choreEffectsView timer
+
+                Nothing ->
+                    detailViewNoSelection
 
 
 detailViewNoSelection : Html FrontendMsg
@@ -427,28 +453,8 @@ detailViewNoSelection =
         []
 
 
-detailViewSelection : Game -> ChoreKind -> Timer -> Html FrontendMsg
-detailViewSelection game kind timer =
-    let
-        event : Event
-        event =
-            Game.completeChoreEvent kind
-
-        mods : List Mod
-        mods =
-            Game.getAllMods game
-
-        moddedEvent : ModdedEvent
-        moddedEvent =
-            IdleGame.Event.applyMods mods event
-
-        effects : List Effect
-        effects =
-            IdleGame.Event.getEffectsModded moddedEvent
-
-        { coin, skillXp, mxp, resource, probability } =
-            getChoreEffectsView game effects
-    in
+detailViewSelection : Game -> ChoreKind -> ChoreEffectsView -> Timer -> Html FrontendMsg
+detailViewSelection game kind { coin, skillXp, mxp, resource, probability } timer =
     div [ class "t-column w-full h-full p-2 relative" ]
         [ div [ class "text-sm uppercase" ] [ text "Chores" ]
         , button [ class "btn btn-primary" ] [ text "Start" ]
@@ -459,7 +465,5 @@ detailViewSelection game kind timer =
             [ choreImage kind ]
         , choreTitle kind
         , choreDuration (Game.getModdedDuration game kind)
-        , coinCounter
-            |> Maybe.map choreCoin
-            |> Maybe.withDefault (div [] [])
+        , choreCoin coin
         ]
