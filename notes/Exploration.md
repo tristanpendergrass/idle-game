@@ -1,4 +1,4 @@
-Adventuring is an activity you do simultaneous to your studies, and offers rewards not found anywhere else. Although it's a left nav item, Adventuring is not a Skill and doesn't have XP or traditional acitivity unlocks. Rather it has locations which you can adventure in.
+Exploration is a skill which , and offers rewards not found anywhere else. Although it's a left nav item, Exploration is not a Skill and doesn't have XP or traditional activity unlocks. Rather it has locations which you can explore.
 
 # Locations
 When you engage in adventuring you are always doing it in a specific location.
@@ -7,7 +7,10 @@ When you engage in adventuring you are always doing it in a specific location.
 * Large city
 * Evil fortress, outer
 * Evil fortress, inner
-These will unlock in a scripted order based on completion of previous locations.
+## Unlocking locations
+These will unlock in a scripted order based on completion of previous locations. To unlock a location:
+* Have the appropriate power
+* Unlock the previous 
 Completion is a concept tracked by a completion meter going from 0 to 100% for each location. Complete them by doing all quests there and encountering all monsters and resources.
 
 # Quests

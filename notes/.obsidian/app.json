@@ -1,5 +1,6 @@
 {
   "autoPairMarkdown": false,
   "autoPairBrackets": false,
-  "useTab": false
+  "useTab": false,
+  "alwaysUpdateLinks": true
 }
