@@ -10,7 +10,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Multiplicable as Quantity
+import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon
@@ -111,7 +111,7 @@ getChoreXp effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
         GainXp quantity ChoresSkill ->
-            Just (Quantity.toCounter quantity)
+            Just (Multiplicable.toCounter quantity)
 
         _ ->
             Nothing
@@ -137,7 +137,7 @@ getChoreCoin effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
         GainCoin quantity ->
-            Just (Quantity.toCounter quantity)
+            Just (Multiplicable.toCounter quantity)
 
         _ ->
             Nothing
@@ -435,6 +435,10 @@ detailView game =
                 effects =
                     IdleGame.Event.getEffectsModded moddedEvent
 
+                orderedEffects : List Effect
+                orderedEffects =
+                    List.sortWith orderEffects effects
+
                 maybeChoreEffectsView : Maybe ChoreEffectsView
                 maybeChoreEffectsView =
                     getChoreEffectsView game effects
@@ -453,8 +457,8 @@ detailViewNoSelection =
         []
 
 
-detailViewSelection : Game -> ChoreKind -> ChoreEffectsView -> Timer -> Html FrontendMsg
-detailViewSelection game kind { coin, skillXp, mxp, resource, probability } timer =
+detailViewSelection : Game -> ChoreKind -> Multiplicable -> ChoreEffectsView -> Timer -> Html FrontendMsg
+detailViewSelection game kind coin { skillXp, mxp, resource, probability } timer =
     div [ class "t-column w-full h-full p-2 relative" ]
         [ div [ class "text-sm uppercase" ] [ text "Chores" ]
         , button [ class "btn btn-primary" ] [ text "Start" ]
@@ -465,5 +469,21 @@ detailViewSelection game kind { coin, skillXp, mxp, resource, probability } time
             [ choreImage kind ]
         , choreTitle kind
         , choreDuration (Game.getModdedDuration game kind)
-        , choreCoin coin
+        , renderCoin coin
+        ]
+
+
+renderCoin : Multiplicable -> Html msg
+renderCoin coin =
+    div [ class "flex items-center gap-1" ]
+        [ div [ class "flex items-center gap-1" ]
+            [ span []
+                [ coin
+                    |> Multiplicable.toCounter
+                    |> Counter.toString
+                    |> text
+                ]
+            , Icon.coin
+                |> Icon.toHtml
+            ]
         ]

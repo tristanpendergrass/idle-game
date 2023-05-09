@@ -25,8 +25,3 @@ type alias IntervalMod =
     { kind : ChoreKind
     , percentChange : Float -- e.g. 0.25 -> 25% faster
     }
-
-
-type alias GameConfig =
-    { chores : List Chore
-    }

@@ -31,7 +31,7 @@ flags =
 devFlags : Flags
 devFlags =
     { showFastForwardSpeed = True
-    , extraFastForwardTime = Duration.hours 4
+    , extraFastForwardTime = Duration.hours 0
     , showDebugPanel = True
     , defaultTab = Tab.Chores
     }

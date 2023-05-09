@@ -3903,6 +3903,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 0.5rem;
 }
 
+.h-64 {
+  height: 16rem;
+}
+
 .h-16 {
   height: 4rem;
 }
@@ -3921,22 +3925,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-6 {
   height: 1.5rem;
-}
-
-.h-96 {
-  height: 24rem;
-}
-
-.h-60 {
-  height: 15rem;
-}
-
-.h-64 {
-  height: 16rem;
-}
-
-.h-72 {
-  height: 18rem;
 }
 
 .max-h-\[90\%\] {
@@ -4011,12 +3999,12 @@ body[dir="rtl"] .checkbox:checked,
   max-width: 1920px;
 }
 
-.max-w-\[90\%\] {
-  max-width: 90%;
-}
-
 .max-w-none {
   max-width: none;
+}
+
+.max-w-\[90\%\] {
+  max-width: 90%;
 }
 
 .flex-1 {

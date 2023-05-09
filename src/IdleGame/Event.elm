@@ -457,3 +457,8 @@ modLabelToString modLabel =
 
         CoinModLabel buff ->
             "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Coin"
+
+
+orderEffects : Effect -> Effect -> Order
+orderEffects effect1 effect2 =
+    Debug.todo ""

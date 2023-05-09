@@ -83,7 +83,7 @@ render game =
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
-            [ div [ class "flex items-center gap-1 px-2 py-1 rounded bg-accent text-accent-content" ]
+            [ div [ class "flex items-center gap-1 px-2 py-1" ]
                 [ span [ class "text-lg truncate" ]
                     [ Icon.coin
                         |> Icon.withSize Icon.Large
