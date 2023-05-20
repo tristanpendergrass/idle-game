@@ -38,7 +38,6 @@
 		{"type":"text","text":"Conjuration","id":"8d5a721fd7116d9d","x":1340,"y":1610,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Enchantment","id":"f6bbe3a7a47ef45e","x":1340,"y":1740,"width":250,"height":60,"color":"5"},
 		{"type":"text","text":"Chronomancy","id":"64624aef464da526","x":1340,"y":1900,"width":250,"height":60,"color":"4"},
-		{"type":"file","file":"Skills/Chores.md","id":"2370817f81cf090c","x":280,"y":1247,"width":250,"height":50},
 		{"type":"text","text":"Chores","id":"6676e74f480219a5","x":913,"y":1237,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Woodcutting","id":"38fc6b2802ecb7cc","x":-400,"y":1237,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Fishing","id":"d601caedf586a2e3","x":-400,"y":1320,"width":250,"height":60,"color":"1"},

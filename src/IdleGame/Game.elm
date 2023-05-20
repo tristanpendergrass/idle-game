@@ -7,7 +7,7 @@ import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Multiplicable as Multiplicable
+import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
@@ -28,7 +28,7 @@ type alias Game =
     { seed : Random.Seed
     , choresXp : Counter
     , choresMxp : Counter
-    , activeChore : Maybe ( ChoreKind, Timer )
+    , activity : Maybe Activity
     , choresData : Chore.AllChoreStates
     , coin : Counter
     , resources : Resource.Amounts
@@ -44,7 +44,7 @@ create seed =
     { seed = seed
     , choresXp = Counter.create 0
     , choresMxp = Counter.create 0
-    , activeChore = Nothing
+    , activity = Nothing
     , choresData =
         { cleanStables = { mxp = Counter.create 0 }
         , cleanBigBubba = { mxp = Counter.create 0 }
@@ -112,8 +112,8 @@ getChoreListItems { choresXp } =
 -- Chores
 
 
-completeChoreEvent : ChoreKind -> Event
-completeChoreEvent kind =
+completeChoreEvent : Game -> ChoreKind -> Event
+completeChoreEvent game kind =
     let
         outcome =
             (Chore.getStats kind).outcome
@@ -125,7 +125,7 @@ completeChoreEvent kind =
         { effects =
             [ gainXp xp ChoresSkill
                 |> withTags [ Chores, ChoreTag kind ]
-            , gainChoreMxp kind
+            , gainChoreMxp game kind
                 |> withTags [ Chores, ChoreTag kind ]
             , gainWithProbability extraResourceProbability
                 [ gainResource 1 extraResource |> withTags [ Chores ]
@@ -144,24 +144,25 @@ type alias ActivityStatus =
 toggleActiveChore : ChoreKind -> Game -> Game
 toggleActiveChore toggleType game =
     let
-        newActiveChore =
-            case game.activeChore of
-                Just ( type_, _ ) ->
-                    if type_ == toggleType then
+        newActivity : Maybe Activity
+        newActivity =
+            case game.activity of
+                Just (ActivityChore kind _) ->
+                    if kind == toggleType then
                         Nothing
 
                     else
-                        Just ( toggleType, Timer.create )
+                        Just (ActivityChore toggleType Timer.create)
 
                 Nothing ->
-                    Just ( toggleType, Timer.create )
+                    Just (ActivityChore toggleType Timer.create)
     in
-    { game | activeChore = newActiveChore }
+    setActivity newActivity game
 
 
-setActiveChore : Maybe ( ChoreKind, Timer.Timer ) -> Game -> Game
-setActiveChore activeChore g =
-    { g | activeChore = activeChore }
+setActivity : Maybe Activity -> Game -> Game
+setActivity activity g =
+    { g | activity = activity }
 
 
 setMonster : Combat.MonsterKind -> Game -> Game
@@ -290,13 +291,14 @@ updateAdventuring delta generator =
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActiveChore, events ) =
-            case game.activeChore of
+        ( newActivity, events ) =
+            case game.activity of
                 Nothing ->
-                    ( game.activeChore, [] )
+                    ( game.activity, [] )
 
-                Just ( choreKind, timer ) ->
+                Just (ActivityChore choreKind timer) ->
                     let
+                        choreDuration : Duration
                         choreDuration =
                             getModdedDuration game choreKind
 
@@ -304,13 +306,11 @@ tick delta game =
                             timer
                                 |> Timer.increment choreDuration delta
 
-                        activeChore =
-                            Just ( choreKind, newTimer )
-
+                        newEvents : List Event
                         newEvents =
-                            List.repeat completions (completeChoreEvent choreKind)
+                            List.repeat completions (completeChoreEvent game choreKind)
                     in
-                    ( activeChore
+                    ( Just (ActivityChore choreKind newTimer)
                     , newEvents
                     )
 
@@ -334,7 +334,7 @@ tick delta game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
-                |> setActiveChore newActiveChore
+                |> setActivity newActivity
                 |> (\g -> updateAdventuring delta (Random.constant ( g, [] )))
                 |> (\g -> List.foldl effectReducer g effects)
 
@@ -379,7 +379,7 @@ intGenerator { base, doublingChance } =
             )
 
 
-calculateChoreMxp : { multiplier : Float, kind : ChoreKind } -> Game -> { mxp : Counter, masteryPoolXp : Counter }
+calculateChoreMxp : { multiplier : Float, kind : ChoreKind } -> Game -> Float
 calculateChoreMxp { multiplier, kind } game =
     -- Important! Keep the application here in sync with Views.Chores.elm
     let
@@ -398,13 +398,8 @@ calculateChoreMxp { multiplier, kind } game =
             toFloat currentMasteryLevel
                 * Duration.inSeconds choreStats.outcome.duration
                 * multiplier
-                |> floor
-                |> Counter.create
-
-        grantedMasteryPoolXp =
-            Counter.multiplyBy 0.5 grantedMxp
     in
-    { mxp = grantedMxp, masteryPoolXp = grantedMasteryPoolXp }
+    grantedMxp
 
 
 applyEffect : Effect -> Game -> Generator ( Game, List Toast )
@@ -437,11 +432,15 @@ applyEffect effect game =
                 |> (\amount -> ( addXp skill amount game, [] ))
                 |> Random.constant
 
-        GainChoreMxp { multiplier } kind ->
+        GainChoreMxp quantity kind ->
             -- Important! Keep the application here in sync with Views.Chores.elm
             let
-                { mxp, masteryPoolXp } =
-                    calculateChoreMxp { multiplier = multiplier, kind = kind } game
+                mxp =
+                    Multiplicable.toCounter quantity
+
+                masteryPoolXp =
+                    Multiplicable.toCounter quantity
+                        |> Counter.multiplyBy 0.5
             in
             game
                 |> addMxp kind mxp
@@ -517,9 +516,27 @@ gainXp amount skill =
     Effect { type_ = GainXp xp skill, tags = [ Xp, skillTag ] }
 
 
-gainChoreMxp : ChoreKind -> Effect
-gainChoreMxp kind =
-    Effect { type_ = GainChoreMxp { multiplier = 1 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
+gainChoreMxp : Game -> ChoreKind -> Effect
+gainChoreMxp game kind =
+    -- Important! Keep the application here in sync with Views.Chores.elm
+    -- let
+    --     { mxp, masteryPoolXp } =
+    --         calculateChoreMxp { multiplier = multiplier, kind = kind } game
+    -- in
+    -- game
+    --     |> addMxp kind mxp
+    --     |> addMasteryPoolXp masteryPoolXp
+    --     |> (\newGame -> Random.constant ( newGame, [] ))
+    let
+        mxp : Float
+        mxp =
+            calculateChoreMxp { multiplier = 1, kind = kind } game
+
+        quantity : Multiplicable
+        quantity =
+            Multiplicable.fromInt (floor mxp)
+    in
+    Effect { type_ = GainChoreMxp quantity kind, tags = [ Mxp, Chores, ChoreTag kind ] }
 
 
 gainCoin : Int -> Effect

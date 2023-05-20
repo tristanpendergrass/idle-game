@@ -2,6 +2,11 @@ module IdleGame.GameTypes exposing (..)
 
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Resource as Resource
+import IdleGame.Timer as Timer exposing (Timer)
+
+
+type Activity
+    = ActivityChore ChoreKind Timer
 
 
 type ChoreKind

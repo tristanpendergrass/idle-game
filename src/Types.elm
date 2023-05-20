@@ -46,6 +46,10 @@ type FrontendGameState
     | FastForward FastForwardState
 
 
+type Preview
+    = PreviewChore ChoreKind
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
     , showDebugPanel : Bool
@@ -56,6 +60,8 @@ type alias FrontendModel =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
+    , activePreview : Maybe Preview
+    , detailViewExpanded : Bool
 
     -- Debug panel
     , showTimePasses : Bool

@@ -2,7 +2,7 @@ module IdleGame.Event exposing (..)
 
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Multiplicable as Multiplicable
+import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Utils
 
@@ -51,9 +51,9 @@ type ModdedEvent
 type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
-    | GainXp Multiplicable.Multiplicable Skill
-    | GainChoreMxp { multiplier : Float } ChoreKind
-    | GainCoin Multiplicable.Multiplicable
+    | GainXp Multiplicable Skill
+    | GainChoreMxp Multiplicable ChoreKind
+    | GainCoin Multiplicable
 
 
 type Effect
@@ -61,6 +61,11 @@ type Effect
         { type_ : EffectType
         , tags : List Tag
         }
+
+
+getEffects : Event -> List Effect
+getEffects (Event { effects }) =
+    effects
 
 
 getEffectsModded : ModdedEvent -> List Effect
@@ -152,7 +157,7 @@ includeVariableEffects mod =
                             let
                                 newEffects : List Effect
                                 newEffects =
-                                    List.concatMap (applyModsToEffect 0 [ { mod | transformer = newTransformer } ]) successEffects
+                                    List.concatMap (applyModsToEffect [ { mod | transformer = newTransformer } ]) successEffects
                             in
                             ( successEffects /= newEffects, newEffects )
 
@@ -160,7 +165,7 @@ includeVariableEffects mod =
                             let
                                 newEffects : List Effect
                                 newEffects =
-                                    List.concatMap (applyModsToEffect 0 [ mod ]) failureEffects
+                                    List.concatMap (applyModsToEffect [ mod ]) failureEffects
                             in
                             ( failureEffects /= newEffects, newEffects )
 
@@ -230,8 +235,13 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : Int -> List Mod -> Effect -> List Effect
-applyModsToEffect depth mods effect =
+applyModsToEffect : List Mod -> Effect -> List Effect
+applyModsToEffect =
+    applyModsToEffectHelp 0
+
+
+applyModsToEffectHelp : Int -> List Mod -> Effect -> List Effect
+applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
             List.foldl
@@ -250,7 +260,7 @@ applyModsToEffect depth mods effect =
         -- The depth < 20 is an arbitrary limit that shouldn't usually be reached. It should be rare for a "further effect" to trigger
         -- a mod that gives another further effect and have that repeat more than 20 times, if so the player just doesn't get the benefit -- :)
         :: (if depth < 20 then
-                List.concatMap (applyModsToEffect (depth + 1) mods) furtherEffects
+                List.concatMap (applyModsToEffectHelp (depth + 1) mods) furtherEffects
 
             else
                 []
@@ -262,7 +272,7 @@ applyMods mods (Event eventData) =
     ModdedEvent
         { eventData
           -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
-            | effects = List.concatMap (applyModsToEffect 0 mods) eventData.effects
+            | effects = List.concatMap (applyModsToEffect mods) eventData.effects
         }
 
 
@@ -329,13 +339,17 @@ coinTransformer buff repetitions effect =
 mxpTransformer : Float -> Transformer
 mxpTransformer buff repetitions effect =
     case getType effect of
-        GainChoreMxp { multiplier } chore ->
+        GainChoreMxp quantity chore ->
             let
                 adjustedBuff =
                     buff * toFloat repetitions
+
+                adjustedMultiplicable =
+                    quantity
+                        |> Multiplicable.addMultiplier adjustedBuff
             in
             effect
-                |> setType (GainChoreMxp { multiplier = multiplier + adjustedBuff } chore)
+                |> setType (GainChoreMxp adjustedMultiplicable chore)
                 |> ChangeEffect
 
         _ ->

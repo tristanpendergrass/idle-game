@@ -71,6 +71,8 @@ init _ key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
+      , detailViewExpanded = False
+      , activePreview = Nothing
 
       -- Debug panel
       , showTimePasses = True

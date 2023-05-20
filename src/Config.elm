@@ -12,7 +12,7 @@ version =
 
 type alias Flags =
     { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
-    , extraFastForwardTime : Duration -- How many milliseconds to artificially add to the FastForward on init from backend
+    , extraFastForwardTime : Duration -- How much time to artificially add to the FastForward on init from backend
     , showDebugPanel : Bool
     , defaultTab : Tab
     }

@@ -13,6 +13,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Effect
 import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
@@ -119,12 +120,28 @@ getChoreXp effect =
 
 getChoreMxp : Game -> Effect -> Maybe Counter
 getChoreMxp game effect =
+    -- -- Important! Keep the application here in sync with Views.Chores.elm
+    -- let
+    --     mxp =
+    --         Multiplicable.toCounter quantity
+    --     masteryPoolXp =
+    --         Multiplicable.toCounter quantity
+    --             |> Counter.multiplyBy 0.5
+    -- in
+    -- game
+    --     |> addMxp kind mxp
+    --     |> addMasteryPoolXp masteryPoolXp
+    --     |> (\newGame -> Random.constant ( newGame, [] ))
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainChoreMxp { multiplier } kind ->
+        GainChoreMxp quantity kind ->
             let
-                { mxp } =
-                    Game.calculateChoreMxp { multiplier = multiplier, kind = kind } game
+                mxp =
+                    Multiplicable.toCounter quantity
+
+                masteryPoolXp =
+                    Multiplicable.toCounter quantity
+                        |> Counter.multiplyBy 0.5
             in
             Just mxp
 
@@ -181,7 +198,7 @@ renderChoreListItem game item =
             let
                 event : Event
                 event =
-                    Game.completeChoreEvent kind
+                    Game.completeChoreEvent game kind
 
                 mods : List Mod
                 mods =
@@ -208,8 +225,8 @@ renderChoreListItem game item =
                             Game.getModdedDuration game kind
 
                         maybeTimer =
-                            case game.activeChore of
-                                Just ( activeType, timer ) ->
+                            case game.activity of
+                                Just (ActivityChore activeType timer) ->
                                     if kind == activeType then
                                         Just timer
 
@@ -411,17 +428,48 @@ renderBottomRight =
     button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
 
 
+
+-- detailView : Game -> Html FrontendMsg
+-- detailView game =
+--     case game.activeChore of
+--         Nothing ->
+--             detailViewNoSelection
+--         Just ( kind, timer ) ->
+--             let
+--                 event : Event
+--                 event =
+--                     Game.completeChoreEvent kind
+--                 mods : List Mod
+--                 mods =
+--                     Game.getAllMods game
+--                 moddedEvent : ModdedEvent
+--                 moddedEvent =
+--                     IdleGame.Event.applyMods mods event
+--                 effects : List Effect
+--                 effects =
+--                     IdleGame.Event.getEffectsModded moddedEvent
+--                 maybeChoreEffectsView : Maybe ChoreEffectsView
+--                 maybeChoreEffectsView =
+--                     getChoreEffectsView game effects
+--             in
+--             case maybeChoreEffectsView of
+--                 Just choreEffectsView ->
+--                     detailViewSelection game kind choreEffectsView timer
+--                 Nothing ->
+--                     detailViewNoSelection
+
+
 detailView : Game -> Html FrontendMsg
 detailView game =
-    case game.activeChore of
+    case game.activity of
         Nothing ->
-            detailViewNoSelection
+            div [ class "t-column w-full h-full p-2" ] []
 
-        Just ( kind, timer ) ->
+        Just (ActivityChore kind timer) ->
             let
                 event : Event
                 event =
-                    Game.completeChoreEvent kind
+                    Game.completeChoreEvent game kind
 
                 mods : List Mod
                 mods =
@@ -443,12 +491,7 @@ detailView game =
                 maybeChoreEffectsView =
                     getChoreEffectsView game effects
             in
-            case maybeChoreEffectsView of
-                Just choreEffectsView ->
-                    detailViewSelection game kind choreEffectsView timer
-
-                Nothing ->
-                    detailViewNoSelection
+            detailViewSelection game kind mods event timer
 
 
 detailViewNoSelection : Html FrontendMsg
@@ -457,8 +500,13 @@ detailViewNoSelection =
         []
 
 
-detailViewSelection : Game -> ChoreKind -> Multiplicable -> ChoreEffectsView -> Timer -> Html FrontendMsg
-detailViewSelection game kind coin { skillXp, mxp, resource, probability } timer =
+detailViewSelection : Game -> ChoreKind -> List Mod -> Event -> Timer -> Html FrontendMsg
+detailViewSelection game kind mods event timer =
+    let
+        effects : List Effect
+        effects =
+            IdleGame.Event.getEffects event
+    in
     div [ class "t-column w-full h-full p-2 relative" ]
         [ div [ class "text-sm uppercase" ] [ text "Chores" ]
         , button [ class "btn btn-primary" ] [ text "Start" ]
@@ -469,21 +517,6 @@ detailViewSelection game kind coin { skillXp, mxp, resource, probability } timer
             [ choreImage kind ]
         , choreTitle kind
         , choreDuration (Game.getModdedDuration game kind)
-        , renderCoin coin
-        ]
-
-
-renderCoin : Multiplicable -> Html msg
-renderCoin coin =
-    div [ class "flex items-center gap-1" ]
-        [ div [ class "flex items-center gap-1" ]
-            [ span []
-                [ coin
-                    |> Multiplicable.toCounter
-                    |> Counter.toString
-                    |> text
-                ]
-            , Icon.coin
-                |> Icon.toHtml
-            ]
+        , div [ class "t-column" ]
+            (List.map (IdleGame.Views.Effect.render mods) effects)
         ]
