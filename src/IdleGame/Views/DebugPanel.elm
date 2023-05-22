@@ -36,20 +36,6 @@ render model =
 
         addTimeButton =
             button [ onClick (AddTime (Duration.hours 8)), class "btn" ] [ text "Add 8 hrs" ]
-
-        toggleTimePassesCheckbox =
-            label
-                [ class "label cursor-pointer justify-start gap-2"
-                ]
-                [ input
-                    [ type_ "checkbox"
-                    , class "checkbox"
-                    , checked model.showTimePasses
-                    , onCheck ToggleTimePasses
-                    ]
-                    []
-                , span [] [ text "Show Time Passes" ]
-                ]
     in
     div
         [ class "fixed bottom-0 w-full h-48 bg-accent text-accent-content border-t border-accent-content relative p-2"
@@ -58,6 +44,5 @@ render model =
         , id panelId
         ]
         [ addTimeButton
-        , toggleTimePassesCheckbox
         , div [ class "absolute top-0 right-0" ] [ closeButton ]
         ]

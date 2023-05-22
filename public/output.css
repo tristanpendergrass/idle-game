@@ -3803,6 +3803,14 @@ body[dir="rtl"] .checkbox:checked,
   right: 0px;
 }
 
+.top-\[calc\(100vh-4rem\)\] {
+  top: calc(100vh - 4rem);
+}
+
+.bottom-\[5rem\] {
+  bottom: 5rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -3837,6 +3845,14 @@ body[dir="rtl"] .checkbox:checked,
 
 .m-1 {
   margin: 0.25rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
 }
 
 .inline-block {
@@ -3915,6 +3931,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 12rem;
 }
 
+.h-\[4rem\] {
+  height: 4rem;
+}
+
 .h-4 {
   height: 1rem;
 }
@@ -3959,12 +3979,16 @@ body[dir="rtl"] .checkbox:checked,
   width: 1.5rem;
 }
 
-.w-80 {
+.w-\[20rem\] {
   width: 20rem;
 }
 
 .w-screen {
   width: 100vw;
+}
+
+.w-80 {
+  width: 20rem;
 }
 
 .w-56 {
@@ -4080,10 +4104,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .items-center {
   align-items: center;
-}
-
-.justify-start {
-  justify-content: flex-start;
 }
 
 .justify-end {
@@ -4581,6 +4601,12 @@ body[dir="rtl"] .checkbox:checked,
 /* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
 
 .toast-tray {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  width: auto;
+  --tw-translate-x: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   gap: 0.5rem;
 }
 
@@ -4596,7 +4622,7 @@ body[dir="rtl"] .checkbox:checked,
 
 .toast-tray {
   position: fixed;
-  bottom: 1rem;
+  bottom: 5rem;
   left: 50%;
   transform: translateX(-50%);
   width: auto;
@@ -4682,6 +4708,10 @@ body[dir="rtl"] .checkbox:checked,
 }
 
 @media (min-width: 1024px) {
+  .lg\:block {
+    display: block;
+  }
+
   .lg\:hidden {
     display: none;
   }

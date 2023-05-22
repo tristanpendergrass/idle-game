@@ -62,9 +62,6 @@ type alias FrontendModel =
     , gameState : FrontendGameState
     , activePreview : Maybe Preview
     , detailViewExpanded : Bool
-
-    -- Debug panel
-    , showTimePasses : Bool
     }
 
 
@@ -82,6 +79,8 @@ type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
     | UrlChanged Url
+      -- Detail View
+    | CollapseDetailView
     | ToastMsg Toast.Msg
     | AddToast Toast
     | HandleFastForward Posix
@@ -105,7 +104,6 @@ type FrontendMsg
     | OpenDebugPanel
     | CloseDebugPanel
     | AddTime Duration
-    | ToggleTimePasses Bool
 
 
 type ToBackend

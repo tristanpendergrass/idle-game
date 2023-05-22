@@ -304,3 +304,8 @@ stalker =
 dropdown : Icon
 dropdown =
     createIconFeather FeatherIcons.arrowDown
+
+
+chevronDown : Icon
+chevronDown =
+    createIconFeather FeatherIcons.chevronDown

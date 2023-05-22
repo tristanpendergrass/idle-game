@@ -23,6 +23,7 @@ import IdleGame.Views.Adventuring
 import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
+import IdleGame.Views.DetailView
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -73,9 +74,6 @@ init _ key =
       , gameState = Initializing
       , detailViewExpanded = False
       , activePreview = Nothing
-
-      -- Debug panel
-      , showTimePasses = True
       }
     , Cmd.none
     )
@@ -97,7 +95,7 @@ setActiveModal activeModal model =
         filteredActiveModal =
             case activeModal of
                 Just (TimePassesModal _ _) ->
-                    if model.showTimePasses then
+                    if Config.flags.showTimePasses then
                         activeModal
 
                     else
@@ -138,11 +136,6 @@ setIsDrawerOpen isOpen model =
 setGameState : FrontendGameState -> FrontendModel -> FrontendModel
 setGameState gameState model =
     { model | gameState = gameState }
-
-
-setShowTimePasses : Bool -> FrontendModel -> FrontendModel
-setShowTimePasses showTimePasses model =
-    { model | showTimePasses = showTimePasses }
 
 
 mapGame : (Game -> Game) -> FrontendModel -> FrontendModel
@@ -241,6 +234,9 @@ update msg model =
                 |> Task.andThen (\_ -> Browser.Dom.focus DebugPanel.panelId)
                 |> Task.attempt (\_ -> NoOp)
             )
+
+        CollapseDetailView ->
+            ( { model | detailViewExpanded = False }, Cmd.none )
 
         CloseDebugPanel ->
             ( { model | showDebugPanel = False }, Cmd.none )
@@ -524,12 +520,6 @@ update msg model =
                 _ ->
                     noOp
 
-        ToggleTimePasses newVal ->
-            ( model
-                |> setShowTimePasses newVal
-            , Cmd.none
-            )
-
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
@@ -581,7 +571,10 @@ toastConfig : Toast.Config FrontendMsg
 toastConfig =
     Toast.config ToastMsg
         -- attributes applied to the toast tray
-        |> Toast.withTrayAttributes [ class "toast-tray", IdleGame.Views.Utils.zIndexes.toast ]
+        |> Toast.withTrayAttributes
+            [ class "t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto;"
+            , IdleGame.Views.Utils.zIndexes.toast
+            ]
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
         |> Toast.withExitAttributes [ class "toast--fade-out" ]
@@ -707,8 +700,7 @@ view model =
                         Snapshot.getValue snapshot
                 in
                 div [ class "flex h-screen relative" ]
-                    [ renderBottomRightItems model
-                    , Toast.render viewToast model.tray toastConfig
+                    [ Toast.render viewToast model.tray toastConfig
                     , div [ class "bg-base-100 drawer drawer-mobile" ]
                         [ input
                             [ id "drawer"
@@ -721,9 +713,13 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
-                    , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
-                        [ IdleGame.Views.Chores.detailView game ]
+                    , IdleGame.Views.DetailView.render game model.detailViewExpanded
+
+                    -- , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
+                    --     [ IdleGame.Views.Chores.detailView game ]
                     , renderModal model.activeModal game
+
+                    -- , renderBottomRightItems model
                     ]
         ]
     }

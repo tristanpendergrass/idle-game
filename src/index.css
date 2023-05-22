@@ -63,9 +63,9 @@
 /* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
 
 .toast-tray {
-  @apply t-column gap-2;
+  @apply t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto;
   position: fixed;
-  bottom: 1rem;
+  bottom: 5rem;
   left: 50%;
   transform: translateX(-50%);
   width: auto; /* Without width: auto the toast tray will have 100% width and block clicking things underneath */

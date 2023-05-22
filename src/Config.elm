@@ -13,6 +13,7 @@ version =
 type alias Flags =
     { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
     , extraFastForwardTime : Duration -- How much time to artificially add to the FastForward on init from backend
+    , showTimePasses : Bool
     , showDebugPanel : Bool
     , defaultTab : Tab
     }
@@ -30,8 +31,9 @@ flags =
 
 devFlags : Flags
 devFlags =
-    { showFastForwardSpeed = True
+    { showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
+    , showTimePasses = False
     , showDebugPanel = True
     , defaultTab = Tab.Chores
     }
@@ -41,6 +43,7 @@ prodFlags : Flags
 prodFlags =
     { showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
+    , showTimePasses = True
     , showDebugPanel = False
     , defaultTab = Tab.Chores
     }
