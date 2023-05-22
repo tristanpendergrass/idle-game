@@ -73,7 +73,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , detailViewExpanded = False
-      , activePreview = Nothing
+      , preview = Nothing
       }
     , Cmd.none
     )
@@ -716,7 +716,7 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
-                    , IdleGame.Views.DetailView.render game model.detailViewExpanded
+                    , IdleGame.Views.DetailView.render game model.preview model.detailViewExpanded
 
                     -- , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
                     --     [ IdleGame.Views.Chores.detailView game ]

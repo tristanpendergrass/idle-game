@@ -60,7 +60,7 @@ type alias FrontendModel =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
-    , activePreview : Maybe Preview
+    , preview : Maybe Preview
     , detailViewExpanded : Bool
     }
 

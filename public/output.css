@@ -3191,6 +3191,12 @@ body[dir="rtl"] .checkbox:checked,
   border-bottom-left-radius: inherit;
 }
 
+.mockup-phone .display {
+  overflow: hidden;
+  border-radius: 40px;
+  margin-top: -25px;
+}
+
 .progress::-moz-progress-bar {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--n) / var(--tw-bg-opacity));
@@ -3811,6 +3817,10 @@ body[dir="rtl"] .checkbox:checked,
   top: calc(100vh - 4rem);
 }
 
+.top-full {
+  top: 100%;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -3947,6 +3957,10 @@ body[dir="rtl"] .checkbox:checked,
   height: 1.5rem;
 }
 
+.h-\[3rem\] {
+  height: 3rem;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
@@ -4009,6 +4023,18 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-\[512px\] {
   width: 512px;
+}
+
+.w-4 {
+  width: 1rem;
+}
+
+.w-32 {
+  width: 8rem;
+}
+
+.w-\[3rem\] {
+  width: 3rem;
 }
 
 .min-w-\[375px\] {
@@ -4145,6 +4171,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .gap-y-8 {
   row-gap: 2rem;
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .overflow-y-auto {
@@ -4306,6 +4336,16 @@ body[dir="rtl"] .checkbox:checked,
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
+}
+
+.object-none {
+  -o-object-fit: none;
+     object-fit: none;
+}
+
+.object-center {
+  -o-object-position: center;
+     object-position: center;
 }
 
 .p-2 {
