@@ -475,4 +475,5 @@ modLabelToString modLabel =
 
 orderEffects : Effect -> Effect -> Order
 orderEffects effect1 effect2 =
-    Debug.todo ""
+    -- TODO: order these properly, e.g. coin before XP, resource before coin
+    LT

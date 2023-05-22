@@ -3767,6 +3767,14 @@ body[dir="rtl"] .checkbox:checked,
   position: sticky;
 }
 
+.bottom-\[5rem\] {
+  bottom: 5rem;
+}
+
+.left-1\/2 {
+  left: 50%;
+}
+
 .bottom-\[2rem\] {
   bottom: 2rem;
 }
@@ -3781,10 +3789,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .right-\[-45px\] {
   right: -45px;
-}
-
-.left-1\/2 {
-  left: 50%;
 }
 
 .-bottom-5 {
@@ -3805,10 +3809,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .top-\[calc\(100vh-4rem\)\] {
   top: calc(100vh - 4rem);
-}
-
-.bottom-\[5rem\] {
-  bottom: 5rem;
 }
 
 .z-10 {
@@ -4122,12 +4122,12 @@ body[dir="rtl"] .checkbox:checked,
   justify-items: center;
 }
 
-.gap-1 {
-  gap: 0.25rem;
-}
-
 .gap-2 {
   gap: 0.5rem;
+}
+
+.gap-1 {
+  gap: 0.25rem;
 }
 
 .gap-3 {
@@ -4532,12 +4532,26 @@ body[dir="rtl"] .checkbox:checked,
   transition-duration: 150ms;
 }
 
+.transition-\[top\] {
+  transition-property: top;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .duration-100 {
   transition-duration: 100ms;
 }
 
 .duration-200 {
   transition-duration: 200ms;
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ease-in {
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
 
 .t-absolute-center-x {
@@ -4681,6 +4695,12 @@ body[dir="rtl"] .checkbox:checked,
 .before\:content-\[attr\(data-tip\)\]::before {
   --tw-content: attr(data-tip);
   content: var(--tw-content);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-reduce\:transition-none {
+    transition-property: none;
+  }
 }
 
 @media (min-width: 768px) {

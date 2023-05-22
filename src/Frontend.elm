@@ -238,6 +238,9 @@ update msg model =
         CollapseDetailView ->
             ( { model | detailViewExpanded = False }, Cmd.none )
 
+        ExpandDetailView ->
+            ( { model | detailViewExpanded = True }, Cmd.none )
+
         CloseDebugPanel ->
             ( { model | showDebugPanel = False }, Cmd.none )
 

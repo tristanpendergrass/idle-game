@@ -22,10 +22,8 @@ statusBarTopCollapsed =
 render : Game -> Bool -> Html FrontendMsg
 render game detailViewExpanded =
     div [ class "bg-base-100" ]
-        [ div [ class "hidden lg:block" ]
+        [ div [ class "hidden lg:block h-full" ]
             [ renderRightRail game
-                [ div [] [ text "Why hello there" ]
-                ]
             ]
         , div [ class "lg:hidden" ]
             [ renderCollapsible
@@ -37,8 +35,8 @@ render game detailViewExpanded =
         ]
 
 
-renderRightRail : Game -> List (Html FrontendMsg) -> Html FrontendMsg
-renderRightRail game children =
+renderRightRail : Game -> Html FrontendMsg
+renderRightRail game =
     div [ class "w-[20rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
         [ IdleGame.Views.Chores.detailView game ]
 
@@ -47,6 +45,7 @@ renderCollapsible : Game -> Bool -> List (Html FrontendMsg) -> Html FrontendMsg
 renderCollapsible game detailViewExpanded children =
     div
         [ class "fixed left-0 w-screen h-screen bg-base-100"
+        , class "transition-[top] duration-100 ease-in motion-reduce:transition-none"
         , classList [ ( statusBarTopExpanded, detailViewExpanded ) ]
         , classList [ ( statusBarTopCollapsed, not detailViewExpanded ) ]
         ]
@@ -74,5 +73,5 @@ collapseButton =
 
 renderStatusBar : Game -> Html FrontendMsg
 renderStatusBar game =
-    div [ class "w-full h-[4rem] bg-accent text-accent-content" ]
+    div [ class "w-full h-[4rem] bg-base-300 text-accent-content", onClick ExpandDetailView ]
         [ text "Status bar" ]

@@ -474,22 +474,6 @@ detailView game =
                 mods : List Mod
                 mods =
                     Game.getAllMods game
-
-                moddedEvent : ModdedEvent
-                moddedEvent =
-                    IdleGame.Event.applyMods mods event
-
-                effects : List Effect
-                effects =
-                    IdleGame.Event.getEffectsModded moddedEvent
-
-                orderedEffects : List Effect
-                orderedEffects =
-                    List.sortWith orderEffects effects
-
-                maybeChoreEffectsView : Maybe ChoreEffectsView
-                maybeChoreEffectsView =
-                    getChoreEffectsView game effects
             in
             detailViewSelection game kind mods event timer
 
@@ -506,6 +490,10 @@ detailViewSelection game kind mods event timer =
         effects : List Effect
         effects =
             IdleGame.Event.getEffects event
+
+        orderedEffects : List Effect
+        orderedEffects =
+            List.sortWith orderEffects effects
     in
     div [ class "t-column w-full h-full p-2 relative" ]
         [ div [ class "text-sm uppercase" ] [ text "Chores" ]
@@ -518,5 +506,5 @@ detailViewSelection game kind mods event timer =
         , choreTitle kind
         , choreDuration (Game.getModdedDuration game kind)
         , div [ class "t-column" ]
-            (List.map (IdleGame.Views.Effect.render mods) effects)
+            (List.map (IdleGame.Views.Effect.render mods) orderedEffects)
         ]

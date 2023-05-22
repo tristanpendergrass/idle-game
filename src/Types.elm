@@ -81,6 +81,7 @@ type FrontendMsg
     | UrlChanged Url
       -- Detail View
     | CollapseDetailView
+    | ExpandDetailView
     | ToastMsg Toast.Msg
     | AddToast Toast
     | HandleFastForward Posix
