@@ -392,7 +392,7 @@ renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extr
                     div
                         [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
                         , Utils.zIndexes.activityProgressBar
-                        , attribute "style" ("width:" ++ String.fromFloat (Percent.toNumber percentComplete) ++ "%")
+                        , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]
                         []
             ]

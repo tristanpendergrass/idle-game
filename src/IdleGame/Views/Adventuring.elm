@@ -268,7 +268,7 @@ render game =
                     , progress
                         [ class "progress h-[2px]"
                         , Html.Attributes.max "100"
-                        , Html.Attributes.value (String.fromFloat (Percent.toNumber percentComplete))
+                        , Html.Attributes.value (String.fromFloat (Percent.toPercentage percentComplete))
                         ]
                         []
                     ]

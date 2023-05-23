@@ -6,8 +6,10 @@ import Html.Events exposing (..)
 import IdleGame.Chore
 import IdleGame.Game exposing (..)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Timer as Timer
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon
+import Percent exposing (Percent)
 import Types exposing (..)
 
 
@@ -77,8 +79,16 @@ renderCollapsible game maybePreview detailViewExpanded =
             StatusBar ->
                 class "top-[calc(100vh-4rem)]"
         ]
-        [ IdleGame.Views.Chores.detailView game
-        , div [ class "absolute top-0 left-0 ml-2 mt-2" ]
+        [ div
+            [ class "w-full h-full"
+            , classList [ ( "hidden", height /= Expanded ) ]
+            ]
+            [ IdleGame.Views.Chores.detailView game
+            ]
+        , div
+            [ class "absolute top-0 left-0 ml-2 mt-2"
+            , classList [ ( "hidden", height /= Expanded ) ]
+            ]
             [ collapseButton ]
         , case game.activity of
             Nothing ->
@@ -112,9 +122,26 @@ renderStatusBar game activity =
             case activity of
                 ActivityChore kind _ ->
                     IdleGame.Chore.getStats kind
+
+        percentComplete : Percent
+        percentComplete =
+            case activity of
+                ActivityChore _ timer ->
+                    Timer.percentComplete timer
     in
-    div [ class "w-full h-[4rem] bg-base-300 text-accent-content flex items-center overflow-hidden p-2", onClick ExpandDetailView ]
-        [ div [ class "h-[3rem] w-[3rem] overflow-hidden bg-red rounded" ]
+    div [ class "w-full h-[4rem] bg-base-300 text-accent-content flex items-center overflow-hidden p-2 gap-3 rounded-t relative", onClick ExpandDetailView ]
+        [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
             [ img [ src stats.imgSrc, class "object-cover h-full w-full object-center" ] []
+            ]
+        , div [ class "grow overflow-hidden h-full flex flex-col items-start justify-center" ]
+            [ div [ class "font-bold text-sm leading-tight" ] [ text stats.title ]
+            , div [ class "text-xs text-base-content/70 leading-tight" ] [ text "Chores" ]
+            ]
+        , div [ class "absolute bottom-0 left-0 w-full h-[2px]" ]
+            [ div
+                [ class "absolute top-0 left-0 w-[50%] h-full bg-base-content/50"
+                , style "width" (String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
+                ]
+                []
             ]
         ]

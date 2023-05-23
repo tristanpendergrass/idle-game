@@ -21,6 +21,6 @@ toFloat (Quantity p) =
     p
 
 
-toNumber : Percent -> Float
-toNumber (Quantity p) =
+toPercentage : Percent -> Float
+toPercentage (Quantity p) =
     p * 100
