@@ -50,6 +50,7 @@ zIndexes =
     , activityProgressBar = class "z-10"
     , navbar = class "z-20"
     , toast = class "z-20"
+    , detailViewMobile = class "z-30" -- needs to be above toast so they don't obscure the full screen detail view
     , bottomRightMenu = class "z-30"
     , drawerSide = class "z-30"
     , modalWrapper = class "z-40"

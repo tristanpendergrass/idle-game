@@ -9,6 +9,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Timer as Timer
 import IdleGame.Views.Chores
 import IdleGame.Views.Icon
+import IdleGame.Views.Utils
 import Percent exposing (Percent)
 import Types exposing (..)
 
@@ -69,6 +70,7 @@ renderCollapsible game maybePreview detailViewExpanded =
     div
         [ class "fixed left-0 w-screen h-screen bg-base-100"
         , class "transition-[top] duration-100 ease-in motion-reduce:transition-none"
+        , IdleGame.Views.Utils.zIndexes.detailViewMobile
         , case height of
             Expanded ->
                 class "top-0"
