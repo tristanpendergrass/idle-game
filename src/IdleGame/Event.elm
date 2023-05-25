@@ -5,6 +5,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Utils
+import IdleGame.Xp as Xp exposing (Xp)
 
 
 
@@ -51,8 +52,8 @@ type ModdedEvent
 type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
-    | GainXp Multiplicable Skill
-    | GainChoreMxp Multiplicable ChoreKind
+    | GainXp { base : Xp, multiplier : Float } Skill
+    | GainChoreMxp { base : Xp, multiplier : Float } ChoreKind
     | GainCoin Multiplicable
 
 
@@ -305,8 +306,7 @@ xpTransformer buff repetitions effect =
                     buff * toFloat repetitions
 
                 adjustedMultiplicable =
-                    quantity
-                        |> Multiplicable.addMultiplier adjustedBuff
+                    { quantity | multiplier = quantity.multiplier * adjustedBuff }
             in
             effect
                 |> setType (GainXp adjustedMultiplicable skill)
@@ -345,8 +345,7 @@ mxpTransformer buff repetitions effect =
                     buff * toFloat repetitions
 
                 adjustedMultiplicable =
-                    quantity
-                        |> Multiplicable.addMultiplier adjustedBuff
+                    { quantity | multiplier = quantity.multiplier * adjustedBuff }
             in
             effect
                 |> setType (GainChoreMxp adjustedMultiplicable chore)

@@ -12,7 +12,7 @@ import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
-import IdleGame.XpFormulas
+import IdleGame.Xp as Xp exposing (Xp)
 import List.Extra
 import Maybe.Extra
 import Quantity
@@ -26,8 +26,8 @@ import Tuple
 
 type alias Game =
     { seed : Random.Seed
-    , choresXp : Counter
-    , choresMxp : Counter
+    , choresXp : Xp
+    , choresMxp : Xp
     , activity : Maybe Activity
     , choresData : Chore.AllChoreStates
     , coin : Counter
@@ -42,19 +42,19 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
-    , choresXp = Counter.create 0
-    , choresMxp = Counter.create 0
+    , choresXp = Xp.fromInt 0
+    , choresMxp = Xp.fromInt 0
     , activity = Nothing
     , choresData =
-        { cleanStables = { mxp = Counter.create 0 }
-        , cleanBigBubba = { mxp = Counter.create 0 }
-        , sweepChimneys = { mxp = Counter.create 0 }
-        , waterGreenhousePlants = { mxp = Counter.create 0 }
-        , washRobes = { mxp = Counter.create 0 }
-        , organizePotionIngredients = { mxp = Counter.create 0 }
-        , repairInstruments = { mxp = Counter.create 0 }
-        , flushDrainDemons = { mxp = Counter.create 0 }
-        , organizeSpellBooks = { mxp = Counter.create 0 }
+        { cleanStables = { mxp = Xp.fromInt 0 }
+        , cleanBigBubba = { mxp = Xp.fromInt 0 }
+        , sweepChimneys = { mxp = Xp.fromInt 0 }
+        , waterGreenhousePlants = { mxp = Xp.fromInt 0 }
+        , washRobes = { mxp = Xp.fromInt 0 }
+        , organizePotionIngredients = { mxp = Xp.fromInt 0 }
+        , repairInstruments = { mxp = Xp.fromInt 0 }
+        , flushDrainDemons = { mxp = Xp.fromInt 0 }
+        , organizeSpellBooks = { mxp = Xp.fromInt 0 }
         }
     , coin = Counter.create 0
     , resources = Resource.createResources
@@ -87,9 +87,7 @@ choreIsUnlocked : Game -> ChoreKind -> Bool
 choreIsUnlocked game kind =
     let
         skillLevel =
-            game.choresXp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevel
+            Xp.level Xp.defaultSchedule game.choresXp
 
         requiredLevel =
             choreUnlockRequirements
@@ -104,9 +102,7 @@ getChoreListItems : Game -> List ChoresListItem
 getChoreListItems { choresXp } =
     let
         skillLevel =
-            choresXp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevel
+            Xp.level Xp.defaultSchedule choresXp
 
         unlockedChoreTypes =
             choreUnlockRequirements
@@ -401,27 +397,25 @@ intGenerator { base, doublingChance } =
             )
 
 
-calculateChoreMxp : { multiplier : Float, kind : ChoreKind } -> Game -> Float
-calculateChoreMxp { multiplier, kind } game =
+calculateChoreMxp : ChoreKind -> Game -> Xp
+calculateChoreMxp kind game =
     -- Important! Keep the application here in sync with Views.Chores.elm
     let
         choreStats =
             Chore.getStats kind
 
-        { mxp } =
-            choreStats.getter game.choresData
+        mxp : Xp
+        mxp =
+            (choreStats.getter game.choresData).mxp
 
+        currentMasteryLevel : Int
         currentMasteryLevel =
-            mxp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevel
-
-        grantedMxp =
-            toFloat currentMasteryLevel
-                * Duration.inSeconds choreStats.outcome.duration
-                * multiplier
+            Xp.level Xp.defaultSchedule mxp
     in
-    grantedMxp
+    toFloat currentMasteryLevel
+        * Duration.inSeconds choreStats.outcome.duration
+        |> floor
+        |> Xp.fromInt
 
 
 applyEffect : Effect -> Game -> Generator ( Game, List Toast )
@@ -450,19 +444,20 @@ applyEffect effect game =
 
         GainXp quantity skill ->
             -- Important! Keep the application here in sync with Views.Chores.elm
-            Multiplicable.toCounter quantity
-                |> (\amount -> ( addXp skill amount game, [] ))
+            ( addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game, [] )
                 |> Random.constant
 
         GainChoreMxp quantity kind ->
             -- Important! Keep the application here in sync with Views.Chores.elm
             let
+                mxp : Xp
                 mxp =
-                    Multiplicable.toCounter quantity
+                    Quantity.multiplyBy quantity.multiplier quantity.base
 
+                masteryPoolXp : Xp
                 masteryPoolXp =
-                    Multiplicable.toCounter quantity
-                        |> Counter.multiplyBy 0.5
+                    Quantity.multiplyBy quantity.multiplier quantity.base
+                        |> Quantity.multiplyBy 0.5
             in
             game
                 |> addMxp kind mxp
@@ -490,18 +485,18 @@ addResource resource amount game =
     )
 
 
-addXp : Skill -> Counter -> Game -> Game
+addXp : Skill -> Xp -> Game -> Game
 addXp resource amount game =
     case resource of
         ChoresSkill ->
-            { game | choresXp = Counter.add game.choresXp amount }
+            { game | choresXp = Quantity.plus game.choresXp amount }
 
 
-addMxp : ChoreKind -> Counter -> Game -> Game
+addMxp : ChoreKind -> Xp -> Game -> Game
 addMxp kind amount game =
     let
         fn { mxp } =
-            { mxp = Counter.add mxp amount }
+            { mxp = Quantity.plus mxp amount }
 
         stats =
             Chore.getStats kind
@@ -509,9 +504,9 @@ addMxp kind amount game =
     { game | choresData = stats.setter fn game.choresData }
 
 
-addMasteryPoolXp : Counter -> Game -> Game
+addMasteryPoolXp : Xp -> Game -> Game
 addMasteryPoolXp amount game =
-    { game | choresMxp = Counter.add game.choresMxp amount }
+    { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
 addCoin : Counter -> Game -> ( Game, List Toast )
@@ -524,18 +519,15 @@ gainResource amount resource =
     Effect { type_ = GainResource { base = amount, doublingChance = 0 } resource, tags = [] }
 
 
-gainXp : Int -> Skill -> Effect
+gainXp : Xp -> Skill -> Effect
 gainXp amount skill =
     let
         skillTag =
             case skill of
                 ChoresSkill ->
                     Chores
-
-        xp =
-            Multiplicable.fromInt amount
     in
-    Effect { type_ = GainXp xp skill, tags = [ Xp, skillTag ] }
+    Effect { type_ = GainXp { base = amount, multiplier = 1.0 } skill, tags = [ Xp, skillTag ] }
 
 
 gainChoreMxp : Game -> ChoreKind -> Effect
@@ -550,15 +542,11 @@ gainChoreMxp game kind =
     --     |> addMasteryPoolXp masteryPoolXp
     --     |> (\newGame -> Random.constant ( newGame, [] ))
     let
-        mxp : Float
-        mxp =
-            calculateChoreMxp { multiplier = 1, kind = kind } game
-
-        quantity : Multiplicable
-        quantity =
-            Multiplicable.fromInt (floor mxp)
+        baseMxp : Xp
+        baseMxp =
+            calculateChoreMxp kind game
     in
-    Effect { type_ = GainChoreMxp quantity kind, tags = [ Mxp, Chores, ChoreTag kind ] }
+    Effect { type_ = GainChoreMxp { base = baseMxp, multiplier = 1.0 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
 
 
 gainCoin : Int -> Effect
@@ -598,8 +586,8 @@ type alias TimePassesResourceLoss =
 
 
 type alias TimePassesXpGain =
-    { originalXp : Counter
-    , currentXp : Counter
+    { originalXp : Xp
+    , currentXp : Xp
     , title : String
     }
 
@@ -689,9 +677,7 @@ getChoreMasteryPoolMods : Game -> List Mod
 getChoreMasteryPoolMods game =
     let
         mxpPercent =
-            game.choresMxp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.masteryPoolPercent
+            Xp.levelPercent Xp.defaultSchedule game.choresMxp
 
         checkpoints =
             choreMasteryPoolCheckpoints
@@ -735,9 +721,7 @@ getChoreUnlocksMods game =
                         Chore.getStats kind
 
                     masteryLevel =
-                        (stats.getter game.choresData).mxp
-                            |> Counter.getValue
-                            |> IdleGame.XpFormulas.skillLevel
+                        Xp.level Xp.defaultSchedule (stats.getter game.choresData).mxp
 
                     everyTenLevelsMod =
                         successBuff 0.05
@@ -796,9 +780,7 @@ getChoreUnlocksIntervalMods game =
 
                     masteryLevel : Int
                     masteryLevel =
-                        (stats.getter game.choresData).mxp
-                            |> Counter.getValue
-                            |> IdleGame.XpFormulas.skillLevel
+                        Xp.level Xp.defaultSchedule (stats.getter game.choresData).mxp
 
                     timesToApplyMod =
                         if masteryLevel >= 99 then

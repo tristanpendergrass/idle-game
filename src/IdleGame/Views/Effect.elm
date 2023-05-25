@@ -11,6 +11,8 @@ import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
+import IdleGame.Xp as Xp exposing (Xp)
+import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
@@ -81,27 +83,25 @@ renderResource { base, doublingChance } kind =
         |> Icon.toHtml
 
 
-renderXp : Multiplicable -> IdleGame.Event.Skill -> Html msg
+renderXp : { base : Xp, multiplier : Float } -> IdleGame.Event.Skill -> Html msg
 renderXp xp skill =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.skillXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ xp
-                |> Multiplicable.toCounter
-                |> Counter.toString
+            [ Quantity.multiplyBy xp.multiplier xp.base
+                |> Xp.toString
                 |> text
             ]
         ]
 
 
-renderMxp : Multiplicable -> IdleGame.GameTypes.ChoreKind -> Html msg
+renderMxp : { base : Xp, multiplier : Float } -> IdleGame.GameTypes.ChoreKind -> Html msg
 renderMxp mxp skill =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ mxp
-                |> Multiplicable.toCounter
-                |> Counter.toString
+            [ Quantity.multiplyBy mxp.multiplier mxp.base
+                |> Xp.toString
                 |> text
             ]
         ]

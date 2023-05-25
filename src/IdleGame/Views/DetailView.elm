@@ -209,10 +209,10 @@ renderContent obj game =
         playButtonState =
             case obj of
                 DetailViewActivity _ ->
-                    Play
+                    Pause
 
                 DetailViewPreview _ ->
-                    Pause
+                    Play
     in
     div [ class "t-column w-full h-full p-3 relative gap-4" ]
         [ -- category of activity
@@ -240,8 +240,6 @@ renderContent obj game =
 
         -- Play/pause button
         , playPauseButton playButtonState kind
-
-        -- , Debug.todo "Play/pause button"
         , ChoresView.choreDuration (Game.getModdedDuration game kind)
         , div [ class "t-column" ]
             (List.map (EffectView.render mods) orderedEffects)

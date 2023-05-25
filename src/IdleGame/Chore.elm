@@ -1,9 +1,10 @@
 module IdleGame.Chore exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
+import IdleGame.Xp as Xp exposing (Xp)
+import Quantity exposing (Quantity)
 
 
 allKinds : List ChoreKind
@@ -21,7 +22,7 @@ allKinds =
 
 
 type alias State =
-    { mxp : Counter }
+    { mxp : Xp }
 
 
 type alias AllChoreStates =
@@ -47,7 +48,7 @@ type alias Stats =
 
 
 type alias ChoreOutcome =
-    { xp : Int
+    { xp : Xp
     , duration : Duration
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
@@ -55,13 +56,13 @@ type alias ChoreOutcome =
     }
 
 
-incrementChoreMxp : Counter -> ChoreKind -> AllChoreStates -> AllChoreStates
+incrementChoreMxp : Xp -> ChoreKind -> AllChoreStates -> AllChoreStates
 incrementChoreMxp amount kind choresData =
     let
         stats =
             getStats kind
     in
-    stats.setter (\choreData -> { choreData | mxp = Counter.add choreData.mxp amount }) choresData
+    stats.setter (\choreData -> { choreData | mxp = Quantity.plus choreData.mxp amount }) choresData
 
 
 cleanStablesStats : Stats
@@ -71,7 +72,7 @@ cleanStablesStats =
     , getter = .cleanStables
     , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
     , outcome =
-        { xp = 10
+        { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
         , extraResourceProbability = 0.25
         , extraResource = Resource.Manure
@@ -87,7 +88,7 @@ cleanBigBubbaStats =
     , getter = .cleanBigBubba
     , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
     , outcome =
-        { xp = 25
+        { xp = Xp.fromInt 25
         , duration = Duration.seconds 6
         , extraResourceProbability = 0.75
         , extraResource = Resource.Manure
@@ -103,7 +104,7 @@ sweepChimneysStats =
     , getter = .sweepChimneys
     , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
     , outcome =
-        { xp = 37
+        { xp = Xp.fromInt 37
         , duration = Duration.seconds 8
         , extraResourceProbability = 0.5
         , extraResource = Resource.Soot
@@ -119,7 +120,7 @@ waterGreenhousePlantsStats =
     , getter = .waterGreenhousePlants
     , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
     , outcome =
-        { xp = 12
+        { xp = Xp.fromInt 12
         , duration = Duration.seconds 2
         , extraResourceProbability = 0.6
         , extraResource = Resource.GreenhouseDirt
@@ -135,7 +136,7 @@ washAndIronRobesStats =
     , getter = .washRobes
     , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
     , outcome =
-        { xp = 50
+        { xp = Xp.fromInt 50
         , duration = Duration.seconds 8
         , extraResourceProbability = 0.2
         , extraResource = Resource.WashWater
@@ -151,7 +152,7 @@ organizePotionIngredientsStats =
     , getter = .organizePotionIngredients
     , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
     , outcome =
-        { xp = 165
+        { xp = Xp.fromInt 165
         , duration = Duration.seconds 20
         , extraResourceProbability = 0.1
         , extraResource = Resource.EmptyBottle
@@ -167,7 +168,7 @@ repairInstrumentsStats =
     , getter = .repairInstruments
     , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
     , outcome =
-        { xp = 75
+        { xp = Xp.fromInt 75
         , duration = Duration.seconds 12
         , extraResourceProbability = 0.25
         , extraResource = Resource.Scrap
@@ -183,7 +184,7 @@ flushDrainDemonsStats =
     , getter = .flushDrainDemons
     , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
     , outcome =
-        { xp = 90
+        { xp = Xp.fromInt 90
         , duration = Duration.seconds 10
         , extraResourceProbability = 0.5
         , extraResource = Resource.Ectoplasm
@@ -199,7 +200,7 @@ organizeSpellBooksStats =
     , getter = .organizeSpellBooks
     , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
     , outcome =
-        { xp = 210
+        { xp = Xp.fromInt 210
         , duration = Duration.seconds 20
         , extraResourceProbability = 0.1
         , extraResource = Resource.Parchment

@@ -17,6 +17,7 @@ import IdleGame.Views.Effect
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
+import IdleGame.Xp as Xp exposing (Xp)
 import IdleGame.XpFormulas
 import List.Extra
 import Percent exposing (Percent)
@@ -27,21 +28,15 @@ render : Game -> Html FrontendMsg
 render game =
     let
         skillLevel =
-            game.choresXp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevel
+            Xp.level Xp.defaultSchedule game.choresXp
                 |> Utils.intToString
 
         skillPercent =
-            game.choresXp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevelPercent
+            Xp.levelPercent Xp.defaultSchedule game.choresXp
                 |> (*) 100
 
         masteryPercent =
-            game.choresMxp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.masteryPoolPercent
+            Xp.levelPercent Xp.defaultSchedule game.choresMxp
                 |> Basics.min 100
 
         masteryPercentLabel =
@@ -52,7 +47,11 @@ render game =
             [ div [ class "t-column" ]
                 [ div [ class "w-full flex items-center justify-between" ]
                     [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
-                    , div [ class "text-2xs" ] [ text <| Counter.toString game.choresXp ]
+                    , div [ class "text-2xs" ]
+                        [ game.choresXp
+                            |> Xp.toString
+                            |> text
+                        ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
@@ -82,7 +81,7 @@ render game =
 
 
 type alias ChoreEffectsView =
-    { coin : Counter, skillXp : Counter, mxp : Counter, resource : Resource.Kind, probability : Float }
+    { coin : Counter, skillXp : Xp, mxp : Xp, resource : Resource.Kind, probability : Float }
 
 
 getChoreEffectsView : Game -> List Effect -> Maybe ChoreEffectsView
