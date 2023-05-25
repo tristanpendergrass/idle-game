@@ -159,15 +159,3 @@ getDurationStringParts millis =
 
                 else
                     []
-
-
-{-| This is a helper function to create a class that will make an element full width, plus some extra.
-Intended to be used to bust out of padding. Pass in the rem value of the amount to increase above 100% width.
--}
-fullWidthIncludingPadding : Float -> Attribute msg
-fullWidthIncludingPadding rem =
-    let
-        remString =
-            String.fromFloat rem
-    in
-    attribute "style" ("width: calc(100% + " ++ remString ++ " * 2); margin-left: -" ++ remString ++ "rem; margin-right: -" ++ remString ++ "rem;")

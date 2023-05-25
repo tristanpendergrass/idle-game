@@ -14,7 +14,7 @@ import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect
-import IdleGame.Views.Icon as Icon
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
 import IdleGame.XpFormulas
@@ -296,7 +296,9 @@ choreImage kind =
 
 choreTitle : ChoreKind -> Html FrontendMsg
 choreTitle kind =
-    h2 [ class "text-sm  md:text-lg text-center" ] [ text (Chore.getStats kind).title ]
+    h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
+        [ span [] [ text (Chore.getStats kind).title ]
+        ]
 
 
 choreDuration : Duration -> Html msg
@@ -426,85 +428,3 @@ renderLockedChore level =
 renderBottomRight : Html FrontendMsg
 renderBottomRight =
     button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
-
-
-
--- detailView : Game -> Html FrontendMsg
--- detailView game =
---     case game.activeChore of
---         Nothing ->
---             detailViewNoSelection
---         Just ( kind, timer ) ->
---             let
---                 event : Event
---                 event =
---                     Game.completeChoreEvent kind
---                 mods : List Mod
---                 mods =
---                     Game.getAllMods game
---                 moddedEvent : ModdedEvent
---                 moddedEvent =
---                     IdleGame.Event.applyMods mods event
---                 effects : List Effect
---                 effects =
---                     IdleGame.Event.getEffectsModded moddedEvent
---                 maybeChoreEffectsView : Maybe ChoreEffectsView
---                 maybeChoreEffectsView =
---                     getChoreEffectsView game effects
---             in
---             case maybeChoreEffectsView of
---                 Just choreEffectsView ->
---                     detailViewSelection game kind choreEffectsView timer
---                 Nothing ->
---                     detailViewNoSelection
-
-
-detailView : Game -> Html FrontendMsg
-detailView game =
-    case game.activity of
-        Nothing ->
-            div [ class "t-column w-full h-full p-2" ] []
-
-        Just (ActivityChore kind timer) ->
-            let
-                event : Event
-                event =
-                    Game.completeChoreEvent game kind
-
-                mods : List Mod
-                mods =
-                    Game.getAllMods game
-            in
-            detailViewSelection game kind mods event timer
-
-
-detailViewNoSelection : Html FrontendMsg
-detailViewNoSelection =
-    div [ class "t-column w-full h-full p-2" ]
-        []
-
-
-detailViewSelection : Game -> ChoreKind -> List Mod -> Event -> Timer -> Html FrontendMsg
-detailViewSelection game kind mods event timer =
-    let
-        effects : List Effect
-        effects =
-            IdleGame.Event.getEffects event
-
-        orderedEffects : List Effect
-        orderedEffects =
-            List.sortWith orderEffects effects
-    in
-    div [ class "t-column w-full h-full p-2 relative" ]
-        [ div [ class "text-sm uppercase" ] [ text "Chores" ]
-        , button [ class "btn btn-primary" ] [ text "Start" ]
-        , div
-            [ class "h-64 relative max-w-none"
-            , Utils.fullWidthIncludingPadding 0.5
-            ]
-            [ choreImage kind ]
-        , choreTitle kind
-        , choreDuration (Game.getModdedDuration game kind)
-        , div [ class "t-column" ]
-            (List.map (IdleGame.Views.Effect.render mods) orderedEffects)
-        ]

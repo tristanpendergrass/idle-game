@@ -309,3 +309,13 @@ dropdown =
 chevronDown : Icon
 chevronDown =
     createIconFeather FeatherIcons.chevronDown
+
+
+play : Icon
+play =
+    createIconFeather FeatherIcons.play
+
+
+pause : Icon
+pause =
+    createIconFeather FeatherIcons.pause

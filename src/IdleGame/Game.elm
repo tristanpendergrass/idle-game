@@ -83,6 +83,23 @@ choreUnlockRequirements =
     ]
 
 
+choreIsUnlocked : Game -> ChoreKind -> Bool
+choreIsUnlocked game kind =
+    let
+        skillLevel =
+            game.choresXp
+                |> Counter.getValue
+                |> IdleGame.XpFormulas.skillLevel
+
+        requiredLevel =
+            choreUnlockRequirements
+                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
+                |> List.map Tuple.first
+                |> List.member kind
+    in
+    requiredLevel
+
+
 getChoreListItems : Game -> List ChoresListItem
 getChoreListItems { choresXp } =
     let
@@ -157,7 +174,12 @@ toggleActiveChore toggleType game =
                 Nothing ->
                     Just (ActivityChore toggleType Timer.create)
     in
-    setActivity newActivity game
+    -- TODO : Write reusable module that tracks xp and unlocks and use it here
+    if choreIsUnlocked game toggleType then
+        setActivity newActivity game
+
+    else
+        game
 
 
 setActivity : Maybe Activity -> Game -> Game

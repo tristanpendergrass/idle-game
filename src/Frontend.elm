@@ -72,7 +72,7 @@ init _ key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
-      , detailViewExpanded = False
+      , detailViewExpanded = Config.flags.defaultDetailViewExpanded
       , preview = Nothing
       }
     , Cmd.none

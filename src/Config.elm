@@ -16,6 +16,7 @@ type alias Flags =
     , showTimePasses : Bool
     , showDebugPanel : Bool
     , defaultTab : Tab
+    , defaultDetailViewExpanded : Bool
     }
 
 
@@ -36,6 +37,7 @@ devFlags =
     , showTimePasses = False
     , showDebugPanel = True
     , defaultTab = Tab.Chores
+    , defaultDetailViewExpanded = True
     }
 
 
@@ -46,4 +48,5 @@ prodFlags =
     , showTimePasses = True
     , showDebugPanel = False
     , defaultTab = Tab.Chores
+    , defaultDetailViewExpanded = False
     }
