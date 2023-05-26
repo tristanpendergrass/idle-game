@@ -15,6 +15,7 @@ import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import List.Extra
 import Maybe.Extra
+import Percent exposing (Percent)
 import Quantity
 import Random exposing (Generator)
 import Tuple
@@ -678,6 +679,7 @@ getChoreMasteryPoolMods game =
     let
         mxpPercent =
             Xp.levelPercent Xp.defaultSchedule game.choresMxp
+                |> Percent.toPercentage
 
         checkpoints =
             choreMasteryPoolCheckpoints

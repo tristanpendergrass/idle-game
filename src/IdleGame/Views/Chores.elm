@@ -18,9 +18,9 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
-import IdleGame.XpFormulas
 import List.Extra
 import Percent exposing (Percent)
+import Quantity
 import Types exposing (..)
 
 
@@ -31,16 +31,21 @@ render game =
             Xp.level Xp.defaultSchedule game.choresXp
                 |> Utils.intToString
 
+        skillPercent : Percent
         skillPercent =
             Xp.levelPercent Xp.defaultSchedule game.choresXp
-                |> (*) 100
 
+        masteryPercent : Percent
         masteryPercent =
             Xp.levelPercent Xp.defaultSchedule game.choresMxp
-                |> Basics.min 100
+                |> Percent.capAtHundred
 
+        masteryPercentLabel : String
         masteryPercentLabel =
-            Utils.intToString (floor masteryPercent)
+            masteryPercent
+                |> Percent.toPercentage
+                |> floor
+                |> Utils.intToString
     in
     div [ class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
@@ -57,16 +62,19 @@ render game =
                     [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
                         [ text skillLevel ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat skillPercent ++ "%") ] []
+                        [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat skillPercent) ++ "%") ] []
                         ]
                     ]
                 , div [ class "w-full flex items-center justify-between" ]
                     [ div [ class "text-2xs font-bold" ] [ text "Mastery Pool" ]
-                    , div [ class "text-2xs flex gap-1" ] [ span [] [ text <| Counter.toString game.choresMxp ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
+                    , div [ class "text-2xs flex gap-1" ]
+                        [ span [] [ text <| Xp.toString game.choresMxp ++ " / 4,500,000" ]
+                        , span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ]
+                        ]
                     ]
                 , div [ class "w-full flex items-center gap-2" ]
                     [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat masteryPercent ++ "%") ] []
+                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat masteryPercent) ++ "%") ] []
                         ]
                     ]
                 , div [ class "w-full flex justify-end" ]
@@ -91,9 +99,11 @@ getChoreEffectsView game effects =
         coin =
             List.Extra.findMap getChoreCoin effects
 
+        xp : Maybe Xp
         xp =
             List.Extra.findMap getChoreXp effects
 
+        mxp : Maybe Xp
         mxp =
             List.Extra.findMap (getChoreMxp game) effects
 
@@ -106,41 +116,30 @@ getChoreEffectsView game effects =
     Maybe.map5 ChoreEffectsView coin xp mxp resource probability
 
 
-getChoreXp : Effect -> Maybe Counter
+getChoreXp : Effect -> Maybe Xp
 getChoreXp effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainXp quantity ChoresSkill ->
-            Just (Multiplicable.toCounter quantity)
+        GainXp amount ChoresSkill ->
+            Just (Quantity.multiplyBy amount.multiplier amount.base)
 
         _ ->
             Nothing
 
 
-getChoreMxp : Game -> Effect -> Maybe Counter
+getChoreMxp : Game -> Effect -> Maybe Xp
 getChoreMxp game effect =
-    -- -- Important! Keep the application here in sync with Views.Chores.elm
-    -- let
-    --     mxp =
-    --         Multiplicable.toCounter quantity
-    --     masteryPoolXp =
-    --         Multiplicable.toCounter quantity
-    --             |> Counter.multiplyBy 0.5
-    -- in
-    -- game
-    --     |> addMxp kind mxp
-    --     |> addMasteryPoolXp masteryPoolXp
-    --     |> (\newGame -> Random.constant ( newGame, [] ))
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainChoreMxp quantity kind ->
+        GainChoreMxp amount kind ->
             let
+                mxp : Xp
                 mxp =
-                    Multiplicable.toCounter quantity
+                    Quantity.multiplyBy amount.multiplier amount.base
 
+                masteryPoolXp : Xp
                 masteryPoolXp =
-                    Multiplicable.toCounter quantity
-                        |> Counter.multiplyBy 0.5
+                    Quantity.multiplyBy 0.5 mxp
             in
             Just mxp
 
@@ -274,9 +273,9 @@ type alias ChoreItemView =
     , coin : Counter
     , extraResourceProbability : Float
     , extraResource : Resource.Kind
-    , skillXp : Counter
-    , mxp : Counter
-    , mxpCurrentValue : Counter
+    , skillXp : Xp
+    , mxp : Xp
+    , mxpCurrentValue : Xp
     }
 
 
@@ -331,25 +330,29 @@ renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extr
                 , child
                 ]
 
+        renderXp : Html FrontendMsg
         renderXp =
             div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                 [ Utils.skillXpBadge
-                , span [ class "font-bold col-span-4" ] [ text (Counter.toString skillXp) ]
+                , span [ class "font-bold col-span-4" ]
+                    [ text <| Xp.toString skillXp
+                    ]
                 , Utils.masteryXpBadge
-                , span [ class "font-bold col-span-4" ] [ text (Counter.toString mxp) ]
+                , span [ class "font-bold col-span-4" ]
+                    [ text <| Xp.toString mxp ]
                 ]
 
+        masteryLevel : String
         masteryLevel =
             mxpCurrentValue
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevel
+                |> Xp.level Xp.defaultSchedule
                 |> Utils.intToString
 
+        masteryPercent : Float
         masteryPercent =
             mxpCurrentValue
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.skillLevelPercent
-                |> (*) 100
+                |> Xp.levelPercent Xp.defaultSchedule
+                |> Percent.toPercentage
     in
     div
         [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
@@ -373,7 +376,8 @@ renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extr
                 -- Chore XP rewards
                 , renderXp
                 , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ] [ text <| masteryLevel ]
+                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ]
+                        [ text <| masteryLevel ]
                     , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
                         [ div
                             [ class "bg-secondary h-1.5 rounded-full"

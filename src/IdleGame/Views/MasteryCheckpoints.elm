@@ -7,14 +7,21 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event as Event
 import IdleGame.Game
 import IdleGame.Views.ModalWrapper
-import IdleGame.Views.Utils
-import IdleGame.XpFormulas
+import IdleGame.Views.Utils as Utils
+import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
+import Quantity exposing (Quantity)
 import Round
 import Types exposing (..)
 
 
-renderCheckpoint : { number : Int, label : Event.ModLabel, isActive : Bool } -> Html FrontendMsg
-renderCheckpoint { number, label, isActive } =
+masteryPoolPercent : Xp -> Percent
+masteryPoolPercent amount =
+    Percent.fromFloat (toFloat (Xp.toInt amount) / 4500000)
+
+
+renderCheckpoint : { percent : Percent, label : Event.ModLabel, isActive : Bool } -> Html FrontendMsg
+renderCheckpoint { percent, label, isActive } =
     div
         [ class "flex w-full items-center gap-4 p-2"
         ]
@@ -27,39 +34,58 @@ renderCheckpoint { number, label, isActive } =
                 else
                     ""
             ]
-            [ text <| IdleGame.Views.Utils.intToString number ++ "%" ]
+            [ text <| Utils.floatToString 0 (Percent.toPercentage percent) ++ "%" ]
         , div [ class "flex-grow text-success" ] [ text <| Event.modLabelToString label ]
         ]
 
 
-render : { mxp : Counter, checkpoints : IdleGame.Game.MasteryPoolCheckpoints } -> Html FrontendMsg
-render { mxp, checkpoints } =
+render : { poolXp : Xp, checkpoints : IdleGame.Game.MasteryPoolCheckpoints } -> Html FrontendMsg
+render { poolXp, checkpoints } =
     let
-        masteryPercent =
-            mxp
-                |> Counter.getValue
-                |> IdleGame.XpFormulas.masteryPoolPercent
+        poolPercent : Percent
+        poolPercent =
+            poolXp
+                |> masteryPoolPercent
 
-        masteryPercentLabel =
-            Round.round 2 masteryPercent
+        poolPercentLabel : String
+        poolPercentLabel =
+            poolPercent
+                |> Percent.toPercentage
+                |> Utils.floatToString 2
     in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-lg font-bold" ] [ text "Mastery Pool Checkpoints" ]
         , div [ class "t-column" ]
             [ div [ class "w-full flex items-center justify-end" ]
-                [ div [ class "text-2xs flex gap-1" ] [ span [] [ text <| Counter.toString mxp ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ] ]
+                [ div [ class "text-2xs flex gap-1" ] [ span [] [ text <| Xp.toString poolXp ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ poolPercentLabel ++ "%)" ] ]
                 ]
             , div [ class "w-full flex items-center gap-2" ]
                 [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                    [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat masteryPercent ++ "%") ] []
+                    [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat poolPercent) ++ "%") ] []
                     ]
                 ]
             ]
         , div [ class "t-column" ]
-            [ renderCheckpoint { number = 10, label = checkpoints.ten.label, isActive = masteryPercent >= 10.0 }
-            , renderCheckpoint { number = 25, label = checkpoints.twentyFive.label, isActive = masteryPercent >= 25.0 }
-            , renderCheckpoint { number = 50, label = checkpoints.fifty.label, isActive = masteryPercent >= 50.0 }
-            , renderCheckpoint { number = 95, label = checkpoints.ninetyFive.label, isActive = masteryPercent >= 95.0 }
+            [ renderCheckpoint
+                { percent = Percent.fromFloat 0.1
+                , label = checkpoints.ten.label
+                , isActive = Quantity.greaterThan (Percent.fromFloat 0.1) poolPercent
+                }
+            , renderCheckpoint
+                { percent = Percent.fromFloat 0.25
+                , label = checkpoints.twentyFive.label
+                , isActive = Quantity.greaterThan (Percent.fromFloat 0.25) poolPercent
+                }
+            , renderCheckpoint
+                { percent = Percent.fromFloat 0.5
+                , label = checkpoints.fifty.label
+                , isActive = Quantity.greaterThan (Percent.fromFloat 0.5) poolPercent
+                }
+            , renderCheckpoint
+                { percent = Percent.fromFloat 0.95
+                , label = checkpoints.ninetyFive.label
+                , isActive = Quantity.greaterThan (Percent.fromFloat 0.95) poolPercent
+                }
             ]
         , IdleGame.Views.ModalWrapper.renderCloseButton
         ]

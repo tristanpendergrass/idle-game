@@ -9,17 +9,17 @@ import IdleGame.Game exposing (Game)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
-import IdleGame.XpFormulas as XpFormulas
+import IdleGame.Xp as Xp exposing (Xp)
 import Types exposing (..)
 
 
 render : Game -> Html FrontendMsg
 render game =
     let
+        choresSkillLevel : Int
         choresSkillLevel =
             game.choresXp
-                |> Counter.getValue
-                |> XpFormulas.skillLevel
+                |> Xp.level Xp.defaultSchedule
 
         ownedLabel =
             div [ class "flex-0 px-2 py-1 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]

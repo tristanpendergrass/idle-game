@@ -7,7 +7,6 @@ import Html.Events exposing (..)
 import IdleGame.Game
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils
-import IdleGame.XpFormulas
 import Json.Decode
 import Round
 import Types exposing (..)

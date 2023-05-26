@@ -2,6 +2,7 @@ module IdleGame.Xp exposing (..)
 
 import Array exposing (Array)
 import IdleGame.Views.Utils
+import Percent exposing (Percent)
 import Quantity exposing (Quantity(..))
 
 
@@ -61,9 +62,10 @@ levelHelp schedule xp prevLevel =
             prevLevel
 
 
-levelPercent : LevelingSchedule -> Xp -> Float
+levelPercent : LevelingSchedule -> Xp -> Percent
 levelPercent schedule xp =
     levelPercentHelp schedule xp 0
+        |> Percent.fromFloat
 
 
 levelPercentHelp : LevelingSchedule -> Xp -> Int -> Float

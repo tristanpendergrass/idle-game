@@ -10,8 +10,9 @@ import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils
-import IdleGame.XpFormulas as XpFormulas
+import IdleGame.Xp as Xp exposing (Xp)
 import Maybe.Extra
+import Quantity exposing (Quantity)
 import Time exposing (Posix)
 import Types exposing (..)
 
@@ -92,24 +93,22 @@ render timePassed timePassesData =
                         |> List.map
                             (\{ title, originalXp, currentXp } ->
                                 let
-                                    difference : Counter
+                                    difference : Xp
                                     difference =
-                                        Counter.subtract currentXp originalXp
+                                        Quantity.minus originalXp currentXp
 
                                     originalLevel : Int
                                     originalLevel =
                                         originalXp
-                                            |> Counter.getValue
-                                            |> XpFormulas.skillLevel
+                                            |> Xp.level Xp.defaultSchedule
 
                                     currentLevel : Int
                                     currentLevel =
                                         currentXp
-                                            |> Counter.getValue
-                                            |> XpFormulas.skillLevel
+                                            |> Xp.level Xp.defaultSchedule
                                 in
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-success" ] [ text <| Counter.toString difference ]
+                                    [ span [ class "text-success" ] [ text <| Xp.toString difference ]
                                     , span [] [ text title ]
                                     , IdleGame.Views.Utils.skillXpBadge
                                     , if originalLevel /= currentLevel then

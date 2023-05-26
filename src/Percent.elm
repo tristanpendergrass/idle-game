@@ -24,3 +24,8 @@ toFloat (Quantity p) =
 toPercentage : Percent -> Float
 toPercentage (Quantity p) =
     p * 100
+
+
+capAtHundred : Percent -> Percent
+capAtHundred (Quantity p) =
+    Quantity (min 100 p)

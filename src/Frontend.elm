@@ -623,7 +623,7 @@ renderModal activeModal game =
         Just ChoreMasteryCheckpointsModal ->
             let
                 children =
-                    IdleGame.Views.MasteryCheckpoints.render { mxp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
+                    IdleGame.Views.MasteryCheckpoints.render { poolXp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
