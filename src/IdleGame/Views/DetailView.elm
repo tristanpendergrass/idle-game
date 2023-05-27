@@ -151,19 +151,8 @@ renderStatusBar game activity =
 renderContentWrapper : Game -> Maybe Preview -> Bool -> Html FrontendMsg
 renderContentWrapper game maybePreview detailViewExpanded =
     case ( game.activity, maybePreview ) of
-        -- case ( game.activity, maybePreview ) of
-        -- ( Nothing, Nothing ) ->
-        --     Collapsed
-        -- ( _, Just _ ) ->
-        --     Expanded
-        -- -- Note that we're ignoring detailViewExpanded here. That's just for the real activity not the preview
-        -- ( Just _, Nothing ) ->
-        --     if detailViewExpanded then
-        --         Expanded
-        --     else
-        --         StatusBar
         ( Nothing, Nothing ) ->
-            div [ class "t-column w-full h-full p-2" ] []
+            div [] []
 
         ( _, Just preview ) ->
             renderContent (DetailViewPreview preview) game
@@ -236,7 +225,7 @@ renderContent obj game =
                 activityProgress timer
 
             _ ->
-                div [] []
+                div [ class "h-1" ] []
 
         -- Play/pause button
         , playPauseButton playButtonState kind
@@ -278,11 +267,20 @@ playPauseButton state kind =
 
                 Pause ->
                     Icon.pause
+
+        handleClick : FrontendMsg
+        handleClick =
+            case state of
+                Play ->
+                    HandlePlayClick kind
+
+                Pause ->
+                    HandlePauseClick kind
     in
     button
         [ class "btn btn-circle btn-icon"
         , classList [ ( "pl-[0.3rem]", state == Play ) ]
-        , onClick <| ToggleActiveChore kind
+        , onClick handleClick
         ]
         [ icon
             |> Icon.toHtml

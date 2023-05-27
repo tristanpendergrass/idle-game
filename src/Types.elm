@@ -101,6 +101,8 @@ type FrontendMsg
     | HandleMonsterSelect Adventuring.MonsterKind
       -- Chores
     | ToggleActiveChore ChoreKind
+    | HandlePlayClick ChoreKind
+    | HandlePauseClick ChoreKind
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel

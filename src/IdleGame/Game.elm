@@ -156,27 +156,36 @@ type alias ActivityStatus =
 
 
 toggleActiveChore : ChoreKind -> Game -> Game
-toggleActiveChore toggleType game =
+toggleActiveChore kind game =
     let
         newActivity : Maybe Activity
         newActivity =
             case game.activity of
-                Just (ActivityChore kind _) ->
-                    if kind == toggleType then
+                Just (ActivityChore k _) ->
+                    if kind == k then
                         Nothing
 
                     else
-                        Just (ActivityChore toggleType Timer.create)
+                        Just (ActivityChore kind Timer.create)
 
                 Nothing ->
-                    Just (ActivityChore toggleType Timer.create)
+                    Just (ActivityChore kind Timer.create)
     in
-    -- TODO : Write reusable module that tracks xp and unlocks and use it here
-    if choreIsUnlocked game toggleType then
+    if choreIsUnlocked game kind then
         setActivity newActivity game
 
     else
         game
+
+
+choreIsActive : ChoreKind -> Game -> Bool
+choreIsActive kind game =
+    case game.activity of
+        Just (ActivityChore k _) ->
+            kind == k
+
+        Nothing ->
+            False
 
 
 setActivity : Maybe Activity -> Game -> Game

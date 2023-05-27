@@ -12,7 +12,7 @@ import Html.Events exposing (..)
 import Html.Extra exposing (..)
 import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -119,7 +119,7 @@ createTimePassesModal oldSnap newSnap =
         timePassed =
             Snapshot.getTimeDifference oldSnap newSnap
     in
-    IdleGame.Game.getTimePassesData oldGame newGame
+    Game.getTimePassesData oldGame newGame
         |> Maybe.map (TimePassesModal timePassed)
 
 
@@ -178,7 +178,7 @@ standardTick =
         (\duration ( oldGame, oldToasts ) ->
             let
                 ( newGame, newToasts ) =
-                    IdleGame.Game.tick duration oldGame
+                    Game.tick duration oldGame
             in
             ( newGame, oldToasts ++ newToasts )
         )
@@ -198,7 +198,36 @@ This tick also discards the notifications of Game.tick.
 performantTick : Snapshot.Tick Game
 performantTick =
     Snapshot.createTick (Duration.seconds 2)
-        (\duration oldGame -> IdleGame.Game.tick duration oldGame |> Tuple.first)
+        (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
+
+
+playChore : ChoreKind -> FrontendModel -> FrontendModel
+playChore kind =
+    mapGame
+        (\game ->
+            if Game.choreIsActive kind game then
+                game
+
+            else
+                Game.toggleActiveChore kind game
+        )
+
+
+pauseChore : ChoreKind -> FrontendModel -> FrontendModel
+pauseChore kind =
+    mapGame
+        (\game ->
+            if Game.choreIsActive kind game then
+                Game.toggleActiveChore kind game
+
+            else
+                game
+        )
+
+
+setPreview : Maybe Preview -> FrontendModel -> FrontendModel
+setPreview maybePreview model =
+    { model | preview = maybePreview }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -308,19 +337,19 @@ update msg model =
 
         StartFight ->
             ( model
-                |> mapGame IdleGame.Game.startFight
+                |> mapGame Game.startFight
             , Cmd.none
             )
 
         StopFight ->
             ( model
-                |> mapGame IdleGame.Game.stopFight
+                |> mapGame Game.stopFight
             , Cmd.none
             )
 
         HandlePlayerMoveSelect index playerMove ->
             ( model
-                |> mapGame (IdleGame.Game.setPlayerMove index playerMove)
+                |> mapGame (Game.setPlayerMove index playerMove)
             , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
                 |> Task.attempt (\_ -> NoOp)
             )
@@ -331,7 +360,7 @@ update msg model =
                     case model.gameState of
                         Playing snapshot ->
                             snapshot
-                                |> Snapshot.map (IdleGame.Game.setMonster monster)
+                                |> Snapshot.map (Game.setMonster monster)
                                 |> Playing
 
                         _ ->
@@ -343,7 +372,21 @@ update msg model =
 
         ToggleActiveChore toggleId ->
             ( model
-                |> mapGame (IdleGame.Game.toggleActiveChore toggleId)
+                |> mapGame (Game.toggleActiveChore toggleId)
+            , Cmd.none
+            )
+
+        HandlePlayClick kind ->
+            ( model
+                |> playChore kind
+                |> setPreview Nothing
+            , Cmd.none
+            )
+
+        HandlePauseClick kind ->
+            ( model
+                |> pauseChore kind
+                |> setPreview (Just (PreviewChore kind))
             , Cmd.none
             )
 
@@ -623,7 +666,7 @@ renderModal activeModal game =
         Just ChoreMasteryCheckpointsModal ->
             let
                 children =
-                    IdleGame.Views.MasteryCheckpoints.render { poolXp = game.choresMxp, checkpoints = IdleGame.Game.choreMasteryPoolCheckpoints }
+                    IdleGame.Views.MasteryCheckpoints.render { poolXp = game.choresMxp, checkpoints = Game.choreMasteryPoolCheckpoints }
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
