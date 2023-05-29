@@ -237,7 +237,7 @@ renderChoreListItem game item =
                     renderChore
                         { kind = kind
                         , title = stats.title
-                        , handleClick = ToggleActiveChore kind
+                        , handleClick = HandleChoreClick kind
                         , maybeTimer = maybeTimer
                         , duration = moddedDuration
                         , imgSrc = stats.imgSrc

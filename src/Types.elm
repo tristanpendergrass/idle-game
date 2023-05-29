@@ -61,7 +61,7 @@ type alias FrontendModel =
     , saveGameTimer : Timer
     , gameState : FrontendGameState
     , preview : Maybe Preview -- Thing we're previewing in the detail view
-    , detailViewExpanded : Bool -- If the activity in game exists and preview does not exist this Bool is used to show or hide the detail view in mobile/tablet screen size
+    , activityExpanded : Bool -- If the activity in game exists and preview does not exist this Bool is used to show or hide the detail view in mobile/tablet screen size
     }
 
 
@@ -100,6 +100,7 @@ type FrontendMsg
     | HandlePlayerMoveSelect Int Adventuring.PlayerMove
     | HandleMonsterSelect Adventuring.MonsterKind
       -- Chores
+    | HandleChoreClick ChoreKind
     | ToggleActiveChore ChoreKind
     | HandlePlayClick ChoreKind
     | HandlePauseClick ChoreKind

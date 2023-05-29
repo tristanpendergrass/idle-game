@@ -17,17 +17,22 @@ import Types exposing (..)
 
 
 render : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-render game maybePreview detailViewExpanded =
+render game maybePreview activityExpanded =
     div [ class "bg-base-300" ]
         [ -- Right rail version for full size screen
           div [ class "hidden xl:block h-full" ]
-            [ div [ class "w-[20rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
-                [ renderContentWrapper game maybePreview detailViewExpanded ]
-            ]
+            [ renderFullscreen game maybePreview activityExpanded ]
 
         -- Collapsible version for mobile
         , div [ class "xl:hidden" ]
-            [ renderCollapsible game maybePreview detailViewExpanded ]
+            [ renderCollapsible game maybePreview activityExpanded ]
+        ]
+
+
+renderFullscreen : Game -> Maybe Preview -> Bool -> Html FrontendMsg
+renderFullscreen game maybePreview activityExpanded =
+    div [ class "w-[375px] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
+        [ renderContentWrapper game maybePreview activityExpanded
         ]
 
 
@@ -42,7 +47,7 @@ It will display either a full screen detail view or be collapsed. In its collaps
 status bar or not depending on the state of the game.
 -}
 renderCollapsible : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-renderCollapsible game maybePreview detailViewExpanded =
+renderCollapsible game maybePreview activityExpanded =
     let
         height : CollapsibleHeight
         height =
@@ -53,16 +58,16 @@ renderCollapsible game maybePreview detailViewExpanded =
                 ( _, Just _ ) ->
                     Expanded
 
-                -- Note that we're ignoring detailViewExpanded here. That's just for the real activity not the preview
+                -- Note that we're ignoring activityExpanded here. That's just for the real activity not the preview
                 ( Just _, Nothing ) ->
-                    if detailViewExpanded then
+                    if activityExpanded then
                         Expanded
 
                     else
                         StatusBar
     in
     div
-        [ class "fixed right-0 w-screen h-screen bg-base-300 lg:w-[calc(100vw-20rem)]"
+        [ class "fixed right-0 w-screen h-screen bg-base-300"
         , class "transition-[top] duration-100 ease-in motion-reduce:transition-none"
         , IdleGame.Views.Utils.zIndexes.detailViewMobile
         , case height of
@@ -79,7 +84,7 @@ renderCollapsible game maybePreview detailViewExpanded =
             [ class "w-full h-full"
             , classList [ ( "hidden", height /= Expanded ) ]
             ]
-            [ renderContentWrapper game maybePreview detailViewExpanded
+            [ renderContentWrapper game maybePreview activityExpanded
             ]
         , div
             [ class "absolute top-0 left-0 ml-3 mt-3"
@@ -93,9 +98,9 @@ renderCollapsible game maybePreview detailViewExpanded =
             Just activity ->
                 div
                     [ class "absolute top-0 left-0 w-full"
-                    , classList [ ( "hidden", detailViewExpanded ) ]
+                    , classList [ ( "hidden", height /= StatusBar ) ]
                     ]
-                    [ renderStatusBar game activity ]
+                    [ renderStatusBar activity ]
         ]
 
 
@@ -110,8 +115,8 @@ collapseButton =
         ]
 
 
-renderStatusBar : Game -> Activity -> Html FrontendMsg
-renderStatusBar game activity =
+renderStatusBar : Activity -> Html FrontendMsg
+renderStatusBar activity =
     let
         stats : Chore.Stats
         stats =
@@ -149,10 +154,10 @@ renderStatusBar game activity =
 
 
 renderContentWrapper : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-renderContentWrapper game maybePreview detailViewExpanded =
+renderContentWrapper game maybePreview activityExpanded =
     case ( game.activity, maybePreview ) of
         ( Nothing, Nothing ) ->
-            div [] []
+            div [ class "t-column w-full h-full p-2" ] []
 
         ( _, Just preview ) ->
             renderContent (DetailViewPreview preview) game

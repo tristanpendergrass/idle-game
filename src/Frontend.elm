@@ -24,6 +24,7 @@ import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
 import IdleGame.Views.DetailView
+import IdleGame.Views.DetailView2
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -72,7 +73,7 @@ init _ key =
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
-      , detailViewExpanded = Config.flags.defaultDetailViewExpanded
+      , activityExpanded = Config.flags.defaultDetailViewExpanded
       , preview = Nothing
       }
     , Cmd.none
@@ -265,10 +266,10 @@ update msg model =
             )
 
         CollapseDetailView ->
-            ( { model | detailViewExpanded = False }, Cmd.none )
+            ( { model | activityExpanded = False }, Cmd.none )
 
         ExpandDetailView ->
-            ( { model | detailViewExpanded = True }, Cmd.none )
+            ( { model | activityExpanded = True }, Cmd.none )
 
         CloseDebugPanel ->
             ( { model | showDebugPanel = False }, Cmd.none )
@@ -368,6 +369,13 @@ update msg model =
               }
             , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
                 |> Task.attempt (\_ -> NoOp)
+            )
+
+        HandleChoreClick kind ->
+            ( model
+                |> pauseChore kind
+                |> setPreview (Just (PreviewChore kind))
+            , Cmd.none
             )
 
         ToggleActiveChore toggleId ->
@@ -744,6 +752,37 @@ view model =
                 let
                     game =
                         Snapshot.getValue snapshot
+
+                    detailViewState : IdleGame.Views.DetailView2.State Activity Preview
+                    detailViewState =
+                        case ( game.activity, model.preview ) of
+                            ( Nothing, Nothing ) ->
+                                IdleGame.Views.DetailView2.Blank
+
+                            ( Just activity, Nothing ) ->
+                                if model.activityExpanded then
+                                    IdleGame.Views.DetailView2.ActivityExpanded activity
+
+                                else
+                                    IdleGame.Views.DetailView2.ActivityCollapsed activity
+
+                            ( Nothing, Just preview ) ->
+                                IdleGame.Views.DetailView2.Preview preview
+
+                            ( Just activity, Just preview ) ->
+                                IdleGame.Views.DetailView2.PreviewWithActivity preview activity
+
+                    renderActivity : Activity -> Html FrontendMsg
+                    renderActivity activity =
+                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) game
+
+                    renderPreview : Preview -> Html FrontendMsg
+                    renderPreview preview =
+                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewPreview preview) game
+
+                    renderStatusBar : Activity -> Html FrontendMsg
+                    renderStatusBar activity =
+                        IdleGame.Views.DetailView.renderStatusBar activity
                 in
                 div [ class "flex h-screen relative" ]
                     [ Toast.render viewToast model.tray toastConfig
@@ -759,8 +798,15 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
-                    , IdleGame.Views.DetailView.render game model.preview model.detailViewExpanded
+                    , IdleGame.Views.DetailView2.render
+                        { state = detailViewState
+                        , renderActivity = renderActivity
+                        , renderPreview = renderPreview
+                        , renderStatusBar = renderStatusBar
+                        , onCollapse = CollapseDetailView
+                        }
 
+                    -- , IdleGame.Views.DetailView.render game model.preview model.activityExpanded
                     -- , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
                     --     [ IdleGame.Views.Chores.detailView game ]
                     , renderModal model.activeModal game
