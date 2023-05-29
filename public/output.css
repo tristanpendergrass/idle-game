@@ -3767,6 +3767,10 @@ body[dir="rtl"] .checkbox:checked,
   margin-left: 50%;
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .visible {
   visibility: visible;
 }
@@ -4364,6 +4368,10 @@ body[dir="rtl"] .checkbox:checked,
   --tw-bg-opacity: 0.4;
 }
 
+.bg-opacity-50 {
+  --tw-bg-opacity: 0.5;
+}
+
 .bg-opacity-90 {
   --tw-bg-opacity: 0.9;
 }
@@ -4566,6 +4574,10 @@ body[dir="rtl"] .checkbox:checked,
   text-decoration-line: underline;
 }
 
+.opacity-0 {
+  opacity: 0;
+}
+
 .opacity-20 {
   opacity: 0.2;
 }
@@ -4624,6 +4636,12 @@ body[dir="rtl"] .checkbox:checked,
   transition-duration: 150ms;
 }
 
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .duration-100 {
   transition-duration: 100ms;
 }
@@ -4634,6 +4652,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .ease-in {
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .t-absolute-center-x {

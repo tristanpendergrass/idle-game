@@ -84,6 +84,26 @@ init _ key =
 -- Update
 
 
+getDetailViewState : Maybe Activity -> Maybe Preview -> Bool -> IdleGame.Views.DetailView2.State Activity Preview
+getDetailViewState maybeActivity maybePreview activityExpanded =
+    case ( maybeActivity, maybePreview ) of
+        ( Nothing, Nothing ) ->
+            IdleGame.Views.DetailView2.Blank
+
+        ( Just activity, Nothing ) ->
+            if activityExpanded then
+                IdleGame.Views.DetailView2.ActivityExpanded activity
+
+            else
+                IdleGame.Views.DetailView2.ActivityCollapsed activity
+
+        ( Nothing, Just preview ) ->
+            IdleGame.Views.DetailView2.Preview preview
+
+        ( Just activity, Just preview ) ->
+            IdleGame.Views.DetailView2.PreviewWithActivity preview activity
+
+
 setIsVisible : Bool -> FrontendModel -> FrontendModel
 setIsVisible isVisible model =
     { model | isVisible = isVisible }
@@ -231,6 +251,11 @@ setPreview maybePreview model =
     { model | preview = maybePreview }
 
 
+setActivityExpanded : Bool -> FrontendModel -> FrontendModel
+setActivityExpanded activityExpanded model =
+    { model | activityExpanded = activityExpanded }
+
+
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
     let
@@ -263,6 +288,24 @@ update msg model =
             , Process.sleep 100
                 |> Task.andThen (\_ -> Browser.Dom.focus DebugPanel.panelId)
                 |> Task.attempt (\_ -> NoOp)
+            )
+
+        ClosePreview ->
+            ( model
+                |> setPreview Nothing
+            , Cmd.none
+            )
+
+        CollapseActivity ->
+            ( model
+                |> setActivityExpanded False
+            , Cmd.none
+            )
+
+        ExpandActivity ->
+            ( model
+                |> setActivityExpanded True
+            , Cmd.none
             )
 
         CollapseDetailView ->
@@ -388,6 +431,7 @@ update msg model =
             ( model
                 |> playChore kind
                 |> setPreview Nothing
+                |> setActivityExpanded True
             , Cmd.none
             )
 
@@ -753,25 +797,6 @@ view model =
                     game =
                         Snapshot.getValue snapshot
 
-                    detailViewState : IdleGame.Views.DetailView2.State Activity Preview
-                    detailViewState =
-                        case ( game.activity, model.preview ) of
-                            ( Nothing, Nothing ) ->
-                                IdleGame.Views.DetailView2.Blank
-
-                            ( Just activity, Nothing ) ->
-                                if model.activityExpanded then
-                                    IdleGame.Views.DetailView2.ActivityExpanded activity
-
-                                else
-                                    IdleGame.Views.DetailView2.ActivityCollapsed activity
-
-                            ( Nothing, Just preview ) ->
-                                IdleGame.Views.DetailView2.Preview preview
-
-                            ( Just activity, Just preview ) ->
-                                IdleGame.Views.DetailView2.PreviewWithActivity preview activity
-
                     renderActivity : Activity -> Html FrontendMsg
                     renderActivity activity =
                         IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) game
@@ -799,11 +824,13 @@ view model =
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
                     , IdleGame.Views.DetailView2.render
-                        { state = detailViewState
+                        { state = getDetailViewState game.activity model.preview model.activityExpanded
                         , renderActivity = renderActivity
                         , renderPreview = renderPreview
                         , renderStatusBar = renderStatusBar
-                        , onCollapse = CollapseDetailView
+                        , onClosePreview = ClosePreview
+                        , onExpandActivity = ExpandActivity
+                        , onCollapseActivity = CollapseActivity
                         }
 
                     -- , IdleGame.Views.DetailView.render game model.preview model.activityExpanded

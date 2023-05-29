@@ -80,6 +80,9 @@ type FrontendMsg
     | UrlClicked UrlRequest
     | UrlChanged Url
       -- Detail View
+    | ClosePreview
+    | ExpandActivity
+    | CollapseActivity
     | CollapseDetailView
     | ExpandDetailView
     | ToastMsg Toast.Msg

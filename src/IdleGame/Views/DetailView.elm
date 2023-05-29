@@ -130,7 +130,7 @@ renderStatusBar activity =
                 ActivityChore _ timer ->
                     Timer.percentComplete timer
     in
-    div [ class "w-full h-[4rem] bg-base-300 text-accent-content flex items-center overflow-hidden p-2 gap-3 rounded-t relative", onClick ExpandDetailView ]
+    div [ class "w-full h-full bg-base-300 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
             [ img [ src stats.imgSrc, class "object-cover h-full w-full object-center" ] []
             ]
@@ -171,6 +171,15 @@ type DetailViewObject
     | DetailViewPreview Preview
 
 
+fade : Bool -> Html FrontendMsg
+fade shouldFade =
+    div
+        [ class "absolute top-0 left-0 w-full h-full bg-base-300 bg-opacity-25 transition-opacity duration-100 ease-in-out pointer-events-none"
+        , classList [ ( "opacity-0", not shouldFade ) ]
+        ]
+        []
+
+
 renderContent : DetailViewObject -> Game -> Html FrontendMsg
 renderContent obj game =
     let
@@ -207,8 +216,17 @@ renderContent obj game =
 
                 DetailViewPreview _ ->
                     Play
+
+        isPreview : Bool
+        isPreview =
+            case obj of
+                DetailViewActivity _ ->
+                    False
+
+                DetailViewPreview _ ->
+                    True
     in
-    div [ class "t-column w-full h-full p-3 relative gap-4" ]
+    div [ class "t-column w-full h-full p-3 relative gap-4 bg-base-300" ]
         [ -- category of activity
           div [ class "text-sm font-semibold" ] [ text "Chores" ]
 
@@ -217,11 +235,13 @@ renderContent obj game =
             [ class "h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
             [ ChoresView.choreImage kind
+            , fade isPreview
             ]
 
         -- title
-        , h2 [ class "text-lg font-semibold" ]
+        , h2 [ class "text-lg font-semibold relative" ]
             [ text (Chore.getStats kind).title
+            , fade isPreview
             ]
 
         -- Progress bar
@@ -234,9 +254,14 @@ renderContent obj game =
 
         -- Play/pause button
         , playPauseButton playButtonState kind
-        , ChoresView.choreDuration (Game.getModdedDuration game kind)
-        , div [ class "t-column" ]
-            (List.map (EffectView.render mods) orderedEffects)
+        , div [ class "relative" ]
+            [ ChoresView.choreDuration (Game.getModdedDuration game kind)
+            , fade isPreview
+            ]
+        , div [ class "t-column relative" ]
+            (List.map (EffectView.render mods) orderedEffects
+                ++ [ fade isPreview ]
+            )
         ]
 
 

@@ -20,20 +20,17 @@ type alias Props a p msg =
     , renderActivity : a -> Html msg
     , renderPreview : p -> Html msg
     , renderStatusBar : a -> Html msg
-    , onCollapse : msg
+    , onClosePreview : msg
+    , onCollapseActivity : msg
+    , onExpandActivity : msg
     }
 
 
 render : Props a p msg -> Html msg
 render props =
-    div [ class "bg-base-300" ]
-        [ -- Right rail version for full size screen
-          div [ class "hidden xl:block h-full" ]
-            [ renderBrowserView props ]
-
-        -- Collapsible version for mobile
-        , div [ class "xl:hidden" ]
-            [ renderMobileView props ]
+    div []
+        [ div [ class "hidden xl:block h-full" ] [ renderBrowserView props ]
+        , div [ class "xl:hidden" ] [ renderMobileView props ]
         ]
 
 
@@ -50,11 +47,22 @@ type MobileViewHeight
     | StatusBar
 
 
-collapseButton : Props a p msg -> Html msg
-collapseButton props =
+closePreviewButton : msg -> Html msg
+closePreviewButton handleClosePreview =
     button
         [ class ""
-        , onClick props.onCollapse
+        , onClick handleClosePreview
+        ]
+        [ Icon.close
+            |> Icon.toHtml
+        ]
+
+
+collapseActivityButton : msg -> Html msg
+collapseActivityButton handleCollapseActivity =
+    button
+        [ class ""
+        , onClick handleCollapseActivity
         ]
         [ Icon.chevronDown
             |> Icon.toHtml
@@ -81,6 +89,24 @@ renderMobileView props =
 
                 PreviewWithActivity _ _ ->
                     Expanded
+
+        collapseOrCloseButton : Html msg
+        collapseOrCloseButton =
+            case props.state of
+                Blank ->
+                    div [] []
+
+                ActivityExpanded _ ->
+                    collapseActivityButton props.onCollapseActivity
+
+                ActivityCollapsed _ ->
+                    div [] []
+
+                Preview _ ->
+                    closePreviewButton props.onClosePreview
+
+                PreviewWithActivity _ _ ->
+                    closePreviewButton props.onClosePreview
     in
     div
         [ class "fixed right-0 w-screen h-screen bg-base-300"
@@ -104,40 +130,43 @@ renderMobileView props =
             ]
         , div
             [ class "absolute top-0 left-0 ml-3 mt-3"
-            , classList [ ( "hidden", height /= Expanded ) ]
             ]
-            [ collapseButton props ]
+            [ collapseOrCloseButton
+            ]
+        , case props.state of
+            Blank ->
+                div [] []
 
-        -- , case game.activity of
-        --     Nothing ->
-        --         div [] []
-        --     Just activity ->
-        --         div
-        --             [ class "absolute top-0 left-0 w-full"
-        --             , classList [ ( "hidden", height /= StatusBar ) ]
-        --             ]
-        --             [ renderStatusBar activity ]
+            ActivityExpanded _ ->
+                div [] []
+
+            ActivityCollapsed activity ->
+                div
+                    [ class "absolute top-0 left-0 w-full"
+                    ]
+                    [ renderStatusBarWrapper props.renderStatusBar activity
+                    ]
+
+            Preview _ ->
+                div [] []
+
+            PreviewWithActivity _ activity ->
+                div
+                    [ class "absolute bottom-0 left-0 w-full"
+                    ]
+                    [ renderStatusBarWrapper props.renderStatusBar activity
+                    ]
         ]
 
 
-
--- type State a p
---     = Blank --
---     | ActivityExpanded a
---     | ActivityCollapsed a
---     | Preview p
---     | PreviewWithActivity p a
+renderStatusBarWrapper : (a -> Html msg) -> a -> Html msg
+renderStatusBarWrapper renderStatusBar activity =
+    div [ class "w-full h-[4rem] rounded-t overflow-hidden status-bar-wrapper" ]
+        [ renderStatusBar activity ]
 
 
 renderContent : Props a p msg -> Html msg
 renderContent props =
-    -- case ( game.activity, maybePreview ) of
-    --     ( Nothing, Nothing ) ->
-    --         div [ class "t-column w-full h-full p-2" ] []
-    --     ( _, Just preview ) ->
-    --         renderContent (DetailViewPreview preview) game
-    --     ( Just activity, Nothing ) ->
-    --         renderContent (DetailViewActivity activity) game
     case props.state of
         Blank ->
             div [ class "t-column w-full h-full p-2" ] []
@@ -150,17 +179,17 @@ renderContent props =
                 [ div
                     [ class "absolute top-0 left-0 w-full"
                     ]
-                    [ props.renderStatusBar activity ]
+                    [ renderStatusBarWrapper props.renderStatusBar activity ]
                 ]
 
         Preview preview ->
             props.renderPreview preview
 
         PreviewWithActivity preview activity ->
-            div [ class "w-full h-full" ]
+            div [ class "w-full h-full relative" ]
                 [ props.renderPreview preview
                 , div
-                    [ class "absolute top-0 bottom-0 w-full"
+                    [ class "absolute bottom-0 left-0 w-full"
                     ]
-                    [ props.renderStatusBar activity ]
+                    [ renderStatusBarWrapper props.renderStatusBar activity ]
                 ]
