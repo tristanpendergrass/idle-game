@@ -165,17 +165,6 @@ renderContent obj extraBottomPadding game =
             (List.map (EffectView.render mods) orderedEffects
                 ++ [ fade isPreview ]
             )
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobar" ]
-        , div [] [ text "foobax" ]
         ]
 
 
