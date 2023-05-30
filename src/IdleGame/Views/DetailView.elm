@@ -16,92 +16,10 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-render : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-render game maybePreview activityExpanded =
-    div [ class "bg-base-300" ]
-        [ -- Right rail version for full size screen
-          div [ class "hidden xl:block h-full" ]
-            [ renderFullscreen game maybePreview activityExpanded ]
-
-        -- Collapsible version for mobile
-        , div [ class "xl:hidden" ]
-            [ renderCollapsible game maybePreview activityExpanded ]
-        ]
-
-
-renderFullscreen : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-renderFullscreen game maybePreview activityExpanded =
-    div [ class "w-[375px] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
-        [ renderContentWrapper game maybePreview activityExpanded
-        ]
-
-
 type CollapsibleHeight
     = Expanded
     | Collapsed
     | StatusBar
-
-
-{-| renderCollapsible is the version of DetailView shown when the screen is less than its widest.
-It will display either a full screen detail view or be collapsed. In its collapsed state it may show a
-status bar or not depending on the state of the game.
--}
-renderCollapsible : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-renderCollapsible game maybePreview activityExpanded =
-    let
-        height : CollapsibleHeight
-        height =
-            case ( game.activity, maybePreview ) of
-                ( Nothing, Nothing ) ->
-                    Collapsed
-
-                ( _, Just _ ) ->
-                    Expanded
-
-                -- Note that we're ignoring activityExpanded here. That's just for the real activity not the preview
-                ( Just _, Nothing ) ->
-                    if activityExpanded then
-                        Expanded
-
-                    else
-                        StatusBar
-    in
-    div
-        [ class "fixed right-0 w-screen h-screen bg-base-300"
-        , class "transition-[top] duration-100 ease-in motion-reduce:transition-none"
-        , IdleGame.Views.Utils.zIndexes.detailViewMobile
-        , case height of
-            Expanded ->
-                class "top-0"
-
-            Collapsed ->
-                class "top-full"
-
-            StatusBar ->
-                class "top-[calc(100vh-4rem)]"
-        ]
-        [ div
-            [ class "w-full h-full"
-            , classList [ ( "hidden", height /= Expanded ) ]
-            ]
-            [ renderContentWrapper game maybePreview activityExpanded
-            ]
-        , div
-            [ class "absolute top-0 left-0 ml-3 mt-3"
-            , classList [ ( "hidden", height /= Expanded ) ]
-            ]
-            [ collapseButton ]
-        , case game.activity of
-            Nothing ->
-                div [] []
-
-            Just activity ->
-                div
-                    [ class "absolute top-0 left-0 w-full"
-                    , classList [ ( "hidden", height /= StatusBar ) ]
-                    ]
-                    [ renderStatusBar activity ]
-        ]
 
 
 collapseButton : Html FrontendMsg
@@ -130,7 +48,7 @@ renderStatusBar activity =
                 ActivityChore _ timer ->
                     Timer.percentComplete timer
     in
-    div [ class "w-full h-full bg-base-300 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative", onClick ExpandDetailView ]
+    div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
             [ img [ src stats.imgSrc, class "object-cover h-full w-full object-center" ] []
             ]
@@ -148,24 +66,6 @@ renderStatusBar activity =
         ]
 
 
-
-{--| Render all the detail content of activity or preview in full height for mobile or full screen
--}
-
-
-renderContentWrapper : Game -> Maybe Preview -> Bool -> Html FrontendMsg
-renderContentWrapper game maybePreview activityExpanded =
-    case ( game.activity, maybePreview ) of
-        ( Nothing, Nothing ) ->
-            div [ class "t-column w-full h-full p-2" ] []
-
-        ( _, Just preview ) ->
-            renderContent (DetailViewPreview preview) game
-
-        ( Just activity, Nothing ) ->
-            renderContent (DetailViewActivity activity) game
-
-
 type DetailViewObject
     = DetailViewActivity Activity
     | DetailViewPreview Preview
@@ -174,14 +74,14 @@ type DetailViewObject
 fade : Bool -> Html FrontendMsg
 fade shouldFade =
     div
-        [ class "absolute top-0 left-0 w-full h-full bg-base-300 bg-opacity-25 transition-opacity duration-100 ease-in-out pointer-events-none"
+        [ class "absolute top-0 left-0 w-full h-full bg-base-200 bg-opacity-25 transition-opacity duration-100 ease-in-out pointer-events-none"
         , classList [ ( "opacity-0", not shouldFade ) ]
         ]
         []
 
 
-renderContent : DetailViewObject -> Game -> Html FrontendMsg
-renderContent obj game =
+renderContent : DetailViewObject -> Bool -> Game -> Html FrontendMsg
+renderContent obj extraBottomPadding game =
     let
         event : Event
         event =
@@ -226,13 +126,16 @@ renderContent obj game =
                 DetailViewPreview _ ->
                     True
     in
-    div [ class "t-column w-full h-full p-3 relative gap-4 bg-base-300" ]
+    div
+        [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
+        , classList [ ( "pb-20", extraBottomPadding ) ]
+        ]
         [ -- category of activity
           div [ class "text-sm font-semibold" ] [ text "Chores" ]
 
         -- preview image
         , div
-            [ class "h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
+            [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
             [ ChoresView.choreImage kind
             , fade isPreview
@@ -262,6 +165,17 @@ renderContent obj game =
             (List.map (EffectView.render mods) orderedEffects
                 ++ [ fade isPreview ]
             )
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobar" ]
+        , div [] [ text "foobax" ]
         ]
 
 

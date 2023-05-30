@@ -101,7 +101,32 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
             IdleGame.Views.DetailView2.Preview preview
 
         ( Just activity, Just preview ) ->
-            IdleGame.Views.DetailView2.PreviewWithActivity preview activity
+            -- Slightly complicated by the fact that we might be trying to preview the same thing as the activity
+            let
+                activityKind : ChoreKind
+                activityKind =
+                    case activity of
+                        ActivityChore k _ ->
+                            k
+
+                previewKind : ChoreKind
+                previewKind =
+                    case preview of
+                        PreviewChore k ->
+                            k
+            in
+            if activityKind == previewKind then
+                if activityExpanded then
+                    IdleGame.Views.DetailView2.ActivityExpanded activity
+
+                else
+                    IdleGame.Views.DetailView2.ActivityCollapsed activity
+
+            else if activityExpanded then
+                IdleGame.Views.DetailView2.ActivityExpanded activity
+
+            else
+                IdleGame.Views.DetailView2.PreviewWithActivity preview activity
 
 
 setIsVisible : Bool -> FrontendModel -> FrontendModel
@@ -254,6 +279,17 @@ setPreview maybePreview model =
 setActivityExpanded : Bool -> FrontendModel -> FrontendModel
 setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
+
+
+getActivity : FrontendModel -> Maybe Activity
+getActivity model =
+    case model.gameState of
+        Playing snapshot ->
+            Snapshot.getValue snapshot
+                |> .activity
+
+        _ ->
+            Nothing
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -415,11 +451,46 @@ update msg model =
             )
 
         HandleChoreClick kind ->
-            ( model
-                |> pauseChore kind
-                |> setPreview (Just (PreviewChore kind))
-            , Cmd.none
-            )
+            let
+                maybeActivity : Maybe Activity
+                maybeActivity =
+                    getActivity model
+
+                detailViewState : IdleGame.Views.DetailView2.State Activity Preview
+                detailViewState =
+                    getDetailViewState maybeActivity model.preview model.activityExpanded
+
+                clickingActiveChore : Bool
+                clickingActiveChore =
+                    case maybeActivity of
+                        Just (ActivityChore k _) ->
+                            k == kind
+
+                        Nothing ->
+                            False
+
+                activityExpanded : Bool
+                activityExpanded =
+                    if clickingActiveChore then
+                        not model.activityExpanded
+
+                    else
+                        False
+            in
+            case detailViewState of
+                IdleGame.Views.DetailView2.ActivityExpanded _ ->
+                    ( model
+                        |> setPreview (Just (PreviewChore kind))
+                        |> setActivityExpanded activityExpanded
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model
+                        |> setPreview (Just (PreviewChore kind))
+                        |> setActivityExpanded activityExpanded
+                    , Cmd.none
+                    )
 
         ToggleActiveChore toggleId ->
             ( model
@@ -670,7 +741,7 @@ toastConfig =
     Toast.config ToastMsg
         -- attributes applied to the toast tray
         |> Toast.withTrayAttributes
-            [ class "t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto;"
+            [ class "t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto"
             , IdleGame.Views.Utils.zIndexes.toast
             ]
         -- attributes applied to the toasts
@@ -797,13 +868,26 @@ view model =
                     game =
                         Snapshot.getValue snapshot
 
+                    detailViewState : IdleGame.Views.DetailView2.State Activity Preview
+                    detailViewState =
+                        getDetailViewState game.activity model.preview model.activityExpanded
+
+                    extraBottomPadding : Bool
+                    extraBottomPadding =
+                        case detailViewState of
+                            IdleGame.Views.DetailView2.PreviewWithActivity _ _ ->
+                                True
+
+                            _ ->
+                                False
+
                     renderActivity : Activity -> Html FrontendMsg
                     renderActivity activity =
-                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) game
+                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) extraBottomPadding game
 
                     renderPreview : Preview -> Html FrontendMsg
                     renderPreview preview =
-                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewPreview preview) game
+                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewPreview preview) extraBottomPadding game
 
                     renderStatusBar : Activity -> Html FrontendMsg
                     renderStatusBar activity =
@@ -824,7 +908,7 @@ view model =
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
                     , IdleGame.Views.DetailView2.render
-                        { state = getDetailViewState game.activity model.preview model.activityExpanded
+                        { state = detailViewState
                         , renderActivity = renderActivity
                         , renderPreview = renderPreview
                         , renderStatusBar = renderStatusBar
