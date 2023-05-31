@@ -1,3 +1,23 @@
+
+
+# Activities
+Create spells that wreak havoc on your enemies. There's nine basic spells to learn:
+* Hex I
+    * Hexes have the most combat effectiveness, allowing you to push higher difficulty monsters
+* Jinx I
+    * Jinxes are weaker than hexes but grant you bonuses like better loot dropped. They also tend to come in handy outside of combat as well.
+* Curse I
+    * Curses deal notably low damage but when infused have powerful effects
+* Hex II
+* Jinx II
+* Curse II
+* Hex III
+* Jinx III
+* Curse III
+
+# Advanced combat ideas
+For when we do [[Combat (advanced)]].
+
 * Hex I
     * Imbue w/ Fire: firebolt. Does light fire damage and causes Burning 2. (% hp fire damage/turn)
     * Imbue w/Ice: icebolt. Does ice damage and causes Chilled 2. (% damage done reduced)

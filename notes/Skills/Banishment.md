@@ -8,3 +8,6 @@ Mine:
 * Unspiriting
 Or we could just go with "Spirits" or something.
 
+# Activities
+
+

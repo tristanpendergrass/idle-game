@@ -2,6 +2,7 @@ module IdleGame.Xp_test exposing (..)
 
 import Expect exposing (..)
 import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
 import Test exposing (..)
 
 
@@ -43,17 +44,21 @@ skillLevelPercentTest =
         [ test "returns correct percent for 0 xp" <|
             \_ ->
                 Xp.levelPercent Xp.defaultSchedule (Xp.fromInt 0)
-                    |> Expect.equal 0
+                    |> Percent.toFloat
+                    |> isAboutEqualTo 0
         , test "returns correct skill level for 100 xp" <|
             \_ ->
                 Xp.levelPercent Xp.defaultSchedule (Xp.fromInt 100)
+                    |> Percent.toFloat
                     |> isAboutEqualTo 0.1868
         , test "returns correct skill level for 1154 xp" <|
             \_ ->
                 Xp.levelPercent Xp.defaultSchedule (Xp.fromInt 1154)
+                    |> Percent.toFloat
                     |> isAboutEqualTo 0
         , test "returns 1.0 for an xp value way above our max" <|
             \_ ->
                 Xp.levelPercent Xp.defaultSchedule (Xp.fromInt 999999999)
+                    |> Percent.toFloat
                     |> isAboutEqualTo 1.0
         ]

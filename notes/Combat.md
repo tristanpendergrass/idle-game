@@ -25,37 +25,18 @@ The first time a monster is defeated you receive a First Conquest reward:
 * Checkmark of some kind on the monster to show you've beaten it.
 The idea is that we can avoid what i felt in melvor was too much temptation to blow past all the different monsters that were available to train. Felt a little like i shouldn't bother to beat them and i would never remember if i even had.
 
-# Combat Spells
-## Types of spells
-Spells in combat should generally fall into one of several categories:
-* Damage spells. Ideal for pushing difficult content and required in most every loadout.
-* Healing/defense spells. Also mainly necessary for difficult content.
-* Support spells, buffs the others.
-* Meta spells, interact with the larger combat cyle in some way by buffing drops, buffing regen time, etc.
-## Cycle of usefulness
-Ideally combat spells go through the following pattern over time:
-* When first unlocked they are exciting to put in your rotation and allow you to improve your combat outcomes; either pushing higher level monsters or improving winrate/droprate of existing monsters.
-* Eventually they are outclassed by subsequently unlocked spells and are only useful on content you've outleveled. It would be a waste to use your most powerful spells on old content and you still have to farm old content for various reasons so the spell is still useful for that.
-* Eventually you've got enough spells that can slay old content that you don't need most of them. There should be ways of recycling or upcycling the spells for mats, with selling them for small amount of coin as a last resort.
+# Player loadout
+The primary factor in deciding the outcome of a fight is the player's loadout. All the following things determine the player's strength, roughly in the following order of importance:
+* Spell the player has equipped.
+* Gear worn by the player
+* Potions imbibed
+* Passive benefits from other skills, e.g. Familiars
 
 ## Tags and Mastery
 Mastery in combat is not done on a per-monster basis but on a per-tag basis. Each monster would have one or more tags, e.g. Beast, Militia. When you fight monsters you get mastery xp in their tags and level up those tags. Tags have mastery thresholds just like skills do that expose weaknesses of the monsters that have that tag, or grant better rewards against that monster.
 
-# Spell ideas
-* Deal small damage. Deal more for each consecutive instance of this spell that is cast
-* Support spell that increases loot from this combat. Or increases mxp gained if lose the combat.
-* Support spell that gives a chance to recover other spells used in this combat
-* Mirror the move of the opponent.
-* Buff punches. This playstyle of using a couple punches (or one big punch) should be particularly effect against some monsters. 
-
 # Tag ideas
-Monsters have tags that alter combat with them in some way.
-* Feral - each consecutive move that does damage does even more damage (incentivize to let them hit you once or twice then interrupt with a strong block)
-* Bounty - this monster i wanted by authorities. Not sure the effect ..
-* Wily - this monster randomly cycles through a few different move loadouts
+* Tag that rewards certain parts of the player loadout. e.g. weakness to certain elements
+* Weakness that scales up depending on player's level in another skill. E.g. herbology confers bonus damage against plant enemies
 
 # Random concepts
-* Mana system like in Yi Xian
-* Take damage = get better stuff support spell. Useful for farming lower tier mobs later like in Returnal
-* Helpers and lackeys.
-    * One part meat shield, one part
