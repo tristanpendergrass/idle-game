@@ -159,3 +159,8 @@ getDurationStringParts millis =
 
                 else
                     []
+
+
+skills =
+    { wrapper = class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]"
+    }

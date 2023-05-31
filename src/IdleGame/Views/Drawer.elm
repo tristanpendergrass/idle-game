@@ -100,7 +100,7 @@ renderDrawer isDrawerOpen activeTab =
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Hexes, underConstruction = True } ]
+                , li [ onClick (SetActiveTab Tab.Hexes) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]

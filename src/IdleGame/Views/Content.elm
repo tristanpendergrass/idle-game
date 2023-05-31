@@ -10,6 +10,7 @@ import IdleGame.Timer
 import IdleGame.Views.Adventuring2
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
+import IdleGame.Views.Hexes
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
@@ -56,6 +57,9 @@ renderContent game activeTab =
 
             Tab.Chores ->
                 IdleGame.Views.Chores.render game
+
+            Tab.Hexes ->
+                IdleGame.Views.Hexes.render game
 
             Tab.Shop ->
                 IdleGame.Views.Shop.render game
