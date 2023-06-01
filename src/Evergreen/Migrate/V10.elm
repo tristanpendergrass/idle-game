@@ -1,8 +1,8 @@
 module Evergreen.Migrate.V10 exposing (..)
 
+import Evergreen.V10.Types as New
 import Evergreen.V7.Types as Old
 import Lamdera.Migrations exposing (..)
-import Types as New
 
 
 frontendModel : Old.FrontendModel -> ModelMigration New.FrontendModel New.FrontendMsg
