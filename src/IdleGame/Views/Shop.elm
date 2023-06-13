@@ -18,7 +18,7 @@ render game =
     let
         choresSkillLevel : Int
         choresSkillLevel =
-            game.choresXp
+            game.xp.chores
                 |> Xp.level Xp.defaultSchedule
 
         ownedLabel =

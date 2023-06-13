@@ -9,6 +9,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
+import IdleGame.Skill as SkillDict exposing (Skill(..), SkillDict)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
@@ -83,7 +84,7 @@ renderResource { base, doublingChance } kind =
         |> Icon.toHtml
 
 
-renderXp : { base : Xp, multiplier : Float } -> IdleGame.Event.Skill -> Html msg
+renderXp : { base : Xp, multiplier : Float } -> Skill -> Html msg
 renderXp xp skill =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.skillXpBadge

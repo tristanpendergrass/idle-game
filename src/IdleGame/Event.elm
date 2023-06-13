@@ -4,6 +4,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
+import IdleGame.Skill exposing (Skill(..), SkillDict)
 import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 
@@ -12,15 +13,13 @@ import IdleGame.Xp as Xp exposing (Xp)
 -- Config
 
 
-type Tag
-    = Chores
-    | Xp
-    | Mxp
+type
+    Tag
+    -- TODO: refactor into a Tag module so references can be Tag.Skill?
+    = SkillTag Skill
+    | XpTag
+    | MxpTag
     | ChoreTag ChoreKind
-
-
-type Skill
-    = ChoresSkill
 
 
 type ModSource
@@ -387,7 +386,7 @@ increaseSuccessTransformer buff repetitions effect =
 
 devGlobalXpBuff : Mod
 devGlobalXpBuff =
-    { tags = [ Xp ]
+    { tags = [ XpTag ]
     , label = XpModLabel 1
     , transformer = xpTransformer 1.0
     , source = AdminCrimes
@@ -397,7 +396,7 @@ devGlobalXpBuff =
 
 choresXpBuff : Float -> Mod
 choresXpBuff buff =
-    { tags = [ Chores, Xp ]
+    { tags = [ SkillTag Chores, XpTag ]
     , label = XpModLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
@@ -407,7 +406,7 @@ choresXpBuff buff =
 
 choresCoinBuff : Float -> Mod
 choresCoinBuff buff =
-    { tags = [ Chores ]
+    { tags = [ SkillTag Chores ]
     , label = CoinModLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
@@ -427,7 +426,7 @@ choresMxpBuff buff =
 
 choresResourceBuff : Float -> Mod
 choresResourceBuff buff =
-    { tags = [ Chores ]
+    { tags = [ SkillTag Chores ]
     , label = ResourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes

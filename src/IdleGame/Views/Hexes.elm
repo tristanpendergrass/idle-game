@@ -27,4 +27,5 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        []
+        [ Utils.xpSection game.xp.hexes
+        ]

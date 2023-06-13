@@ -12,6 +12,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
+import IdleGame.Skill exposing (Skill(..))
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -27,7 +28,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.choresXp
+        [ Utils.xpSection game.xp.chores
 
         -- Chore grid
         , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4" ]
@@ -67,7 +68,7 @@ getChoreXp : Effect -> Maybe Xp
 getChoreXp effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainXp amount ChoresSkill ->
+        GainXp amount Chores ->
             Just (Quantity.multiplyBy amount.multiplier amount.base)
 
         _ ->

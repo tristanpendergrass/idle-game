@@ -10,6 +10,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.Skill as SkillDict exposing (Skill(..), SkillDict)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -27,7 +28,9 @@ import Tuple
 
 type alias Game =
     { seed : Random.Seed
-    , choresXp : Xp
+
+    -- , choresXp : Xp
+    , xp : SkillDict Xp
     , choresMxp : Xp
     , activity : Maybe Activity
     , choresData : Chore.AllChoreStates
@@ -43,7 +46,10 @@ type alias Game =
 create : Random.Seed -> Game
 create seed =
     { seed = seed
-    , choresXp = Xp.fromInt 0
+    , xp =
+        { chores = Xp.fromInt 0
+        , hexes = Xp.fromInt 0
+        }
     , choresMxp = Xp.fromInt 0
     , activity = Nothing
     , choresData =
@@ -88,7 +94,7 @@ choreIsUnlocked : Game -> ChoreKind -> Bool
 choreIsUnlocked game kind =
     let
         skillLevel =
-            Xp.level Xp.defaultSchedule game.choresXp
+            Xp.level Xp.defaultSchedule game.xp.chores
 
         requiredLevel =
             choreUnlockRequirements
@@ -100,10 +106,10 @@ choreIsUnlocked game kind =
 
 
 getChoreListItems : Game -> List ChoresListItem
-getChoreListItems { choresXp } =
+getChoreListItems { xp } =
     let
         skillLevel =
-            Xp.level Xp.defaultSchedule choresXp
+            Xp.level Xp.defaultSchedule xp.chores
 
         unlockedChoreTypes =
             choreUnlockRequirements
@@ -137,16 +143,16 @@ completeChoreEvent game kind =
     in
     Event
         { effects =
-            [ gainXp xp ChoresSkill
-                |> withTags [ Chores, ChoreTag kind ]
+            [ gainXp xp Chores
+                |> withTags [ SkillTag Chores, ChoreTag kind ]
             , gainChoreMxp game kind
-                |> withTags [ Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Chores, ChoreTag kind ]
             , gainWithProbability extraResourceProbability
-                [ gainResource 1 extraResource |> withTags [ Chores ]
+                [ gainResource 1 extraResource |> withTags [ SkillTag Chores, ChoreTag kind ]
                 ]
-                |> withTags [ Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Chores, ChoreTag kind ]
             , gainCoin coin
-                |> withTags [ Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Chores, ChoreTag kind ]
             ]
         }
 
@@ -496,10 +502,13 @@ addResource resource amount game =
 
 
 addXp : Skill -> Xp -> Game -> Game
-addXp resource amount game =
-    case resource of
-        ChoresSkill ->
-            { game | choresXp = Quantity.plus game.choresXp amount }
+addXp skill amount game =
+    case skill of
+        Chores ->
+            { game | xp = SkillDict.updateInDict Chores (Quantity.plus amount) game.xp }
+
+        Hexes ->
+            { game | xp = SkillDict.updateInDict Hexes (Quantity.plus amount) game.xp }
 
 
 addMxp : ChoreKind -> Xp -> Game -> Game
@@ -531,13 +540,7 @@ gainResource amount resource =
 
 gainXp : Xp -> Skill -> Effect
 gainXp amount skill =
-    let
-        skillTag =
-            case skill of
-                ChoresSkill ->
-                    Chores
-    in
-    Effect { type_ = GainXp { base = amount, multiplier = 1.0 } skill, tags = [ Xp, skillTag ] }
+    Effect { type_ = GainXp { base = amount, multiplier = 1.0 } skill, tags = [ XpTag, SkillTag skill ] }
 
 
 gainChoreMxp : Game -> ChoreKind -> Effect
@@ -556,7 +559,7 @@ gainChoreMxp game kind =
         baseMxp =
             calculateChoreMxp kind game
     in
-    Effect { type_ = GainChoreMxp { base = baseMxp, multiplier = 1.0 } kind, tags = [ Mxp, Chores, ChoreTag kind ] }
+    Effect { type_ = GainChoreMxp { base = baseMxp, multiplier = 1.0 } kind, tags = [ MxpTag, SkillTag Chores, ChoreTag kind ] }
 
 
 gainCoin : Int -> Effect
@@ -615,11 +618,11 @@ getTimePassesData : Game -> Game -> Maybe TimePassesData
 getTimePassesData originalGame currentGame =
     let
         xpGains =
-            if originalGame.choresXp == currentGame.choresXp then
+            if originalGame.xp.chores == currentGame.xp.chores then
                 []
 
             else
-                [ { title = "Chores", originalXp = originalGame.choresXp, currentXp = currentGame.choresXp } ]
+                [ { title = "Chores", originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
 
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
@@ -738,7 +741,7 @@ getChoreUnlocksMods game =
                         successBuff 0.05
                             |> withHowManyTimesToApplyMod (masteryLevel // 10)
                             -- repeat once for each ten levels
-                            |> modWithTags [ Chores, ChoreTag kind ]
+                            |> modWithTags [ SkillTag Chores, ChoreTag kind ]
                 in
                 [ everyTenLevelsMod
                 ]
