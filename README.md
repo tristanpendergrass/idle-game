@@ -46,8 +46,16 @@ $ npm test -- --watch
   - [x] Show something in Time Passes
   - [x] Add a second monster and way to choose between them
   - [x] Show reward on monster screen
-  - [ ] Add different moves to different monsters
-  - [ ] Add spells optimal against that second monster
+  - [ ] Put it back in
+- [ ] Add hexes
+  - [ ] Craft them for free
+  - [ ] Require parchment
+- [ ] Add parchment to shop
+- [ ] Make combat require hexes
+- [x] Activity detail sidebar
+	- [x] desktop
+	- [x] mobile
+- [x] Activity status bar at bottom for mobile
 
 ## Future
 ### Tech stuff
@@ -57,20 +65,17 @@ $ npm test -- --watch
 - [ ] Find a way to unit test performance of tick
 
 ### Fundamentals
+- [ ] Remove mastery pool logic from game
 - [ ] Show what mods there are on an effect/interval and where they came from
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
-- [ ] Activity detail sidebar
-	- [ ] desktop
-	- [ ] mobile
-- [ ] Activity status bar at bottom for mobile
 - [ ] Move Item Mastery (M) info to detail sidebar
 - [ ] Show Time Passes during Fast Forward with real time change
 - [ ] Add change log section
   - [ ] Add notification that shows that update happened
 
 ### Features
-- [ ] Skill 2
 - [ ] Skill 3
+- [ ] Skill 4
 
 ### Glitz
 - [ ] Progress bar animations
@@ -78,6 +83,7 @@ $ npm test -- --watch
 - [ ] Close modals on space/escape
 - [ ] Design audit following https://anthonyhobday.com/sideprojects/saferules/
 - [ ] Money amount in Bag tab looks like a button -- remove background entirely?
+- [ ] Make right rail not have slide animation when going from empty to active
 
 # Changelog
 

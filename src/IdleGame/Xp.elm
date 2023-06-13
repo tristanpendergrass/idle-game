@@ -1,7 +1,6 @@
 module IdleGame.Xp exposing (..)
 
 import Array exposing (Array)
-import IdleGame.Views.Utils
 import Percent exposing (Percent)
 import Quantity exposing (Quantity(..))
 
@@ -34,13 +33,6 @@ fromInt amount =
 toInt : Xp -> Int
 toInt (Quantity amount) =
     floor amount
-
-
-toString : Xp -> String
-toString (Quantity amount) =
-    amount
-        |> floor
-        |> IdleGame.Views.Utils.intToString
 
 
 level : LevelingSchedule -> Xp -> Int

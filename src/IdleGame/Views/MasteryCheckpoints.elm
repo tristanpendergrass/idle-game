@@ -52,12 +52,23 @@ render { poolXp, checkpoints } =
             poolPercent
                 |> Percent.toPercentage
                 |> Utils.floatToString 2
+
+        poolXpString : String
+        poolXpString =
+            poolXp
+                |> Xp.toInt
+                |> Utils.intToString
     in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-lg font-bold" ] [ text "Mastery Pool Checkpoints" ]
         , div [ class "t-column" ]
             [ div [ class "w-full flex items-center justify-end" ]
-                [ div [ class "text-2xs flex gap-1" ] [ span [] [ text <| Xp.toString poolXp ++ " / 4,500,000" ], span [ class "font-bold text-secondary" ] [ text <| "(" ++ poolPercentLabel ++ "%)" ] ]
+                [ div [ class "text-2xs flex gap-1" ]
+                    [ span []
+                        [ text <| poolXpString ++ " / 4,500,000"
+                        ]
+                    , span [ class "font-bold text-secondary" ] [ text <| "(" ++ poolPercentLabel ++ "%)" ]
+                    ]
                 ]
             , div [ class "w-full flex items-center gap-2" ]
                 [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]

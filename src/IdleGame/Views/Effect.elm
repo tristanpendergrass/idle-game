@@ -89,7 +89,8 @@ renderXp xp skill =
         [ Utils.skillXpBadge
         , span [ class "font-bold col-span-4" ]
             [ Quantity.multiplyBy xp.multiplier xp.base
-                |> Xp.toString
+                |> Xp.toInt
+                |> Utils.intToString
                 |> text
             ]
         ]
@@ -101,7 +102,8 @@ renderMxp mxp skill =
         [ Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
             [ Quantity.multiplyBy mxp.multiplier mxp.base
-                |> Xp.toString
+                |> Xp.toInt
+                |> Utils.intToString
                 |> text
             ]
         ]

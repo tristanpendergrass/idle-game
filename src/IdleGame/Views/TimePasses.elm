@@ -9,7 +9,7 @@ import IdleGame.Game exposing (TimePassesData)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
-import IdleGame.Views.Utils
+import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Maybe.Extra
 import Quantity exposing (Quantity)
@@ -27,7 +27,7 @@ resourceIcon =
 renderCombatsWon : Int -> Html FrontendMsg
 renderCombatsWon num =
     li [ class "flex items-center gap-1" ]
-        [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString num ]
+        [ span [ class "text-success" ] [ text <| Utils.intToString num ]
         , span [] [ text "combats won" ]
         ]
 
@@ -35,7 +35,7 @@ renderCombatsWon num =
 renderCombatsLost : Int -> Html FrontendMsg
 renderCombatsLost num =
     li [ class "flex items-center gap-1" ]
-        [ span [ class "text-error" ] [ text <| IdleGame.Views.Utils.intToString num ]
+        [ span [ class "text-error" ] [ text <| Utils.intToString num ]
         , span [] [ text "combats lost" ]
         ]
 
@@ -57,7 +57,7 @@ render timePassed timePassesData =
     in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
-        , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , ul [ class "t-column font-semibold" ]
             (List.concat
                 [ if combatsWonDiff > 0 then
@@ -108,11 +108,16 @@ render timePassed timePassesData =
                                             |> Xp.level Xp.defaultSchedule
                                 in
                                 li [ class "flex items-center gap-2" ]
-                                    [ span [ class "text-success" ] [ text <| Xp.toString difference ]
+                                    [ span [ class "text-success" ]
+                                        [ difference
+                                            |> Xp.toInt
+                                            |> Utils.intToString
+                                            |> text
+                                        ]
                                     , span [] [ text title ]
-                                    , IdleGame.Views.Utils.skillXpBadge
+                                    , Utils.skillXpBadge
                                     , if originalLevel /= currentLevel then
-                                        span [] [ text <| "(Level " ++ IdleGame.Views.Utils.intToString originalLevel ++ " -> " ++ IdleGame.Views.Utils.intToString currentLevel ++ ")" ]
+                                        span [] [ text <| "(Level " ++ Utils.intToString originalLevel ++ " -> " ++ Utils.intToString currentLevel ++ ")" ]
 
                                       else
                                         span [] []
@@ -122,7 +127,7 @@ render timePassed timePassesData =
                         |> Resource.mapDiff
                             (\amount resource ->
                                 li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
-                                    [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString amount ]
+                                    [ span [ class "text-success" ] [ text <| Utils.intToString amount ]
                                     , (Resource.getStats resource).icon
                                         |> Icon.toHtml
                                     , span [] [ text <| (Resource.getStats resource).title ]

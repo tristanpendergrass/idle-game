@@ -26,61 +26,8 @@ import Types exposing (..)
 
 render : Game -> Html FrontendMsg
 render game =
-    let
-        skillLevel =
-            Xp.level Xp.defaultSchedule game.choresXp
-                |> Utils.intToString
-
-        skillPercent : Percent
-        skillPercent =
-            Xp.levelPercent Xp.defaultSchedule game.choresXp
-
-        masteryPercent : Percent
-        masteryPercent =
-            Xp.levelPercent Xp.defaultSchedule game.choresMxp
-                |> Percent.capAtHundred
-
-        masteryPercentLabel : String
-        masteryPercentLabel =
-            masteryPercent
-                |> Percent.toPercentage
-                |> floor
-                |> Utils.intToString
-    in
     div [ Utils.skills.wrapper ]
-        [ div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
-            [ div [ class "t-column" ]
-                [ div [ class "w-full flex items-center justify-between" ]
-                    [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
-                    , div [ class "text-2xs" ]
-                        [ game.choresXp
-                            |> Xp.toString
-                            |> text
-                        ]
-                    ]
-                , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
-                        [ text skillLevel ]
-                    , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat skillPercent) ++ "%") ] []
-                        ]
-                    ]
-                , div [ class "w-full flex items-center justify-between" ]
-                    [ div [ class "text-2xs font-bold" ] [ text "Mastery Pool" ]
-                    , div [ class "text-2xs flex gap-1" ]
-                        [ span [] [ text <| Xp.toString game.choresMxp ++ " / 4,500,000" ]
-                        , span [ class "font-bold text-secondary" ] [ text <| "(" ++ masteryPercentLabel ++ "%)" ]
-                        ]
-                    ]
-                , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div [ class "bg-secondary h-1.5 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat masteryPercent) ++ "%") ] []
-                        ]
-                    ]
-                , div [ class "w-full flex justify-end" ]
-                    [ button [ class "btn btn-xs btn-secondary", onClick OpenMasteryCheckpointsModal ] [ text "View Checkpoints" ] ]
-                ]
-            ]
+        [ Utils.xpSection game.choresXp
 
         -- Chore grid
         , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4" ]
@@ -335,11 +282,18 @@ renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extr
             div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
                 [ Utils.skillXpBadge
                 , span [ class "font-bold col-span-4" ]
-                    [ text <| Xp.toString skillXp
+                    [ skillXp
+                        |> Xp.toInt
+                        |> Utils.intToString
+                        |> text
                     ]
                 , Utils.masteryXpBadge
                 , span [ class "font-bold col-span-4" ]
-                    [ text <| Xp.toString mxp ]
+                    [ mxp
+                        |> Xp.toInt
+                        |> Utils.intToString
+                        |> text
+                    ]
                 ]
 
         masteryLevel : String
