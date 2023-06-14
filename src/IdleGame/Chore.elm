@@ -32,11 +32,7 @@ allKinds =
     ]
 
 
-type alias State =
-    { mxp : Xp }
-
-
-type alias ChoreRecord a =
+type alias Record a =
     { cleanStables : a
     , cleanBigBubba : a
     , sweepChimneys : a
@@ -49,7 +45,7 @@ type alias ChoreRecord a =
     }
 
 
-getByKind : Kind -> ChoreRecord a -> a
+getByKind : Kind -> Record a -> a
 getByKind kind data =
     case kind of
         CleanStables ->
@@ -80,7 +76,7 @@ getByKind kind data =
             data.organizeSpellBooks
 
 
-setByKind : Kind -> a -> ChoreRecord a -> ChoreRecord a
+setByKind : Kind -> a -> Record a -> Record a
 setByKind kind value data =
     case kind of
         CleanStables ->
@@ -111,24 +107,9 @@ setByKind kind value data =
             { data | organizeSpellBooks = value }
 
 
-updateByKind : Kind -> (a -> a) -> ChoreRecord a -> ChoreRecord a
+updateByKind : Kind -> (a -> a) -> Record a -> Record a
 updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
-
-
-type alias AllStates =
-    ChoreRecord State
-
-
-type alias AllStats =
-    ChoreRecord Stats
-
-
-type alias Stats =
-    { title : String
-    , imgSrc : String
-    , outcome : ChoreOutcome
-    }
 
 
 type alias ChoreOutcome =
@@ -140,7 +121,23 @@ type alias ChoreOutcome =
     }
 
 
-allStats : ChoreRecord Stats
+type alias Stats =
+    { title : String
+    , imgSrc : String
+    , outcome : ChoreOutcome
+    }
+
+
+type alias AllStats =
+    Record Stats
+
+
+getStats : Kind -> Stats
+getStats kind =
+    getByKind kind allStats
+
+
+allStats : Record Stats
 allStats =
     { cleanStables = cleanStablesStats
     , cleanBigBubba = cleanBigBubbaStats
@@ -278,8 +275,3 @@ organizeSpellBooksStats =
         , coin = 30
         }
     }
-
-
-getStats : Kind -> Stats
-getStats kind =
-    getByKind kind allStats

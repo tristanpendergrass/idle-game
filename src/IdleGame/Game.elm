@@ -33,7 +33,7 @@ type alias Game =
     , xp : SkillDict Xp
     , choresMxp : Xp
     , activity : Maybe Activity
-    , choresData : Chore.AllStates
+    , choresData : Chore.Record { mxp : Xp }
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
