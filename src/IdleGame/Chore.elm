@@ -112,7 +112,7 @@ updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
 
 
-type alias ChoreOutcome =
+type alias Outcome =
     { xp : Xp
     , duration : Duration
     , extraResourceProbability : Float
@@ -124,7 +124,7 @@ type alias ChoreOutcome =
 type alias Stats =
     { title : String
     , imgSrc : String
-    , outcome : ChoreOutcome
+    , outcome : Outcome
     }
 
 
