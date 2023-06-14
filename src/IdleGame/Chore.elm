@@ -25,24 +25,123 @@ type alias State =
     { mxp : Xp }
 
 
-type alias AllChoreStates =
-    { cleanStables : State
-    , cleanBigBubba : State
-    , sweepChimneys : State
-    , waterGreenhousePlants : State
-    , washRobes : State
-    , organizePotionIngredients : State
-    , repairInstruments : State
-    , flushDrainDemons : State
-    , organizeSpellBooks : State
+type alias ChoreRecord a =
+    { cleanStables : a
+    , cleanBigBubba : a
+    , sweepChimneys : a
+    , waterGreenhousePlants : a
+    , washRobes : a
+    , organizePotionIngredients : a
+    , repairInstruments : a
+    , flushDrainDemons : a
+    , organizeSpellBooks : a
     }
+
+
+getByKind : ChoreKind -> ChoreRecord a -> a
+getByKind kind data =
+    case kind of
+        CleanStables ->
+            data.cleanStables
+
+        CleanBigBubba ->
+            data.cleanBigBubba
+
+        SweepChimneys ->
+            data.sweepChimneys
+
+        WaterGreenhousePlants ->
+            data.waterGreenhousePlants
+
+        WashAndIronRobes ->
+            data.washRobes
+
+        OrganizePotionIngredients ->
+            data.organizePotionIngredients
+
+        RepairInstruments ->
+            data.repairInstruments
+
+        FlushDrainDemons ->
+            data.flushDrainDemons
+
+        OrganizeSpellBooks ->
+            data.organizeSpellBooks
+
+
+setByKind : ChoreKind -> a -> ChoreRecord a -> ChoreRecord a
+setByKind kind value data =
+    case kind of
+        CleanStables ->
+            { data | cleanStables = value }
+
+        CleanBigBubba ->
+            { data | cleanBigBubba = value }
+
+        SweepChimneys ->
+            { data | sweepChimneys = value }
+
+        WaterGreenhousePlants ->
+            { data | waterGreenhousePlants = value }
+
+        WashAndIronRobes ->
+            { data | washRobes = value }
+
+        OrganizePotionIngredients ->
+            { data | organizePotionIngredients = value }
+
+        RepairInstruments ->
+            { data | repairInstruments = value }
+
+        FlushDrainDemons ->
+            { data | flushDrainDemons = value }
+
+        OrganizeSpellBooks ->
+            { data | organizeSpellBooks = value }
+
+
+updateByKind : ChoreKind -> (a -> a) -> ChoreRecord a -> ChoreRecord a
+updateByKind kind update data =
+    case kind of
+        CleanStables ->
+            { data | cleanStables = update data.cleanStables }
+
+        CleanBigBubba ->
+            { data | cleanBigBubba = update data.cleanBigBubba }
+
+        SweepChimneys ->
+            { data | sweepChimneys = update data.sweepChimneys }
+
+        WaterGreenhousePlants ->
+            { data | waterGreenhousePlants = update data.waterGreenhousePlants }
+
+        WashAndIronRobes ->
+            { data | washRobes = update data.washRobes }
+
+        OrganizePotionIngredients ->
+            { data | organizePotionIngredients = update data.organizePotionIngredients }
+
+        RepairInstruments ->
+            { data | repairInstruments = update data.repairInstruments }
+
+        FlushDrainDemons ->
+            { data | flushDrainDemons = update data.flushDrainDemons }
+
+        OrganizeSpellBooks ->
+            { data | organizeSpellBooks = update data.organizeSpellBooks }
+
+
+type alias AllStates =
+    ChoreRecord State
+
+
+type alias AllStats =
+    ChoreRecord Stats
 
 
 type alias Stats =
     { title : String
     , imgSrc : String
-    , getter : AllChoreStates -> State
-    , setter : (State -> State) -> AllChoreStates -> AllChoreStates
     , outcome : ChoreOutcome
     }
 
@@ -56,21 +155,24 @@ type alias ChoreOutcome =
     }
 
 
-incrementChoreMxp : Xp -> ChoreKind -> AllChoreStates -> AllChoreStates
-incrementChoreMxp amount kind choresData =
-    let
-        stats =
-            getStats kind
-    in
-    stats.setter (\choreData -> { choreData | mxp = Quantity.plus choreData.mxp amount }) choresData
+allStats : ChoreRecord Stats
+allStats =
+    { cleanStables = cleanStablesStats
+    , cleanBigBubba = cleanBigBubbaStats
+    , sweepChimneys = sweepChimneysStats
+    , waterGreenhousePlants = waterGreenhousePlantsStats
+    , washRobes = washAndIronRobesStats
+    , organizePotionIngredients = organizePotionIngredientsStats
+    , repairInstruments = repairInstrumentsStats
+    , flushDrainDemons = flushDrainDemonsStats
+    , organizeSpellBooks = organizeSpellBooksStats
+    }
 
 
 cleanStablesStats : Stats
 cleanStablesStats =
     { title = "Clean Stables"
     , imgSrc = "/chores/stable.png"
-    , getter = .cleanStables
-    , setter = \fn choresData -> { choresData | cleanStables = fn choresData.cleanStables }
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -85,8 +187,6 @@ cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { title = "Clean Big Bubba's Stall"
     , imgSrc = "/chores/bubba4.png"
-    , getter = .cleanBigBubba
-    , setter = \fn choresData -> { choresData | cleanBigBubba = fn choresData.cleanBigBubba }
     , outcome =
         { xp = Xp.fromInt 25
         , duration = Duration.seconds 6
@@ -101,8 +201,6 @@ sweepChimneysStats : Stats
 sweepChimneysStats =
     { title = "Sweep Chimneys"
     , imgSrc = "/chores/chimney.png"
-    , getter = .sweepChimneys
-    , setter = \fn choresData -> { choresData | sweepChimneys = fn choresData.sweepChimneys }
     , outcome =
         { xp = Xp.fromInt 37
         , duration = Duration.seconds 8
@@ -117,8 +215,6 @@ waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
     { title = "Water Greenhouse Plants"
     , imgSrc = "/chores/greenhouse_3.png"
-    , getter = .waterGreenhousePlants
-    , setter = \fn choresData -> { choresData | waterGreenhousePlants = fn choresData.waterGreenhousePlants }
     , outcome =
         { xp = Xp.fromInt 12
         , duration = Duration.seconds 2
@@ -133,8 +229,6 @@ washAndIronRobesStats : Stats
 washAndIronRobesStats =
     { title = "Wash and Iron Robes"
     , imgSrc = "/chores/washRobes.png"
-    , getter = .washRobes
-    , setter = \fn choresData -> { choresData | washRobes = fn choresData.washRobes }
     , outcome =
         { xp = Xp.fromInt 50
         , duration = Duration.seconds 8
@@ -149,8 +243,6 @@ organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
     { title = "Organize Potion Ingredients"
     , imgSrc = "/chores/potionIngredients_2.png"
-    , getter = .organizePotionIngredients
-    , setter = \fn choresData -> { choresData | organizePotionIngredients = fn choresData.organizePotionIngredients }
     , outcome =
         { xp = Xp.fromInt 165
         , duration = Duration.seconds 20
@@ -165,8 +257,6 @@ repairInstrumentsStats : Stats
 repairInstrumentsStats =
     { title = "Repair Instruments"
     , imgSrc = "/chores/repairInstruments.png"
-    , getter = .repairInstruments
-    , setter = \fn choresData -> { choresData | repairInstruments = fn choresData.repairInstruments }
     , outcome =
         { xp = Xp.fromInt 75
         , duration = Duration.seconds 12
@@ -181,8 +271,6 @@ flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
     { title = "Flush the Drain Demons"
     , imgSrc = "/chores/drainDemons.png"
-    , getter = .flushDrainDemons
-    , setter = \fn choresData -> { choresData | flushDrainDemons = fn choresData.flushDrainDemons }
     , outcome =
         { xp = Xp.fromInt 90
         , duration = Duration.seconds 10
@@ -197,8 +285,6 @@ organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
     { title = "Organize Spell Books"
     , imgSrc = "/chores/spellBooks.png"
-    , getter = .organizeSpellBooks
-    , setter = \fn choresData -> { choresData | organizeSpellBooks = fn choresData.organizeSpellBooks }
     , outcome =
         { xp = Xp.fromInt 210
         , duration = Duration.seconds 20
@@ -211,30 +297,4 @@ organizeSpellBooksStats =
 
 getStats : ChoreKind -> Stats
 getStats kind =
-    case kind of
-        CleanStables ->
-            cleanStablesStats
-
-        CleanBigBubba ->
-            cleanBigBubbaStats
-
-        SweepChimneys ->
-            sweepChimneysStats
-
-        WaterGreenhousePlants ->
-            waterGreenhousePlantsStats
-
-        WashAndIronRobes ->
-            washAndIronRobesStats
-
-        OrganizePotionIngredients ->
-            organizePotionIngredientsStats
-
-        RepairInstruments ->
-            repairInstrumentsStats
-
-        FlushDrainDemons ->
-            flushDrainDemonsStats
-
-        OrganizeSpellBooks ->
-            organizeSpellBooksStats
+    getByKind kind allStats

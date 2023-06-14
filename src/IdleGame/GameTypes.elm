@@ -21,6 +21,18 @@ type ChoreKind
     | OrganizeSpellBooks
 
 
+type HexKind
+    = Hex1
+    | Jinx1
+    | Curse1
+    | Hex2
+    | Jinx2
+    | Curse2
+    | Hex3
+    | Jinx3
+    | Curse3
+
+
 type Toast
     = GainedCoin Counter
     | GainedResource Int Resource.Kind

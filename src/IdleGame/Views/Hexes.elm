@@ -28,4 +28,10 @@ render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
         [ Utils.xpSection game.xp.hexes
+        , div [ Utils.skills.grid ]
+            (List.map (renderHexListItem game) (Game.getChoreListItems game))
         ]
+
+
+renderHexListItem _ _ =
+    div [] []

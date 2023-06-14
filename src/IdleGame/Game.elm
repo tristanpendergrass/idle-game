@@ -33,7 +33,7 @@ type alias Game =
     , xp : SkillDict Xp
     , choresMxp : Xp
     , activity : Maybe Activity
-    , choresData : Chore.AllChoreStates
+    , choresData : Chore.AllStates
     , coin : Counter
     , resources : Resource.Amounts
     , shopItems : ShopItems
@@ -72,12 +72,25 @@ create seed =
     }
 
 
-type ChoresListItem
-    = LockedChore Int
-    | ChoreItem ChoreKind
+type ActivityListItem
+    = LockedActivity Int
+    | ActivityListItem ChoreKind
 
 
 choreUnlockRequirements =
+    [ ( CleanStables, 1 )
+    , ( CleanBigBubba, 10 )
+    , ( SweepChimneys, 25 )
+    , ( WaterGreenhousePlants, 35 )
+    , ( WashAndIronRobes, 45 )
+    , ( OrganizePotionIngredients, 55 )
+    , ( RepairInstruments, 65 )
+    , ( FlushDrainDemons, 75 )
+    , ( OrganizeSpellBooks, 90 )
+    ]
+
+
+hexUnlockRequirements =
     [ ( CleanStables, 1 )
     , ( CleanBigBubba, 10 )
     , ( SweepChimneys, 25 )
@@ -105,7 +118,7 @@ choreIsUnlocked game kind =
     requiredLevel
 
 
-getChoreListItems : Game -> List ChoresListItem
+getChoreListItems : Game -> List ActivityListItem
 getChoreListItems { xp } =
     let
         skillLevel =
@@ -114,14 +127,37 @@ getChoreListItems { xp } =
         unlockedChoreTypes =
             choreUnlockRequirements
                 |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
-                |> List.map (\( type_, _ ) -> ChoreItem type_)
+                |> List.map (\( type_, _ ) -> ActivityListItem type_)
 
         maybeNextUnlock =
             choreUnlockRequirements
                 |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
                 |> List.sortBy Tuple.second
                 |> List.head
-                |> Maybe.map (\( _, level ) -> LockedChore level)
+                |> Maybe.map (\( _, level ) -> LockedActivity level)
+                |> Maybe.map List.singleton
+                |> Maybe.withDefault []
+    in
+    unlockedChoreTypes ++ maybeNextUnlock
+
+
+getHexesListItems : Game -> List ActivityListItem
+getHexesListItems { xp } =
+    let
+        skillLevel =
+            Xp.level Xp.defaultSchedule xp.hexes
+
+        unlockedChoreTypes =
+            choreUnlockRequirements
+                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
+                |> List.map (\( type_, _ ) -> ActivityListItem type_)
+
+        maybeNextUnlock =
+            choreUnlockRequirements
+                |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
+                |> List.sortBy Tuple.second
+                |> List.head
+                |> Maybe.map (\( _, level ) -> LockedActivity level)
                 |> Maybe.map List.singleton
                 |> Maybe.withDefault []
     in
@@ -422,7 +458,9 @@ calculateChoreMxp kind game =
 
         mxp : Xp
         mxp =
-            (choreStats.getter game.choresData).mxp
+            game.choresData
+                |> Chore.getByKind kind
+                |> .mxp
 
         currentMasteryLevel : Int
         currentMasteryLevel =
@@ -520,7 +558,11 @@ addMxp kind amount game =
         stats =
             Chore.getStats kind
     in
-    { game | choresData = stats.setter fn game.choresData }
+    { game
+        | choresData =
+            game.choresData
+                |> Chore.updateByKind kind fn
+    }
 
 
 addMasteryPoolXp : Xp -> Game -> Game
@@ -731,11 +773,12 @@ getChoreUnlocksMods game =
         |> List.concatMap
             (\kind ->
                 let
-                    stats =
-                        Chore.getStats kind
+                    mxp : Xp
+                    mxp =
+                        (Chore.getByKind kind game.choresData).mxp
 
                     masteryLevel =
-                        Xp.level Xp.defaultSchedule (stats.getter game.choresData).mxp
+                        Xp.level Xp.defaultSchedule mxp
 
                     everyTenLevelsMod =
                         successBuff 0.05
@@ -789,12 +832,13 @@ getChoreUnlocksIntervalMods game =
         |> List.map
             (\kind ->
                 let
-                    stats =
-                        Chore.getStats kind
+                    mxp : Xp
+                    mxp =
+                        (Chore.getByKind kind game.choresData).mxp
 
                     masteryLevel : Int
                     masteryLevel =
-                        Xp.level Xp.defaultSchedule (stats.getter game.choresData).mxp
+                        Xp.level Xp.defaultSchedule mxp
 
                     timesToApplyMod =
                         if masteryLevel >= 99 then

@@ -29,9 +29,7 @@ render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
         [ Utils.xpSection game.xp.chores
-
-        -- Chore grid
-        , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4" ]
+        , div [ Utils.skills.grid ]
             (List.map (renderChoreListItem game) (Game.getChoreListItems game))
         ]
 
@@ -137,10 +135,10 @@ getChoreProbability effect =
             Nothing
 
 
-renderChoreListItem : Game -> Game.ChoresListItem -> Html FrontendMsg
+renderChoreListItem : Game -> Game.ActivityListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
-        Game.ChoreItem kind ->
+        Game.ActivityListItem kind ->
             let
                 event : Event
                 event =
@@ -194,10 +192,10 @@ renderChoreListItem game item =
                         , extraResource = resource
                         , skillXp = skillXp
                         , mxp = mxp
-                        , mxpCurrentValue = (stats.getter game.choresData).mxp
+                        , mxpCurrentValue = (Chore.getByKind kind game.choresData).mxp
                         }
 
-        Game.LockedChore level ->
+        Game.LockedActivity level ->
             renderLockedChore level
 
 
