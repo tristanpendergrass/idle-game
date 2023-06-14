@@ -5,7 +5,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
-import IdleGame.Skill exposing (Skill(..), SkillDict)
+import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 
@@ -17,7 +17,7 @@ import IdleGame.Xp as Xp exposing (Xp)
 type
     Tag
     -- TODO: refactor into a Tag module so references can be Tag.Skill?
-    = SkillTag Skill
+    = SkillTag Skill.Kind
     | XpTag
     | MxpTag
     | ChoreTag Chore.Kind
@@ -52,7 +52,7 @@ type ModdedEvent
 type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
-    | GainXp { base : Xp, multiplier : Float } Skill
+    | GainXp { base : Xp, multiplier : Float } Skill.Kind
     | GainChoreMxp { base : Xp, multiplier : Float } Chore.Kind
     | GainCoin Multiplicable
 
@@ -397,7 +397,7 @@ devGlobalXpBuff =
 
 choresXpBuff : Float -> Mod
 choresXpBuff buff =
-    { tags = [ SkillTag Chores, XpTag ]
+    { tags = [ SkillTag Skill.Chores, XpTag ]
     , label = XpModLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
@@ -407,7 +407,7 @@ choresXpBuff buff =
 
 choresCoinBuff : Float -> Mod
 choresCoinBuff buff =
-    { tags = [ SkillTag Chores ]
+    { tags = [ SkillTag Skill.Chores ]
     , label = CoinModLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
@@ -427,7 +427,7 @@ choresMxpBuff buff =
 
 choresResourceBuff : Float -> Mod
 choresResourceBuff buff =
-    { tags = [ SkillTag Chores ]
+    { tags = [ SkillTag Skill.Chores ]
     , label = ResourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes

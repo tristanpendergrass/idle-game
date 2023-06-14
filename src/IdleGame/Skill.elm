@@ -1,42 +1,37 @@
 module IdleGame.Skill exposing (..)
 
 
-type Skill
+type Kind
     = Chores
     | Hexes
 
 
-type alias SkillDict a =
+type alias Record a =
     { chores : a
     , hexes : a
     }
 
 
-getInDict : Skill -> SkillDict a -> a
-getInDict skill dict =
-    case skill of
+getByKind : Kind -> Record a -> a
+getByKind kind data =
+    case kind of
         Chores ->
-            dict.chores
+            data.chores
 
         Hexes ->
-            dict.hexes
+            data.hexes
 
 
-setInDict : Skill -> a -> SkillDict a -> SkillDict a
-setInDict skill value dict =
-    case skill of
+setByKind : Kind -> a -> Record a -> Record a
+setByKind kind value data =
+    case kind of
         Chores ->
-            { dict | chores = value }
+            { data | chores = value }
 
         Hexes ->
-            { dict | hexes = value }
+            { data | hexes = value }
 
 
-updateInDict : Skill -> (a -> a) -> SkillDict a -> SkillDict a
-updateInDict skill f dict =
-    case skill of
-        Chores ->
-            { dict | chores = f dict.chores }
-
-        Hexes ->
-            { dict | hexes = f dict.hexes }
+updateByKind : Kind -> (a -> a) -> Record a -> Record a
+updateByKind kind update data =
+    setByKind kind (update (getByKind kind data)) data

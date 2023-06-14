@@ -10,7 +10,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
-import IdleGame.Skill as SkillDict exposing (Skill(..), SkillDict)
+import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -28,9 +28,7 @@ import Tuple
 
 type alias Game =
     { seed : Random.Seed
-
-    -- , choresXp : Xp
-    , xp : SkillDict Xp
+    , xp : Skill.Record Xp
     , choresMxp : Xp
     , activity : Maybe Activity
     , choresData : Chore.Record { mxp : Xp }
@@ -77,78 +75,62 @@ type ActivityListItem
     | ActivityListItem Chore.Kind
 
 
+choreUnlockRequirements : Chore.Record Int
 choreUnlockRequirements =
-    [ ( Chore.CleanStables, 1 )
-    , ( Chore.CleanBigBubba, 10 )
-    , ( Chore.SweepChimneys, 25 )
-    , ( Chore.WaterGreenhousePlants, 35 )
-    , ( Chore.WashAndIronRobes, 45 )
-    , ( Chore.OrganizePotionIngredients, 55 )
-    , ( Chore.RepairInstruments, 65 )
-    , ( Chore.FlushDrainDemons, 75 )
-    , ( Chore.OrganizeSpellBooks, 90 )
-    ]
+    { cleanStables = 1
+    , cleanBigBubba = 10
+    , sweepChimneys = 25
+    , waterGreenhousePlants = 35
+    , washRobes = 45
+    , organizePotionIngredients = 55
+    , repairInstruments = 65
+    , flushDrainDemons = 75
+    , organizeSpellBooks = 90
+    }
 
 
 choreIsUnlocked : Game -> Chore.Kind -> Bool
 choreIsUnlocked game kind =
     let
-        skillLevel =
-            Xp.level Xp.defaultSchedule game.xp.chores
+        currentLevel : Int
+        currentLevel =
+            game.xp.chores
+                |> Xp.level Xp.defaultSchedule
 
+        requiredLevel : Int
         requiredLevel =
-            choreUnlockRequirements
-                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
-                |> List.map Tuple.first
-                |> List.member kind
+            Chore.getByKind kind choreUnlockRequirements
     in
-    requiredLevel
+    currentLevel >= requiredLevel
 
 
 getChoreListItems : Game -> List ActivityListItem
 getChoreListItems { xp } =
-    let
-        skillLevel =
-            Xp.level Xp.defaultSchedule xp.chores
-
-        unlockedChoreTypes =
-            choreUnlockRequirements
-                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
-                |> List.map (\( type_, _ ) -> ActivityListItem type_)
-
-        maybeNextUnlock =
-            choreUnlockRequirements
-                |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
-                |> List.sortBy Tuple.second
-                |> List.head
-                |> Maybe.map (\( _, level ) -> LockedActivity level)
-                |> Maybe.map List.singleton
-                |> Maybe.withDefault []
-    in
-    unlockedChoreTypes ++ maybeNextUnlock
-
-
-getHexesListItems : Game -> List ActivityListItem
-getHexesListItems { xp } =
-    let
-        skillLevel =
-            Xp.level Xp.defaultSchedule xp.hexes
-
-        unlockedChoreTypes =
-            choreUnlockRequirements
-                |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
-                |> List.map (\( type_, _ ) -> ActivityListItem type_)
-
-        maybeNextUnlock =
-            choreUnlockRequirements
-                |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
-                |> List.sortBy Tuple.second
-                |> List.head
-                |> Maybe.map (\( _, level ) -> LockedActivity level)
-                |> Maybe.map List.singleton
-                |> Maybe.withDefault []
-    in
-    unlockedChoreTypes ++ maybeNextUnlock
+    -- let
+    --     skillLevel =
+    --         Xp.level Xp.defaultSchedule xp.chores
+    --     unlockedChoreTypes =
+    --         choreUnlockRequirements
+    --             |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
+    --             |> List.map (\( type_, _ ) -> ActivityListItem type_)
+    --     maybeNextUnlock =
+    --         choreUnlockRequirements
+    --             |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
+    --             |> List.sortBy Tuple.second
+    --             |> List.head
+    --             |> Maybe.map (\( _, level ) -> LockedActivity level)
+    --             |> Maybe.map List.singleton
+    --             |> Maybe.withDefault []
+    --     reducer : Chore.Kind -> List ActivityListItem -> List ActivityListItem
+    --     reducer kind list =
+    --         if choreIsUnlocked { xp } kind then
+    --             ActivityListItem kind :: list
+    --         else
+    --             list
+    -- in
+    -- List.foldl reducer [] Chore.allKinds
+    -- unlockedChoreTypes ++ maybeNextUnlock
+    []
 
 
 
@@ -166,16 +148,16 @@ completeChoreEvent game kind =
     in
     Event
         { effects =
-            [ gainXp xp Chores
-                |> withTags [ SkillTag Chores, ChoreTag kind ]
+            [ gainXp xp Skill.Chores
+                |> withTags [ SkillTag Skill.Chores, ChoreTag kind ]
             , gainChoreMxp game kind
-                |> withTags [ SkillTag Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Skill.Chores, ChoreTag kind ]
             , gainWithProbability extraResourceProbability
-                [ gainResource 1 extraResource |> withTags [ SkillTag Chores, ChoreTag kind ]
+                [ gainResource 1 extraResource |> withTags [ SkillTag Skill.Chores, ChoreTag kind ]
                 ]
-                |> withTags [ SkillTag Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Skill.Chores, ChoreTag kind ]
             , gainCoin coin
-                |> withTags [ SkillTag Chores, ChoreTag kind ]
+                |> withTags [ SkillTag Skill.Chores, ChoreTag kind ]
             ]
         }
 
@@ -526,14 +508,14 @@ addResource resource amount game =
     )
 
 
-addXp : Skill -> Xp -> Game -> Game
+addXp : Skill.Kind -> Xp -> Game -> Game
 addXp skill amount game =
     case skill of
-        Chores ->
-            { game | xp = SkillDict.updateInDict Chores (Quantity.plus amount) game.xp }
+        Skill.Chores ->
+            { game | xp = Skill.updateByKind Skill.Chores (Quantity.plus amount) game.xp }
 
-        Hexes ->
-            { game | xp = SkillDict.updateInDict Hexes (Quantity.plus amount) game.xp }
+        Skill.Hexes ->
+            { game | xp = Skill.updateByKind Skill.Hexes (Quantity.plus amount) game.xp }
 
 
 addMxp : Chore.Kind -> Xp -> Game -> Game
@@ -567,7 +549,7 @@ gainResource amount resource =
     Effect { type_ = GainResource { base = amount, doublingChance = 0 } resource, tags = [] }
 
 
-gainXp : Xp -> Skill -> Effect
+gainXp : Xp -> Skill.Kind -> Effect
 gainXp amount skill =
     Effect { type_ = GainXp { base = amount, multiplier = 1.0 } skill, tags = [ XpTag, SkillTag skill ] }
 
@@ -588,7 +570,7 @@ gainChoreMxp game kind =
         baseMxp =
             calculateChoreMxp kind game
     in
-    Effect { type_ = GainChoreMxp { base = baseMxp, multiplier = 1.0 } kind, tags = [ MxpTag, SkillTag Chores, ChoreTag kind ] }
+    Effect { type_ = GainChoreMxp { base = baseMxp, multiplier = 1.0 } kind, tags = [ MxpTag, SkillTag Skill.Chores, ChoreTag kind ] }
 
 
 gainCoin : Int -> Effect
@@ -771,7 +753,7 @@ getChoreUnlocksMods game =
                         successBuff 0.05
                             |> withHowManyTimesToApplyMod (masteryLevel // 10)
                             -- repeat once for each ten levels
-                            |> modWithTags [ SkillTag Chores, ChoreTag kind ]
+                            |> modWithTags [ SkillTag Skill.Chores, ChoreTag kind ]
                 in
                 [ everyTenLevelsMod
                 ]

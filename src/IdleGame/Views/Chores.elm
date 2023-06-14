@@ -12,7 +12,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
-import IdleGame.Skill exposing (Skill(..))
+import IdleGame.Skill exposing (Kind(..))
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect
 import IdleGame.Views.Icon as Icon exposing (Icon)
