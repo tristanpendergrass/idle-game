@@ -102,33 +102,7 @@ setByKind kind value data =
 
 updateByKind : ChoreKind -> (a -> a) -> ChoreRecord a -> ChoreRecord a
 updateByKind kind update data =
-    case kind of
-        CleanStables ->
-            { data | cleanStables = update data.cleanStables }
-
-        CleanBigBubba ->
-            { data | cleanBigBubba = update data.cleanBigBubba }
-
-        SweepChimneys ->
-            { data | sweepChimneys = update data.sweepChimneys }
-
-        WaterGreenhousePlants ->
-            { data | waterGreenhousePlants = update data.waterGreenhousePlants }
-
-        WashAndIronRobes ->
-            { data | washRobes = update data.washRobes }
-
-        OrganizePotionIngredients ->
-            { data | organizePotionIngredients = update data.organizePotionIngredients }
-
-        RepairInstruments ->
-            { data | repairInstruments = update data.repairInstruments }
-
-        FlushDrainDemons ->
-            { data | flushDrainDemons = update data.flushDrainDemons }
-
-        OrganizeSpellBooks ->
-            { data | organizeSpellBooks = update data.organizeSpellBooks }
+    setByKind kind (update (getByKind kind data)) data
 
 
 type alias AllStates =
