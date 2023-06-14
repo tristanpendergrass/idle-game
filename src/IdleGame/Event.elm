@@ -1,5 +1,6 @@
 module IdleGame.Event exposing (..)
 
+import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
@@ -19,7 +20,7 @@ type
     = SkillTag Skill
     | XpTag
     | MxpTag
-    | ChoreTag ChoreKind
+    | ChoreTag Chore.Kind
 
 
 type ModSource
@@ -52,7 +53,7 @@ type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Xp, multiplier : Float } Skill
-    | GainChoreMxp { base : Xp, multiplier : Float } ChoreKind
+    | GainChoreMxp { base : Xp, multiplier : Float } Chore.Kind
     | GainCoin Multiplicable
 
 

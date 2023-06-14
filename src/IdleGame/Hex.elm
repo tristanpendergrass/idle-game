@@ -1,6 +1,7 @@
 module IdleGame.Hex exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.Chore as Chore
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Xp as Xp exposing (Xp)
@@ -56,7 +57,7 @@ type alias ChoreOutcome =
     }
 
 
-incrementChoreMxp : Xp -> ChoreKind -> AllStates -> AllStates
+incrementChoreMxp : Xp -> Chore.Kind -> AllStates -> AllStates
 incrementChoreMxp amount kind choresData =
     let
         stats =
@@ -81,7 +82,7 @@ hex1Stats =
     }
 
 
-getStats : ChoreKind -> Stats
+getStats : Chore.Kind -> Stats
 getStats kind =
     -- case kind of
     --     CleanStables ->

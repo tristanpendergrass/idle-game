@@ -91,7 +91,7 @@ renderContent obj extraBottomPadding game =
         mods =
             Game.getAllMods game
 
-        kind : ChoreKind
+        kind : Chore.Kind
         kind =
             case obj of
                 DetailViewActivity (ActivityChore k _) ->
@@ -189,7 +189,7 @@ type PlayButtonState
     | Pause
 
 
-playPauseButton : PlayButtonState -> ChoreKind -> Html FrontendMsg
+playPauseButton : PlayButtonState -> Chore.Kind -> Html FrontendMsg
 playPauseButton state kind =
     let
         icon : Icon

@@ -10,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
+import IdleGame.Chore as Chore
 import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
@@ -103,13 +104,13 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
         ( Just activity, Just preview ) ->
             -- Slightly complicated by the fact that we might be trying to preview the same thing as the activity
             let
-                activityKind : ChoreKind
+                activityKind : Chore.Kind
                 activityKind =
                     case activity of
                         ActivityChore k _ ->
                             k
 
-                previewKind : ChoreKind
+                previewKind : Chore.Kind
                 previewKind =
                     case preview of
                         PreviewChore k ->
@@ -247,7 +248,7 @@ performantTick =
         (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
 
 
-playChore : ChoreKind -> FrontendModel -> FrontendModel
+playChore : Chore.Kind -> FrontendModel -> FrontendModel
 playChore kind =
     mapGame
         (\game ->
@@ -259,7 +260,7 @@ playChore kind =
         )
 
 
-pauseChore : ChoreKind -> FrontendModel -> FrontendModel
+pauseChore : Chore.Kind -> FrontendModel -> FrontendModel
 pauseChore kind =
     mapGame
         (\game ->

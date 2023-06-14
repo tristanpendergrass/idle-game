@@ -47,7 +47,7 @@ type FrontendGameState
 
 
 type Preview
-    = PreviewChore ChoreKind
+    = PreviewChore Chore.Kind
 
 
 type alias FrontendModel =
@@ -103,10 +103,10 @@ type FrontendMsg
     | HandlePlayerMoveSelect Int Adventuring.PlayerMove
     | HandleMonsterSelect Adventuring.MonsterKind
       -- Chores
-    | HandleChoreClick ChoreKind
-    | ToggleActiveChore ChoreKind
-    | HandlePlayClick ChoreKind
-    | HandlePauseClick ChoreKind
+    | HandleChoreClick Chore.Kind
+    | ToggleActiveChore Chore.Kind
+    | HandlePlayClick Chore.Kind
+    | HandlePauseClick Chore.Kind
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel

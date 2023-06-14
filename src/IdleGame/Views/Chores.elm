@@ -210,7 +210,7 @@ probabilityToInt x =
 
 
 type alias ChoreItemView =
-    { kind : ChoreKind
+    { kind : Chore.Kind
     , title : String
     , handleClick : FrontendMsg
     , maybeTimer : Maybe Timer
@@ -229,7 +229,7 @@ type alias ChoreItemView =
 -- Chore title
 
 
-choreImage : ChoreKind -> Html FrontendMsg
+choreImage : Chore.Kind -> Html FrontendMsg
 choreImage kind =
     img
         [ src <| (Chore.getStats kind).imgSrc
@@ -238,7 +238,7 @@ choreImage kind =
         []
 
 
-choreTitle : ChoreKind -> Html FrontendMsg
+choreTitle : Chore.Kind -> Html FrontendMsg
 choreTitle kind =
     h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
         [ span [] [ text (Chore.getStats kind).title ]

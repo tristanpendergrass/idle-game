@@ -1,13 +1,24 @@
 module IdleGame.Chore exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Xp as Xp exposing (Xp)
 import Quantity exposing (Quantity)
 
 
-allKinds : List ChoreKind
+type Kind
+    = CleanStables
+    | CleanBigBubba
+    | SweepChimneys
+    | WaterGreenhousePlants
+    | WashAndIronRobes
+    | OrganizePotionIngredients
+    | RepairInstruments
+    | FlushDrainDemons
+    | OrganizeSpellBooks
+
+
+allKinds : List Kind
 allKinds =
     [ CleanStables
     , CleanBigBubba
@@ -38,7 +49,7 @@ type alias ChoreRecord a =
     }
 
 
-getByKind : ChoreKind -> ChoreRecord a -> a
+getByKind : Kind -> ChoreRecord a -> a
 getByKind kind data =
     case kind of
         CleanStables ->
@@ -69,7 +80,7 @@ getByKind kind data =
             data.organizeSpellBooks
 
 
-setByKind : ChoreKind -> a -> ChoreRecord a -> ChoreRecord a
+setByKind : Kind -> a -> ChoreRecord a -> ChoreRecord a
 setByKind kind value data =
     case kind of
         CleanStables ->
@@ -100,7 +111,7 @@ setByKind kind value data =
             { data | organizeSpellBooks = value }
 
 
-updateByKind : ChoreKind -> (a -> a) -> ChoreRecord a -> ChoreRecord a
+updateByKind : Kind -> (a -> a) -> ChoreRecord a -> ChoreRecord a
 updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
 
@@ -269,6 +280,6 @@ organizeSpellBooksStats =
     }
 
 
-getStats : ChoreKind -> Stats
+getStats : Kind -> Stats
 getStats kind =
     getByKind kind allStats

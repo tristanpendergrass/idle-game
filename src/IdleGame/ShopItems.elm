@@ -36,7 +36,7 @@ type alias Stats =
 
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod [ { kind = CleanStables, percentChange = 0.1 } ]
+    ShopItemIntervalMod [ { kind = Chore.CleanStables, percentChange = 0.1 } ]
 
 
 shovelStats =
@@ -46,8 +46,8 @@ shovelStats =
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
-            [ { kind = CleanStables, percentChange = 0.05 }
-            , { kind = CleanBigBubba, percentChange = 0.05 }
+            [ { kind = Chore.CleanStables, percentChange = 0.05 }
+            , { kind = Chore.CleanBigBubba, percentChange = 0.05 }
             ]
     , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
     , getter = .shovel
@@ -60,7 +60,7 @@ beginnerDualWieldingStats =
     , icon = Icon.book
     , price = Counter.create 6000
     , unlockLevel = 35
-    , reward = ShopItemIntervalMod [ { kind = WaterGreenhousePlants, percentChange = 1.0 } ]
+    , reward = ShopItemIntervalMod [ { kind = Chore.WaterGreenhousePlants, percentChange = 1.0 } ]
     , description = "+100% faster at Water Greenhouse Plants"
     , getter = .beginnerDualWielding
     , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
@@ -91,12 +91,12 @@ readingGlassesStats =
             [ Event.choresMxpBuff 0.2
                 |> Event.withSource Event.ShopItem
                 |> Event.modWithTags
-                    [ Event.ChoreTag OrganizePotionIngredients
+                    [ Event.ChoreTag Chore.OrganizePotionIngredients
                     ]
             , Event.choresMxpBuff 0.2
                 |> Event.withSource Event.ShopItem
                 |> Event.modWithTags
-                    [ Event.ChoreTag OrganizeSpellBooks
+                    [ Event.ChoreTag Chore.OrganizeSpellBooks
                     ]
             ]
     , description = "+20% Mastery XP from Organize Potion Ingredients and Organize Spell Books"
@@ -115,7 +115,7 @@ oversizedBagStats =
             [ Event.successBuff 0.75
                 |> Event.withSource Event.ShopItem
                 |> Event.modWithTags
-                    [ Event.ChoreTag RepairInstruments ]
+                    [ Event.ChoreTag Chore.RepairInstruments ]
             ]
     , description = "Always receive item from Repair Instruments"
     , getter = .oversizedBag

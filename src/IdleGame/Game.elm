@@ -74,36 +74,23 @@ create seed =
 
 type ActivityListItem
     = LockedActivity Int
-    | ActivityListItem ChoreKind
+    | ActivityListItem Chore.Kind
 
 
 choreUnlockRequirements =
-    [ ( CleanStables, 1 )
-    , ( CleanBigBubba, 10 )
-    , ( SweepChimneys, 25 )
-    , ( WaterGreenhousePlants, 35 )
-    , ( WashAndIronRobes, 45 )
-    , ( OrganizePotionIngredients, 55 )
-    , ( RepairInstruments, 65 )
-    , ( FlushDrainDemons, 75 )
-    , ( OrganizeSpellBooks, 90 )
+    [ ( Chore.CleanStables, 1 )
+    , ( Chore.CleanBigBubba, 10 )
+    , ( Chore.SweepChimneys, 25 )
+    , ( Chore.WaterGreenhousePlants, 35 )
+    , ( Chore.WashAndIronRobes, 45 )
+    , ( Chore.OrganizePotionIngredients, 55 )
+    , ( Chore.RepairInstruments, 65 )
+    , ( Chore.FlushDrainDemons, 75 )
+    , ( Chore.OrganizeSpellBooks, 90 )
     ]
 
 
-hexUnlockRequirements =
-    [ ( CleanStables, 1 )
-    , ( CleanBigBubba, 10 )
-    , ( SweepChimneys, 25 )
-    , ( WaterGreenhousePlants, 35 )
-    , ( WashAndIronRobes, 45 )
-    , ( OrganizePotionIngredients, 55 )
-    , ( RepairInstruments, 65 )
-    , ( FlushDrainDemons, 75 )
-    , ( OrganizeSpellBooks, 90 )
-    ]
-
-
-choreIsUnlocked : Game -> ChoreKind -> Bool
+choreIsUnlocked : Game -> Chore.Kind -> Bool
 choreIsUnlocked game kind =
     let
         skillLevel =
@@ -168,7 +155,7 @@ getHexesListItems { xp } =
 -- Chores
 
 
-completeChoreEvent : Game -> ChoreKind -> Event
+completeChoreEvent : Game -> Chore.Kind -> Event
 completeChoreEvent game kind =
     let
         outcome =
@@ -197,7 +184,7 @@ type alias ActivityStatus =
     Maybe Timer
 
 
-toggleActiveChore : ChoreKind -> Game -> Game
+toggleActiveChore : Chore.Kind -> Game -> Game
 toggleActiveChore kind game =
     let
         newActivity : Maybe Activity
@@ -220,7 +207,7 @@ toggleActiveChore kind game =
         game
 
 
-choreIsActive : ChoreKind -> Game -> Bool
+choreIsActive : Chore.Kind -> Game -> Bool
 choreIsActive kind game =
     case game.activity of
         Just (ActivityChore k _) ->
@@ -268,7 +255,7 @@ applyIntervalMods mods duration =
     Quantity.divideBy multiplier duration
 
 
-getModdedDuration : Game -> ChoreKind -> Duration
+getModdedDuration : Game -> Chore.Kind -> Duration
 getModdedDuration game choreKind =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     let
@@ -449,7 +436,7 @@ intGenerator { base, doublingChance } =
             )
 
 
-calculateChoreMxp : ChoreKind -> Game -> Xp
+calculateChoreMxp : Chore.Kind -> Game -> Xp
 calculateChoreMxp kind game =
     -- Important! Keep the application here in sync with Views.Chores.elm
     let
@@ -549,7 +536,7 @@ addXp skill amount game =
             { game | xp = SkillDict.updateInDict Hexes (Quantity.plus amount) game.xp }
 
 
-addMxp : ChoreKind -> Xp -> Game -> Game
+addMxp : Chore.Kind -> Xp -> Game -> Game
 addMxp kind amount game =
     let
         fn { mxp } =
@@ -585,7 +572,7 @@ gainXp amount skill =
     Effect { type_ = GainXp { base = amount, multiplier = 1.0 } skill, tags = [ XpTag, SkillTag skill ] }
 
 
-gainChoreMxp : Game -> ChoreKind -> Effect
+gainChoreMxp : Game -> Chore.Kind -> Effect
 gainChoreMxp game kind =
     -- Important! Keep the application here in sync with Views.Chores.elm
     -- let

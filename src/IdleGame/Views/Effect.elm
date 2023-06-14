@@ -3,6 +3,7 @@ module IdleGame.Views.Effect exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event
 import IdleGame.Game as Game exposing (Game)
@@ -97,7 +98,7 @@ renderXp xp skill =
         ]
 
 
-renderMxp : { base : Xp, multiplier : Float } -> IdleGame.GameTypes.ChoreKind -> Html msg
+renderMxp : { base : Xp, multiplier : Float } -> Chore.Kind -> Html msg
 renderMxp mxp skill =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.masteryXpBadge

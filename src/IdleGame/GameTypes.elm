@@ -1,24 +1,13 @@
 module IdleGame.GameTypes exposing (..)
 
+import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 
 
 type Activity
-    = ActivityChore ChoreKind Timer
-
-
-type ChoreKind
-    = CleanStables
-    | CleanBigBubba
-    | SweepChimneys
-    | WaterGreenhousePlants
-    | WashAndIronRobes
-    | OrganizePotionIngredients
-    | RepairInstruments
-    | FlushDrainDemons
-    | OrganizeSpellBooks
+    = ActivityChore Chore.Kind Timer
 
 
 type HexKind
@@ -39,6 +28,6 @@ type Toast
 
 
 type alias IntervalMod =
-    { kind : ChoreKind
+    { kind : Chore.Kind
     , percentChange : Float -- e.g. 0.25 -> 25% faster
     }
