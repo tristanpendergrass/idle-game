@@ -129,8 +129,17 @@ getChoreListItems { xp } =
     --             list
     -- in
     -- List.foldl reducer [] Chore.allKinds
-    -- unlockedChoreTypes ++ maybeNextUnlock
-    []
+    let
+        xp : Xp
+        xp =
+            Skill.getByKind Skill.Chores xp
+
+        skillLevel : Int
+        skillLevel =
+            Xp.level Xp.defaultSchedule xp
+    in
+    Chore.allKinds
+        |> List.Extra.maybeMap.map (\kind -> )
 
 
 
