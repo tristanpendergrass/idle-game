@@ -75,71 +75,65 @@ type ActivityListItem
     | ActivityListItem Chore.Kind
 
 
-choreUnlockRequirements : Chore.Record Int
-choreUnlockRequirements =
-    { cleanStables = 1
-    , cleanBigBubba = 10
-    , sweepChimneys = 25
-    , waterGreenhousePlants = 35
-    , washRobes = 45
-    , organizePotionIngredients = 55
-    , repairInstruments = 65
-    , flushDrainDemons = 75
-    , organizeSpellBooks = 90
-    }
-
-
-choreIsUnlocked : Game -> Chore.Kind -> Bool
-choreIsUnlocked game kind =
-    let
-        currentLevel : Int
-        currentLevel =
-            game.xp.chores
-                |> Xp.level Xp.defaultSchedule
-
-        requiredLevel : Int
-        requiredLevel =
-            Chore.getByKind kind choreUnlockRequirements
-    in
-    currentLevel >= requiredLevel
-
-
 getChoreListItems : Game -> List ActivityListItem
-getChoreListItems { xp } =
-    -- let
-    --     skillLevel =
-    --         Xp.level Xp.defaultSchedule xp.chores
-    --     unlockedChoreTypes =
-    --         choreUnlockRequirements
-    --             |> List.filter (\( _, choreLevel ) -> choreLevel <= skillLevel)
-    --             |> List.map (\( type_, _ ) -> ActivityListItem type_)
-    --     maybeNextUnlock =
-    --         choreUnlockRequirements
-    --             |> List.filter (\( _, choreLevel ) -> choreLevel > skillLevel)
-    --             |> List.sortBy Tuple.second
-    --             |> List.head
-    --             |> Maybe.map (\( _, level ) -> LockedActivity level)
-    --             |> Maybe.map List.singleton
-    --             |> Maybe.withDefault []
-    --     reducer : Chore.Kind -> List ActivityListItem -> List ActivityListItem
-    --     reducer kind list =
-    --         if choreIsUnlocked { xp } kind then
-    --             ActivityListItem kind :: list
-    --         else
-    --             list
-    -- in
-    -- List.foldl reducer [] Chore.allKinds
+getChoreListItems game =
     let
         xp : Xp
         xp =
-            Skill.getByKind Skill.Chores xp
+            Skill.getByKind Skill.Chores game.xp
 
         skillLevel : Int
         skillLevel =
             Xp.level Xp.defaultSchedule xp
+
+        convertToListItem : Chore.Kind -> ActivityListItem
+        convertToListItem kind =
+            let
+                currentLevel : Int
+                currentLevel =
+                    game.xp.chores
+                        |> Xp.level Xp.defaultSchedule
+
+                requiredLevel : Int
+                requiredLevel =
+                    (Chore.getByKind kind Chore.allStats).unlockLevel
+            in
+            if currentLevel >= requiredLevel then
+                ActivityListItem kind
+
+            else
+                LockedActivity requiredLevel
+
+        reducer : Chore.Kind -> { items : List ActivityListItem, lockedItem : Bool } -> { items : List ActivityListItem, lockedItem : Bool }
+        reducer kind accum =
+            if accum.lockedItem then
+                accum
+
+            else
+                let
+                    listItem : ActivityListItem
+                    listItem =
+                        convertToListItem kind
+
+                    newItems : List ActivityListItem
+                    newItems =
+                        List.concat [ accum.items, [ listItem ] ]
+
+                    newItemIsLocked : Bool
+                    newItemIsLocked =
+                        case listItem of
+                            ActivityListItem _ ->
+                                False
+
+                            LockedActivity level ->
+                                True
+                in
+                { items = newItems, lockedItem = newItemIsLocked }
+
+        result =
+            List.foldl reducer { items = [], lockedItem = False } Chore.allKinds
     in
-    Chore.allKinds
-        |> List.Extra.maybeMap.map (\kind -> )
+    result.items
 
 
 
@@ -178,20 +172,30 @@ type alias ActivityStatus =
 toggleActiveChore : Chore.Kind -> Game -> Game
 toggleActiveChore kind game =
     let
-        newActivity : Maybe Activity
-        newActivity =
-            case game.activity of
-                Just (ActivityChore k _) ->
-                    if kind == k then
-                        Nothing
+        currentLevel : Int
+        currentLevel =
+            game.xp.chores
+                |> Xp.level Xp.defaultSchedule
 
-                    else
-                        Just (ActivityChore kind Timer.create)
-
-                Nothing ->
-                    Just (ActivityChore kind Timer.create)
+        requiredLevel : Int
+        requiredLevel =
+            (Chore.getByKind kind Chore.allStats).unlockLevel
     in
-    if choreIsUnlocked game kind then
+    if currentLevel >= requiredLevel then
+        let
+            newActivity : Maybe Activity
+            newActivity =
+                case game.activity of
+                    Just (ActivityChore k _) ->
+                        if kind == k then
+                            Nothing
+
+                        else
+                            Just (ActivityChore kind Timer.create)
+
+                    Nothing ->
+                        Just (ActivityChore kind Timer.create)
+        in
         setActivity newActivity game
 
     else

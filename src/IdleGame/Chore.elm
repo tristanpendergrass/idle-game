@@ -1,7 +1,9 @@
 module IdleGame.Chore exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
+import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
 import Quantity exposing (Quantity)
 
@@ -124,6 +126,7 @@ type alias Outcome =
 type alias Stats =
     { title : String
     , imgSrc : String
+    , unlockLevel : Int
     , outcome : Outcome
     }
 
@@ -155,6 +158,7 @@ cleanStablesStats : Stats
 cleanStablesStats =
     { title = "Clean Stables"
     , imgSrc = "/chores/stable.png"
+    , unlockLevel = 1
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -169,6 +173,7 @@ cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { title = "Clean Big Bubba's Stall"
     , imgSrc = "/chores/bubba4.png"
+    , unlockLevel = 10
     , outcome =
         { xp = Xp.fromInt 25
         , duration = Duration.seconds 6
@@ -183,6 +188,7 @@ sweepChimneysStats : Stats
 sweepChimneysStats =
     { title = "Sweep Chimneys"
     , imgSrc = "/chores/chimney.png"
+    , unlockLevel = 25
     , outcome =
         { xp = Xp.fromInt 37
         , duration = Duration.seconds 8
@@ -197,6 +203,7 @@ waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
     { title = "Water Greenhouse Plants"
     , imgSrc = "/chores/greenhouse_3.png"
+    , unlockLevel = 35
     , outcome =
         { xp = Xp.fromInt 12
         , duration = Duration.seconds 2
@@ -211,6 +218,7 @@ washAndIronRobesStats : Stats
 washAndIronRobesStats =
     { title = "Wash and Iron Robes"
     , imgSrc = "/chores/washRobes.png"
+    , unlockLevel = 45
     , outcome =
         { xp = Xp.fromInt 50
         , duration = Duration.seconds 8
@@ -225,6 +233,7 @@ organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
     { title = "Organize Potion Ingredients"
     , imgSrc = "/chores/potionIngredients_2.png"
+    , unlockLevel = 55
     , outcome =
         { xp = Xp.fromInt 165
         , duration = Duration.seconds 20
@@ -239,6 +248,7 @@ repairInstrumentsStats : Stats
 repairInstrumentsStats =
     { title = "Repair Instruments"
     , imgSrc = "/chores/repairInstruments.png"
+    , unlockLevel = 65
     , outcome =
         { xp = Xp.fromInt 75
         , duration = Duration.seconds 12
@@ -253,6 +263,7 @@ flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
     { title = "Flush the Drain Demons"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 75
     , outcome =
         { xp = Xp.fromInt 90
         , duration = Duration.seconds 10
@@ -267,6 +278,7 @@ organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
     { title = "Organize Spell Books"
     , imgSrc = "/chores/spellBooks.png"
+    , unlockLevel = 90
     , outcome =
         { xp = Xp.fromInt 210
         , duration = Duration.seconds 20
@@ -275,3 +287,39 @@ organizeSpellBooksStats =
         , coin = 30
         }
     }
+
+
+type alias ActivityData =
+    { kind : Kind
+    , timer : Timer
+    }
+
+
+createActivityData : Kind -> ActivityData
+createActivityData kind =
+    { kind = kind
+    , timer = Timer.create
+    }
+
+
+tick : Game -> Duration -> ActivityData -> ( Maybe ActivityData, List Event )
+tick game delta activityData =
+    let
+        { choreKind, timer } =
+            activityData
+
+        choreDuration : Duration
+        choreDuration =
+            getModdedDuration game choreKind
+
+        ( newTimer, completions ) =
+            timer
+                |> Timer.increment choreDuration delta
+
+        newEvents : List Event
+        newEvents =
+            List.repeat completions (completeChoreEvent game choreKind)
+    in
+    ( Just (ActivityChore choreKind newTimer)
+    , newEvents
+    )

@@ -1,8 +1,6 @@
 module IdleGame.Hex exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.Chore as Chore
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Xp as Xp exposing (Xp)
 import Quantity exposing (Quantity)
@@ -124,6 +122,7 @@ type alias Outcome =
 type alias Stats =
     { title : String
     , imgSrc : String
+    , unlockLevel : Int
     , outcome : Outcome
     }
 
@@ -155,6 +154,7 @@ hex1Stats : Stats
 hex1Stats =
     { title = "Hex I"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 1
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -167,6 +167,7 @@ jinx1Stats : Stats
 jinx1Stats =
     { title = "Jinx I"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 10
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -179,6 +180,7 @@ curse1Stats : Stats
 curse1Stats =
     { title = "Curse I"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 25
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -191,6 +193,7 @@ hex2Stats : Stats
 hex2Stats =
     { title = "Hex II"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 35
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -203,6 +206,7 @@ jinx2Stats : Stats
 jinx2Stats =
     { title = "Jinx II"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 45
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -215,6 +219,7 @@ curse2Stats : Stats
 curse2Stats =
     { title = "Curse II"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 60
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -227,6 +232,7 @@ hex3Stats : Stats
 hex3Stats =
     { title = "Hex III"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 70
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -239,6 +245,7 @@ jinx3Stats : Stats
 jinx3Stats =
     { title = "Jinx III"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 85
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3
@@ -251,6 +258,7 @@ curse3Stats : Stats
 curse3Stats =
     { title = "Curse III"
     , imgSrc = "/chores/drainDemons.png"
+    , unlockLevel = 95
     , outcome =
         { xp = Xp.fromInt 10
         , duration = Duration.seconds 3

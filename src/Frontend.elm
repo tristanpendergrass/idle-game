@@ -252,11 +252,18 @@ playChore : Chore.Kind -> FrontendModel -> FrontendModel
 playChore kind =
     mapGame
         (\game ->
-            if Game.choreIsActive kind game then
-                game
+            case game.activity of
+                ActivityChore kind _ ->
+                    game
 
-            else
-                Game.toggleActiveChore kind game
+                -- Already playing
+                _ ->
+                    if Chore.canStart kind game then
+                        Game.setActivity (ActivityChore kind Timer.create)
+
+                    else
+                        game
+         -- In this case player didn't meet requirements to start activity, TODO: show snackbar of why?
         )
 
 

@@ -2,12 +2,14 @@ module IdleGame.GameTypes exposing (..)
 
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Hex as Hex
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 
 
 type Activity
-    = ActivityChore Chore.Kind Timer
+    = ActivityChore Chore.ActivityData
+    | ActivityHex Hex.Kind Timer
 
 
 type Toast
