@@ -5,6 +5,7 @@ import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
 
@@ -36,7 +37,7 @@ type alias Stats =
 
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod [ { kind = Chore.CleanStables, percentChange = 0.1 } ]
+    ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 0.1 } ]
 
 
 shovelStats =
@@ -46,8 +47,8 @@ shovelStats =
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
-            [ { kind = Chore.CleanStables, percentChange = 0.05 }
-            , { kind = Chore.CleanBigBubba, percentChange = 0.05 }
+            [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 0.05 }
+            , { kind = IdleGame.Kinds.Activities.CleanBigBubba, percentChange = 0.05 }
             ]
     , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
     , getter = .shovel
@@ -60,7 +61,9 @@ beginnerDualWieldingStats =
     , icon = Icon.book
     , price = Counter.create 6000
     , unlockLevel = 35
-    , reward = ShopItemIntervalMod [ { kind = Chore.WaterGreenhousePlants, percentChange = 1.0 } ]
+
+    -- , reward = ShopItemIntervalMod [ { kind = Activity.WaterGreenhousePlants, percentChange = 1.0 } ]
+    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
     , description = "+100% faster at Water Greenhouse Plants"
     , getter = .beginnerDualWielding
     , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
@@ -72,9 +75,11 @@ keyringStats =
     , icon = Icon.keyring
     , price = Counter.create 10000
     , unlockLevel = 1
-    , reward =
-        ShopItemIntervalMod
-            (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Chore.allKinds)
+
+    -- , reward =
+    -- ShopItemIntervalMod
+    -- (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Activity.allKinds)
+    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
     , description = "+10% faster at All Chores"
     , getter = .keyring
     , setter = \owned ownedItems -> { ownedItems | keyring = owned }
@@ -86,19 +91,21 @@ readingGlassesStats =
     , icon = Icon.readingGlasses
     , price = Counter.create 3000
     , unlockLevel = 55
-    , reward =
-        ShopItemMod
-            [ Event.choresMxpBuff 0.2
-                |> Event.withSource Event.ShopItem
-                |> Event.modWithTags
-                    [ Event.ChoreTag Chore.OrganizePotionIngredients
-                    ]
-            , Event.choresMxpBuff 0.2
-                |> Event.withSource Event.ShopItem
-                |> Event.modWithTags
-                    [ Event.ChoreTag Chore.OrganizeSpellBooks
-                    ]
-            ]
+    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+
+    -- , reward =
+    --     ShopItemMod
+    --         [ Event.choresMxpBuff 0.2
+    --             |> Event.withSource Event.ShopItem
+    --             |> Event.modWithTags
+    --                 [ Event.ChoreTag Activity.OrganizePotionIngredients
+    --                 ]
+    --         , Event.choresMxpBuff 0.2
+    --             |> Event.withSource Event.ShopItem
+    --             |> Event.modWithTags
+    --                 [ Event.ChoreTag Activity.OrganizeSpellBooks
+    --                 ]
+    --         ]
     , description = "+20% Mastery XP from Organize Potion Ingredients and Organize Spell Books"
     , getter = .readingGlasses
     , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
@@ -110,13 +117,15 @@ oversizedBagStats =
     , icon = Icon.oversizedBag
     , price = Counter.create 5000
     , unlockLevel = 65
-    , reward =
-        ShopItemMod
-            [ Event.successBuff 0.75
-                |> Event.withSource Event.ShopItem
-                |> Event.modWithTags
-                    [ Event.ChoreTag Chore.RepairInstruments ]
-            ]
+    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+
+    -- , reward =
+    --     ShopItemMod
+    --         [ Event.successBuff 0.75
+    --             |> Event.withSource Event.ShopItem
+    --             |> Event.modWithTags
+    --                 [ Event.ChoreTag Activity.RepairInstruments ]
+    --         ]
     , description = "Always receive item from Repair Instruments"
     , getter = .oversizedBag
     , setter = \owned ownedItems -> { ownedItems | oversizedBag = owned }

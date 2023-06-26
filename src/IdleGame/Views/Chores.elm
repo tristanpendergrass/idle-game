@@ -5,11 +5,13 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill exposing (Kind(..))
@@ -77,15 +79,15 @@ getChoreMxp : Game -> Effect -> Maybe Xp
 getChoreMxp game effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     case getType effect of
-        GainChoreMxp amount kind ->
+        GainMxp amount kind ->
             let
+                base : Xp
+                base =
+                    Game.calculateActivityMxp kind game
+
                 mxp : Xp
                 mxp =
-                    Quantity.multiplyBy amount.multiplier amount.base
-
-                masteryPoolXp : Xp
-                masteryPoolXp =
-                    Quantity.multiplyBy 0.5 mxp
+                    Quantity.multiplyBy amount.multiplier base
             in
             Just mxp
 
@@ -142,7 +144,7 @@ renderChoreListItem game item =
             let
                 event : Event
                 event =
-                    Game.completeChoreEvent game kind
+                    (Activity.getStats kind).event
 
                 mods : List Mod
                 mods =
@@ -162,7 +164,7 @@ renderChoreListItem game item =
                 Just { coin, skillXp, mxp, resource, probability } ->
                     let
                         stats =
-                            Chore.getStats kind
+                            Activity.getStats kind
 
                         moddedDuration : Duration
                         moddedDuration =
@@ -170,7 +172,7 @@ renderChoreListItem game item =
 
                         maybeTimer =
                             case game.activity of
-                                Just (ActivityChore activeType timer) ->
+                                Just ( activeType, timer ) ->
                                     if kind == activeType then
                                         Just timer
 
@@ -183,7 +185,7 @@ renderChoreListItem game item =
                     renderChore
                         { kind = kind
                         , title = stats.title
-                        , handleClick = HandleChoreClick kind
+                        , handleClick = HandleActivityClick kind
                         , maybeTimer = maybeTimer
                         , duration = moddedDuration
                         , imgSrc = stats.imgSrc
@@ -192,7 +194,7 @@ renderChoreListItem game item =
                         , extraResource = resource
                         , skillXp = skillXp
                         , mxp = mxp
-                        , mxpCurrentValue = (Chore.getByKind kind game.choresData).mxp
+                        , mxpCurrentValue = Activity.getByKind kind game.mxp
                         }
 
         Game.LockedActivity level ->
@@ -210,7 +212,7 @@ probabilityToInt x =
 
 
 type alias ChoreItemView =
-    { kind : Chore.Kind
+    { kind : Activity
     , title : String
     , handleClick : FrontendMsg
     , maybeTimer : Maybe Timer
@@ -229,19 +231,19 @@ type alias ChoreItemView =
 -- Chore title
 
 
-choreImage : Chore.Kind -> Html FrontendMsg
-choreImage kind =
+activityImage : Activity -> Html FrontendMsg
+activityImage kind =
     img
-        [ src <| (Chore.getStats kind).imgSrc
+        [ src <| (Activity.getStats kind).imgSrc
         , class "h-full w-full object-cover"
         ]
         []
 
 
-choreTitle : Chore.Kind -> Html FrontendMsg
+choreTitle : Activity -> Html FrontendMsg
 choreTitle kind =
     h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
-        [ span [] [ text (Chore.getStats kind).title ]
+        [ span [] [ text (Activity.getStats kind).title ]
         ]
 
 
@@ -316,7 +318,7 @@ renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extr
         -- [ figure []
         --     [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
         [ div [ class "h-24 relative" ]
-            [ choreImage kind ]
+            [ activityImage kind ]
         , div [ class "relative card-body" ]
             [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
                 -- Chore title

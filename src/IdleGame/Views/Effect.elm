@@ -8,6 +8,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -18,11 +19,11 @@ import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
-render : List IdleGame.Event.Mod -> IdleGame.Event.Effect -> Html FrontendMsg
-render mods effect =
+render : Game -> List IdleGame.Event.Mod -> IdleGame.Event.Effect -> Html FrontendMsg
+render game mods effect =
     IdleGame.Event.applyModsToEffect mods effect
         |> List.head
-        |> Maybe.map renderModdedEffect
+        |> Maybe.map (renderModdedEffect game)
         |> Maybe.withDefault (div [] [])
 
 
@@ -34,8 +35,8 @@ render mods effect =
 -- | GainCoin Multiplicable.Multiplicable
 
 
-renderModdedEffect : IdleGame.Event.Effect -> Html FrontendMsg
-renderModdedEffect effect =
+renderModdedEffect : Game -> IdleGame.Event.Effect -> Html FrontendMsg
+renderModdedEffect game effect =
     case IdleGame.Event.getType effect of
         IdleGame.Event.GainCoin multiplicable ->
             renderCoin multiplicable
@@ -46,8 +47,8 @@ renderModdedEffect effect =
         IdleGame.Event.GainXp multiplicable skill ->
             renderXp multiplicable skill
 
-        IdleGame.Event.GainChoreMxp multiplier skill ->
-            renderMxp multiplier skill
+        IdleGame.Event.GainMxp multiplier activity ->
+            renderMxp game multiplier activity
 
         IdleGame.Event.VariableSuccess { successProbability, successEffects, failureEffects } ->
             case successEffects of
@@ -98,12 +99,17 @@ renderXp xp skill =
         ]
 
 
-renderMxp : { base : Xp, multiplier : Float } -> Chore.Kind -> Html msg
-renderMxp mxp skill =
+renderMxp : Game -> { multiplier : Float } -> Activity -> Html msg
+renderMxp game mxp activity =
+    let
+        base : Xp
+        base =
+            Game.calculateActivityMxp activity game
+    in
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ Quantity.multiplyBy mxp.multiplier mxp.base
+            [ Quantity.multiplyBy mxp.multiplier base
                 |> Xp.toInt
                 |> Utils.intToString
                 |> text

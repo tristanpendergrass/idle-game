@@ -9,6 +9,7 @@ import IdleGame.Chore as Chore
 import IdleGame.Combat as Adventuring
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
@@ -47,7 +48,7 @@ type FrontendGameState
 
 
 type Preview
-    = PreviewChore Chore.Kind
+    = Preview Activity
 
 
 type alias FrontendModel =
@@ -102,11 +103,10 @@ type FrontendMsg
     | StopFight
     | HandlePlayerMoveSelect Int Adventuring.PlayerMove
     | HandleMonsterSelect Adventuring.MonsterKind
-      -- Chores
-    | HandleChoreClick Chore.Kind
-    | ToggleActiveChore Chore.Kind
-    | HandlePlayClick Chore.Kind
-    | HandlePauseClick Chore.Kind
+      -- Activities
+    | HandleActivityClick Activity
+    | HandlePlayClick Activity
+    | HandleStopClick Activity
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel

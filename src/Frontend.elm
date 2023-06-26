@@ -10,11 +10,13 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
+import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
@@ -85,7 +87,7 @@ init _ key =
 -- Update
 
 
-getDetailViewState : Maybe Activity -> Maybe Preview -> Bool -> IdleGame.Views.DetailView2.State Activity Preview
+getDetailViewState : Maybe ( Activity, Timer ) -> Maybe Preview -> Bool -> IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
 getDetailViewState maybeActivity maybePreview activityExpanded =
     case ( maybeActivity, maybePreview ) of
         ( Nothing, Nothing ) ->
@@ -104,19 +106,13 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
         ( Just activity, Just preview ) ->
             -- Slightly complicated by the fact that we might be trying to preview the same thing as the activity
             let
-                activityKind : Chore.Kind
-                activityKind =
-                    case activity of
-                        ActivityChore k _ ->
-                            k
-
-                previewKind : Chore.Kind
-                previewKind =
+                previewActivity : Activity
+                previewActivity =
                     case preview of
-                        PreviewChore k ->
-                            k
+                        Preview a ->
+                            a
             in
-            if activityKind == previewKind then
+            if Tuple.first activity == previewActivity then
                 if activityExpanded then
                     IdleGame.Views.DetailView2.ActivityExpanded activity
 
@@ -248,37 +244,6 @@ performantTick =
         (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
 
 
-playChore : Chore.Kind -> FrontendModel -> FrontendModel
-playChore kind =
-    mapGame
-        (\game ->
-            case game.activity of
-                ActivityChore kind _ ->
-                    game
-
-                -- Already playing
-                _ ->
-                    if Chore.canStart kind game then
-                        Game.setActivity (ActivityChore kind Timer.create)
-
-                    else
-                        game
-         -- In this case player didn't meet requirements to start activity, TODO: show snackbar of why?
-        )
-
-
-pauseChore : Chore.Kind -> FrontendModel -> FrontendModel
-pauseChore kind =
-    mapGame
-        (\game ->
-            if Game.choreIsActive kind game then
-                Game.toggleActiveChore kind game
-
-            else
-                game
-        )
-
-
 setPreview : Maybe Preview -> FrontendModel -> FrontendModel
 setPreview maybePreview model =
     { model | preview = maybePreview }
@@ -289,12 +254,11 @@ setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-getActivity : FrontendModel -> Maybe Activity
+getActivity : FrontendModel -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
         Playing snapshot ->
-            Snapshot.getValue snapshot
-                |> .activity
+            (Snapshot.getValue snapshot).activity
 
         _ ->
             Nothing
@@ -458,28 +422,28 @@ update msg model =
                 |> Task.attempt (\_ -> NoOp)
             )
 
-        HandleChoreClick kind ->
+        HandleActivityClick kind ->
             let
-                maybeActivity : Maybe Activity
-                maybeActivity =
+                currentActivity : Maybe ( Activity, Timer )
+                currentActivity =
                     getActivity model
 
-                detailViewState : IdleGame.Views.DetailView2.State Activity Preview
+                detailViewState : IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
                 detailViewState =
-                    getDetailViewState maybeActivity model.preview model.activityExpanded
+                    getDetailViewState currentActivity model.preview model.activityExpanded
 
-                clickingActiveChore : Bool
-                clickingActiveChore =
-                    case maybeActivity of
-                        Just (ActivityChore k _) ->
+                clickingActiveActivity : Bool
+                clickingActiveActivity =
+                    case currentActivity of
+                        Just ( k, _ ) ->
                             k == kind
 
                         Nothing ->
                             False
 
-                activityExpanded : Bool
-                activityExpanded =
-                    if clickingActiveChore then
+                newActivityExpandedValue : Bool
+                newActivityExpandedValue =
+                    if clickingActiveActivity then
                         not model.activityExpanded
 
                     else
@@ -488,36 +452,30 @@ update msg model =
             case detailViewState of
                 IdleGame.Views.DetailView2.ActivityExpanded _ ->
                     ( model
-                        |> setPreview (Just (PreviewChore kind))
-                        |> setActivityExpanded activityExpanded
+                        |> setPreview (Just (Preview kind))
+                        |> setActivityExpanded newActivityExpandedValue
                     , Cmd.none
                     )
 
                 _ ->
                     ( model
-                        |> setPreview (Just (PreviewChore kind))
-                        |> setActivityExpanded activityExpanded
+                        |> setPreview (Just (Preview kind))
+                        |> setActivityExpanded newActivityExpandedValue
                     , Cmd.none
                     )
 
-        ToggleActiveChore toggleId ->
-            ( model
-                |> mapGame (Game.toggleActiveChore toggleId)
-            , Cmd.none
-            )
-
         HandlePlayClick kind ->
             ( model
-                |> playChore kind
+                |> mapGame (\game -> Game.setActivity (Just ( kind, Timer.create )) game)
                 |> setPreview Nothing
                 |> setActivityExpanded True
             , Cmd.none
             )
 
-        HandlePauseClick kind ->
+        HandleStopClick kind ->
             ( model
-                |> pauseChore kind
-                |> setPreview (Just (PreviewChore kind))
+                |> mapGame (\game -> Game.setActivity Nothing game)
+                |> setPreview (Just (Preview kind))
             , Cmd.none
             )
 
@@ -876,7 +834,7 @@ view model =
                     game =
                         Snapshot.getValue snapshot
 
-                    detailViewState : IdleGame.Views.DetailView2.State Activity Preview
+                    detailViewState : IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
                     detailViewState =
                         getDetailViewState game.activity model.preview model.activityExpanded
 
@@ -889,7 +847,7 @@ view model =
                             _ ->
                                 False
 
-                    renderActivity : Activity -> Html FrontendMsg
+                    renderActivity : ( Activity, Timer ) -> Html FrontendMsg
                     renderActivity activity =
                         IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) extraBottomPadding game
 
@@ -897,7 +855,7 @@ view model =
                     renderPreview preview =
                         IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewPreview preview) extraBottomPadding game
 
-                    renderStatusBar : Activity -> Html FrontendMsg
+                    renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
                     renderStatusBar activity =
                         IdleGame.Views.DetailView.renderStatusBar activity
                 in

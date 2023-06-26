@@ -3,10 +3,12 @@ module IdleGame.Views.DetailView exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Chores as ChoresView
 import IdleGame.Views.Effect as EffectView
@@ -33,20 +35,16 @@ collapseButton =
         ]
 
 
-renderStatusBar : Activity -> Html FrontendMsg
-renderStatusBar activity =
+renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
+renderStatusBar ( activity, timer ) =
     let
-        stats : Chore.Stats
+        stats : Activity.Stats
         stats =
-            case activity of
-                ActivityChore kind _ ->
-                    Chore.getStats kind
+            Activity.getStats activity
 
         percentComplete : Percent
         percentComplete =
-            case activity of
-                ActivityChore _ timer ->
-                    Timer.percentComplete timer
+            Timer.percentComplete timer
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
@@ -67,7 +65,7 @@ renderStatusBar activity =
 
 
 type DetailViewObject
-    = DetailViewActivity Activity
+    = DetailViewActivity ( Activity, Timer )
     | DetailViewPreview Preview
 
 
@@ -83,22 +81,22 @@ fade shouldFade =
 renderContent : DetailViewObject -> Bool -> Game -> Html FrontendMsg
 renderContent obj extraBottomPadding game =
     let
+        kind : Activity
+        kind =
+            case obj of
+                DetailViewActivity ( k, _ ) ->
+                    k
+
+                DetailViewPreview (Preview k) ->
+                    k
+
         event : Event
         event =
-            Game.completeChoreEvent game kind
+            (Activity.getStats kind).event
 
         mods : List Event.Mod
         mods =
             Game.getAllMods game
-
-        kind : Chore.Kind
-        kind =
-            case obj of
-                DetailViewActivity (ActivityChore k _) ->
-                    k
-
-                DetailViewPreview (PreviewChore k) ->
-                    k
 
         effects : List Event.Effect
         effects =
@@ -137,19 +135,19 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ ChoresView.choreImage kind
+            [ ChoresView.activityImage kind
             , fade isPreview
             ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]
-            [ text (Chore.getStats kind).title
+            [ text (Activity.getStats kind).title
             , fade isPreview
             ]
 
         -- Progress bar
         , case obj of
-            DetailViewActivity (ActivityChore _ timer) ->
+            DetailViewActivity ( _, timer ) ->
                 activityProgress timer
 
             _ ->
@@ -162,7 +160,7 @@ renderContent obj extraBottomPadding game =
             , fade isPreview
             ]
         , div [ class "t-column relative" ]
-            (List.map (EffectView.render mods) orderedEffects
+            (List.map (EffectView.render game mods) orderedEffects
                 ++ [ fade isPreview ]
             )
         ]
@@ -189,7 +187,7 @@ type PlayButtonState
     | Pause
 
 
-playPauseButton : PlayButtonState -> Chore.Kind -> Html FrontendMsg
+playPauseButton : PlayButtonState -> Activity -> Html FrontendMsg
 playPauseButton state kind =
     let
         icon : Icon
@@ -208,7 +206,7 @@ playPauseButton state kind =
                     HandlePlayClick kind
 
                 Pause ->
-                    HandlePauseClick kind
+                    HandleStopClick kind
     in
     button
         [ class "btn btn-circle btn-icon"

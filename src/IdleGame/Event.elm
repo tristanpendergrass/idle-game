@@ -2,7 +2,7 @@ module IdleGame.Event exposing (..)
 
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -20,7 +20,7 @@ type
     = SkillTag Skill.Kind
     | XpTag
     | MxpTag
-    | ChoreTag Chore.Kind
+    | ActivityTag Activity
 
 
 type ModSource
@@ -53,7 +53,7 @@ type EffectType
     = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Xp, multiplier : Float } Skill.Kind
-    | GainChoreMxp { base : Xp, multiplier : Float } Chore.Kind
+    | GainMxp { multiplier : Float } Activity
     | GainCoin Multiplicable
 
 
@@ -339,7 +339,7 @@ coinTransformer buff repetitions effect =
 mxpTransformer : Float -> Transformer
 mxpTransformer buff repetitions effect =
     case getType effect of
-        GainChoreMxp quantity chore ->
+        GainMxp quantity chore ->
             let
                 adjustedBuff =
                     buff * toFloat repetitions
@@ -348,7 +348,7 @@ mxpTransformer buff repetitions effect =
                     { quantity | multiplier = quantity.multiplier * adjustedBuff }
             in
             effect
-                |> setType (GainChoreMxp adjustedMultiplicable chore)
+                |> setType (GainMxp adjustedMultiplicable chore)
                 |> ChangeEffect
 
         _ ->
@@ -476,3 +476,54 @@ orderEffects : Effect -> Effect -> Order
 orderEffects effect1 effect2 =
     -- TODO: order these properly, e.g. coin before XP, resource before coin
     LT
+
+
+
+-- Effect helpers
+
+
+gainXp : Xp -> Skill.Kind -> Effect
+gainXp quantity skill =
+    Effect
+        { type_ = GainXp { base = quantity, multiplier = 1 } skill
+        , tags = []
+        }
+
+
+gainCoin : Int -> Effect
+gainCoin quantity =
+    Effect
+        { type_ = GainCoin (Multiplicable.fromInt quantity)
+        , tags = []
+        }
+
+
+gainMxp : Activity -> Effect
+gainMxp activity =
+    Effect
+        { type_ = GainMxp { multiplier = 1 } activity
+        , tags = []
+        }
+
+
+gainResource : Int -> Resource.Kind -> Effect
+gainResource quantity kind =
+    Effect
+        { type_ = GainResource { base = quantity, doublingChance = 0 } kind
+        , tags = []
+        }
+
+
+gainWithProbability : Float -> List Effect -> Effect
+gainWithProbability probability successEffects =
+    Effect { type_ = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }, tags = [] }
+
+
+withTags : List Tag -> Effect -> Effect
+withTags newTags (Effect { type_, tags }) =
+    Effect
+        { type_ = type_
+
+        -- TODO: dedupe tags?
+        , tags = tags ++ newTags
+        }

@@ -1,7 +1,6 @@
 module IdleGame.Chore exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -300,26 +299,3 @@ createActivityData kind =
     { kind = kind
     , timer = Timer.create
     }
-
-
-tick : Game -> Duration -> ActivityData -> ( Maybe ActivityData, List Event )
-tick game delta activityData =
-    let
-        { choreKind, timer } =
-            activityData
-
-        choreDuration : Duration
-        choreDuration =
-            getModdedDuration game choreKind
-
-        ( newTimer, completions ) =
-            timer
-                |> Timer.increment choreDuration delta
-
-        newEvents : List Event
-        newEvents =
-            List.repeat completions (completeChoreEvent game choreKind)
-    in
-    ( Just (ActivityChore choreKind newTimer)
-    , newEvents
-    )
