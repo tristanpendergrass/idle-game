@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Event exposing (..)
+import IdleGame.Event as Event exposing (Effect, Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -16,7 +16,7 @@ import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill exposing (Kind(..))
 import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Views.Effect
+import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
@@ -67,8 +67,8 @@ getChoreEffectsView game effects =
 getChoreXp : Effect -> Maybe Xp
 getChoreXp effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    case getType effect of
-        GainXp amount Chores ->
+    case Event.getType effect of
+        Event.GainXp amount Chores ->
             Just (Quantity.multiplyBy amount.multiplier amount.base)
 
         _ ->
@@ -78,8 +78,8 @@ getChoreXp effect =
 getChoreMxp : Game -> Effect -> Maybe Xp
 getChoreMxp game effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    case getType effect of
-        GainMxp amount kind ->
+    case Event.getType effect of
+        Event.GainMxp amount kind ->
             let
                 base : Xp
                 base =
@@ -98,8 +98,8 @@ getChoreMxp game effect =
 getChoreCoin : Effect -> Maybe Counter
 getChoreCoin effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    case getType effect of
-        GainCoin quantity ->
+    case Event.getType effect of
+        Event.GainCoin quantity ->
             Just (Multiplicable.toCounter quantity)
 
         _ ->
@@ -109,13 +109,13 @@ getChoreCoin effect =
 getChoreResource : Effect -> Maybe Resource.Kind
 getChoreResource effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    case getType effect of
-        VariableSuccess { successEffects } ->
+    case Event.getType effect of
+        Event.VariableSuccess { successEffects } ->
             successEffects
                 |> List.Extra.findMap
                     (\innerEffect ->
-                        case getType innerEffect of
-                            GainResource _ kind ->
+                        case Event.getType innerEffect of
+                            Event.GainResource _ kind ->
                                 Just kind
 
                             _ ->
@@ -129,8 +129,8 @@ getChoreResource effect =
 getChoreProbability : Effect -> Maybe Float
 getChoreProbability effect =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
-    case getType effect of
-        VariableSuccess { successProbability } ->
+    case Event.getType effect of
+        Event.VariableSuccess { successProbability } ->
             Just successProbability
 
         _ ->
@@ -146,16 +146,16 @@ renderChoreListItem game item =
                 event =
                     (Activity.getStats kind).event
 
-                mods : List Mod
+                mods : List Event.Mod
                 mods =
                     Game.getAllMods game
 
-                moddedEvent : ModdedEvent
+                moddedEvent : Event.ModdedEvent
                 moddedEvent =
-                    IdleGame.Event.applyMods mods event
+                    Event.applyMods mods event
 
                 effects =
-                    IdleGame.Event.getEffectsModded moddedEvent
+                    Event.getEffectsModded moddedEvent
             in
             case getChoreEffectsView game effects of
                 Nothing ->
@@ -170,6 +170,7 @@ renderChoreListItem game item =
                         moddedDuration =
                             Game.getModdedDuration game kind
 
+                        maybeTimer : Maybe Timer
                         maybeTimer =
                             case game.activity of
                                 Just ( activeType, timer ) ->
@@ -182,20 +183,21 @@ renderChoreListItem game item =
                                 Nothing ->
                                     Nothing
                     in
-                    renderChore
-                        { kind = kind
-                        , title = stats.title
-                        , handleClick = HandleActivityClick kind
-                        , maybeTimer = maybeTimer
-                        , duration = moddedDuration
-                        , imgSrc = stats.imgSrc
-                        , coin = coin
-                        , extraResourceProbability = probability
-                        , extraResource = resource
-                        , skillXp = skillXp
-                        , mxp = mxp
-                        , mxpCurrentValue = Activity.getByKind kind game.mxp
-                        }
+                    -- renderChore
+                    --     { kind = kind
+                    --     , title = stats.title
+                    --     , handleClick = HandleActivityClick kind
+                    --     , maybeTimer = maybeTimer
+                    --     , duration = moddedDuration
+                    --     , imgSrc = stats.imgSrc
+                    --     , coin = coin
+                    --     , extraResourceProbability = probability
+                    --     , extraResource = resource
+                    --     , skillXp = skillXp
+                    --     , mxp = mxp
+                    --     , mxpCurrentValue = Activity.getByKind kind game.mxp
+                    --     }
+                    renderChore2 kind maybeTimer game
 
         Game.LockedActivity level ->
             renderLockedChore level
@@ -260,6 +262,73 @@ choreCoin coin =
             , Icon.coin
                 |> Icon.toHtml
             ]
+        ]
+
+
+renderChore2 : Activity -> Maybe Timer -> Game -> Html FrontendMsg
+renderChore2 activity maybeTimer game =
+    -- Similar to renderContent
+    let
+        stats : Activity.Stats
+        stats =
+            Activity.getStats activity
+
+        event : Event
+        event =
+            stats.event
+
+        mods : List Event.Mod
+        mods =
+            Game.getAllMods game
+
+        effects : List Event.Effect
+        effects =
+            Event.getEffects event
+
+        orderedEffects : List Event.Effect
+        orderedEffects =
+            List.sortWith Event.orderEffects effects
+    in
+    div
+        [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
+        , class "t-column"
+
+        -- div
+        --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
+        ]
+        [ -- category of activity
+          div [ class "text-sm font-semibold" ] [ text "Chores" ]
+
+        -- preview image
+        , div
+            [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
+            ]
+            [ activityImage activity
+            ]
+
+        -- title
+        , h2 [ class "text-lg font-semibold relative" ]
+            [ text stats.title
+            ]
+
+        -- Progress bar
+        -- Chore progress bar
+        , case Maybe.map Timer.percentComplete maybeTimer of
+            Nothing ->
+                div [] []
+
+            Just percentComplete ->
+                div
+                    [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
+                    , Utils.zIndexes.activityProgressBar
+                    , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
+                    ]
+                    []
+        , div [ class "relative" ]
+            [ choreDuration (Game.getModdedDuration game activity)
+            ]
+        , div [ class "t-column relative" ]
+            (List.map (EffectView.render game mods) orderedEffects)
         ]
 
 
