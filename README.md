@@ -47,11 +47,11 @@ $ npm test -- --watch
   - [x] Add a second monster and way to choose between them
   - [x] Show reward on monster screen
   - [ ] Put it back in
+  - [ ] Require hexes in inventory to fight
 - [ ] Add hexes
   - [ ] Craft them for free
   - [ ] Require parchment
 - [ ] Add parchment to shop
-- [ ] Make combat require hexes
 - [x] Activity detail sidebar
 	- [x] desktop
 	- [x] mobile
@@ -72,6 +72,7 @@ $ npm test -- --watch
 - [ ] Show Time Passes during Fast Forward with real time change
 - [ ] Add change log section
   - [ ] Add notification that shows that update happened
+- [ ] Address long fast forward times somehow (with a cap?)
 
 ### Features
 - [ ] Skill 3

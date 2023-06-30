@@ -140,64 +140,8 @@ getChoreProbability effect =
 renderChoreListItem : Game -> Game.ActivityListItem -> Html FrontendMsg
 renderChoreListItem game item =
     case item of
-        Game.ActivityListItem kind ->
-            let
-                event : Event
-                event =
-                    (Activity.getStats kind).event
-
-                mods : List Event.Mod
-                mods =
-                    Game.getAllMods game
-
-                moddedEvent : Event.ModdedEvent
-                moddedEvent =
-                    Event.applyMods mods event
-
-                effects =
-                    Event.getEffectsModded moddedEvent
-            in
-            case getChoreEffectsView game effects of
-                Nothing ->
-                    div [] []
-
-                Just { coin, skillXp, mxp, resource, probability } ->
-                    let
-                        stats =
-                            Activity.getStats kind
-
-                        moddedDuration : Duration
-                        moddedDuration =
-                            Game.getModdedDuration game kind
-
-                        maybeTimer : Maybe Timer
-                        maybeTimer =
-                            case game.activity of
-                                Just ( activeType, timer ) ->
-                                    if kind == activeType then
-                                        Just timer
-
-                                    else
-                                        Nothing
-
-                                Nothing ->
-                                    Nothing
-                    in
-                    -- renderChore
-                    --     { kind = kind
-                    --     , title = stats.title
-                    --     , handleClick = HandleActivityClick kind
-                    --     , maybeTimer = maybeTimer
-                    --     , duration = moddedDuration
-                    --     , imgSrc = stats.imgSrc
-                    --     , coin = coin
-                    --     , extraResourceProbability = probability
-                    --     , extraResource = resource
-                    --     , skillXp = skillXp
-                    --     , mxp = mxp
-                    --     , mxpCurrentValue = Activity.getByKind kind game.mxp
-                    --     }
-                    renderChore2 kind maybeTimer game
+        Game.ActivityListItem activity ->
+            renderActivity activity game
 
         Game.LockedActivity level ->
             renderLockedChore level
@@ -211,22 +155,6 @@ choreHeight =
 probabilityToInt : Float -> Int
 probabilityToInt x =
     floor (x * 100)
-
-
-type alias ChoreItemView =
-    { kind : Activity
-    , title : String
-    , handleClick : FrontendMsg
-    , maybeTimer : Maybe Timer
-    , duration : Duration
-    , imgSrc : String
-    , coin : Counter
-    , extraResourceProbability : Float
-    , extraResource : Resource.Kind
-    , skillXp : Xp
-    , mxp : Xp
-    , mxpCurrentValue : Xp
-    }
 
 
 
@@ -265,10 +193,22 @@ choreCoin coin =
         ]
 
 
-renderChore2 : Activity -> Maybe Timer -> Game -> Html FrontendMsg
-renderChore2 activity maybeTimer game =
+renderActivity : Activity -> Game -> Html FrontendMsg
+renderActivity activity game =
     -- Similar to renderContent
     let
+        maybeTimer : Maybe Timer
+        maybeTimer =
+            game.activity
+                |> Maybe.andThen
+                    (\( activeType, timer ) ->
+                        if activity == activeType then
+                            Just timer
+
+                        else
+                            Nothing
+                    )
+
         stats : Activity.Stats
         stats =
             Activity.getStats activity
@@ -288,31 +228,32 @@ renderChore2 activity maybeTimer game =
         orderedEffects : List Event.Effect
         orderedEffects =
             List.sortWith Event.orderEffects effects
+
+        duration : Duration
+        duration =
+            Game.getModdedDuration game activity
     in
     div
         [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-        , class "t-column"
+        , onClick (HandleActivityClick activity)
 
         -- div
         --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
         ]
-        [ -- category of activity
-          div [ class "text-sm font-semibold" ] [ text "Chores" ]
-
-        -- preview image
-        , div
-            [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
-            ]
-            [ activityImage activity
-            ]
-
-        -- title
-        , h2 [ class "text-lg font-semibold relative" ]
-            [ text stats.title
+        [ -- preview image
+          div [ class "h-24 relative" ]
+            [ activityImage activity ]
+        , div [ class "relative card-body" ]
+            [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
+                -- Chore title
+                ([ choreTitle activity
+                 , choreDuration duration
+                 ]
+                    ++ List.map (EffectView.render game mods) orderedEffects
+                )
             ]
 
         -- Progress bar
-        -- Chore progress bar
         , case Maybe.map Timer.percentComplete maybeTimer of
             Nothing ->
                 div [] []
@@ -324,107 +265,6 @@ renderChore2 activity maybeTimer game =
                     , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                     ]
                     []
-        , div [ class "relative" ]
-            [ choreDuration (Game.getModdedDuration game activity)
-            ]
-        , div [ class "t-column relative" ]
-            (List.map (EffectView.render game mods) orderedEffects)
-        ]
-
-
-renderChore : ChoreItemView -> Html FrontendMsg
-renderChore { kind, title, handleClick, maybeTimer, duration, imgSrc, coin, extraResource, extraResourceProbability, skillXp, mxp, mxpCurrentValue } =
-    let
-        renderResource : Resource.Kind -> Html FrontendMsg
-        renderResource resource =
-            (Resource.getStats resource).icon
-                |> Icon.toHtml
-
-        renderSuccessCondition child =
-            div [ class "flex items-center gap-2" ]
-                [ div [ class "border border-info text-info px-2 rounded-full" ] [ text (Utils.intToString (probabilityToInt extraResourceProbability) ++ "%") ]
-                , div [] [ text ":" ]
-                , child
-                ]
-
-        renderXp : Html FrontendMsg
-        renderXp =
-            div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-                [ Utils.skillXpBadge
-                , span [ class "font-bold col-span-4" ]
-                    [ skillXp
-                        |> Xp.toInt
-                        |> Utils.intToString
-                        |> text
-                    ]
-                , Utils.masteryXpBadge
-                , span [ class "font-bold col-span-4" ]
-                    [ mxp
-                        |> Xp.toInt
-                        |> Utils.intToString
-                        |> text
-                    ]
-                ]
-
-        masteryLevel : String
-        masteryLevel =
-            mxpCurrentValue
-                |> Xp.level Xp.defaultSchedule
-                |> Utils.intToString
-
-        masteryPercent : Float
-        masteryPercent =
-            mxpCurrentValue
-                |> Xp.levelPercent Xp.defaultSchedule
-                |> Percent.toPercentage
-    in
-    div
-        [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-        , class choreHeight
-        , onClick handleClick
-        ]
-        -- Chore image
-        -- [ figure []
-        --     [ img [ src imgSrc, class "w-full h-24 object-cover" ] [] ]
-        [ div [ class "h-24 relative" ]
-            [ activityImage kind ]
-        , div [ class "relative card-body" ]
-            [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
-                -- Chore title
-                [ choreTitle kind
-                , choreDuration duration
-                , choreCoin coin
-                , renderSuccessCondition (renderResource extraResource)
-                , div [ class "divider" ] []
-
-                -- Chore XP rewards
-                , renderXp
-                , div [ class "w-full flex items-center gap-2" ]
-                    [ div [ class "text-2xs font-bold py-[0.35rem] w-6 leading-none bg-secondary text-secondary-content rounded text-center" ]
-                        [ text <| masteryLevel ]
-                    , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                        [ div
-                            [ class "bg-secondary h-1.5 rounded-full"
-                            , attribute "style" ("width:" ++ String.fromFloat masteryPercent ++ "%")
-                            ]
-                            []
-                        ]
-                    ]
-                ]
-
-            -- Chore progress bar
-            , case Maybe.map Timer.percentComplete maybeTimer of
-                Nothing ->
-                    div [] []
-
-                Just percentComplete ->
-                    div
-                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
-                        , Utils.zIndexes.activityProgressBar
-                        , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
-                        ]
-                        []
-            ]
         ]
 
 
