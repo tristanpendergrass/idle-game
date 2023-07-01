@@ -7,6 +7,7 @@ import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
+import IdleGame.Views.Activity
 import IdleGame.Views.Adventuring2
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores

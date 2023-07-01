@@ -67,23 +67,19 @@ type ActivityListItem
     | ActivityListItem Activity
 
 
-getChoreListItems : Game -> List ActivityListItem
-getChoreListItems game =
+getActivityListItems : Skill.Kind -> Game -> List ActivityListItem
+getActivityListItems skill game =
     let
         xp : Xp
         xp =
-            Skill.getByKind Skill.Chores game.xp
-
-        skillLevel : Int
-        skillLevel =
-            Xp.level Xp.defaultSchedule xp
+            Skill.getByKind skill game.xp
 
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
             let
                 currentLevel : Int
                 currentLevel =
-                    game.xp.chores
+                    Skill.getByKind skill game.xp
                         |> Xp.level Xp.defaultSchedule
 
                 requiredLevel : Int
@@ -124,7 +120,7 @@ getChoreListItems game =
                 { items = newItems, lockedItem = newItemIsLocked }
 
         result =
-            List.foldl reducer { items = [], lockedItem = False } Activity.allChores
+            List.foldl reducer { items = [], lockedItem = False } (Activity.getActivities skill)
     in
     result.items
 

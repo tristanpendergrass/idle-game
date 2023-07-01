@@ -12,7 +12,9 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
+import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Activity
 import IdleGame.Views.Effect
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
@@ -27,11 +29,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.xp.hexes
+        [ Utils.xpSection game.xp.chores
         , div [ Utils.skills.grid ]
-            (List.map (renderHexListItem game) (Game.getChoreListItems game))
+            (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Skill.Hexes game))
         ]
-
-
-renderHexListItem _ _ =
-    div [] []

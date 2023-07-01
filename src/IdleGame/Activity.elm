@@ -24,6 +24,16 @@ allHexes =
     ]
 
 
+getActivities : Skill.Kind -> List Activity
+getActivities skill =
+    case skill of
+        Skill.Chores ->
+            allChores
+
+        Skill.Hexes ->
+            allHexes
+
+
 allKinds : List Activity
 allKinds =
     [ IdleGame.Kinds.Activities.CleanStables

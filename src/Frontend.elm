@@ -22,8 +22,8 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Views.Activity
 import IdleGame.Views.Adventuring
-import IdleGame.Views.Chores
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
 import IdleGame.Views.DetailView
@@ -782,7 +782,7 @@ renderBottomRightItems model =
          )
             ++ (case model.activeTab of
                     Tab.Chores ->
-                        [ IdleGame.Views.Chores.renderBottomRight ]
+                        [ IdleGame.Views.Activity.renderBottomRight ]
 
                     _ ->
                         []

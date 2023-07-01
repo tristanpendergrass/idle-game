@@ -10,7 +10,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Views.Chores as ChoresView
+import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
@@ -135,7 +135,7 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ ChoresView.activityImage kind
+            [ ActivityView.activityImage kind
             , fade isPreview
             ]
 
@@ -156,7 +156,7 @@ renderContent obj extraBottomPadding game =
         -- Play/pause button
         , playPauseButton playButtonState kind
         , div [ class "relative" ]
-            [ ChoresView.choreDuration (Game.getModdedDuration game kind)
+            [ ActivityView.activityDuration (Game.getModdedDuration game kind)
             , fade isPreview
             ]
         , div [ class "t-column relative" ]
