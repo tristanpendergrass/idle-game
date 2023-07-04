@@ -10,18 +10,23 @@ import IdleGame.Skill as Skill
 import IdleGame.Xp as Xp exposing (Xp)
 
 
+allActivitiesBySkill : Skill.Kind -> List Activity
+allActivitiesBySkill skill =
+    allKinds
+        |> List.filter
+            (\kind ->
+                (getStats kind).skill == skill
+            )
+
+
 allChores : List Activity
 allChores =
-    [ IdleGame.Kinds.Activities.CleanStables
-    , IdleGame.Kinds.Activities.CleanBigBubba
-    ]
+    allActivitiesBySkill Skill.Chores
 
 
 allHexes : List Activity
 allHexes =
-    [ IdleGame.Kinds.Activities.Hex1
-    , IdleGame.Kinds.Activities.Jinx1
-    ]
+    allActivitiesBySkill Skill.Hexes
 
 
 getActivities : Skill.Kind -> List Activity
@@ -94,7 +99,8 @@ updateByKind kind f record =
 
 
 type alias Stats =
-    { title : String
+    { skill : Skill.Kind
+    , title : String
     , imgSrc : String
     , unlockSkill : Skill.Kind
     , unlockLevel : Int
@@ -119,7 +125,8 @@ allStats =
 
 cleanStablesStats : Stats
 cleanStablesStats =
-    { title = "Clean Stables"
+    { skill = Skill.Chores
+    , title = "Clean Stables"
     , imgSrc = "/chores/stable.png"
     , unlockLevel = 1
     , unlockSkill = Skill.Chores
@@ -140,7 +147,8 @@ cleanStablesStats =
 
 cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
-    { title = "Clean Big Bubba's Stall"
+    { skill = Skill.Chores
+    , title = "Clean Big Bubba's Stall"
     , imgSrc = "/chores/bubba4.png"
     , unlockLevel = 10
     , unlockSkill = Skill.Chores
@@ -161,7 +169,8 @@ cleanBigBubbaStats =
 
 hex1Stats : Stats
 hex1Stats =
-    { title = "Hex I"
+    { skill = Skill.Hexes
+    , title = "Hex I"
     , imgSrc = "/chores/stable.png"
     , unlockLevel = 1
     , unlockSkill = Skill.Hexes
@@ -177,7 +186,8 @@ hex1Stats =
 
 jinx1Stats : Stats
 jinx1Stats =
-    { title = "Jinx I"
+    { skill = Skill.Hexes
+    , title = "Jinx I"
     , imgSrc = "/chores/stable.png"
     , unlockLevel = 10
     , unlockSkill = Skill.Hexes

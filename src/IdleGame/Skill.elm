@@ -35,3 +35,13 @@ setByKind kind value data =
 updateByKind : Kind -> (a -> a) -> Record a -> Record a
 updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
+
+
+getLabel : Kind -> String
+getLabel kind =
+    case kind of
+        Chores ->
+            "Chores"
+
+        Hexes ->
+            "Hexes"

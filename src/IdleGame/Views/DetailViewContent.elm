@@ -9,6 +9,7 @@ import IdleGame.Event as Event exposing (Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
@@ -45,6 +46,10 @@ renderStatusBar ( activity, timer ) =
         percentComplete : Percent
         percentComplete =
             Timer.percentComplete timer
+
+        skillLabel : String
+        skillLabel =
+            Skill.getLabel stats.skill
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
@@ -52,7 +57,7 @@ renderStatusBar ( activity, timer ) =
             ]
         , div [ class "grow overflow-hidden h-full flex flex-col items-start justify-center" ]
             [ div [ class "font-bold text-sm leading-tight" ] [ text stats.title ]
-            , div [ class "text-xs text-base-content/70 leading-tight" ] [ text "Chores" ]
+            , div [ class "text-xs text-base-content/70 leading-tight" ] [ text skillLabel ]
             ]
         , div [ class "absolute bottom-0 left-0 w-full h-[2px]" ]
             [ div
@@ -123,13 +128,17 @@ renderContent obj extraBottomPadding game =
 
                 DetailViewPreview _ ->
                     True
+
+        skillLabel : String
+        skillLabel =
+            Skill.getLabel (Activity.getStats kind).skill
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
         , classList [ ( "pb-20", extraBottomPadding ) ]
         ]
         [ -- category of activity
-          div [ class "text-sm font-semibold" ] [ text "Chores" ]
+          div [ class "text-sm font-semibold" ] [ text skillLabel ]
 
         -- preview image
         , div
