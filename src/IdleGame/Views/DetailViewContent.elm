@@ -50,10 +50,19 @@ renderStatusBar ( activity, timer ) =
         skillLabel : String
         skillLabel =
             Skill.getLabel stats.skill
+
+        image : Html FrontendMsg
+        image =
+            case stats.image of
+                Activity.ActivityLandscape imgSrc ->
+                    img [ src imgSrc, class "object-cover h-full w-full object-center" ] []
+
+                Activity.ActivityIcon icon ->
+                    div [ class "h-full w-full flex items-center justify-center" ] [ Icon.toHtml icon ]
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
-            [ img [ src stats.imgSrc, class "object-cover h-full w-full object-center" ] []
+            [ image
             ]
         , div [ class "grow overflow-hidden h-full flex flex-col items-start justify-center" ]
             [ div [ class "font-bold text-sm leading-tight" ] [ text stats.title ]

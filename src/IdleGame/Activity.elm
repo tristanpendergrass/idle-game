@@ -7,6 +7,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 
 
@@ -98,10 +99,15 @@ updateByKind kind f record =
     setByKind kind (f (getByKind kind record)) record
 
 
+type ActivityImage
+    = ActivityLandscape String
+    | ActivityIcon Icon
+
+
 type alias Stats =
     { skill : Skill.Kind
     , title : String
-    , imgSrc : String
+    , image : ActivityImage
     , unlockSkill : Skill.Kind
     , unlockLevel : Int
     , duration : Duration
@@ -127,7 +133,7 @@ cleanStablesStats : Stats
 cleanStablesStats =
     { skill = Skill.Chores
     , title = "Clean Stables"
-    , imgSrc = "/chores/stable.png"
+    , image = ActivityLandscape "/chores/stable.png"
     , unlockLevel = 1
     , unlockSkill = Skill.Chores
     , duration = Duration.seconds 5
@@ -149,7 +155,7 @@ cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { skill = Skill.Chores
     , title = "Clean Big Bubba's Stall"
-    , imgSrc = "/chores/bubba4.png"
+    , image = ActivityLandscape "/chores/bubba4.png"
     , unlockLevel = 10
     , unlockSkill = Skill.Chores
     , duration = Duration.seconds 5
@@ -171,7 +177,7 @@ hex1Stats : Stats
 hex1Stats =
     { skill = Skill.Hexes
     , title = "Hex I"
-    , imgSrc = "/chores/stable.png"
+    , image = ActivityIcon Icon.adventuring
     , unlockLevel = 1
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5
@@ -188,7 +194,7 @@ jinx1Stats : Stats
 jinx1Stats =
     { skill = Skill.Hexes
     , title = "Jinx I"
-    , imgSrc = "/chores/stable.png"
+    , image = ActivityIcon Icon.adventuring
     , unlockLevel = 10
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5

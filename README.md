@@ -85,6 +85,7 @@ $ npm test -- --watch
 - [ ] Design audit following https://anthonyhobday.com/sideprojects/saferules/
 - [ ] Money amount in Bag tab looks like a button -- remove background entirely?
 - [ ] Make right rail not have slide animation when going from empty to active
+- [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
 
 # Changelog
 

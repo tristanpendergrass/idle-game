@@ -5,7 +5,6 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Chore as Chore
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
@@ -29,7 +28,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.xp.chores
+        [ Utils.xpSection game.xp.hexes
         , div [ Utils.skills.grid ]
             (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Skill.Hexes game))
         ]

@@ -50,11 +50,21 @@ probabilityToInt x =
 
 activityImage : Activity -> Html FrontendMsg
 activityImage kind =
-    img
-        [ src <| (Activity.getStats kind).imgSrc
-        , class "h-full w-full object-cover"
-        ]
-        []
+    case (Activity.getStats kind).image of
+        Activity.ActivityLandscape imgSrc ->
+            img
+                [ src imgSrc
+                , class "h-full w-full object-cover"
+                ]
+                []
+
+        Activity.ActivityIcon icon ->
+            div
+                [ class "h-full w-full flex items-center justify-center" ]
+                [ icon
+                    |> Icon.withSize Icon.Large
+                    |> Icon.toHtml
+                ]
 
 
 activityTitle : Activity -> Html FrontendMsg
