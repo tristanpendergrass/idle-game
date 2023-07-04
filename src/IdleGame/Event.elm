@@ -474,8 +474,36 @@ modLabelToString modLabel =
 
 orderEffects : Effect -> Effect -> Order
 orderEffects effect1 effect2 =
-    -- TODO: order these properly, e.g. coin before XP, resource before coin
-    LT
+    case ( getType effect1, getType effect2 ) of
+        -- Coin comes at front
+        ( GainCoin _, _ ) ->
+            LT
+
+        ( _, GainCoin _ ) ->
+            GT
+
+        -- XP comes before MXP
+        ( GainXp _ _, GainMxp _ _ ) ->
+            LT
+
+        ( GainMxp _ _, GainXp _ _ ) ->
+            GT
+
+        -- Both types of XP come at the end
+        ( GainXp _ _, _ ) ->
+            GT
+
+        ( GainMxp _ _, _ ) ->
+            GT
+
+        ( _, GainXp _ _ ) ->
+            LT
+
+        ( _, GainMxp _ _ ) ->
+            LT
+
+        _ ->
+            EQ
 
 
 
