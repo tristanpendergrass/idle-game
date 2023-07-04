@@ -26,8 +26,8 @@ import IdleGame.Views.Activity
 import IdleGame.Views.Adventuring
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
-import IdleGame.Views.DetailView
-import IdleGame.Views.DetailView2
+import IdleGame.Views.DetailViewContent
+import IdleGame.Views.DetailViewWrapper
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -35,7 +35,7 @@ import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.TimePasses
-import IdleGame.Views.Utils
+import IdleGame.Views.Utils as ViewUtils
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
@@ -87,21 +87,21 @@ init _ key =
 -- Update
 
 
-getDetailViewState : Maybe ( Activity, Timer ) -> Maybe Preview -> Bool -> IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
+getDetailViewState : Maybe ( Activity, Timer ) -> Maybe Preview -> Bool -> IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
 getDetailViewState maybeActivity maybePreview activityExpanded =
     case ( maybeActivity, maybePreview ) of
         ( Nothing, Nothing ) ->
-            IdleGame.Views.DetailView2.Blank
+            IdleGame.Views.DetailViewWrapper.Blank
 
         ( Just activity, Nothing ) ->
             if activityExpanded then
-                IdleGame.Views.DetailView2.ActivityExpanded activity
+                IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
             else
-                IdleGame.Views.DetailView2.ActivityCollapsed activity
+                IdleGame.Views.DetailViewWrapper.ActivityCollapsed activity
 
         ( Nothing, Just preview ) ->
-            IdleGame.Views.DetailView2.Preview preview
+            IdleGame.Views.DetailViewWrapper.Preview preview
 
         ( Just activity, Just preview ) ->
             -- Slightly complicated by the fact that we might be trying to preview the same thing as the activity
@@ -114,16 +114,16 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
             in
             if Tuple.first activity == previewActivity then
                 if activityExpanded then
-                    IdleGame.Views.DetailView2.ActivityExpanded activity
+                    IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
                 else
-                    IdleGame.Views.DetailView2.ActivityCollapsed activity
+                    IdleGame.Views.DetailViewWrapper.ActivityCollapsed activity
 
             else if activityExpanded then
-                IdleGame.Views.DetailView2.ActivityExpanded activity
+                IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
             else
-                IdleGame.Views.DetailView2.PreviewWithActivity preview activity
+                IdleGame.Views.DetailViewWrapper.PreviewWithActivity preview activity
 
 
 setIsVisible : Bool -> FrontendModel -> FrontendModel
@@ -262,6 +262,11 @@ getActivity model =
 
         _ ->
             Nothing
+
+
+setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
+setActivity newActivity =
+    mapGame (\game -> Game.setActivity newActivity game)
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -422,15 +427,11 @@ update msg model =
                 |> Task.attempt (\_ -> NoOp)
             )
 
-        HandleActivityClick kind ->
+        HandleActivityClick { screenWidth } kind ->
             let
                 currentActivity : Maybe ( Activity, Timer )
                 currentActivity =
                     getActivity model
-
-                detailViewState : IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
-                detailViewState =
-                    getDetailViewState currentActivity model.preview model.activityExpanded
 
                 clickingActiveActivity : Bool
                 clickingActiveActivity =
@@ -441,32 +442,31 @@ update msg model =
                         Nothing ->
                             False
 
-                newActivityExpandedValue : Bool
-                newActivityExpandedValue =
+                newActivity : Maybe ( Activity, Timer )
+                newActivity =
                     if clickingActiveActivity then
-                        not model.activityExpanded
+                        Nothing
 
                     else
-                        False
+                        Just ( kind, Timer.create )
             in
-            case detailViewState of
-                IdleGame.Views.DetailView2.ActivityExpanded _ ->
-                    ( model
-                        |> setPreview (Just (Preview kind))
-                        |> setActivityExpanded newActivityExpandedValue
-                    , Cmd.none
-                    )
+            if ViewUtils.screenSupportsRighRail screenWidth then
+                ( model
+                    |> setActivity newActivity
+                    |> setActivityExpanded (not clickingActiveActivity)
+                , Cmd.none
+                )
 
-                _ ->
-                    ( model
-                        |> setPreview (Just (Preview kind))
-                        |> setActivityExpanded newActivityExpandedValue
-                    , Cmd.none
-                    )
+            else
+                ( model
+                    |> setActivity newActivity
+                    |> setActivityExpanded False
+                , Cmd.none
+                )
 
         HandlePlayClick kind ->
             ( model
-                |> mapGame (\game -> Game.setActivity (Just ( kind, Timer.create )) game)
+                |> setActivity (Just ( kind, Timer.create ))
                 |> setPreview Nothing
                 |> setActivityExpanded True
             , Cmd.none
@@ -708,7 +708,7 @@ toastConfig =
         -- attributes applied to the toast tray
         |> Toast.withTrayAttributes
             [ class "t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto"
-            , IdleGame.Views.Utils.zIndexes.toast
+            , ViewUtils.zIndexes.toast
             ]
         -- attributes applied to the toasts
         |> Toast.withAttributes [ class "toast" ]
@@ -731,7 +731,7 @@ toastToHtml notification =
                     Resource.getStats resource
             in
             div [ class "flex gap-1 items-center" ]
-                [ span [] [ text <| "+" ++ IdleGame.Views.Utils.intToString amount ]
+                [ span [] [ text <| "+" ++ ViewUtils.intToString amount ]
                 , stats.icon
                     |> Icon.toHtml
                 ]
@@ -773,7 +773,7 @@ renderModal activeModal game =
 
 renderBottomRightItems : FrontendModel -> Html FrontendMsg
 renderBottomRightItems model =
-    div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", IdleGame.Views.Utils.zIndexes.bottomRightMenu ]
+    div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", ViewUtils.zIndexes.bottomRightMenu ]
         ((if Config.flags.showDebugPanel then
             [ DebugPanel.renderOpenButton ]
 
@@ -834,14 +834,14 @@ view model =
                     game =
                         Snapshot.getValue snapshot
 
-                    detailViewState : IdleGame.Views.DetailView2.State ( Activity, Timer ) Preview
+                    detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
                         getDetailViewState game.activity model.preview model.activityExpanded
 
                     extraBottomPadding : Bool
                     extraBottomPadding =
                         case detailViewState of
-                            IdleGame.Views.DetailView2.PreviewWithActivity _ _ ->
+                            IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
                                 True
 
                             _ ->
@@ -849,15 +849,15 @@ view model =
 
                     renderActivity : ( Activity, Timer ) -> Html FrontendMsg
                     renderActivity activity =
-                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewActivity activity) extraBottomPadding game
+                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity activity) extraBottomPadding game
 
                     renderPreview : Preview -> Html FrontendMsg
                     renderPreview preview =
-                        IdleGame.Views.DetailView.renderContent (IdleGame.Views.DetailView.DetailViewPreview preview) extraBottomPadding game
+                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewPreview preview) extraBottomPadding game
 
                     renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
                     renderStatusBar activity =
-                        IdleGame.Views.DetailView.renderStatusBar activity
+                        IdleGame.Views.DetailViewContent.renderStatusBar activity
                 in
                 div [ class "flex h-screen relative" ]
                     [ Toast.render viewToast model.tray toastConfig
@@ -873,7 +873,7 @@ view model =
                         , IdleGame.Views.Content.renderContent game model.activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
                         ]
-                    , IdleGame.Views.DetailView2.render
+                    , IdleGame.Views.DetailViewWrapper.render
                         { state = detailViewState
                         , renderActivity = renderActivity
                         , renderPreview = renderPreview
@@ -887,8 +887,7 @@ view model =
                     -- , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
                     --     [ IdleGame.Views.Chores.detailView game ]
                     , renderModal model.activeModal game
-
-                    -- , renderBottomRightItems model
+                    , renderBottomRightItems model
                     ]
         ]
     }

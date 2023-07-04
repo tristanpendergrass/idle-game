@@ -202,3 +202,51 @@ skills =
     , grid = class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4"
     , xpSection = xpSection
     }
+
+
+type
+    ScreenWidth
+    -- Represents the width of a screen in which the game is displayed
+    = ScreenXs -- Screen width < 640px
+    | ScreenSm
+    | ScreenMd
+    | ScreenLg
+    | ScreenXl
+    | Screen2xl -- Screen width >= 1536px
+
+
+withScreenWidth : (ScreenWidth -> Html msg) -> Html msg
+withScreenWidth view =
+    -- Use Tailwind breakpoints to determine the screen width
+    div []
+        [ div [ class "block sm:hidden" ] [ view ScreenXs ]
+        , div [ class "hidden sm:block md:hidden" ] [ view ScreenSm ]
+        , div [ class "hidden md:block lg:hidden" ] [ view ScreenMd ]
+        , div [ class "hidden lg:block xl:hidden" ] [ view ScreenLg ]
+        , div [ class "hidden xl:block 2xl:hidden" ] [ view ScreenXl ]
+        , div [ class "hidden 2xl:block" ] [ view Screen2xl ]
+        ]
+
+
+{-| Returns true if the screen is large enough to display the game in full screen mode, with right rail and left drawer displayed.
+-}
+screenSupportsRighRail : ScreenWidth -> Bool
+screenSupportsRighRail screenWidth =
+    case screenWidth of
+        ScreenXs ->
+            False
+
+        ScreenSm ->
+            False
+
+        ScreenMd ->
+            False
+
+        ScreenLg ->
+            False
+
+        ScreenXl ->
+            True
+
+        Screen2xl ->
+            True

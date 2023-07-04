@@ -114,7 +114,7 @@ getActivityListItems skill game =
                             ActivityListItem _ ->
                                 False
 
-                            LockedActivity level ->
+                            LockedActivity _ ->
                                 True
                 in
                 { items = newItems, lockedItem = newItemIsLocked }

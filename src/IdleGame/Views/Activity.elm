@@ -28,6 +28,7 @@ renderActivityListItem game item =
     case item of
         Game.ActivityListItem activity ->
             renderActivity activity game
+                |> Utils.withScreenWidth
 
         Game.LockedActivity level ->
             renderLockedActivity level
@@ -79,8 +80,8 @@ activityCoin coin =
         ]
 
 
-renderActivity : Activity -> Game -> Html FrontendMsg
-renderActivity activity game =
+renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
+renderActivity activity game screenWidth =
     -- Similar to renderContent
     let
         maybeTimer : Maybe Timer
@@ -121,8 +122,9 @@ renderActivity activity game =
     in
     div
         [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-        , onClick (HandleActivityClick activity)
+        , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
 
+        -- , onClick (HandleActivityClick { expandDetailView = expandDetailView } activity)
         -- div
         --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
         ]

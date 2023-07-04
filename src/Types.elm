@@ -15,6 +15,7 @@ import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
+import IdleGame.Views.Utils as ViewUtils
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Time exposing (Posix)
@@ -104,7 +105,7 @@ type FrontendMsg
     | HandlePlayerMoveSelect Int Adventuring.PlayerMove
     | HandleMonsterSelect Adventuring.MonsterKind
       -- Activities
-    | HandleActivityClick Activity
+    | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity
       -- Debug Panel

@@ -1,4 +1,4 @@
-module IdleGame.Views.DetailView2 exposing (..)
+module IdleGame.Views.DetailViewWrapper exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
