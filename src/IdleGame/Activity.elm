@@ -177,7 +177,7 @@ hex1Stats : Stats
 hex1Stats =
     { skill = Skill.Hexes
     , title = "Hex I"
-    , image = ActivityIcon Icon.adventuring
+    , image = ActivityIcon (Icon.letter 'H')
     , unlockLevel = 1
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5
@@ -194,7 +194,7 @@ jinx1Stats : Stats
 jinx1Stats =
     { skill = Skill.Hexes
     , title = "Jinx I"
-    , image = ActivityIcon Icon.adventuring
+    , image = ActivityIcon (Icon.letter 'J')
     , unlockLevel = 10
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5

@@ -20,6 +20,7 @@ type alias Params =
 type Icon
     = IconFeather FeatherIcons.Icon Params
     | IconPublic String Params
+    | IconLetter Char Params
 
 
 defaultParams : Params
@@ -36,6 +37,9 @@ mapParams fn icon =
 
         IconPublic p params ->
             IconPublic p (fn params)
+
+        IconLetter c params ->
+            IconLetter c (fn params)
 
 
 withSize : Size -> Icon -> Icon
@@ -63,16 +67,16 @@ sizeToTailwindClass : Size -> String
 sizeToTailwindClass size =
     case size of
         Small ->
-            "w-3 h-3"
+            "w-3 h-3 text-xs"
 
         Medium ->
-            "w-6 h-6"
+            "w-6 h-6 text-sm font-semibold"
 
         Large ->
-            "w-12 h-12"
+            "w-12 h-12 text-2xl font-bold"
 
         ExtraLarge ->
-            "w-24 h-24"
+            "w-24 h-24 text-4xl font-bold"
 
 
 toHtml : Icon -> Html msg
@@ -90,6 +94,19 @@ toHtml icon =
                 , class (sizeToTailwindClass params.size)
                 ]
                 []
+
+        IconLetter char params ->
+            div [ class "avatar" ]
+                [ div
+                    [ class (sizeToTailwindClass params.size)
+                    , class "mask mask-hexagon bg-warning text-warning-content"
+                    ]
+                    [ div
+                        [ class "w-full h-full flex items-center justify-center"
+                        ]
+                        [ text (String.fromChar char) ]
+                    ]
+                ]
 
 
 
@@ -319,3 +336,8 @@ play =
 pause : Icon
 pause =
     createIconFeather FeatherIcons.pause
+
+
+letter : Char -> Icon
+letter char =
+    IconLetter char defaultParams
