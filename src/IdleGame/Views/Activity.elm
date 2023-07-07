@@ -60,7 +60,7 @@ activityImage kind =
 
         Activity.ActivityIcon icon ->
             div
-                [ class "h-full w-full flex items-center justify-center" ]
+                [ class "h-full w-full flex items-center justify-center bg-accent" ]
                 [ icon
                     |> Icon.withSize Icon.Large
                     |> Icon.toHtml

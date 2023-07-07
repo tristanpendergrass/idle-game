@@ -18,9 +18,9 @@ type alias Params =
 
 
 type Icon
-    = IconFeather FeatherIcons.Icon Params
-    | IconPublic String Params
-    | IconLetter Char Params
+    = IconFeather FeatherIcons.Icon Params -- Icons sourced from FeatherIcons library
+    | IconPublic String Params -- Icons sourced from the /public folder e.g. pngs
+    | IconString String Params -- Icons sourced from the alphabet. Should just be one or two characters
 
 
 defaultParams : Params
@@ -38,8 +38,8 @@ mapParams fn icon =
         IconPublic p params ->
             IconPublic p (fn params)
 
-        IconLetter c params ->
-            IconLetter c (fn params)
+        IconString c params ->
+            IconString c (fn params)
 
 
 withSize : Size -> Icon -> Icon
@@ -95,7 +95,7 @@ toHtml icon =
                 ]
                 []
 
-        IconLetter char params ->
+        IconString str params ->
             div [ class "avatar" ]
                 [ div
                     [ class (sizeToTailwindClass params.size)
@@ -104,7 +104,7 @@ toHtml icon =
                     [ div
                         [ class "w-full h-full flex items-center justify-center"
                         ]
-                        [ text (String.fromChar char) ]
+                        [ text str ]
                     ]
                 ]
 
@@ -338,6 +338,6 @@ pause =
     createIconFeather FeatherIcons.pause
 
 
-letter : Char -> Icon
-letter char =
-    IconLetter char defaultParams
+letter : String -> Icon
+letter str =
+    IconString str defaultParams

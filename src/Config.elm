@@ -36,8 +36,8 @@ devFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultTab = Tab.Chores
-    , defaultDetailViewExpanded = True
+    , defaultTab = Tab.Hexes
+    , defaultDetailViewExpanded = False
     }
 
 

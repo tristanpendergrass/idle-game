@@ -58,7 +58,7 @@ renderStatusBar ( activity, timer ) =
                     img [ src imgSrc, class "object-cover h-full w-full object-center" ] []
 
                 Activity.ActivityIcon icon ->
-                    div [ class "h-full w-full flex items-center justify-center" ] [ Icon.toHtml icon ]
+                    div [ class "h-full w-full flex items-center justify-center bg-accent" ] [ Icon.toHtml icon ]
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
