@@ -91,24 +91,6 @@ activityCoin coin =
         ]
 
 
-previewActivityButton : Activity -> Html FrontendMsg
-previewActivityButton activity =
-    button
-        [ class "btn btn-square btn-info btn-xs"
-        , onClick (HandlePreviewClick activity)
-        ]
-        [ Icon.eye
-            |> Icon.withSize Icon.Small
-            |> Icon.toHtml
-        ]
-
-
-contextAreaTailwindClasses =
-    { parentPadding = class "pb-10"
-    , elementHeight = class "h-10"
-    }
-
-
 renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
 renderActivity activity game screenWidth =
     -- Similar to renderContent
@@ -155,7 +137,7 @@ renderActivity activity game screenWidth =
             , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
             }
     in
-    div [ class "relative", contextAreaTailwindClasses.parentPadding ]
+    div [ class "relative" ]
         [ div
             [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
 
@@ -163,10 +145,6 @@ renderActivity activity game screenWidth =
             , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
             , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
-
-            -- , onClick (HandleActivityClick { expandDetailView = expandDetailView } activity)
-            -- div
-            --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
             ]
             [ -- preview image
               div [ class "h-24 relative" ]
@@ -194,14 +172,6 @@ renderActivity activity game screenWidth =
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]
                         []
-            ]
-        , div
-            [ class "absolute bottom-0 left-1/2 transform -translate-x-1/2" -- center horizontally, position at bottom
-            , class "w-12 bg-primary px-2 rounded-b flex justify-center items-center gap-1"
-            , contextAreaTailwindClasses.elementHeight
-            ]
-            [ -- preview button
-              previewActivityButton activity
             ]
         ]
 
