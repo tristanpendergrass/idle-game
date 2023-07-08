@@ -52,6 +52,12 @@ type Preview
     = Preview Activity
 
 
+type alias PointerState =
+    { longPress : Maybe ( Timer, Float, FrontendMsg ) -- If defined the long press has a timer, a Float duration (in ms), and a FrontendMsg to send when the timer fires
+    , click : FrontendMsg -- The click message to send when the pointer is released if a long press isn't detected
+    }
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
     , showDebugPanel : Bool
@@ -64,6 +70,7 @@ type alias FrontendModel =
     , gameState : FrontendGameState
     , preview : Maybe Preview -- Thing we're previewing in the detail view
     , activityExpanded : Bool -- If the activity in game exists and preview does not exist this Bool is used to show or hide the detail view in mobile/tablet screen size
+    , pointerState : Maybe PointerState
     }
 
 
@@ -99,6 +106,9 @@ type FrontendMsg
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Kind
+    | HandlePointerDown PointerState
+    | HandlePointerUp
+    | HandlePointerCancel
       -- Adventuring
     | StartFight
     | StopFight

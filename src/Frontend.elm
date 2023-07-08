@@ -78,6 +78,7 @@ init _ key =
       , gameState = Initializing
       , activityExpanded = Config.flags.defaultDetailViewExpanded
       , preview = Nothing
+      , pointerState = Nothing
       }
     , Cmd.none
     )
@@ -267,6 +268,37 @@ getActivity model =
 setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
 setActivity newActivity =
     mapGame (\game -> Game.setActivity newActivity game)
+
+
+updatePointer : Float -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
+updatePointer delta model =
+    case model.pointerState of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just { click, longPress } ->
+            case longPress of
+                Nothing ->
+                    ( model, Cmd.none )
+
+                Just ( timer, floatDuration, longPressMsg ) ->
+                    let
+                        ( newTimer, completions ) =
+                            Timer.increment (Duration.milliseconds floatDuration) (Duration.milliseconds delta) timer
+                    in
+                    if completions > 0 then
+                        update longPressMsg { model | pointerState = Nothing }
+
+                    else
+                        ( { model
+                            | pointerState =
+                                Just
+                                    { click = click
+                                    , longPress = Just ( newTimer, floatDuration, longPressMsg )
+                                    }
+                          }
+                        , Cmd.none
+                        )
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -528,11 +560,16 @@ update msg model =
 
                             else
                                 []
+
+                        modelWithSaveTimer : FrontendModel
+                        modelWithSaveTimer =
+                            model
+                                |> setSaveGameTimer newTimer
+
+                        ( modelWithUpdatedPointer, pointerCmds ) =
+                            updatePointer delta modelWithSaveTimer
                     in
-                    ( model
-                        |> setSaveGameTimer newTimer
-                    , Cmd.batch <| saveGameCmd
-                    )
+                    ( modelWithUpdatedPointer, Cmd.batch <| saveGameCmd ++ [ pointerCmds ] )
 
                 _ ->
                     noOp
@@ -662,6 +699,20 @@ update msg model =
                     )
             , Cmd.none
             )
+
+        HandlePointerDown pointerState ->
+            ( { model | pointerState = Just pointerState }, Cmd.none )
+
+        HandlePointerUp ->
+            case model.pointerState of
+                Nothing ->
+                    ( { model | pointerState = Nothing }, Cmd.none )
+
+                Just { click } ->
+                    update click { model | pointerState = Nothing }
+
+        HandlePointerCancel ->
+            ( { model | pointerState = Nothing }, Cmd.none )
 
         AddTime amount ->
             case model.gameState of

@@ -19,6 +19,7 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
+import Json.Decode as D
 import Percent exposing (Percent)
 import Types exposing (..)
 
@@ -147,11 +148,21 @@ renderActivity activity game screenWidth =
         duration : Duration
         duration =
             Game.getModdedDuration game activity
+
+        pointerDownState : PointerState
+        pointerDownState =
+            { click = HandleActivityClick { screenWidth = screenWidth } activity
+            , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
+            }
     in
     div [ class "relative", contextAreaTailwindClasses.parentPadding ]
         [ div
             [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-            , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
+
+            -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
+            , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
+            , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
+            , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
 
             -- , onClick (HandleActivityClick { expandDetailView = expandDetailView } activity)
             -- div
