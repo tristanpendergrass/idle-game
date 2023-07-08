@@ -464,6 +464,33 @@ update msg model =
                 , Cmd.none
                 )
 
+        HandlePreviewClick activity ->
+            let
+                currentActivity : Maybe ( Activity, Timer )
+                currentActivity =
+                    getActivity model
+
+                clickingActiveActivity : Bool
+                clickingActiveActivity =
+                    case currentActivity of
+                        Just ( k, _ ) ->
+                            k == activity
+
+                        Nothing ->
+                            False
+            in
+            ( model
+                |> setPreview (Just (Preview activity))
+                |> setActivityExpanded
+                    (if clickingActiveActivity then
+                        True
+
+                     else
+                        False
+                    )
+            , Cmd.none
+            )
+
         HandlePlayClick kind ->
             ( model
                 |> setActivity (Just ( kind, Timer.create ))

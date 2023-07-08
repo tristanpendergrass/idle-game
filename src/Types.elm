@@ -106,6 +106,7 @@ type FrontendMsg
     | HandleMonsterSelect Adventuring.MonsterKind
       -- Activities
     | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
+    | HandlePreviewClick Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity
       -- Debug Panel

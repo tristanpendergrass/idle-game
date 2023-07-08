@@ -90,6 +90,24 @@ activityCoin coin =
         ]
 
 
+previewActivityButton : Activity -> Html FrontendMsg
+previewActivityButton activity =
+    button
+        [ class "btn btn-square btn-info btn-xs"
+        , onClick (HandlePreviewClick activity)
+        ]
+        [ Icon.eye
+            |> Icon.withSize Icon.Small
+            |> Icon.toHtml
+        ]
+
+
+contextAreaTailwindClasses =
+    { parentPadding = class "pb-10"
+    , elementHeight = class "h-10"
+    }
+
+
 renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
 renderActivity activity game screenWidth =
     -- Similar to renderContent
@@ -130,39 +148,50 @@ renderActivity activity game screenWidth =
         duration =
             Game.getModdedDuration game activity
     in
-    div
-        [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-        , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
+    div [ class "relative", contextAreaTailwindClasses.parentPadding ]
+        [ div
+            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
+            , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
 
-        -- , onClick (HandleActivityClick { expandDetailView = expandDetailView } activity)
-        -- div
-        --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
-        ]
-        [ -- preview image
-          div [ class "h-24 relative" ]
-            [ activityImage activity ]
-        , div [ class "relative card-body" ]
-            [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
-                -- Activity title
-                ([ activityTitle activity
-                 , activityDuration duration
-                 ]
-                    ++ List.map (EffectView.render game mods) orderedEffects
-                )
+            -- , onClick (HandleActivityClick { expandDetailView = expandDetailView } activity)
+            -- div
+            --     [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
             ]
+            [ -- preview image
+              div [ class "h-24 relative" ]
+                [ activityImage activity
+                ]
+            , div [ class "relative card-body" ]
+                [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
+                    -- Activity title
+                    ([ activityTitle activity
+                     , activityDuration duration
+                     ]
+                        ++ List.map (EffectView.render game mods) orderedEffects
+                    )
+                ]
 
-        -- Progress bar
-        , case Maybe.map Timer.percentComplete maybeTimer of
-            Nothing ->
-                div [] []
+            -- Progress bar
+            , case Maybe.map Timer.percentComplete maybeTimer of
+                Nothing ->
+                    div [] []
 
-            Just percentComplete ->
-                div
-                    [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
-                    , Utils.zIndexes.activityProgressBar
-                    , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
-                    ]
-                    []
+                Just percentComplete ->
+                    div
+                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
+                        , Utils.zIndexes.activityProgressBar
+                        , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
+                        ]
+                        []
+            ]
+        , div
+            [ class "absolute bottom-0 left-1/2 transform -translate-x-1/2" -- center horizontally, position at bottom
+            , class "w-12 bg-primary px-2 rounded-b flex justify-center items-center gap-1"
+            , contextAreaTailwindClasses.elementHeight
+            ]
+            [ -- preview button
+              previewActivityButton activity
+            ]
         ]
 
 

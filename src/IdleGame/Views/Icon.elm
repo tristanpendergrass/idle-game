@@ -113,6 +113,11 @@ toHtml icon =
 -- Icon creators
 
 
+letter : String -> Icon
+letter str =
+    IconString str defaultParams
+
+
 createIconFeather : FeatherIcons.Icon -> Icon
 createIconFeather featherIcon =
     IconFeather featherIcon defaultParams
@@ -338,6 +343,6 @@ pause =
     createIconFeather FeatherIcons.pause
 
 
-letter : String -> Icon
-letter str =
-    IconString str defaultParams
+eye : Icon
+eye =
+    createIconFeather FeatherIcons.eye
