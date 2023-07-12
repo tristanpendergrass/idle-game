@@ -38,5 +38,6 @@ Mastery in combat is not done on a per-monster basis but on a per-tag basis. Eac
 # Tag ideas
 * Tag that rewards certain parts of the player loadout. e.g. weakness to certain elements
 * Weakness that scales up depending on player's level in another skill. E.g. herbology confers bonus damage against plant enemies
+* Mysterious cult played for laughs. They say ominous things and make threats but they seem to be empty. "You play your part in the sinful entreaty." Other factions don't take them seriously. 
 
 # Random concepts

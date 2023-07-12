@@ -2,5 +2,6 @@
   "autoPairMarkdown": false,
   "autoPairBrackets": false,
   "useTab": false,
-  "alwaysUpdateLinks": true
+  "alwaysUpdateLinks": true,
+  "promptDelete": false
 }
