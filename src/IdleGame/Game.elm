@@ -404,7 +404,7 @@ applyEvent event =
         )
 
 
-applyEffects : List Effect -> Game -> Generator (Result GameUpdateErr ( Game, List Toast ))
+applyEffects : List Effect -> Game -> Generator (Result ApplyEffectErr ( Game, List Toast ))
 applyEffects effects game =
     let
         mods : List Mod
@@ -428,7 +428,20 @@ applyEffects effects game =
                             Err e ->
                                 Random.constant (Err e)
 
-                            Ok ( g, t, a ) ->
+                            Ok tupp ->
+                                let
+                                    g : Game
+                                    g =
+                                        tupp.game
+
+                                    t : List Toast
+                                    t =
+                                        tupp.toasts
+
+                                    a : List Effect
+                                    a =
+                                        tupp.additionalEffects
+                                in
                                 applyEffects (rest ++ additionalEffectsFromMod ++ a) g
                                     |> Random.andThen
                                         (\res2 ->
@@ -453,7 +466,7 @@ applyEffects effects game =
 --     )
 
 
-type GameUpdateErr
+type ApplyEffectErr
     = EffectErr
 
 
@@ -530,16 +543,16 @@ calculateActivityMxp kind game =
         |> Xp.fromInt
 
 
-type alias GTA =
+type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    ( Game, List Toast, List Effect )
+    { game : Game, toasts : List Toast, additionalEffects : List Effect }
 
 
-type alias GameUpdateGen =
-    Generator (Result GameUpdateErr GTA)
+type alias ApplyEffectResultGenerator =
+    Generator (Result ApplyEffectErr ApplyEffectValue)
 
 
-applyEffect : Effect -> Game -> GameUpdateGen
+applyEffect : Effect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
@@ -555,7 +568,7 @@ applyEffect effect game =
                                 else
                                     failureEffects
                         in
-                        Random.constant (Ok ( game, [], chosenEffects ))
+                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
                     )
 
         GainResource quantity resource ->
@@ -566,7 +579,10 @@ applyEffect effect game =
 
         GainXp quantity skill ->
             -- Important! Keep the application here in sync with Views.Chores.elm
-            ( addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game, [], [] )
+            { game = addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game
+            , toasts = []
+            , additionalEffects = []
+            }
                 |> Random.constant
                 |> Random.map Ok
 
@@ -589,7 +605,7 @@ applyEffect effect game =
             game
                 |> addMxp kind mxp
                 |> addMasteryPoolXp masteryPoolXp
-                |> (\newGame -> Random.constant ( newGame, [], [] ))
+                |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok
 
         GainCoin quantity ->
@@ -603,16 +619,17 @@ applyEffect effect game =
                 |> Random.map Ok
 
 
-addResource : Resource.Kind -> Int -> Game -> GTA
+addResource : Resource.Kind -> Int -> Game -> ApplyEffectValue
 addResource resource amount game =
-    ( { game
-        | resources =
-            game.resources
-                |> Resource.addResource resource amount
-      }
-    , [ GainedResource amount resource ]
-    , []
-    )
+    { game =
+        { game
+            | resources =
+                game.resources
+                    |> Resource.addResource resource amount
+        }
+    , toasts = [ GainedResource amount resource ]
+    , additionalEffects = []
+    }
 
 
 addXp : Skill.Kind -> Xp -> Game -> Game
@@ -643,9 +660,12 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addCoin : Counter -> Game -> GTA
+addCoin : Counter -> Game -> ApplyEffectValue
 addCoin amount game =
-    ( { game | coin = Counter.add game.coin amount }, [ GainedCoin amount ], [] )
+    { game = { game | coin = Counter.add game.coin amount }
+    , toasts = [ GainedCoin amount ]
+    , additionalEffects = []
+    }
 
 
 gainCoin : Int -> Effect
