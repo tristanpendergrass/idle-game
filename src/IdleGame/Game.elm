@@ -242,74 +242,84 @@ combatReward =
     Event { effects = [ gainCoin 25 ] }
 
 
-rewardPlayer : Game -> Generator ( Game, List Toast )
-rewardPlayer game =
-    let
-        modifiedCombatReward =
-            applyMods (getAllMods game) combatReward
 
-        effects : List Effect
-        effects =
-            case modifiedCombatReward of
-                ModdedEvent eventData ->
-                    eventData.effects
-    in
-    List.foldl effectReducer (Random.constant ( game, [] )) effects
-
-
-incrementCombatsWon : Game -> Game
-incrementCombatsWon game =
-    { game | combatsWon = game.combatsWon + 1 }
-
-
-incrementCombatsLost : Game -> Game
-incrementCombatsLost game =
-    { game | combatsLost = game.combatsLost + 1 }
-
-
-updateAdventuring : Duration -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-updateAdventuring delta generator =
-    generator
-        |> Random.andThen
-            (\( game, toasts ) ->
-                Adventuring.update delta game.adventuring
-                    |> Random.andThen
-                        (\updateResult ->
-                            case updateResult of
-                                Adventuring.PlayerWon timeRemaining newAdventuring ->
-                                    let
-                                        updatedGenerator : Generator ( Game, List Toast )
-                                        updatedGenerator =
-                                            game
-                                                |> (\g -> { g | adventuring = newAdventuring })
-                                                |> incrementCombatsWon
-                                                |> rewardPlayer
-                                                |> Random.map (\( g, t ) -> ( g, toasts ++ t ))
-                                    in
-                                    updateAdventuring timeRemaining updatedGenerator
-
-                                Adventuring.MonsterWon timeRemaining newAdventuring ->
-                                    let
-                                        updatedGenerator : Generator ( Game, List Toast )
-                                        updatedGenerator =
-                                            game
-                                                |> (\g -> { g | adventuring = newAdventuring })
-                                                |> incrementCombatsLost
-                                                |> (\g -> Random.constant ( g, toasts ))
-                                    in
-                                    updateAdventuring timeRemaining updatedGenerator
-
-                                Adventuring.Continue newAdventuring ->
-                                    let
-                                        updatedGenerator : Generator ( Game, List Toast )
-                                        updatedGenerator =
-                                            game
-                                                |> (\g -> { g | adventuring = newAdventuring })
-                                                |> (\g -> Random.constant ( g, toasts ))
-                                    in
-                                    updatedGenerator
-                        )
-            )
+-- resultFoldl : (a -> b -> Result e b) -> b -> List a -> Result e b
+-- resultFoldl f acc list =
+--     case list of
+--         [] ->
+--             Ok acc
+--         x :: xs ->
+--             case f x acc of
+--                 Err e ->
+--                     Err e
+--                 Ok newAcc ->
+--                     resultFoldl f newAcc xs
+-- rewardPlayer : Game -> Generator ( Game, List Toast )
+-- rewardPlayer game =
+--     let
+--         modifiedCombatReward =
+--             applyMods (getAllMods game) combatReward
+--         effects : List Effect
+--         effects =
+--             case modifiedCombatReward of
+--                 ModdedEvent eventData ->
+--                     eventData.effects
+--         inter : Generator (Result GameUpdateErr ( Game, List Toast ))
+--         inter =
+--             resultFoldl effectReducer (Random.constant (Ok ( game, [] ))) effects
+--     in
+--     inter
+--         |> Random.map
+--             (\res ->
+--                 Result.withDefault ( game, [] ) res
+--             )
+-- incrementCombatsWon : Game -> Game
+-- incrementCombatsWon game =
+--     { game | combatsWon = game.combatsWon + 1 }
+-- incrementCombatsLost : Game -> Game
+-- incrementCombatsLost game =
+--     { game | combatsLost = game.combatsLost + 1 }
+-- updateAdventuring : Duration -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+-- updateAdventuring delta generator =
+--     generator
+--         |> Random.andThen
+--             (\( game, toasts ) ->
+--                 Adventuring.update delta game.adventuring
+--                     |> Random.andThen
+--                         (\updateResult ->
+--                             case updateResult of
+--                                 Adventuring.PlayerWon timeRemaining newAdventuring ->
+--                                     let
+--                                         updatedGenerator : Generator ( Game, List Toast )
+--                                         updatedGenerator =
+--                                             game
+--                                                 |> (\g -> { g | adventuring = newAdventuring })
+--                                                 |> incrementCombatsWon
+--                                                 |> rewardPlayer
+--                                                 |> Random.map (\( g, t ) -> ( g, toasts ++ t ))
+--                                     in
+--                                     updateAdventuring timeRemaining updatedGenerator
+--                                 Adventuring.MonsterWon timeRemaining newAdventuring ->
+--                                     let
+--                                         updatedGenerator : Generator ( Game, List Toast )
+--                                         updatedGenerator =
+--                                             game
+--                                                 |> (\g -> { g | adventuring = newAdventuring })
+--                                                 |> incrementCombatsLost
+--                                                 |> (\g -> Random.constant ( g, toasts ))
+--                                     in
+--                                     updateAdventuring timeRemaining updatedGenerator
+--                                 Adventuring.Continue newAdventuring ->
+--                                     let
+--                                         updatedGenerator : Generator ( Game, List Toast )
+--                                         updatedGenerator =
+--                                             game
+--                                                 |> (\g -> { g | adventuring = newAdventuring })
+--                                                 |> (\g -> Random.constant ( g, toasts ))
+--                                     in
+--                                     updatedGenerator
+--                         )
+--             )
 
 
 tick : Duration -> Game -> ( Game, List Toast )
@@ -342,29 +352,27 @@ tick delta game =
                     , newEvents
                     )
 
-        modifiedEvents =
-            case events of
-                [] ->
-                    []
-
-                _ ->
-                    let
-                        mods =
-                            getAllMods game
-                    in
-                    List.map (applyMods mods) events
-
-        effects : List Effect
-        effects =
-            modifiedEvents
-                |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
-
+        -- modifiedEvents =
+        --     case events of
+        --         -- Optimization so we don't calculate mods if there's no effects to apply them to
+        --         [] ->
+        --             []
+        --         _ ->
+        --             let
+        --                 mods =
+        --                     getAllMods game
+        --             in
+        --             List.map (applyMods mods) events
+        -- effects : List Effect
+        -- effects =
+        --     modifiedEvents
+        --         |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
                 |> setActivity newActivity
-                |> (\g -> updateAdventuring delta (Random.constant ( g, [] )))
-                |> (\g -> List.foldl effectReducer g effects)
+                -- |> (\g -> updateAdventuring delta (Random.constant ( g, [] )))
+                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) events)
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -372,17 +380,110 @@ tick delta game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-effectReducer : Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-effectReducer effect gen =
-    gen
-        |> Random.andThen
-            (\( game, notifications ) ->
-                applyEffect effect game
-                    |> Random.map
-                        (\( newGame, newToasts ) ->
-                            ( newGame, notifications ++ newToasts )
-                        )
-            )
+applyEvent : Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent event =
+    Random.andThen
+        (\( game, toasts ) ->
+            let
+                effects : List Effect
+                effects =
+                    case event of
+                        Event data ->
+                            data.effects
+            in
+            applyEffects effects game
+                |> Random.andThen
+                    (\res ->
+                        case res of
+                            Err _ ->
+                                Random.constant ( game, toasts )
+
+                            Ok ( newGame, newToasts ) ->
+                                Random.constant ( newGame, toasts ++ newToasts )
+                    )
+        )
+
+
+applyEffects : List Effect -> Game -> Generator (Result GameUpdateErr ( Game, List Toast ))
+applyEffects effects game =
+    let
+        mods : List Mod
+        mods =
+            -- Caching this at top of function but could consider recalculating it within
+            getAllMods game
+    in
+    case effects of
+        [] ->
+            Random.constant (Ok ( game, [] ))
+
+        effect :: rest ->
+            let
+                ( effect2, additionalEffectsFromMod ) =
+                    applyModsToEffect mods effect
+            in
+            applyEffect effect2 game
+                |> Random.andThen
+                    (\res ->
+                        case res of
+                            Err e ->
+                                Random.constant (Err e)
+
+                            Ok ( g, t, a ) ->
+                                applyEffects (rest ++ additionalEffectsFromMod ++ a) g
+                                    |> Random.andThen
+                                        (\res2 ->
+                                            case res2 of
+                                                Err e2 ->
+                                                    Random.constant (Err e2)
+
+                                                Ok ( g2, t2 ) ->
+                                                    Random.constant (Ok ( g2, t2 ++ t ))
+                                        )
+                    )
+
+
+
+-- |> mapGeneratorResult
+--     (\( g, t, a ) ->
+--         applyEffects (rest ++ a) g
+--             |> mapGeneratorResult
+--                 (\( g2, t2 ) ->
+--                     Random.constant (Ok ( g2, t ++ t2 ))
+--                 )
+--     )
+
+
+type GameUpdateErr
+    = EffectErr
+
+
+mapGeneratorResult : (a -> Generator (Result e a)) -> Generator (Result e a) -> Generator (Result e a)
+mapGeneratorResult fn =
+    Random.andThen
+        (\res ->
+            case res of
+                Ok a ->
+                    fn a
+
+                Err err ->
+                    Random.constant (Err err)
+        )
+
+
+
+-- effectReducer : Effect -> GameUpdateGen -> GameUpdateGen
+-- effectReducer effect =
+--     let
+--         fn : ( Game, List Toast ) -> GameUpdateGen
+--         fn ( game, notifications ) =
+--             applyEffect effect game
+--                 |> Random.map
+--                     (\res ->
+--                         res
+--                             |> Result.map (\( newGame, newToasts, newEffects ) -> ( newGame, notifications ++ newToasts, newEffects ))
+--                     )
+--     in
+--     mapGeneratorResult fn
 
 
 successGenerator : Float -> Generator Bool
@@ -429,7 +530,16 @@ calculateActivityMxp kind game =
         |> Xp.fromInt
 
 
-applyEffect : Effect -> Game -> Generator ( Game, List Toast )
+type alias GTA =
+    -- When applying an effect a toast is generated to inform the player what happened
+    ( Game, List Toast, List Effect )
+
+
+type alias GameUpdateGen =
+    Generator (Result GameUpdateErr GTA)
+
+
+applyEffect : Effect -> Game -> GameUpdateGen
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
@@ -445,18 +555,20 @@ applyEffect effect game =
                                 else
                                     failureEffects
                         in
-                        List.foldl effectReducer (Random.constant ( game, [] )) chosenEffects
+                        Random.constant (Ok ( game, [], chosenEffects ))
                     )
 
         GainResource quantity resource ->
             -- Important! Keep the application here in sync with Views.Chores.elm
             intGenerator quantity
                 |> Random.map (\amount -> addResource resource amount game)
+                |> Random.map Ok
 
         GainXp quantity skill ->
             -- Important! Keep the application here in sync with Views.Chores.elm
-            ( addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game, [] )
+            ( addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game, [], [] )
                 |> Random.constant
+                |> Random.map Ok
 
         GainMxp quantity kind ->
             -- Important! Keep the application here in sync with Views.Chores.elm
@@ -477,7 +589,8 @@ applyEffect effect game =
             game
                 |> addMxp kind mxp
                 |> addMasteryPoolXp masteryPoolXp
-                |> (\newGame -> Random.constant ( newGame, [] ))
+                |> (\newGame -> Random.constant ( newGame, [], [] ))
+                |> Random.map Ok
 
         GainCoin quantity ->
             -- Important! Keep the application here in sync with Views.Chores.elm
@@ -487,9 +600,10 @@ applyEffect effect game =
             in
             addCoin newCounter game
                 |> Random.constant
+                |> Random.map Ok
 
 
-addResource : Resource.Kind -> Int -> Game -> ( Game, List Toast )
+addResource : Resource.Kind -> Int -> Game -> GTA
 addResource resource amount game =
     ( { game
         | resources =
@@ -497,6 +611,7 @@ addResource resource amount game =
                 |> Resource.addResource resource amount
       }
     , [ GainedResource amount resource ]
+    , []
     )
 
 
@@ -528,9 +643,9 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addCoin : Counter -> Game -> ( Game, List Toast )
+addCoin : Counter -> Game -> GTA
 addCoin amount game =
-    ( { game | coin = Counter.add game.coin amount }, [ GainedCoin amount ] )
+    ( { game | coin = Counter.add game.coin amount }, [ GainedCoin amount ], [] )
 
 
 gainCoin : Int -> Effect
@@ -787,3 +902,7 @@ getAllIntervalMods game =
             getMasteryIntervalMods game
     in
     shopItemIntervalMods ++ choreUnlockIntervalMods
+
+
+
+--

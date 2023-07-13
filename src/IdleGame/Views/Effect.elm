@@ -22,9 +22,8 @@ import Types exposing (..)
 render : Game -> List IdleGame.Event.Mod -> IdleGame.Event.Effect -> Html FrontendMsg
 render game mods effect =
     IdleGame.Event.applyModsToEffect mods effect
-        |> List.head
-        |> Maybe.map (renderModdedEffect game)
-        |> Maybe.withDefault (div [] [])
+        |> Tuple.first
+        |> renderModdedEffect game
 
 
 

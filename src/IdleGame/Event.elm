@@ -158,7 +158,15 @@ includeVariableEffects mod =
                             let
                                 newEffects : List Effect
                                 newEffects =
-                                    List.concatMap (applyModsToEffect [ { mod | transformer = newTransformer } ]) successEffects
+                                    successEffects
+                                        |> List.concatMap
+                                            (\successEffect ->
+                                                let
+                                                    ( moddedSuccessEffect, additionalSuccessEffects ) =
+                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] successEffect
+                                                in
+                                                moddedSuccessEffect :: additionalSuccessEffects
+                                            )
                             in
                             ( successEffects /= newEffects, newEffects )
 
@@ -166,7 +174,15 @@ includeVariableEffects mod =
                             let
                                 newEffects : List Effect
                                 newEffects =
-                                    List.concatMap (applyModsToEffect [ mod ]) failureEffects
+                                    successEffects
+                                        |> List.concatMap
+                                            (\failureEffect ->
+                                                let
+                                                    ( moddedFailureEffect, additionalFailureEffects ) =
+                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] failureEffect
+                                                in
+                                                moddedFailureEffect :: additionalFailureEffects
+                                            )
                             in
                             ( failureEffects /= newEffects, newEffects )
 
@@ -236,12 +252,17 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : List Mod -> Effect -> List Effect
+applyModsToEffect : List Mod -> Effect -> ( Effect, List Effect )
 applyModsToEffect =
     applyModsToEffectHelp 0
 
 
-applyModsToEffectHelp : Int -> List Mod -> Effect -> List Effect
+tupleToList : ( a, List a ) -> List a
+tupleToList ( x, xs ) =
+    x :: xs
+
+
+applyModsToEffectHelp : Int -> List Mod -> Effect -> ( Effect, List Effect )
 applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
@@ -256,30 +277,29 @@ applyModsToEffectHelp depth mods effect =
                 ( effect, [] )
                 mods
     in
-    newEffect
-        -- TODO: unit test this 20 threshold?
-        -- The depth < 20 is an arbitrary limit that shouldn't usually be reached. It should be rare for a "further effect" to trigger
-        -- a mod that gives another further effect and have that repeat more than 20 times, if so the player just doesn't get the benefit -- :)
-        :: (if depth < 20 then
-                List.concatMap (applyModsToEffectHelp (depth + 1) mods) furtherEffects
+    ( newEffect
+      -- TODO: unit test this 20 threshold?
+      -- The depth < 20 is an arbitrary limit that shouldn't usually be reached. It should be rare for a "further effect" to trigger
+      -- a mod that gives another further effect and have that repeat more than 20 times, if so the player just doesn't get the benefit -- :)
+    , if depth < 20 then
+        List.concatMap (applyModsToEffectHelp (depth + 1) mods >> tupleToList) furtherEffects
 
-            else
-                []
-           )
-
-
-applyMods : List Mod -> Event -> ModdedEvent
-applyMods mods (Event eventData) =
-    ModdedEvent
-        { eventData
-          -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
-            | effects = List.concatMap (applyModsToEffect mods) eventData.effects
-        }
+      else
+        []
+    )
 
 
-withMods : List Mod -> Event -> ModdedEvent
-withMods mods event =
-    applyMods mods event
+
+-- applyMods : List Mod -> Event -> ModdedEvent
+-- applyMods mods (Event eventData) =
+--     ModdedEvent
+--         { eventData
+--           -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
+--             | effects = List.concatMap (applyModsToEffect mods) eventData.effects
+--         }
+-- withMods : List Mod -> Event -> ModdedEvent
+-- withMods mods event =
+--     applyMods mods event
 
 
 withHowManyTimesToApplyMod : Int -> Mod -> Mod
