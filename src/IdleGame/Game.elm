@@ -406,43 +406,37 @@ applyEvent event =
 
 applyEffects : List Effect -> Game -> Generator (Result ApplyEffectErr ( Game, List Toast ))
 applyEffects effects game =
-    let
-        mods : List Mod
-        mods =
-            -- Caching this at top of function but could consider recalculating it within
-            getAllMods game
-    in
     case effects of
         [] ->
             Random.constant (Ok ( game, [] ))
 
         effect :: rest ->
             let
-                ( effect2, additionalEffectsFromMod ) =
-                    applyModsToEffect mods effect
+                ( moddedEffect, additionalEffectsFromMod ) =
+                    applyModsToEffect (getAllMods game) effect
             in
-            applyEffect effect2 game
+            applyEffect moddedEffect game
                 |> Random.andThen
-                    (\res ->
-                        case res of
+                    (\applyEffectResult ->
+                        case applyEffectResult of
                             Err e ->
                                 Random.constant (Err e)
 
-                            Ok tupp ->
+                            Ok applyEffectVal ->
                                 let
                                     g : Game
                                     g =
-                                        tupp.game
+                                        applyEffectVal.game
 
-                                    t : List Toast
-                                    t =
-                                        tupp.toasts
+                                    toasts : List Toast
+                                    toasts =
+                                        applyEffectVal.toasts
 
-                                    a : List Effect
-                                    a =
-                                        tupp.additionalEffects
+                                    additionalEffects : List Effect
+                                    additionalEffects =
+                                        applyEffectVal.additionalEffects
                                 in
-                                applyEffects (rest ++ additionalEffectsFromMod ++ a) g
+                                applyEffects (rest ++ additionalEffectsFromMod ++ additionalEffects) g
                                     |> Random.andThen
                                         (\res2 ->
                                             case res2 of
@@ -450,7 +444,7 @@ applyEffects effects game =
                                                     Random.constant (Err e2)
 
                                                 Ok ( g2, t2 ) ->
-                                                    Random.constant (Ok ( g2, t2 ++ t ))
+                                                    Random.constant (Ok ( g2, t2 ++ toasts ))
                                         )
                     )
 

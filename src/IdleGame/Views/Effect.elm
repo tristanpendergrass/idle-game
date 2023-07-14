@@ -26,14 +26,6 @@ render game mods effect =
         |> renderModdedEffect game
 
 
-
--- = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
--- | GainResource { base : Int, doublingChance : Float } Resource.Kind
--- | GainXp Multiplicable.Multiplicable Skill
--- | GainChoreMxp { multiplier : Float } ChoreKind
--- | GainCoin Multiplicable.Multiplicable
-
-
 renderModdedEffect : Game -> IdleGame.Event.Effect -> Html FrontendMsg
 renderModdedEffect game effect =
     case IdleGame.Event.getType effect of
