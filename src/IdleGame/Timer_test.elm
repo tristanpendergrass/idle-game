@@ -49,7 +49,7 @@ timerTest =
             \_ ->
                 Timer.create
                     |> Timer.increment (Duration.seconds 1) (Duration.seconds 0.5)
-                    |> (\( newTimer, _ ) -> newTimer)
+                    |> Tuple.first
                     |> expectPercentComplete (Percent.fromFloat 0.5)
         , test "tracks one completion" <|
             \_ ->
@@ -60,7 +60,7 @@ timerTest =
             \_ ->
                 Timer.create
                     |> Timer.increment (Duration.seconds 1) (Duration.seconds 1.3)
-                    |> (\( newTimer, _ ) -> newTimer)
+                    |> Tuple.first
                     |> expectPercentComplete (Percent.fromFloat 0.3)
         , test "tracks multiple completions" <|
             \_ ->
@@ -71,34 +71,34 @@ timerTest =
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.25)
-                    |> (\( newTimer, _ ) -> newTimer)
+                    |> Tuple.first
                     |> expectPercentComplete (Percent.fromFloat 0.25)
         , test "incrementUntilComplete works for a delta that completes the timer" <|
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 1.25)
-                    |> (\( newTimer, _ ) -> newTimer)
+                    |> Tuple.first
                     |> expectPercentComplete (Percent.fromFloat 0)
         , test "incrementUntilComplete returns 0 additional time if not completing the timer" <|
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.25)
-                    |> (\( _, remainingTime ) -> remainingTime)
+                    |> Tuple.second
                     |> aboutEqualDuration (Duration.seconds 0)
         , test "incrementUntilComplete returns the additional time if completing the timer" <|
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.95)
-                    |> (\( t, _ ) -> t)
+                    |> Tuple.first
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.1)
-                    |> (\( _, remainingTime ) -> remainingTime)
+                    |> Tuple.second
                     |> aboutEqualDuration (Duration.seconds 0.05)
         , test "incrementUntilComplete returns the additional time if completing the timer multiple times" <|
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.95)
-                    |> (\( t, _ ) -> t)
+                    |> Tuple.first
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 1.1)
-                    |> (\( _, remainingTime ) -> remainingTime)
+                    |> Tuple.second
                     |> aboutEqualDuration (Duration.seconds 1.05)
         ]
