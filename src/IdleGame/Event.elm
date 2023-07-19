@@ -1,9 +1,9 @@
 module IdleGame.Event exposing (..)
 
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Kinds.Activities exposing (Activity)
-import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
@@ -54,7 +54,7 @@ type EffectType
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
     | GainXp { base : Xp, multiplier : Float } Skill.Kind
     | GainMxp { multiplier : Float } Activity
-    | GainCoin Multiplicable
+    | GainCoin { base : Coin, multiplier : Float }
 
 
 type Effect
@@ -341,12 +341,8 @@ coinTransformer buff repetitions effect =
     case getType effect of
         GainCoin quantity ->
             let
-                adjustedBuff =
-                    buff * toFloat repetitions
-
                 adjustedMultiplicable =
-                    quantity
-                        |> Multiplicable.addMultiplier adjustedBuff
+                    { quantity | multiplier = quantity.multiplier + (buff * toFloat repetitions) }
             in
             effect
                 |> setType (GainCoin adjustedMultiplicable)
@@ -538,10 +534,10 @@ gainXp quantity skill =
         }
 
 
-gainCoin : Int -> Effect
+gainCoin : Coin -> Effect
 gainCoin quantity =
     Effect
-        { type_ = GainCoin (Multiplicable.fromInt quantity)
+        { type_ = GainCoin { base = quantity, multiplier = 1 }
         , tags = []
         }
 

@@ -9,7 +9,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)

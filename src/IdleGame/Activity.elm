@@ -1,6 +1,7 @@
 module IdleGame.Activity exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
@@ -140,8 +141,8 @@ cleanStablesStats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.fromInt 5) Skill.Chores
-                , Event.gainCoin 1
+                [ Event.gainXp (Xp.int 5) Skill.Chores
+                , Event.gainCoin (Coin.int 1)
                 , Event.gainMxp IdleGame.Kinds.Activities.CleanStables
                 , Event.gainWithProbability 0.5
                     [ Event.gainResource 3 Resource.Manure
@@ -162,8 +163,8 @@ cleanBigBubbaStats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.fromInt 10) Skill.Chores
-                , Event.gainCoin 1
+                [ Event.gainXp (Xp.int 10) Skill.Chores
+                , Event.gainCoin (Coin.int 1)
                 , Event.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
                 , Event.gainWithProbability 0.5
                     [ Event.gainResource 3 Resource.Manure
@@ -184,7 +185,7 @@ hex1Stats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.fromInt 5) Skill.Hexes
+                [ Event.gainXp (Xp.int 5) Skill.Hexes
                 ]
             }
     }
@@ -201,7 +202,7 @@ jinx1Stats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.fromInt 10) Skill.Hexes
+                [ Event.gainXp (Xp.int 10) Skill.Hexes
                 ]
             }
     }

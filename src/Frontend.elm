@@ -12,6 +12,7 @@ import Html.Events exposing (..)
 import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
@@ -678,19 +679,20 @@ update msg model =
                 |> mapGame
                     (\game ->
                         let
+                            stats : ShopItems.Stats
                             stats =
                                 ShopItems.getStats kind
 
                             canAfford : Bool
                             canAfford =
-                                Counter.getValue stats.price <= Counter.getValue game.coin
+                                Coin.toInt stats.price <= Coin.toInt game.coin
 
                             dontOwnItemYet =
                                 not <| ShopItems.isOwned kind game.shopItems
                         in
                         if canAfford && dontOwnItemYet then
                             { game
-                                | coin = Counter.subtract game.coin stats.price
+                                | coin = Quantity.difference game.coin stats.price
                                 , shopItems = ShopItems.addItem kind game.shopItems
                             }
 
@@ -798,7 +800,12 @@ toastToHtml notification =
     case notification of
         GainedCoin amount ->
             div [ class "flex gap-1 items-center" ]
-                [ span [] [ text <| "+" ++ Counter.toString amount ]
+                [ span []
+                    [ amount
+                        |> Coin.toInt
+                        |> ViewUtils.intToString
+                        |> text
+                    ]
                 , Icon.coin
                     |> Icon.toHtml
                 ]

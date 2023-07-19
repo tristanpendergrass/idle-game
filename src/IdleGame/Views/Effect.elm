@@ -4,12 +4,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
-import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -29,8 +29,8 @@ render game mods effect =
 renderModdedEffect : Game -> IdleGame.Event.Effect -> Html FrontendMsg
 renderModdedEffect game effect =
     case IdleGame.Event.getType effect of
-        IdleGame.Event.GainCoin multiplicable ->
-            renderCoin multiplicable
+        IdleGame.Event.GainCoin coin ->
+            renderCoin coin
 
         IdleGame.Event.GainResource { base, doublingChance } kind ->
             renderResource { base = base, doublingChance = doublingChance } kind
@@ -55,14 +55,19 @@ renderModdedEffect game effect =
                     div [] []
 
 
-renderCoin : Multiplicable -> Html msg
-renderCoin coin =
+renderCoin : { base : Coin, multiplier : Float } -> Html msg
+renderCoin { base, multiplier } =
+    let
+        coin : Coin
+        coin =
+            Quantity.multiplyBy multiplier base
+    in
     div [ class "flex items-center gap-1" ]
         [ div [ class "flex items-center gap-1" ]
             [ span []
                 [ coin
-                    |> Multiplicable.toCounter
-                    |> Counter.toString
+                    |> Coin.toInt
+                    |> Utils.intToString
                     |> text
                 ]
             , Icon.coin

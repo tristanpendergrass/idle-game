@@ -156,7 +156,7 @@ hex1Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 1
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Hex1
         }
@@ -169,7 +169,7 @@ jinx1Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 10
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Jinx1
         }
@@ -182,7 +182,7 @@ curse1Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 25
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Curse1
         }
@@ -195,7 +195,7 @@ hex2Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 35
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Hex2
         }
@@ -208,7 +208,7 @@ jinx2Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 45
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Jinx2
         }
@@ -221,7 +221,7 @@ curse2Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 60
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Curse2
         }
@@ -234,7 +234,7 @@ hex3Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 70
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Hex3
         }
@@ -247,7 +247,7 @@ jinx3Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 85
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Jinx3
         }
@@ -260,7 +260,7 @@ curse3Stats =
     , imgSrc = "/chores/drainDemons.png"
     , unlockLevel = 95
     , outcome =
-        { xp = Xp.fromInt 10
+        { xp = Xp.int 10
         , duration = Duration.seconds 3
         , createdHex = Curse3
         }

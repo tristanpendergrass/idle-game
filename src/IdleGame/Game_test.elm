@@ -2,11 +2,15 @@ module IdleGame.Game_test exposing (..)
 
 import Duration exposing (Duration)
 import Expect exposing (..)
+import Html.Attributes exposing (download)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
-import IdleGame.Event exposing (..)
+import IdleGame.Event as Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
+import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Quantity
 import Random
@@ -14,8 +18,8 @@ import Test exposing (..)
 import Test.Random
 
 
-expectGame : (Game -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectValue -> Expectation
-expectGame check result =
+expectOk : (Game -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
+expectOk check result =
     case result of
         Err _ ->
             Expect.fail "applyEffect returned Err"
@@ -24,7 +28,17 @@ expectGame check result =
             check val.game
 
 
-expectToasts : (List Toast -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectValue -> Expectation
+expectErr : (Game.ApplyEffectErr -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
+expectErr check result =
+    case result of
+        Err err ->
+            check err
+
+        Ok _ ->
+            Expect.fail "applyEffect was expected to return Err"
+
+
+expectToasts : (List Toast -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
 expectToasts check result =
     case result of
         Err _ ->
@@ -34,52 +48,66 @@ expectToasts check result =
             check val.toasts
 
 
-expectAdditionalEffect : (List Effect -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectValue -> Expectation
-expectAdditionalEffect check result =
-    case result of
-        Err _ ->
-            Expect.fail "applyEffect returned Err"
+expectCoin : Coin -> (Game -> Expectation)
+expectCoin amount =
+    .coin >> Expect.equal amount
 
-        Ok val ->
-            check val.additionalEffects
+
+expectXp : Xp -> Skill.Kind -> (Game -> Expectation)
+expectXp amount skill =
+    .xp >> Skill.getByKind skill >> Expect.equal amount
+
+
+initialGame : Game
+initialGame =
+    Game.create (Random.initialSeed 0)
+
+
+testEffects : String -> { effects : List Effect, check : Result Game.ApplyEffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects name { effects, check } =
+    Test.Random.check
+        name
+        (Game.applyEffects effects initialGame)
+        check
 
 
 applyEffectsTest : Test
 applyEffectsTest =
-    todo "Build out test suite for applyEffects, then refactor applyEffects to allow for tail call optimization"
-
-
-applyEffectTest : Test
-applyEffectTest =
-    describe "applyEffect"
-        [ describe "for GainCoin" <|
-            [ let
-                effect : Effect
-                effect =
-                    Game.gainCoin 5
-
-                initialGame : Game
-                initialGame =
-                    Game.create (Random.initialSeed 0)
-
-                gameAfterAddingCoin : Game.ApplyEffectResultGenerator
-                gameAfterAddingCoin =
-                    Game.applyEffect effect initialGame
-
-                checkCoin : Result Game.ApplyEffectErr Game.ApplyEffectValue -> Expectation
-                checkCoin result =
-                    result
-                        |> Result.map
-                            (\val ->
-                                let
-                                    gameCoin : Int
-                                    gameCoin =
-                                        Counter.getValue val.game.coin
-                                in
-                                Expect.equal gameCoin 5
-                            )
-                        |> Result.withDefault (Expect.fail "applyEffect returned Err")
-              in
-              Test.Random.check "applies GainCoin" gameAfterAddingCoin checkCoin
-            ]
+    -- TODO: test tail call optimization in applyEffects
+    describe "applyEffects"
+        [ testEffects "applies GainCoin"
+            { effects = [ Event.gainCoin (Coin.int 5) ]
+            , check = expectOk (expectCoin (Coin.int 5))
+            }
+        , testEffects "applies GainCoin and GainXp"
+            { effects =
+                [ Event.gainCoin (Coin.int 5)
+                , Event.gainXp (Xp.int 5) Skill.Chores
+                ]
+            , check =
+                Expect.all
+                    (List.map expectOk
+                        [ expectCoin (Coin.int 5)
+                        , expectXp (Xp.int 5) Skill.Chores
+                        ]
+                    )
+            }
+        , testEffects "can add and remove coin"
+            { effects =
+                [ Event.gainCoin (Coin.int 5)
+                , Event.gainCoin (Coin.int -4)
+                ]
+            , check = expectOk (expectCoin (Coin.int 1))
+            }
+        , testEffects "cannot go below zero coin"
+            { effects = [ Event.gainCoin (Coin.int -5) ]
+            , check = expectErr (Expect.equal Game.EffectErr)
+            }
+        , testEffects "order matters when subtracting coin"
+            { effects =
+                [ Event.gainCoin (Coin.int 5)
+                , Event.gainCoin (Coin.int -6)
+                ]
+            , check = expectErr (Expect.equal Game.EffectErr)
+            }
         ]

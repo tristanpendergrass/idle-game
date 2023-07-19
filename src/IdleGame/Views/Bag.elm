@@ -3,6 +3,7 @@ module IdleGame.Views.Bag exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
@@ -48,7 +49,7 @@ render game =
                         |> Icon.toHtml
                     ]
                 , span [ class "text-log font-semibold" ]
-                    [ text <| Counter.toString game.coin
+                    [ text <| IdleGame.Views.Utils.intToString (Coin.toInt game.coin)
                     ]
                 ]
             ]

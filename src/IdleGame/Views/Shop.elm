@@ -3,7 +3,7 @@ module IdleGame.Views.Shop exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -26,16 +26,19 @@ render game =
                 [ text "Owned"
                 ]
 
-        priceLabel : Counter -> Html FrontendMsg
+        priceLabel : Coin -> Html FrontendMsg
         priceLabel price =
             div [ class "flex items-center gap-1" ]
                 [ Icon.coin
                     |> Icon.toHtml
                 , div
                     [ class "font-bold"
-                    , classList [ ( "text-error", Counter.getValue price > Counter.getValue game.coin ) ]
+                    , classList [ ( "text-error", Coin.toInt price > Coin.toInt game.coin ) ]
                     ]
-                    [ text <| Counter.toString price
+                    [ price
+                        |> Coin.toInt
+                        |> IdleGame.Views.Utils.intToString
+                        |> text
                     ]
                 ]
 
@@ -90,7 +93,10 @@ render game =
                         |> Icon.toHtml
                     ]
                 , span [ class "text-log font-semibold" ]
-                    [ text <| Counter.toString game.coin
+                    [ game.coin
+                        |> Coin.toInt
+                        |> IdleGame.Views.Utils.intToString
+                        |> text
                     ]
                 ]
             ]

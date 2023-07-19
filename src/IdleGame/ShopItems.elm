@@ -2,6 +2,7 @@ module IdleGame.ShopItems exposing (..)
 
 import Html exposing (..)
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
@@ -26,7 +27,7 @@ allKinds =
 type alias Stats =
     { title : String
     , icon : Icon
-    , price : Counter
+    , price : Coin
     , unlockLevel : Int
     , reward : Reward
     , description : String
@@ -40,10 +41,11 @@ dummyReward =
     ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 0.1 } ]
 
 
+shovelStats : Stats
 shovelStats =
     { title = "Shovel"
     , icon = Icon.shovel
-    , price = Counter.create 50
+    , price = Coin.int 50
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
@@ -56,10 +58,11 @@ shovelStats =
     }
 
 
+beginnerDualWieldingStats : Stats
 beginnerDualWieldingStats =
     { title = "Beginner Dual Wielding"
     , icon = Icon.book
-    , price = Counter.create 6000
+    , price = Coin.int 6000
     , unlockLevel = 35
 
     -- , reward = ShopItemIntervalMod [ { kind = Activity.WaterGreenhousePlants, percentChange = 1.0 } ]
@@ -70,10 +73,11 @@ beginnerDualWieldingStats =
     }
 
 
+keyringStats : Stats
 keyringStats =
     { title = "Keyring"
     , icon = Icon.keyring
-    , price = Counter.create 10000
+    , price = Coin.int 10000
     , unlockLevel = 1
 
     -- , reward =
@@ -86,10 +90,11 @@ keyringStats =
     }
 
 
+readingGlassesStats : Stats
 readingGlassesStats =
     { title = "Reading Glasses"
     , icon = Icon.readingGlasses
-    , price = Counter.create 3000
+    , price = Coin.int 3000
     , unlockLevel = 55
     , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
 
@@ -112,10 +117,11 @@ readingGlassesStats =
     }
 
 
+oversizedBagStats : Stats
 oversizedBagStats =
     { title = "OversizedBag"
     , icon = Icon.oversizedBag
-    , price = Counter.create 5000
+    , price = Coin.int 5000
     , unlockLevel = 65
     , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
 

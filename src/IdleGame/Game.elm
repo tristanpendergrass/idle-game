@@ -4,12 +4,12 @@ import Duration exposing (Duration)
 import IdleGame.Activity as Activity
 import IdleGame.Adventuring as Adventuring exposing (Adventuring)
 import IdleGame.Chore as Chore
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
-import IdleGame.Multiplicable as Multiplicable exposing (Multiplicable)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Skill as Skill
@@ -34,7 +34,7 @@ type alias Game =
     , mxp : Activity.Record Xp
     , choresMxp : Xp
     , activity : Maybe ( Activity, Timer )
-    , coin : Counter
+    , coin : Coin
     , resources : Resource.Amounts
     , shopItems : ShopItems
     , adventuring : Adventuring
@@ -47,13 +47,13 @@ create : Random.Seed -> Game
 create seed =
     { seed = seed
     , xp =
-        { chores = Xp.fromInt 0
-        , hexes = Xp.fromInt 0
+        { chores = Xp.int 0
+        , hexes = Xp.int 0
         }
-    , mxp = Activity.createRecord (Xp.fromInt 0)
-    , choresMxp = Xp.fromInt 0
+    , mxp = Activity.createRecord (Xp.int 0)
+    , choresMxp = Xp.int 0
     , activity = Nothing
-    , coin = Counter.create 0
+    , coin = Coin.int 0
     , resources = Resource.createResources
     , shopItems = ShopItems.create
     , adventuring = Adventuring.create
@@ -239,7 +239,7 @@ getModdedDuration game kind =
 
 combatReward : Event
 combatReward =
-    Event { effects = [ gainCoin 25 ] }
+    Event { effects = [ gainCoin (Coin.int 25) ] }
 
 
 
@@ -398,17 +398,25 @@ applyEvent event =
                             Err _ ->
                                 Random.constant ( game, toasts )
 
-                            Ok ( newGame, newToasts ) ->
-                                Random.constant ( newGame, toasts ++ newToasts )
+                            Ok val ->
+                                Random.constant ( val.game, toasts ++ val.toasts )
                     )
         )
 
 
-applyEffects : List Effect -> Game -> Generator (Result ApplyEffectErr ( Game, List Toast ))
+type alias ApplyEffectsValue =
+    { game : Game, toasts : List Toast }
+
+
+type alias ApplyEffectsResultGenerator =
+    Generator (Result ApplyEffectErr ApplyEffectsValue)
+
+
+applyEffects : List Effect -> Game -> ApplyEffectsResultGenerator
 applyEffects effects game =
     case effects of
         [] ->
-            Random.constant (Ok ( game, [] ))
+            Random.constant (Ok { game = game, toasts = [] })
 
         effect :: rest ->
             let
@@ -443,21 +451,10 @@ applyEffects effects game =
                                                 Err e2 ->
                                                     Random.constant (Err e2)
 
-                                                Ok ( g2, t2 ) ->
-                                                    Random.constant (Ok ( g2, t2 ++ toasts ))
+                                                Ok val ->
+                                                    Random.constant (Ok { game = val.game, toasts = val.toasts ++ toasts })
                                         )
                     )
-
-
-
--- |> mapGeneratorResult
---     (\( g, t, a ) ->
---         applyEffects (rest ++ a) g
---             |> mapGeneratorResult
---                 (\( g2, t2 ) ->
---                     Random.constant (Ok ( g2, t ++ t2 ))
---                 )
---     )
 
 
 type ApplyEffectErr
@@ -534,7 +531,7 @@ calculateActivityMxp kind game =
     toFloat currentMasteryLevel
         * Duration.inSeconds stats.duration
         |> floor
-        |> Xp.fromInt
+        |> Xp.int
 
 
 type alias ApplyEffectValue =
@@ -602,15 +599,15 @@ applyEffect effect game =
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok
 
-        GainCoin quantity ->
+        GainCoin { base, multiplier } ->
             -- Important! Keep the application here in sync with Views.Chores.elm
             let
-                newCounter =
-                    Multiplicable.toCounter quantity
+                product : Coin
+                product =
+                    Quantity.multiplyBy multiplier base
             in
-            addCoin newCounter game
+            addCoin product game
                 |> Random.constant
-                |> Random.map Ok
 
 
 addResource : Resource.Kind -> Int -> Game -> ApplyEffectValue
@@ -654,21 +651,26 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addCoin : Counter -> Game -> ApplyEffectValue
+addCoin : Coin -> Game -> Result ApplyEffectErr ApplyEffectValue
 addCoin amount game =
-    { game = { game | coin = Counter.add game.coin amount }
-    , toasts = [ GainedCoin amount ]
-    , additionalEffects = []
-    }
-
-
-gainCoin : Int -> Effect
-gainCoin amount =
     let
-        coin =
-            Multiplicable.fromInt amount
+        newCoin : Coin
+        newCoin =
+            Quantity.plus game.coin amount
+
+        isAllowed : Bool
+        isAllowed =
+            Quantity.greaterThanOrEqualTo (Coin.int 0) newCoin
     in
-    Effect { type_ = GainCoin coin, tags = [] }
+    if isAllowed then
+        Ok
+            { game = { game | coin = newCoin }
+            , toasts = [ GainedCoin amount ]
+            , additionalEffects = []
+            }
+
+    else
+        Err EffectErr
 
 
 type alias TimePassesResourceGain =
@@ -692,7 +694,7 @@ type alias TimePassesXpGain =
 
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , coinGains : Maybe Counter
+    , coinGains : Maybe Coin
     , resourcesDiff : Resource.Diff
     , combatsWonDiff : Int
     , combatsLostDiff : Int
@@ -718,10 +720,10 @@ getTimePassesData originalGame currentGame =
         combatsLostDiff =
             currentGame.combatsLost - originalGame.combatsLost
 
-        coinGains : Maybe Counter
+        coinGains : Maybe Coin
         coinGains =
-            if Counter.getValue currentGame.coin > Counter.getValue originalGame.coin then
-                Just <| Counter.subtract currentGame.coin originalGame.coin
+            if Coin.toInt currentGame.coin > Coin.toInt originalGame.coin then
+                Just <| Quantity.difference currentGame.coin originalGame.coin
 
             else
                 Nothing
@@ -804,30 +806,6 @@ getChoreMasteryPoolMods game =
 
     else
         []
-
-
-
--- Mastery thresholds for specific chores
--- getChoreUnlocksMods : Game -> List Mod
--- getChoreUnlocksMods game =
---     Chore.allKinds
---         |> List.concatMap
---             (\kind ->
---                 let
---                     mxp : Xp
---                     mxp =
---                         (Chore.getByKind kind game.mxp).mxp
---                     masteryLevel =
---                         Xp.level Xp.defaultSchedule mxp
---                     everyTenLevelsMod =
---                         successBuff 0.05
---                             |> withHowManyTimesToApplyMod (masteryLevel // 10)
---                             -- repeat once for each ten levels
---                             |> modWithTags [ SkillTag Skill.Chores, ChoreTag kind ]
---                 in
---                 [ everyTenLevelsMod
---                 ]
---             )
 
 
 getShopItemMods : Game -> List Mod

@@ -4,6 +4,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (TimePassesData)
 import IdleGame.Resource as Resource
@@ -83,7 +84,12 @@ render timePassed timePassesData =
 
                         Just amount ->
                             [ li [ class "flex items-center gap-2" ]
-                                [ span [ class "text-success" ] [ text <| Counter.toString amount ]
+                                [ span [ class "text-success" ]
+                                    [ amount
+                                        |> Coin.toInt
+                                        |> Utils.intToString
+                                        |> text
+                                    ]
                                 , Icon.coin
                                     |> Icon.toHtml
                                 , span [] [ text "coin" ]
