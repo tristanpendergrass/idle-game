@@ -16,6 +16,10 @@ type
     | Parchment
 
 
+type Err
+    = NegativeAmount
+
+
 allResources : List Kind
 allResources =
     [ Manure, Soot, GreenhouseDirt, WashWater, EmptyBottle, Scrap, Ectoplasm, Parchment ]
@@ -119,18 +123,27 @@ createResources =
     }
 
 
-getAmount : Kind -> Amounts -> Int
-getAmount resource =
+getByKind : Kind -> Amounts -> Int
+getByKind resource =
     (getStats resource).getter
 
 
-addResource : Kind -> Int -> Amounts -> Amounts
-addResource resource amount resources =
+add : Kind -> Int -> Amounts -> Result Err Amounts
+add resource amount resources =
     let
+        oldAmount : Int
         oldAmount =
             (getStats resource).getter resources
+
+        newAmount : Int
+        newAmount =
+            oldAmount + amount
     in
-    (getStats resource).setter (oldAmount + amount) resources
+    if newAmount >= 0 then
+        Ok ((getStats resource).setter newAmount resources)
+
+    else
+        Err NegativeAmount
 
 
 getDiff : { original : Amounts, current : Amounts } -> Diff
@@ -163,7 +176,7 @@ mapDiff fn diff =
 isEmptyDiff : Diff -> Bool
 isEmptyDiff resourcesDiff =
     allResources
-        |> List.map (\resource -> getAmount resource resourcesDiff)
+        |> List.map (\resource -> getByKind resource resourcesDiff)
         |> List.all ((==) 0)
 
 

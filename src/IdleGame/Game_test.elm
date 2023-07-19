@@ -8,6 +8,7 @@ import IdleGame.Counter as Counter
 import IdleGame.Event as Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -18,7 +19,7 @@ import Test exposing (..)
 import Test.Random
 
 
-expectOk : (Game -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
+expectOk : (Game -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
 expectOk check result =
     case result of
         Err _ ->
@@ -28,7 +29,7 @@ expectOk check result =
             check val.game
 
 
-expectErr : (Game.ApplyEffectErr -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
+expectErr : (Game.EffectErr -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
 expectErr check result =
     case result of
         Err err ->
@@ -38,7 +39,7 @@ expectErr check result =
             Expect.fail "applyEffect was expected to return Err"
 
 
-expectToasts : (List Toast -> Expectation) -> Result Game.ApplyEffectErr Game.ApplyEffectsValue -> Expectation
+expectToasts : (List Toast -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
 expectToasts check result =
     case result of
         Err _ ->
@@ -53,6 +54,11 @@ expectCoin amount =
     .coin >> Expect.equal amount
 
 
+expectResource : Int -> Resource.Kind -> (Game -> Expectation)
+expectResource amount kind =
+    .resources >> Resource.getByKind kind >> Expect.equal amount
+
+
 expectXp : Xp -> Skill.Kind -> (Game -> Expectation)
 expectXp amount skill =
     .xp >> Skill.getByKind skill >> Expect.equal amount
@@ -63,7 +69,7 @@ initialGame =
     Game.create (Random.initialSeed 0)
 
 
-testEffects : String -> { effects : List Effect, check : Result Game.ApplyEffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects : String -> { effects : List Effect, check : Result Game.EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
 testEffects name { effects, check } =
     Test.Random.check
         name
@@ -75,39 +81,64 @@ applyEffectsTest : Test
 applyEffectsTest =
     -- TODO: test tail call optimization in applyEffects
     describe "applyEffects"
-        [ testEffects "applies GainCoin"
-            { effects = [ Event.gainCoin (Coin.int 5) ]
-            , check = expectOk (expectCoin (Coin.int 5))
-            }
-        , testEffects "applies GainCoin and GainXp"
-            { effects =
-                [ Event.gainCoin (Coin.int 5)
-                , Event.gainXp (Xp.int 5) Skill.Chores
-                ]
-            , check =
-                Expect.all
-                    (List.map expectOk
-                        [ expectCoin (Coin.int 5)
-                        , expectXp (Xp.int 5) Skill.Chores
-                        ]
-                    )
-            }
-        , testEffects "can add and remove coin"
-            { effects =
-                [ Event.gainCoin (Coin.int 5)
-                , Event.gainCoin (Coin.int -4)
-                ]
-            , check = expectOk (expectCoin (Coin.int 1))
-            }
-        , testEffects "cannot go below zero coin"
-            { effects = [ Event.gainCoin (Coin.int -5) ]
-            , check = expectErr (Expect.equal Game.EffectErr)
-            }
-        , testEffects "order matters when subtracting coin"
-            { effects =
-                [ Event.gainCoin (Coin.int 5)
-                , Event.gainCoin (Coin.int -6)
-                ]
-            , check = expectErr (Expect.equal Game.EffectErr)
-            }
+        [ describe "GainCoin"
+            [ testEffects "can get a coin"
+                { effects = [ Event.gainCoin (Coin.int 5) ]
+                , check = expectOk (expectCoin (Coin.int 5))
+                }
+            , testEffects "can add and remove coin"
+                { effects =
+                    [ Event.gainCoin (Coin.int 5)
+                    , Event.gainCoin (Coin.int -4)
+                    ]
+                , check = expectOk (expectCoin (Coin.int 1))
+                }
+            , testEffects "cannot go below zero coin"
+                { effects = [ Event.gainCoin (Coin.int -5) ]
+                , check = expectErr (Expect.equal Game.EffectErr)
+                }
+            , testEffects "cannot go below zero coin and order matters"
+                { effects =
+                    [ Event.gainCoin (Coin.int 5)
+                    , Event.gainCoin (Coin.int -6)
+                    , Event.gainCoin (Coin.int 2)
+                    ]
+                , check = expectErr (Expect.equal Game.EffectErr)
+                }
+            ]
+        , describe "GainXp"
+            [ testEffects "can get Xp for Chores"
+                { effects = [ Event.gainXp (Xp.int 5) Skill.Chores ]
+                , check = expectOk (expectXp (Xp.int 5) Skill.Chores)
+                }
+            , testEffects "can get Xp for Hexes"
+                { effects = [ Event.gainXp (Xp.int 5) Skill.Hexes ]
+                , check = expectOk (expectXp (Xp.int 5) Skill.Hexes)
+                }
+            ]
+        , describe "GainResource"
+            [ testEffects "can get resources"
+                { effects = [ Event.gainResource 1 Resource.EmptyBottle ]
+                , check = expectOk (expectResource 1 Resource.EmptyBottle)
+                }
+            , testEffects "cannot go below 0 of a resource"
+                { effects = [ Event.gainResource -1 Resource.EmptyBottle ]
+                , check = expectErr (Expect.equal Game.EffectErr)
+                }
+            ]
+        , describe "multiple effects"
+            [ testEffects "applies GainCoin and GainXp"
+                { effects =
+                    [ Event.gainCoin (Coin.int 5)
+                    , Event.gainXp (Xp.int 5) Skill.Chores
+                    ]
+                , check =
+                    Expect.all
+                        (List.map expectOk
+                            [ expectCoin (Coin.int 5)
+                            , expectXp (Xp.int 5) Skill.Chores
+                            ]
+                        )
+                }
+            ]
         ]

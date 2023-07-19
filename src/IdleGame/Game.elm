@@ -409,7 +409,7 @@ type alias ApplyEffectsValue =
 
 
 type alias ApplyEffectsResultGenerator =
-    Generator (Result ApplyEffectErr ApplyEffectsValue)
+    Generator (Result EffectErr ApplyEffectsValue)
 
 
 applyEffects : List Effect -> Game -> ApplyEffectsResultGenerator
@@ -457,7 +457,7 @@ applyEffects effects game =
                     )
 
 
-type ApplyEffectErr
+type EffectErr
     = EffectErr
 
 
@@ -514,7 +514,6 @@ intGenerator { base, doublingChance } =
 
 calculateActivityMxp : Activity -> Game -> Xp
 calculateActivityMxp kind game =
-    -- Important! Keep the application here in sync with Views.Chores.elm
     let
         stats =
             Activity.getStats kind
@@ -540,14 +539,13 @@ type alias ApplyEffectValue =
 
 
 type alias ApplyEffectResultGenerator =
-    Generator (Result ApplyEffectErr ApplyEffectValue)
+    Generator (Result EffectErr ApplyEffectValue)
 
 
 applyEffect : Effect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
     case getType effect of
         VariableSuccess { successProbability, successEffects, failureEffects } ->
-            -- Important! Keep the application here in sync with Views.Chores.elm
             successGenerator successProbability
                 |> Random.andThen
                     (\succeeded ->
@@ -562,14 +560,20 @@ applyEffect effect game =
                         Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
                     )
 
+        GainCoin { base, multiplier } ->
+            let
+                product : Coin
+                product =
+                    Quantity.multiplyBy multiplier base
+            in
+            addCoin product game
+                |> Random.constant
+
         GainResource quantity resource ->
-            -- Important! Keep the application here in sync with Views.Chores.elm
             intGenerator quantity
                 |> Random.map (\amount -> addResource resource amount game)
-                |> Random.map Ok
 
         GainXp quantity skill ->
-            -- Important! Keep the application here in sync with Views.Chores.elm
             { game = addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game
             , toasts = []
             , additionalEffects = []
@@ -578,7 +582,6 @@ applyEffect effect game =
                 |> Random.map Ok
 
         GainMxp quantity kind ->
-            -- Important! Keep the application here in sync with Views.Chores.elm
             let
                 base : Xp
                 base =
@@ -598,29 +601,6 @@ applyEffect effect game =
                 |> addMasteryPoolXp masteryPoolXp
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok
-
-        GainCoin { base, multiplier } ->
-            -- Important! Keep the application here in sync with Views.Chores.elm
-            let
-                product : Coin
-                product =
-                    Quantity.multiplyBy multiplier base
-            in
-            addCoin product game
-                |> Random.constant
-
-
-addResource : Resource.Kind -> Int -> Game -> ApplyEffectValue
-addResource resource amount game =
-    { game =
-        { game
-            | resources =
-                game.resources
-                    |> Resource.addResource resource amount
-        }
-    , toasts = [ GainedResource amount resource ]
-    , additionalEffects = []
-    }
 
 
 addXp : Skill.Kind -> Xp -> Game -> Game
@@ -651,7 +631,26 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addCoin : Coin -> Game -> Result ApplyEffectErr ApplyEffectValue
+addResource : Resource.Kind -> Int -> Game -> Result EffectErr ApplyEffectValue
+addResource resource amount game =
+    let
+        newResources : Result Resource.Err Resource.Amounts
+        newResources =
+            Resource.add resource amount game.resources
+    in
+    case newResources of
+        Err Resource.NegativeAmount ->
+            Err EffectErr
+
+        Ok val ->
+            Ok
+                { game = { game | resources = val }
+                , toasts = [ GainedResource amount resource ]
+                , additionalEffects = []
+                }
+
+
+addCoin : Coin -> Game -> Result EffectErr ApplyEffectValue
 addCoin amount game =
     let
         newCoin : Coin
