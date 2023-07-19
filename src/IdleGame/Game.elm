@@ -36,7 +36,7 @@ type alias Game =
     , choresMxp : Xp
     , activity : Maybe ( Activity, Timer )
     , coin : Coin
-    , resources : Resource.Amounts
+    , resources : Resource.Record Int
     , shopItems : ShopItems
     , adventuring : Adventuring
     , combatsWon : Int
@@ -55,7 +55,7 @@ create seed =
     , choresMxp = Xp.int 0
     , activity = Nothing
     , coin = Coin.int 0
-    , resources = Resource.createResources
+    , resources = Resource.emptyResourceRecord
     , shopItems = ShopItems.create
     , adventuring = Adventuring.create
     , combatsWon = 0
@@ -631,7 +631,7 @@ addMasteryPoolXp amount game =
 addResource : Resource.Kind -> Int -> Game -> Result EffectErr ApplyEffectValue
 addResource resource amount game =
     let
-        newResources : Result EffectErr Resource.Amounts
+        newResources : Result EffectErr (Resource.Record Int)
         newResources =
             Resource.add resource amount game.resources
     in
