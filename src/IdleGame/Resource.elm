@@ -1,5 +1,6 @@
 module IdleGame.Resource exposing (..)
 
+import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
@@ -14,10 +15,6 @@ type
     | Scrap
     | Ectoplasm
     | Parchment
-
-
-type Err
-    = NegativeAmount
 
 
 allResources : List Kind
@@ -128,7 +125,7 @@ getByKind resource =
     (getStats resource).getter
 
 
-add : Kind -> Int -> Amounts -> Result Err Amounts
+add : Kind -> Int -> Amounts -> Result EffectErr Amounts
 add resource amount resources =
     let
         oldAmount : Int
@@ -143,7 +140,7 @@ add resource amount resources =
         Ok ((getStats resource).setter newAmount resources)
 
     else
-        Err NegativeAmount
+        Err EffectErr.NegativeAmount
 
 
 getDiff : { original : Amounts, current : Amounts } -> Diff

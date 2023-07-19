@@ -7,6 +7,7 @@ import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -457,10 +458,6 @@ applyEffects effects game =
                     )
 
 
-type EffectErr
-    = EffectErr
-
-
 mapGeneratorResult : (a -> Generator (Result e a)) -> Generator (Result e a) -> Generator (Result e a)
 mapGeneratorResult fn =
     Random.andThen
@@ -634,20 +631,18 @@ addMasteryPoolXp amount game =
 addResource : Resource.Kind -> Int -> Game -> Result EffectErr ApplyEffectValue
 addResource resource amount game =
     let
-        newResources : Result Resource.Err Resource.Amounts
+        newResources : Result EffectErr Resource.Amounts
         newResources =
             Resource.add resource amount game.resources
     in
-    case newResources of
-        Err Resource.NegativeAmount ->
-            Err EffectErr
-
-        Ok val ->
-            Ok
+    newResources
+        |> Result.map
+            (\val ->
                 { game = { game | resources = val }
                 , toasts = [ GainedResource amount resource ]
                 , additionalEffects = []
                 }
+            )
 
 
 addCoin : Coin -> Game -> Result EffectErr ApplyEffectValue
@@ -657,19 +652,19 @@ addCoin amount game =
         newCoin =
             Quantity.plus game.coin amount
 
-        isAllowed : Bool
-        isAllowed =
-            Quantity.greaterThanOrEqualTo (Coin.int 0) newCoin
+        isNegative : Bool
+        isNegative =
+            Quantity.lessThan (Coin.int 0) newCoin
     in
-    if isAllowed then
+    if isNegative then
+        Err EffectErr.NegativeAmount
+
+    else
         Ok
             { game = { game | coin = newCoin }
             , toasts = [ GainedCoin amount ]
             , additionalEffects = []
             }
-
-    else
-        Err EffectErr
 
 
 type alias TimePassesResourceGain =

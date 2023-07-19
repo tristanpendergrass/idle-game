@@ -5,6 +5,7 @@ import Expect exposing (..)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
+import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event as Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -19,7 +20,7 @@ import Test exposing (..)
 import Test.Random
 
 
-expectOk : (Game -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
+expectOk : (Game -> Expectation) -> Result EffectErr Game.ApplyEffectsValue -> Expectation
 expectOk check result =
     case result of
         Err _ ->
@@ -29,7 +30,7 @@ expectOk check result =
             check val.game
 
 
-expectErr : (Game.EffectErr -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
+expectErr : (EffectErr -> Expectation) -> Result EffectErr Game.ApplyEffectsValue -> Expectation
 expectErr check result =
     case result of
         Err err ->
@@ -39,7 +40,7 @@ expectErr check result =
             Expect.fail "applyEffect was expected to return Err"
 
 
-expectToasts : (List Toast -> Expectation) -> Result Game.EffectErr Game.ApplyEffectsValue -> Expectation
+expectToasts : (List Toast -> Expectation) -> Result EffectErr Game.ApplyEffectsValue -> Expectation
 expectToasts check result =
     case result of
         Err _ ->
@@ -69,7 +70,7 @@ initialGame =
     Game.create (Random.initialSeed 0)
 
 
-testEffects : String -> { effects : List Effect, check : Result Game.EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects : String -> { effects : List Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
 testEffects name { effects, check } =
     Test.Random.check
         name
@@ -95,7 +96,7 @@ applyEffectsTest =
                 }
             , testEffects "cannot go below zero coin"
                 { effects = [ Event.gainCoin (Coin.int -5) ]
-                , check = expectErr (Expect.equal Game.EffectErr)
+                , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffects "cannot go below zero coin and order matters"
                 { effects =
@@ -103,7 +104,7 @@ applyEffectsTest =
                     , Event.gainCoin (Coin.int -6)
                     , Event.gainCoin (Coin.int 2)
                     ]
-                , check = expectErr (Expect.equal Game.EffectErr)
+                , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
         , describe "GainXp"
@@ -123,7 +124,7 @@ applyEffectsTest =
                 }
             , testEffects "cannot go below 0 of a resource"
                 { effects = [ Event.gainResource -1 Resource.EmptyBottle ]
-                , check = expectErr (Expect.equal Game.EffectErr)
+                , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
         , describe "multiple effects"
