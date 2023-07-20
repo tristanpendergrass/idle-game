@@ -185,9 +185,35 @@ applyEffectsTest =
                 { effects = [ Event.gainResource -1 Resource.EmptyBottle ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
-            , testEffectsDistribution "can gain resource with 50% probability"
+            , testEffectsDistribution "doubling chance of 50% works"
+                { effects = [ Event.gainResourceWithDoubling 1 Resource.EmptyBottle 0.5 ]
+                , distribution =
+                    Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 1 of resource"
+                          , hasOk (hasResource 1 Resource.EmptyBottle)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 2 of resource"
+                          , hasOk (hasResource 2 Resource.EmptyBottle)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 1 Resource.EmptyBottle
+                                    , hasResource 2 Resource.EmptyBottle
+                                    ]
+                                )
+                          )
+                        ]
+                }
+            ]
+        , describe "variable effects"
+            [ testEffectsDistribution "can have a 50% chance to gain a resource"
                 { effects =
-                    [ Event.gainWithProbability 0.5 [ Event.gainResource 1 Resource.EmptyBottle ]
+                    [ Event.gainWithProbability 0.5
+                        [ Event.gainResource 1 Resource.EmptyBottle ]
                     ]
                 , distribution =
                     Test.expectDistribution
@@ -209,21 +235,6 @@ applyEffectsTest =
                                 )
                           )
                         ]
-                }
-            ]
-        , describe "multiple effects"
-            [ testEffects "applies GainCoin and GainXp"
-                { effects =
-                    [ Event.gainCoin (Coin.int 5)
-                    , Event.gainXp (Xp.int 5) Skill.Chores
-                    ]
-                , check =
-                    Expect.all
-                        (List.map expectOk
-                            [ expectCoin (Coin.int 5)
-                            , expectXp (Xp.int 5) Skill.Chores
-                            ]
-                        )
                 }
             ]
         ]

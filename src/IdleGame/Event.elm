@@ -558,6 +558,14 @@ gainResource quantity kind =
         }
 
 
+gainResourceWithDoubling : Int -> Resource.Kind -> Float -> Effect
+gainResourceWithDoubling quantity kind doubling =
+    Effect
+        { type_ = GainResource { base = quantity, doublingChance = doubling } kind
+        , tags = []
+        }
+
+
 gainWithProbability : Float -> List Effect -> Effect
 gainWithProbability probability successEffects =
     Effect { type_ = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }, tags = [] }
