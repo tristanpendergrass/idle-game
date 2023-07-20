@@ -2,6 +2,7 @@ module IdleGame.Game_test exposing (..)
 
 import Duration exposing (Duration)
 import Expect exposing (..)
+import Fuzz exposing (Fuzzer)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
@@ -17,7 +18,13 @@ import Percent exposing (Percent)
 import Quantity
 import Random
 import Test exposing (..)
+import Test.Distribution
 import Test.Random
+
+
+hasNoneOf : List (Game -> Bool) -> Game -> Bool
+hasNoneOf checks game =
+    List.all (\check -> not (check game)) checks
 
 
 expectOk : (Game -> Expectation) -> Result EffectErr Game.ApplyEffectsValue -> Expectation
@@ -25,6 +32,16 @@ expectOk check result =
     case result of
         Err _ ->
             Expect.fail "applyEffect returned Err"
+
+        Ok val ->
+            check val.game
+
+
+hasOk : (Game -> Bool) -> Result EffectErr Game.ApplyEffectsValue -> Bool
+hasOk check result =
+    case result of
+        Err _ ->
+            False
 
         Ok val ->
             check val.game
@@ -38,6 +55,16 @@ expectErr check result =
 
         Ok _ ->
             Expect.fail "applyEffect was expected to return Err"
+
+
+hasErr : (EffectErr -> Bool) -> Result EffectErr Game.ApplyEffectsValue -> Bool
+hasErr check result =
+    case result of
+        Err err ->
+            check err
+
+        Ok _ ->
+            False
 
 
 expectToasts : (List Toast -> Expectation) -> Result EffectErr Game.ApplyEffectsValue -> Expectation
@@ -55,14 +82,29 @@ expectCoin amount =
     .coin >> Expect.equal amount
 
 
+hasCoin : Coin -> (Game -> Bool)
+hasCoin amount =
+    .coin >> (==) amount
+
+
 expectResource : Int -> Resource.Kind -> (Game -> Expectation)
 expectResource amount kind =
     .resources >> Resource.getByKind kind >> Expect.equal amount
 
 
+hasResource : Int -> Resource.Kind -> (Game -> Bool)
+hasResource amount kind =
+    .resources >> Resource.getByKind kind >> (==) amount
+
+
 expectXp : Xp -> Skill.Kind -> (Game -> Expectation)
 expectXp amount skill =
     .xp >> Skill.getByKind skill >> Expect.equal amount
+
+
+hasXp : Xp -> Skill.Kind -> (Game -> Bool)
+hasXp amount skill =
+    .xp >> Skill.getByKind skill >> (==) amount
 
 
 initialGame : Game
@@ -76,6 +118,23 @@ testEffects name { effects, check } =
         name
         (Game.applyEffects effects initialGame)
         check
+
+
+testEffectsDistribution :
+    String
+    ->
+        { effects : List Effect
+        , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
+        }
+    -> Test
+testEffectsDistribution name { effects, distribution } =
+    Test.fuzzWith
+        { runs = 100
+        , distribution = distribution
+        }
+        (Fuzz.fromGenerator (Game.applyEffects effects initialGame))
+        name
+        (\_ -> Expect.pass)
 
 
 applyEffectsTest : Test
@@ -125,6 +184,31 @@ applyEffectsTest =
             , testEffects "cannot go below 0 of a resource"
                 { effects = [ Event.gainResource -1 Resource.EmptyBottle ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
+                }
+            , testEffectsDistribution "can gain resource with 50% probability"
+                { effects =
+                    [ Event.gainWithProbability 0.5 [ Event.gainResource 1 Resource.EmptyBottle ]
+                    ]
+                , distribution =
+                    Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 0 of resource"
+                          , hasOk (hasResource 0 Resource.EmptyBottle)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 1 of resource"
+                          , hasOk (hasResource 1 Resource.EmptyBottle)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has more than 1 reasource"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 0 Resource.EmptyBottle
+                                    , hasResource 1 Resource.EmptyBottle
+                                    ]
+                                )
+                          )
+                        ]
                 }
             ]
         , describe "multiple effects"
