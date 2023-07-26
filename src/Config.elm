@@ -32,17 +32,21 @@ flags =
 
 devFlags : Flags
 devFlags =
+    -- (\_/)
+    -- (^_^) < "Here are the dev flags :)"
+    -- c(")(")
     { showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultTab = Tab.Hexes
+    , defaultTab = Tab.Shop
     , defaultDetailViewExpanded = False
     }
 
 
 prodFlags : Flags
 prodFlags =
+    -- WARNING!! THESE ARE PROD FLAGS!!
     { showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
