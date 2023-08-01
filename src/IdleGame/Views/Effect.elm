@@ -61,25 +61,39 @@ renderCoin { base, multiplier } =
         coin : Coin
         coin =
             Quantity.multiplyBy multiplier base
+
+        isNegative : Bool
+        isNegative =
+            Coin.toInt coin < 0
     in
     div [ class "flex items-center gap-1" ]
-        [ div [ class "flex items-center gap-1" ]
-            [ span []
-                [ coin
-                    |> Coin.toInt
-                    |> Utils.intToString
-                    |> text
-                ]
-            , Icon.coin
-                |> Icon.toHtml
+        [ span [ classList [ ( "text-error", isNegative ) ] ]
+            [ coin
+                |> Coin.toInt
+                |> Utils.intToString
+                |> text
             ]
+        , Icon.coin
+            |> Icon.toHtml
         ]
 
 
 renderResource : { base : Int, doublingChance : Float } -> Resource.Kind -> Html msg
 renderResource { base, doublingChance } kind =
-    (Resource.getStats kind).icon
-        |> Icon.toHtml
+    let
+        isNegative : Bool
+        isNegative =
+            base < 0
+    in
+    div [ class "flex items-center gap-1" ]
+        [ span [ classList [ ( "text-error", isNegative ) ] ]
+            [ base
+                |> Utils.intToString
+                |> text
+            ]
+        , (Resource.getStats kind).icon
+            |> Icon.toHtml
+        ]
 
 
 renderXp : { base : Xp, multiplier : Float } -> Skill.Kind -> Html msg
