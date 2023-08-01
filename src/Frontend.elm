@@ -592,9 +592,6 @@ update msg model =
 
                     else
                         let
-                            tick =
-                                standardTick
-
                             oldSnapshot : Snapshot ( Game, List Toast )
                             oldSnapshot =
                                 snapshot
@@ -603,7 +600,7 @@ update msg model =
                             updatedSnapshot : Snapshot ( Game, List Toast )
                             updatedSnapshot =
                                 oldSnapshot
-                                    |> Snapshot.tickUntil tick now
+                                    |> Snapshot.tickUntil standardTick now
 
                             ( _, toasts ) =
                                 Snapshot.getValue updatedSnapshot
@@ -701,6 +698,30 @@ update msg model =
                     )
             , Cmd.none
             )
+
+        HandleShopResourceClick amount resource ->
+            case model.gameState of
+                Playing snapshot ->
+                    let
+                        game : Game
+                        game =
+                            Snapshot.getValue snapshot
+
+                        ( newGame, toasts ) =
+                            Game.attemptPurchaseResource amount resource game
+
+                        newModel : FrontendModel
+                        newModel =
+                            { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+
+                        notificationCmds : List (Cmd FrontendMsg)
+                        notificationCmds =
+                            List.map (AddToast >> delay 0) toasts
+                    in
+                    ( newModel, Cmd.batch notificationCmds )
+
+                _ ->
+                    noOp
 
         HandlePointerDown pointerState ->
             ( { model | pointerState = Just pointerState }, Cmd.none )

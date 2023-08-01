@@ -106,6 +106,7 @@ type FrontendMsg
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Kind
+    | HandleShopResourceClick Int Resource.Kind
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel

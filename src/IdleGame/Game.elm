@@ -8,7 +8,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.Event exposing (..)
+import IdleGame.Event as Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
@@ -374,6 +374,36 @@ tick delta game =
                 |> setActivity newActivity
                 -- |> (\g -> updateAdventuring delta (Random.constant ( g, [] )))
                 |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) events)
+
+        ( ( newGame, notifications ), newSeed ) =
+            Random.step gameGenerator game.seed
+    in
+    ( { newGame | seed = newSeed }, notifications )
+
+
+getPurchaseEvent : Int -> Resource.Kind -> Event
+getPurchaseEvent amount resource =
+    let
+        cost : Coin.Coin
+        cost =
+            Quantity.multiplyBy (toFloat amount) (Coin.int 10)
+                |> Quantity.multiplyBy -1
+    in
+    Event.Event
+        { effects = [ gainCoin cost, gainResource amount resource ]
+        }
+
+
+attemptPurchaseResource : Int -> Resource.Kind -> Game -> ( Game, List Toast )
+attemptPurchaseResource amount resource game =
+    let
+        event : Event
+        event =
+            getPurchaseEvent amount resource
+
+        gameGenerator : Generator ( Game, List Toast )
+        gameGenerator =
+            applyEvent event (Random.constant ( game, [] ))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed

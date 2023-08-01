@@ -5,7 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Event exposing (..)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game exposing (Game, attemptPurchaseResource)
+import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
@@ -83,6 +84,22 @@ render game =
                     , span [] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
                     ]
                 ]
+
+        buyParchment : Html FrontendMsg
+        buyParchment =
+            div
+                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
+                , onClick <| HandleShopResourceClick 1 Resource.Parchment
+                ]
+                [ Icon.parchment
+                    |> Icon.withSize Icon.ExtraLarge
+                    |> Icon.toHtml
+                , div [ class "flex-1 t-column" ]
+                    [ span [ class "font-bold" ] [ text "Parchment" ]
+                    , span [] [ text "mmmhm" ]
+                    ]
+                , priceLabel (Coin.int 10)
+                ]
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
@@ -102,18 +119,20 @@ render game =
             ]
         , div [ class "divider" ] []
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            (List.map
-                (\kind ->
-                    let
-                        unlockLevel =
-                            (ShopItems.getStats kind).unlockLevel
-                    in
-                    if unlockLevel > choresSkillLevel then
-                        renderLockedShopItem unlockLevel
+            ([]
+                ++ [ buyParchment ]
+                ++ List.map
+                    (\kind ->
+                        let
+                            unlockLevel =
+                                (ShopItems.getStats kind).unlockLevel
+                        in
+                        if unlockLevel > choresSkillLevel then
+                            renderLockedShopItem unlockLevel
 
-                    else
-                        renderShopItem game.shopItems kind
-                )
-                ShopItems.allKinds
+                        else
+                            renderShopItem game.shopItems kind
+                    )
+                    ShopItems.allKinds
             )
         ]
