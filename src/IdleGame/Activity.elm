@@ -178,7 +178,7 @@ hex1Stats : Stats
 hex1Stats =
     { skill = Skill.Hexes
     , title = "Hex I"
-    , image = ActivityIcon (Icon.letter "Hx1")
+    , image = ActivityIcon (Resource.getStats Resource.Hex1).icon
     , unlockLevel = 1
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5
@@ -186,6 +186,8 @@ hex1Stats =
         Event.Event
             { effects =
                 [ Event.gainXp (Xp.int 5) Skill.Hexes
+                , Event.gainResource -1 Resource.Parchment
+                , Event.gainResource 1 Resource.Hex1
                 ]
             }
     }
@@ -195,7 +197,7 @@ jinx1Stats : Stats
 jinx1Stats =
     { skill = Skill.Hexes
     , title = "Jinx I"
-    , image = ActivityIcon (Icon.letter "Jx1")
+    , image = ActivityIcon (Resource.getStats Resource.Jinx1).icon
     , unlockLevel = 10
     , unlockSkill = Skill.Hexes
     , duration = Duration.seconds 5
@@ -203,6 +205,8 @@ jinx1Stats =
         Event.Event
             { effects =
                 [ Event.gainXp (Xp.int 10) Skill.Hexes
+                , Event.gainResource -1 Resource.Parchment
+                , Event.gainResource 1 Resource.Jinx1
                 ]
             }
     }
