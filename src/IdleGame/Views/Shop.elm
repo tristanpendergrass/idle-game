@@ -61,7 +61,7 @@ render game =
                     |> Icon.toHtml
                 , div [ class "flex-1 t-column" ]
                     [ span [ class "font-bold" ] [ text stats.title ]
-                    , span [] [ text stats.description ]
+                    , span [ class "text-sm" ] [ text stats.description ]
                     ]
                 , if owned then
                     ownedLabel
@@ -81,25 +81,50 @@ render game =
                     ]
                 , div [ class "flex-1 t-column" ]
                     [ span [ class "font-bold" ] [ text "???" ]
-                    , span [] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
+                    , span [ class "text-sm" ] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
                     ]
                 ]
 
-        buyParchment : Html FrontendMsg
-        buyParchment =
+        renderResource : ( Resource.Kind, Coin ) -> Html FrontendMsg
+        renderResource ( resource, price ) =
+            let
+                resourceStats : Resource.Stats
+                resourceStats =
+                    Resource.getStats resource
+
+                owned : Int
+                owned =
+                    Resource.getByKind resource game.resources
+            in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
-                , onClick <| HandleShopResourceClick 1 Resource.Parchment
+                , onClick <| HandleShopResourceClick 1 resource
                 ]
-                [ Icon.parchment
+                [ resourceStats.icon
                     |> Icon.withSize Icon.ExtraLarge
                     |> Icon.toHtml
                 , div [ class "flex-1 t-column" ]
-                    [ span [ class "font-bold" ] [ text "Parchment" ]
-                    , span [] [ text "mmmhm" ]
+                    [ span [ class "font-bold" ] [ text resourceStats.title ]
+                    , span [ class "flex items-center gap-1 text-sm" ]
+                        [ span [] [ text "Owned:" ]
+                        , span [ class "font-bold" ] [ text <| IdleGame.Views.Utils.intToString owned ]
+                        ]
                     ]
-                , priceLabel (Coin.int 10)
+                , priceLabel price
                 ]
+
+        purchasableResources : List ( Resource.Kind, Coin )
+        purchasableResources =
+            Resource.allResources
+                |> List.filterMap
+                    (\kind ->
+                        case (Resource.getStats kind).purchasing of
+                            Resource.Purchasable price ->
+                                Just ( kind, price )
+
+                            Resource.NotPurchasable ->
+                                Nothing
+                    )
     in
     div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
@@ -119,20 +144,21 @@ render game =
             ]
         , div [ class "divider" ] []
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            ([]
-                ++ [ buyParchment ]
-                ++ List.map
-                    (\kind ->
-                        let
-                            unlockLevel =
-                                (ShopItems.getStats kind).unlockLevel
-                        in
-                        if unlockLevel > choresSkillLevel then
-                            renderLockedShopItem unlockLevel
+            (List.map
+                (\kind ->
+                    let
+                        unlockLevel =
+                            (ShopItems.getStats kind).unlockLevel
+                    in
+                    if unlockLevel > choresSkillLevel then
+                        renderLockedShopItem unlockLevel
 
-                        else
-                            renderShopItem game.shopItems kind
-                    )
-                    ShopItems.allKinds
+                    else
+                        renderShopItem game.shopItems kind
+                )
+                ShopItems.allKinds
             )
+        , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []
+        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
+            (List.map renderResource purchasableResources)
         ]

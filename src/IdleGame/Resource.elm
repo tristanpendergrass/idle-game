@@ -1,5 +1,6 @@
 module IdleGame.Resource exposing (..)
 
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
@@ -95,9 +96,15 @@ updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
 
 
+type Purchasing
+    = Purchasable Coin
+    | NotPurchasable
+
+
 type alias Stats =
     { title : String
     , icon : Icon
+    , purchasing : Purchasing
     }
 
 
@@ -118,6 +125,7 @@ manureStats : Stats
 manureStats =
     { title = "Manure"
     , icon = Icon.manure
+    , purchasing = NotPurchasable
     }
 
 
@@ -125,6 +133,7 @@ sootStats : Stats
 sootStats =
     { title = "Soot"
     , icon = Icon.soot
+    , purchasing = NotPurchasable
     }
 
 
@@ -132,6 +141,7 @@ greenhouseDirtStats : Stats
 greenhouseDirtStats =
     { title = "Greenhouse Dirt"
     , icon = Icon.greenhouseDirt
+    , purchasing = NotPurchasable
     }
 
 
@@ -139,6 +149,7 @@ washWaterStats : Stats
 washWaterStats =
     { title = "Wash Water"
     , icon = Icon.washWater
+    , purchasing = NotPurchasable
     }
 
 
@@ -146,6 +157,7 @@ emptyBottleStats : Stats
 emptyBottleStats =
     { title = "Empty Bottle"
     , icon = Icon.emptyBottle
+    , purchasing = NotPurchasable
     }
 
 
@@ -153,6 +165,7 @@ scrapStats : Stats
 scrapStats =
     { title = "Scrap"
     , icon = Icon.scrap
+    , purchasing = NotPurchasable
     }
 
 
@@ -160,6 +173,7 @@ ectoplasmStats : Stats
 ectoplasmStats =
     { title = "Ectoplasm"
     , icon = Icon.ectoplasm
+    , purchasing = NotPurchasable
     }
 
 
@@ -167,6 +181,7 @@ parchmentStats : Stats
 parchmentStats =
     { title = "Parchment"
     , icon = Icon.parchment
+    , purchasing = Purchasable (Coin.int 10)
     }
 
 
