@@ -48,10 +48,10 @@ $ npm test -- --watch
   - [x] Show reward on monster screen
   - [ ] Put it back in
   - [ ] Require hexes in inventory to fight
-- [ ] Add hexes
-  - [ ] Craft them for free
-  - [ ] Require parchment
-- [ ] Add parchment to shop
+- [x] Add hexes
+  - [x] Craft them for free
+  - [x] Require parchment
+- [x] Add parchment to shop
 - [x] Activity detail sidebar
 	- [x] desktop
 	- [x] mobile
@@ -73,6 +73,7 @@ $ npm test -- --watch
 - [ ] Add change log section
   - [ ] Add notification that shows that update happened
 - [ ] Address long fast forward times somehow (with a cap?)
+- [ ] Prevent activity starting if it will fail and show error message
 
 ### Features
 - [ ] Skill 3
@@ -86,6 +87,7 @@ $ npm test -- --watch
 - [ ] Money amount in Bag tab looks like a button -- remove background entirely?
 - [ ] Make right rail not have slide animation when going from empty to active
 - [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
+- [ ] Remove animation on right rail
 
 # Changelog
 
