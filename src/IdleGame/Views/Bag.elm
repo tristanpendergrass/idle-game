@@ -24,18 +24,7 @@ render game =
             in
             li []
                 [ div [ class "t-column gap-4" ]
-                    [ div [ class "border-2 border-primary bg-primary/50 rounded relative" ]
-                        [ stats.icon
-                            |> Icon.withSize Icon.Large
-                            |> Icon.toHtml
-
-                        -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
-                        , div [ class "t-absolute-center-x -bottom-5" ]
-                            [ span [ class "px-4 bg-base-100 text-base-content border border-primary-content rounded-xl text-sm font-semibold" ]
-                                [ text <| IdleGame.Views.Utils.intToString quantity
-                                ]
-                            ]
-                        ]
+                    [ IdleGame.Views.Utils.resourceAndQuantity { resource = resource, quantity = quantity, iconSize = Icon.Large }
                     , span [ class "inline-block truncate" ] [ text stats.title ]
                     ]
                 ]

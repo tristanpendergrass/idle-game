@@ -35,6 +35,7 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
+import IdleGame.Views.ShopResourceModal
 import IdleGame.Views.TimePasses
 import IdleGame.Views.Utils as ViewUtils
 import Json.Decode.Pipeline exposing (..)
@@ -699,29 +700,31 @@ update msg model =
             , Cmd.none
             )
 
-        HandleShopResourceClick amount resource ->
-            case model.gameState of
-                Playing snapshot ->
-                    let
-                        game : Game
-                        game =
-                            Snapshot.getValue snapshot
-
-                        ( newGame, toasts ) =
-                            Game.attemptPurchaseResource amount resource game
-
-                        newModel : FrontendModel
-                        newModel =
-                            { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
-
-                        notificationCmds : List (Cmd FrontendMsg)
-                        notificationCmds =
-                            List.map (AddToast >> delay 0) toasts
-                    in
-                    ( newModel, Cmd.batch notificationCmds )
-
-                _ ->
-                    noOp
+        -- HandleShopResourceClick amount resource ->
+        --     case model.gameState of
+        --         Playing snapshot ->
+        --             let
+        --                 game : Game
+        --                 game =
+        --                     Snapshot.getValue snapshot
+        --                 ( newGame, toasts ) =
+        --                     Game.attemptPurchaseResource amount resource game
+        --                 newModel : FrontendModel
+        --                 newModel =
+        --                     { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+        --                 notificationCmds : List (Cmd FrontendMsg)
+        --                 notificationCmds =
+        --                     List.map (AddToast >> delay 0) toasts
+        --             in
+        --             ( newModel, Cmd.batch notificationCmds )
+        --         _ ->
+        --             noOp
+        HandleShopResourceClick resource ->
+            ( { model
+                | activeModal = Just (ShopResourceModal 1 resource)
+              }
+            , Cmd.none
+            )
 
         HandlePointerDown pointerState ->
             ( { model | pointerState = Just pointerState }, Cmd.none )
@@ -874,6 +877,15 @@ renderModal activeModal game =
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
+                |> IdleGame.Views.ModalWrapper.render
+
+        Just (ShopResourceModal amount resource) ->
+            let
+                children =
+                    IdleGame.Views.ShopResourceModal.render amount resource
+            in
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
                 |> IdleGame.Views.ModalWrapper.render
 
 

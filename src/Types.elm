@@ -27,6 +27,7 @@ type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreMasteryCheckpointsModal
     | ChoreItemUnlocksModal
+    | ShopResourceModal Int Resource.Kind
 
 
 type PreviousIntervalTimer
@@ -106,7 +107,7 @@ type FrontendMsg
     | OpenMasteryUnlocksModal
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Kind
-    | HandleShopResourceClick Int Resource.Kind
+    | HandleShopResourceClick Resource.Kind
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel

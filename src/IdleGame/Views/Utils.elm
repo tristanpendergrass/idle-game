@@ -4,6 +4,8 @@ import FormatNumber
 import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import IdleGame.Resource as Resource
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 
@@ -250,3 +252,24 @@ screenSupportsRighRail screenWidth =
 
         Screen2xl ->
             True
+
+
+resourceAndQuantity : { resource : Resource.Kind, quantity : Int, iconSize : Icon.Size } -> Html msg
+resourceAndQuantity { resource, quantity, iconSize } =
+    let
+        resourceStats : Resource.Stats
+        resourceStats =
+            Resource.getStats resource
+    in
+    div [ class "border-2 border-primary bg-primary/50 rounded relative w-24" ]
+        [ resourceStats.icon
+            |> Icon.withSize iconSize
+            |> Icon.toHtml
+
+        -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
+        , div [ class "t-absolute-center-x -bottom-3 max-w-full" ]
+            [ span [ class "px-4 bg-base-100 text-base-content border border-1 border-base-content rounded-xl text-sm font-semibold max-w-full" ]
+                [ text (intToString quantity)
+                ]
+            ]
+        ]

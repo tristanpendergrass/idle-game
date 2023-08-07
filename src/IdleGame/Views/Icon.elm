@@ -333,6 +333,16 @@ chevronDown =
     createIconFeather FeatherIcons.chevronDown
 
 
+chevronLeft : Icon
+chevronLeft =
+    createIconFeather FeatherIcons.chevronLeft
+
+
+chevronRight : Icon
+chevronRight =
+    createIconFeather FeatherIcons.chevronRight
+
+
 play : Icon
 play =
     createIconFeather FeatherIcons.play

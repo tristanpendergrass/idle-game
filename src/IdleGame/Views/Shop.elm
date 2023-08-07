@@ -98,7 +98,7 @@ render game =
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
-                , onClick <| HandleShopResourceClick 1 resource
+                , onClick <| HandleShopResourceClick resource
                 ]
                 [ resourceStats.icon
                     |> Icon.withSize Icon.ExtraLarge
