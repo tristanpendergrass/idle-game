@@ -2322,39 +2322,6 @@ html {
   display: flex;
 }
 
-.modal {
-  pointer-events: none;
-  visibility: hidden;
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-  display: flex;
-  justify-content: center;
-  opacity: 0;
-  z-index: 999;
-  background-color: hsl(var(--nf, var(--n)) / var(--tw-bg-opacity));
-  --tw-bg-opacity: 0.4;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-property: transform, opacity;
-  overflow-y: hidden;
-  overscroll-behavior: contain;
-}
-
-:where(.modal) {
-  align-items: center;
-}
-
-.modal-open, 
-.modal:target, 
-.modal-toggle:checked + .modal {
-  pointer-events: auto;
-  visibility: visible;
-  opacity: 1;
-}
-
 .modal-action {
   display: flex;
   margin-top: 1.5rem;
@@ -3374,15 +3341,6 @@ body[dir="rtl"] .checkbox:checked,
   overflow: hidden;
   border-radius: 40px;
   margin-top: -25px;
-}
-
-.modal-open .modal-box, 
-.modal-toggle:checked + .modal .modal-box, 
-.modal:target .modal-box {
-  --tw-translate-y: 0px;
-  --tw-scale-x: 1;
-  --tw-scale-y: 1;
-  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
 .modal-action > :not([hidden]) ~ :not([hidden]) {
@@ -4623,11 +4581,6 @@ body[dir="rtl"] .checkbox:checked,
   padding-bottom: 0.75rem;
 }
 
-.px-1 {
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-
 .pb-16 {
   padding-bottom: 4rem;
 }
@@ -4636,12 +4589,12 @@ body[dir="rtl"] .checkbox:checked,
   padding-bottom: 5rem;
 }
 
-.pl-\[0\.3rem\] {
-  padding-left: 0.3rem;
-}
-
 .pl-4 {
   padding-left: 1rem;
+}
+
+.pl-\[0\.3rem\] {
+  padding-left: 0.3rem;
 }
 
 .text-center {
@@ -5063,10 +5016,6 @@ body[dir="rtl"] .checkbox:checked,
     display: block;
   }
 
-  .lg\:inline-block {
-    display: inline-block;
-  }
-
   .lg\:flex {
     display: flex;
   }
@@ -5085,6 +5034,10 @@ body[dir="rtl"] .checkbox:checked,
 
   .lg\:gap-4 {
     gap: 1rem;
+  }
+
+  .lg\:transition-none {
+    transition-property: none;
   }
 }
 

@@ -28,7 +28,7 @@ type alias Props a p msg =
 
 topTransitionClasses : Attribute msg
 topTransitionClasses =
-    class "transition-[top] duration-100 ease-in motion-reduce:transition-none"
+    class "transition-[top] duration-100 ease-in motion-reduce:transition-none lg:transition-none"
 
 
 emptyContent : Html msg

@@ -38,24 +38,17 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.2
-- [ ] Combat proof of concept
-  - [x] Cycle through moves on timer
-  - [x] Apply damage to health
-  - [x] Shield mitigates damage
-  - [x] Restart fight and award an item or coin on kill of monster
-  - [x] Show something in Time Passes
-  - [x] Add a second monster and way to choose between them
-  - [x] Show reward on monster screen
-  - [ ] Put it back in
-  - [ ] Require hexes in inventory to fight
-- [x] Add hexes
+- [ ] Add hexes
   - [x] Craft them for free
   - [x] Require parchment
+  - [ ] Mastery bonuses
 - [x] Add parchment to shop
 - [x] Activity detail sidebar
 	- [x] desktop
 	- [x] mobile
 - [x] Activity status bar at bottom for mobile
+- [ ] Move Item Mastery (M) info to detail sidebar
+- [ ] Remove mastery pool logic from game
 
 ## Future
 ### Tech stuff
@@ -65,10 +58,8 @@ $ npm test -- --watch
 - [ ] Find a way to unit test performance of tick
 
 ### Fundamentals
-- [ ] Remove mastery pool logic from game
-- [ ] Show what mods there are on an effect/interval and where they came from
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
-- [ ] Move Item Mastery (M) info to detail sidebar
+- [ ] Show what mods there are on an effect/interval and where they came from
 - [ ] Show Time Passes during Fast Forward with real time change
 - [ ] Add change log section
   - [ ] Add notification that shows that update happened
@@ -78,6 +69,7 @@ $ npm test -- --watch
 ### Features
 - [ ] Skill 3
 - [ ] Skill 4
+- [ ] Combat
 
 ### Glitz
 - [ ] Progress bar animations
