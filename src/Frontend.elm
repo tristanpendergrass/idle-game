@@ -726,6 +726,57 @@ update msg model =
             , Cmd.none
             )
 
+        HandleShopResourcePurchase ->
+            case model.activeModal of
+                Just (ShopResourceModal quantity resource) ->
+                    case model.gameState of
+                        Playing snapshot ->
+                            let
+                                game : Game
+                                game =
+                                    Snapshot.getValue snapshot
+
+                                ( newGame, toasts ) =
+                                    Game.attemptPurchaseResource quantity resource game
+
+                                newModel : FrontendModel
+                                newModel =
+                                    { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+
+                                notificationCmds : List (Cmd FrontendMsg)
+                                notificationCmds =
+                                    List.map (AddToast >> delay 0) toasts
+                            in
+                            ( newModel, Cmd.batch notificationCmds )
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
+
+        HandleShopResourceQuantityChange string ->
+            case model.activeModal of
+                Just (ShopResourceModal _ resource) ->
+                    let
+                        maybeQuantity : Maybe Int
+                        maybeQuantity =
+                            String.toInt string
+                    in
+                    case maybeQuantity of
+                        Just quantity ->
+                            ( { model
+                                | activeModal = Just (ShopResourceModal quantity resource)
+                              }
+                            , Cmd.none
+                            )
+
+                        Nothing ->
+                            noOp
+
+                _ ->
+                    noOp
+
         HandlePointerDown pointerState ->
             ( { model | pointerState = Just pointerState }, Cmd.none )
 

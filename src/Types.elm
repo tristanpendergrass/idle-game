@@ -108,6 +108,8 @@ type FrontendMsg
     | SetActiveTab Tab
     | HandleShopItemClick ShopItems.Kind
     | HandleShopResourceClick Resource.Kind
+    | HandleShopResourceQuantityChange String
+    | HandleShopResourcePurchase
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel

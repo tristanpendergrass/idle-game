@@ -20,18 +20,18 @@ render quantity resource =
         [ h3 [ class "font-bold text-lg" ] [ text resourceStats.title ]
         , IdleGame.Views.Utils.resourceAndQuantity { resource = resource, quantity = quantity, iconSize = Icon.ExtraLarge }
         , div [ class "flex items-center gap-4" ]
-            [ button [ class "btn btn-icon" ]
+            [ button [ class "btn btn-square btn-sm btn-outline" ]
                 [ Icon.chevronLeft
                     |> Icon.toHtml
                 ]
-            , input [ class "input input-bordered w-16 text-center", value "1" ] []
-            , button [ class "btn btn-icon" ]
+            , input [ class "input input-bordered w-16 text-center", value (String.fromInt quantity), onInput HandleShopResourceQuantityChange ] []
+            , button [ class "btn btn-square btn-sm btn-outline" ]
                 [ Icon.chevronRight
                     |> Icon.toHtml
                 ]
             ]
         , div [ class "modal-action flex items-center gap-4" ]
-            [ button [ class "btn", onClick CloseModal ] [ text "Cancel" ]
-            , button [ class "btn btn-primary" ] [ text "Buy" ]
+            [ button [ class "btn btn-outline", onClick CloseModal ] [ text "Cancel" ]
+            , button [ class "btn btn-primary", onClick HandleShopResourcePurchase ] [ text "Buy" ]
             ]
         ]
