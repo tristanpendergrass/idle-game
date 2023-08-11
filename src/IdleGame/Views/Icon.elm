@@ -356,3 +356,8 @@ pause =
 eye : Icon
 eye =
     createIconFeather FeatherIcons.eye
+
+
+go : Icon
+go =
+    createIconFeather FeatherIcons.logIn

@@ -84,6 +84,20 @@ renderDrawer isDrawerOpen activeTab =
                     [ Icon.close
                         |> Icon.toHtml
                     ]
+                , button [ class "btn btn-secondary flex items-center gap-2 hidden lg:flex" ]
+                    [ Icon.go
+                        |> Icon.withSize Icon.Medium
+                        |> Icon.toHtml
+                    , span [] [ text "Combat" ]
+                    ]
+                ]
+            , div [ class "pl-4 w-full flex justify-center items-center" ]
+                [ button [ class "btn btn-secondary flex items-center gap-2 lg:hidden" ]
+                    [ Icon.go
+                        |> Icon.withSize Icon.Medium
+                        |> Icon.toHtml
+                    , span [] [ text "Combat" ]
+                    ]
                 ]
             , div [ class "h-4" ] []
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]

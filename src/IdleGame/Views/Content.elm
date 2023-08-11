@@ -1,5 +1,7 @@
 module IdleGame.Views.Content exposing (..)
 
+-- import IdleGame.Views.Adventuring2
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -8,7 +10,7 @@ import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
-import IdleGame.Views.Adventuring2
+import IdleGame.Views.Adventuring
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.Hexes
@@ -66,7 +68,7 @@ renderContent game activeTab =
                 IdleGame.Views.Shop.render game
 
             Tab.Adventuring ->
-                IdleGame.Views.Adventuring2.render game
+                IdleGame.Views.Adventuring.render game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render
