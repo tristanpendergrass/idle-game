@@ -933,7 +933,7 @@ renderModal activeModal game =
         Just (ShopResourceModal amount resource) ->
             let
                 children =
-                    IdleGame.Views.ShopResourceModal.render amount resource
+                    IdleGame.Views.ShopResourceModal.render game amount resource
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"

@@ -91,10 +91,6 @@ render game =
                 resourceStats : Resource.Stats
                 resourceStats =
                     Resource.getStats resource
-
-                owned : Int
-                owned =
-                    Resource.getByKind resource game.resources
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
@@ -105,10 +101,6 @@ render game =
                     |> Icon.toHtml
                 , div [ class "flex-1 t-column" ]
                     [ span [ class "font-bold" ] [ text resourceStats.title ]
-                    , span [ class "flex items-center gap-1 text-sm" ]
-                        [ span [] [ text "Owned:" ]
-                        , span [ class "font-bold" ] [ text <| IdleGame.Views.Utils.intToString owned ]
-                        ]
                     ]
                 , priceLabel price
                 ]
