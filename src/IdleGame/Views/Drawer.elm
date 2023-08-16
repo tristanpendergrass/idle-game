@@ -12,9 +12,18 @@ import IdleGame.Views.Utils as Utils
 import Types exposing (..)
 
 
-renderDrawer : Bool -> Tab -> Html FrontendMsg
-renderDrawer isDrawerOpen activeTab =
+renderDrawer : Bool -> Mode -> Tab -> Html FrontendMsg
+renderDrawer isDrawerOpen mode activeTab =
     let
+        setActiveTab : Tab -> FrontendMsg
+        setActiveTab tab =
+            case mode of
+                Skill ->
+                    SetActiveSkillTab tab
+
+                Combat ->
+                    SetActiveCombatTab tab
+
         underConstructionIcon =
             Icon.underConstruction
                 |> Icon.withSize Icon.Small
@@ -43,7 +52,7 @@ renderDrawer isDrawerOpen activeTab =
         renderForbiddenTab =
             span
                 [ class "flex gap-4 items-center"
-                , onClick <| SetActiveTab Tab.ForbiddenKnowledge
+                , onClick <| setActiveTab Tab.ForbiddenKnowledge
                 ]
                 [ span [ class "flex-none" ]
                     [ Icon.forbiddenKnowledge
@@ -60,12 +69,81 @@ renderDrawer isDrawerOpen activeTab =
 
             else
                 []
+
+        switchModeButton =
+            let
+                newMode : Mode
+                newMode =
+                    case mode of
+                        Skill ->
+                            Combat
+
+                        Combat ->
+                            Skill
+
+                label : String
+                label =
+                    case newMode of
+                        Skill ->
+                            "Skilling"
+
+                        Combat ->
+                            "Combat"
+            in
+            button [ class "btn btn-secondary flex items-center gap-2", onClick (SwitchMode newMode) ]
+                [ Icon.go
+                    |> Icon.withSize Icon.Medium
+                    |> Icon.toHtml
+                , span [] [ text label ]
+                ]
+
+        skillTabs : List (Html FrontendMsg)
+        skillTabs =
+            [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [ onClick (SetActiveSkillTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
+                , li [ onClick (SetActiveSkillTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                , li [ onClick (SetActiveSkillTab Tab.Adventuring) ] [ renderTab { tab = Tab.Adventuring, underConstruction = False } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ onClick (SetActiveSkillTab Tab.Chores) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
+                , li [ onClick (SetActiveSkillTab Tab.Explore) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
+                , li [ onClick (SetActiveSkillTab Tab.Mischief) ] [ renderTab { tab = Tab.Mischief, underConstruction = True } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
+                , li [ onClick (SetActiveSkillTab Tab.Hexes) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Potionmaking, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Conjuration, underConstruction = True } ]
+                , li [ class "disabled" ] [ renderTab { tab = Tab.Transmogrification, underConstruction = True } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ span [] [ text "Dark Arts" ] ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
+                , li [ class "disabled" ] [ renderForbiddenTab ]
+                ]
+            ]
+
+        combatTabs : List (Html FrontendMsg)
+        combatTabs =
+            [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [ onClick (SetActiveCombatTab Tab.SchoolGrounds) ] [ renderTab { tab = Tab.SchoolGrounds, underConstruction = False } ]
+                , li [ onClick (SetActiveCombatTab Tab.Forest) ] [ renderTab { tab = Tab.Forest, underConstruction = False } ]
+                , li [ onClick (SetActiveCombatTab Tab.Sewers) ] [ renderTab { tab = Tab.Sewers, underConstruction = False } ]
+                ]
+            ]
     in
     div ([ class "drawer-side", attribute "style" "scroll-behavior: smooth; scroll-padding-top:5rem" ] ++ zIndexAttributes)
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 w-80" ]
             -- title row
-            [ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
+            ([ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center gap-2" ]
                     [ div [ class "flex-0 px-2" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl" ]
@@ -84,89 +162,20 @@ renderDrawer isDrawerOpen activeTab =
                     [ Icon.close
                         |> Icon.toHtml
                     ]
-                , button [ class "btn btn-secondary flex items-center gap-2 hidden lg:flex" ]
-                    [ Icon.go
-                        |> Icon.withSize Icon.Medium
-                        |> Icon.toHtml
-                    , span [] [ text "Combat" ]
-                    ]
+                , div [ class "hidden lg:block" ]
+                    [ switchModeButton ]
                 ]
-            , div [ class "pl-4 w-full flex justify-center items-center" ]
-                [ button [ class "btn btn-secondary flex items-center gap-2 lg:hidden" ]
-                    [ Icon.go
-                        |> Icon.withSize Icon.Medium
-                        |> Icon.toHtml
-                    , span [] [ text "Combat" ]
-                    ]
+             , div [ class "pl-4 w-full flex justify-center items-center lg:hidden" ]
+                [ switchModeButton
                 ]
-            , div [ class "h-4" ] []
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [ onClick (SetActiveTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
-                , li [ onClick (SetActiveTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
-                , li [ onClick (SetActiveTab Tab.Adventuring) ] [ renderTab { tab = Tab.Adventuring, underConstruction = False } ]
-                ]
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ onClick (SetActiveTab Tab.Chores) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
-                , li [ onClick (SetActiveTab Tab.Explore) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
-                , li [ onClick (SetActiveTab Tab.Mischief) ] [ renderTab { tab = Tab.Mischief, underConstruction = True } ]
-                ]
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li [ onClick (SetActiveTab Tab.Hexes) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Potionmaking, underConstruction = True } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Conjuration, underConstruction = True } ]
-                , li [ class "disabled" ] [ renderTab { tab = Tab.Transmogrification, underConstruction = True } ]
-                ]
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ class "menu-title" ] [ span [] [ text "Dark Arts" ] ]
-                , li [ class "disabled" ] [ renderForbiddenTab ]
-                , li [ class "disabled" ] [ renderForbiddenTab ]
-                , li [ class "disabled" ] [ renderForbiddenTab ]
-                ]
-            ]
+             , div [ class "h-4" ] []
+             ]
+                ++ (case mode of
+                        Skill ->
+                            skillTabs
+
+                        Combat ->
+                            combatTabs
+                   )
+            )
         ]
-
-
-
--- renderCategory : Bool -> Maybe Tab -> Tabs.Category -> Html FrontendMsg
--- renderCategory withTopLine activeTab category =
---     let
---         maybeTopLine =
---             if withTopLine then
---                 [ li [] [] ]
---             else
---                 []
---         maybeTitle =
---             case category.title of
---                 Just title ->
---                     [ li [ class "menu-title" ]
---                         [ span []
---                             [ span [ classList [ ( "text-error text-opacity-40", category.forbidden ) ] ]
---                                 [ text title ]
---                             ]
---                         ]
---                     ]
---                 Nothing ->
---                     []
---     in
---     ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
---         (maybeTopLine ++ maybeTitle ++ List.map (\tab -> renderTab tab (Just tab.type_ == Maybe.map .type_ activeTab)) category.items)
--- renderTab : Tab -> Bool -> Html FrontendMsg
--- renderTab tab isActive =
---     li [ classList [ ( "disabled", tab.disabled ) ] ]
---         [ span [ class "flex gap-4", classList [ ( "active", isActive ) ] ]
---             [ span [ class "flex-none" ]
---                 [ tab.icon
---                     |> Icon.toFeatherIcon
---                     |> FeatherIcons.withSize 24
---                     |> FeatherIcons.toHtml []
---                 ]
---             , span [ class "flex-1" ] [ text tab.title ]
---             ]
---         ]

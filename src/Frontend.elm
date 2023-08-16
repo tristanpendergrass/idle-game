@@ -73,7 +73,9 @@ init _ key =
       , showDebugPanel = False
       , tray = Toast.tray
       , isDrawerOpen = False
-      , activeTab = Config.flags.defaultTab
+      , mode = Config.flags.defaultMode
+      , activeSkillTab = Config.flags.defaultSkillTab
+      , activeCombatTab = Config.flags.defaultCombatTab
       , isVisible = True
       , activeModal = Nothing
       , saveGameTimer = Timer.create
@@ -169,9 +171,14 @@ createTimePassesModal oldSnap newSnap =
         |> Maybe.map (TimePassesModal timePassed)
 
 
-setActiveTab : Tab -> FrontendModel -> FrontendModel
-setActiveTab tab model =
-    { model | activeTab = tab }
+setActiveSkillTab : Tab -> FrontendModel -> FrontendModel
+setActiveSkillTab tab model =
+    { model | activeSkillTab = tab }
+
+
+setActiveCombatTab : Tab -> FrontendModel -> FrontendModel
+setActiveCombatTab tab model =
+    { model | activeCombatTab = tab }
 
 
 setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
@@ -336,6 +343,9 @@ update msg model =
                 |> Task.andThen (\_ -> Browser.Dom.focus DebugPanel.panelId)
                 |> Task.attempt (\_ -> NoOp)
             )
+
+        SwitchMode mode ->
+            ( { model | mode = mode }, Cmd.none )
 
         ClosePreview ->
             ( model
@@ -665,9 +675,16 @@ update msg model =
             , Cmd.none
             )
 
-        SetActiveTab tab ->
+        SetActiveSkillTab tab ->
             ( model
-                |> setActiveTab tab
+                |> setActiveSkillTab tab
+                |> setIsDrawerOpen False
+            , Cmd.none
+            )
+
+        SetActiveCombatTab tab ->
+            ( model
+                |> setActiveCombatTab tab
                 |> setIsDrawerOpen False
             , Cmd.none
             )
@@ -949,7 +966,7 @@ renderBottomRightItems model =
           else
             []
          )
-            ++ (case model.activeTab of
+            ++ (case model.activeSkillTab of
                     Tab.Chores ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
@@ -1027,6 +1044,15 @@ view model =
                     renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
                     renderStatusBar activity =
                         IdleGame.Views.DetailViewContent.renderStatusBar activity
+
+                    activeTab : Tab
+                    activeTab =
+                        case model.mode of
+                            Skill ->
+                                model.activeSkillTab
+
+                            Combat ->
+                                model.activeCombatTab
                 in
                 div [ class "flex h-screen relative" ]
                     [ Toast.render viewToast model.tray toastConfig
@@ -1039,8 +1065,8 @@ view model =
                             , onCheck SetDrawerOpen
                             ]
                             []
-                        , IdleGame.Views.Content.renderContent game model.activeTab
-                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.activeTab
+                        , IdleGame.Views.Content.renderContent game activeTab
+                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.mode activeTab
                         ]
                     , IdleGame.Views.DetailViewWrapper.render
                         { state = detailViewState

@@ -3,6 +3,7 @@ module Config exposing (Flags, flags, version)
 import Duration exposing (Duration)
 import Env
 import IdleGame.Tab as Tab exposing (Tab)
+import Types exposing (..)
 
 
 version : String
@@ -15,7 +16,9 @@ type alias Flags =
     , extraFastForwardTime : Duration -- How much time to artificially add to the FastForward on init from backend
     , showTimePasses : Bool
     , showDebugPanel : Bool
-    , defaultTab : Tab
+    , defaultMode : Mode
+    , defaultSkillTab : Tab
+    , defaultCombatTab : Tab
     , defaultDetailViewExpanded : Bool
     }
 
@@ -39,7 +42,9 @@ devFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultTab = Tab.Shop
+    , defaultMode = Combat
+    , defaultSkillTab = Tab.Shop
+    , defaultCombatTab = Tab.SchoolGrounds
     , defaultDetailViewExpanded = False
     }
 
@@ -51,6 +56,8 @@ prodFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = False
-    , defaultTab = Tab.Chores
+    , defaultMode = Skill
+    , defaultSkillTab = Tab.Shop
+    , defaultCombatTab = Tab.SchoolGrounds
     , defaultDetailViewExpanded = False
     }

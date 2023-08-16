@@ -59,12 +59,19 @@ type alias PointerState =
     }
 
 
+type Mode
+    = Skill
+    | Combat
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
-    , activeTab : Tab
+    , mode : Mode
+    , activeSkillTab : Tab
+    , activeCombatTab : Tab
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
@@ -90,6 +97,7 @@ type FrontendMsg
     | UrlClicked UrlRequest
     | UrlChanged Url
       -- Detail View
+    | SwitchMode Mode
     | ClosePreview
     | ExpandActivity
     | CollapseActivity
@@ -105,7 +113,8 @@ type FrontendMsg
     | CloseModal
     | OpenMasteryCheckpointsModal
     | OpenMasteryUnlocksModal
-    | SetActiveTab Tab
+    | SetActiveSkillTab Tab
+    | SetActiveCombatTab Tab
     | HandleShopItemClick ShopItems.Kind
     | HandleShopResourceClick Resource.Kind
     | HandleShopResourceQuantityChange String

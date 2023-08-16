@@ -19,6 +19,10 @@ type Tab
     | Potionmaking
     | Conjuration
     | Transmogrification
+      -- Combat
+    | SchoolGrounds
+    | Forest
+    | Sewers
 
 
 type alias TabConfig =
@@ -97,5 +101,20 @@ getConfig tab =
 
         Transmogrification ->
             { title = "Transmogrification"
+            , icon = Icon.transmogrification
+            }
+
+        SchoolGrounds ->
+            { title = "School Grounds"
+            , icon = Icon.enchantment
+            }
+
+        Forest ->
+            { title = "Forest"
+            , icon = Icon.botany
+            }
+
+        Sewers ->
+            { title = "Sewers"
             , icon = Icon.transmogrification
             }
