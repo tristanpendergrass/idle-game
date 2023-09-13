@@ -1,6 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
+import Html.Attributes exposing (download)
 import IdleGame.Activity as Activity
 import IdleGame.Adventuring as Adventuring exposing (Adventuring)
 import IdleGame.Chore as Chore
@@ -11,6 +12,8 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event as Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Skill as Skill
@@ -35,6 +38,7 @@ type alias Game =
     , mxp : Activity.Record Xp
     , choresMxp : Xp
     , activity : Maybe ( Activity, Timer )
+    , monster : Maybe Monster
     , coin : Coin
     , resources : Resource.Record Int
     , shopItems : ShopItems
@@ -54,6 +58,7 @@ create seed =
     , mxp = Activity.createRecord (Xp.int 0)
     , choresMxp = Xp.int 0
     , activity = Nothing
+    , monster = Nothing
     , coin = Coin.int 0
     , resources = Resource.emptyResourceRecord
     , shopItems = ShopItems.create
@@ -66,6 +71,18 @@ create seed =
 type ActivityListItem
     = LockedActivity Int
     | ActivityListItem Activity
+    | MonsterListItem Monster
+
+
+getMonsterListItems : Game -> List ActivityListItem
+getMonsterListItems game =
+    let
+        monsters : List Monster
+        monsters =
+            Monster.allMonsters
+    in
+    monsters
+        |> List.map (\monster -> MonsterListItem monster)
 
 
 getActivityListItems : Skill.Kind -> Game -> List ActivityListItem
@@ -117,6 +134,9 @@ getActivityListItems skill game =
 
                             LockedActivity _ ->
                                 True
+
+                            MonsterListItem _ ->
+                                False
                 in
                 { items = newItems, lockedItem = newItemIsLocked }
 
@@ -187,9 +207,9 @@ setActivity activity g =
     { g | activity = activity }
 
 
-setMonster : Combat.MonsterKind -> Game -> Game
+setMonster : Maybe Monster -> Game -> Game
 setMonster newMonster game =
-    { game | adventuring = Adventuring.setMonster newMonster game.adventuring }
+    { game | monster = newMonster }
 
 
 startFight : Game -> Game

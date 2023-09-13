@@ -181,7 +181,7 @@ renderMonsterTitle monster =
             (Combat.allMonsterKinds
                 |> List.map
                     (\kind ->
-                        li [] [ button [ onClick (HandleMonsterSelect kind) ] [ text <| (Combat.getMonsterStats kind).title ] ]
+                        li [] [ button [ onClick NoOp ] [ text <| (Combat.getMonsterStats kind).title ] ]
                     )
             )
         ]

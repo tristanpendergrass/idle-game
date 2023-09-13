@@ -44,7 +44,7 @@ devFlags =
     , showDebugPanel = True
     , defaultMode = Combat
     , defaultSkillTab = Tab.Shop
-    , defaultCombatTab = Tab.SchoolGrounds
+    , defaultCombatTab = Tab.CombatTab1
     , defaultDetailViewExpanded = False
     }
 
@@ -58,6 +58,6 @@ prodFlags =
     , showDebugPanel = False
     , defaultMode = Skill
     , defaultSkillTab = Tab.Shop
-    , defaultCombatTab = Tab.SchoolGrounds
+    , defaultCombatTab = Tab.Chores
     , defaultDetailViewExpanded = False
     }

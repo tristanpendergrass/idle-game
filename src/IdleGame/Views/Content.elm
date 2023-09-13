@@ -13,6 +13,7 @@ import IdleGame.Views.Activity
 import IdleGame.Views.Adventuring
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
+import IdleGame.Views.CombatTab1
 import IdleGame.Views.Hexes
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
@@ -69,6 +70,9 @@ renderContent game activeTab =
 
             Tab.Adventuring ->
                 IdleGame.Views.Adventuring.render game
+
+            Tab.CombatTab1 ->
+                IdleGame.Views.CombatTab1.render game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

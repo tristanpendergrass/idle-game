@@ -11,6 +11,8 @@ import IdleGame.Event as Event exposing (Effect, Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill exposing (Kind(..))
 import IdleGame.Timer as Timer exposing (Timer)
@@ -33,6 +35,10 @@ renderActivityListItem game item =
 
         Game.LockedActivity level ->
             renderLockedActivity level
+
+        Game.MonsterListItem monster ->
+            renderMonster monster game
+                |> Utils.withScreenWidth
 
 
 activityHeight : String
@@ -68,10 +74,27 @@ activityImage kind =
                 ]
 
 
+monsterImage : Monster -> Html FrontendMsg
+monsterImage kind =
+    div
+        [ class "h-full w-full flex items-center justify-center bg-accent" ]
+        [ (Monster.getStats kind).image
+            |> Icon.withSize Icon.Large
+            |> Icon.toHtml
+        ]
+
+
 activityTitle : Activity -> Html FrontendMsg
 activityTitle kind =
     h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
         [ span [] [ text (Activity.getStats kind).title ]
+        ]
+
+
+monsterTitle : Monster -> Html FrontendMsg
+monsterTitle kind =
+    h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
+        [ span [] [ text (Monster.getStats kind).title ]
         ]
 
 
@@ -91,9 +114,30 @@ activityCoin coin =
         ]
 
 
+renderMonster : Monster -> Game -> Utils.ScreenWidth -> Html FrontendMsg
+renderMonster monster game screenWidth =
+    -- TODO: Move to its own file
+    div [ class "relative" ]
+        [ div
+            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
+            , onClick (HandleMonsterClick { screenWidth = screenWidth } monster)
+            ]
+            [ -- preview image
+              div [ class "h-24 relative" ]
+                [ monsterImage monster
+                ]
+            , div [ class "relative card-body" ]
+                [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
+                    -- Activity title
+                    [ monsterTitle monster
+                    ]
+                ]
+            ]
+        ]
+
+
 renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
 renderActivity activity game screenWidth =
-    -- Similar to renderContent
     let
         maybeTimer : Maybe Timer
         maybeTimer =

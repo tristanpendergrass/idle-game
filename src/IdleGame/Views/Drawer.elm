@@ -133,9 +133,7 @@ renderDrawer isDrawerOpen mode activeTab =
         combatTabs : List (Html FrontendMsg)
         combatTabs =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [ onClick (SetActiveCombatTab Tab.SchoolGrounds) ] [ renderTab { tab = Tab.SchoolGrounds, underConstruction = False } ]
-                , li [ onClick (SetActiveCombatTab Tab.Forest) ] [ renderTab { tab = Tab.Forest, underConstruction = False } ]
-                , li [ onClick (SetActiveCombatTab Tab.Sewers) ] [ renderTab { tab = Tab.Sewers, underConstruction = False } ]
+                [ li [ onClick (SetActiveCombatTab Tab.CombatTab1) ] [ renderTab { tab = Tab.CombatTab1, underConstruction = False } ]
                 ]
             ]
     in

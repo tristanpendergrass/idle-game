@@ -20,9 +20,7 @@ type Tab
     | Conjuration
     | Transmogrification
       -- Combat
-    | SchoolGrounds
-    | Forest
-    | Sewers
+    | CombatTab1
 
 
 type alias TabConfig =
@@ -104,17 +102,7 @@ getConfig tab =
             , icon = Icon.transmogrification
             }
 
-        SchoolGrounds ->
-            { title = "School Grounds"
+        CombatTab1 ->
+            { title = "Combat Tab 1"
             , icon = Icon.enchantment
-            }
-
-        Forest ->
-            { title = "Forest"
-            , icon = Icon.botany
-            }
-
-        Sewers ->
-            { title = "Sewers"
-            , icon = Icon.transmogrification
             }

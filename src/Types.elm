@@ -10,6 +10,7 @@ import IdleGame.Combat as Adventuring
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
@@ -126,8 +127,8 @@ type FrontendMsg
     | StartFight
     | StopFight
     | HandlePlayerMoveSelect Int Adventuring.PlayerMove
-    | HandleMonsterSelect Adventuring.MonsterKind
       -- Activities
+    | HandleMonsterClick { screenWidth : ViewUtils.ScreenWidth } Monster
     | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
     | HandlePreviewClick Activity
     | HandlePlayClick Activity

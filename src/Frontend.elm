@@ -18,6 +18,8 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
@@ -274,9 +276,24 @@ getActivity model =
             Nothing
 
 
+getMonster : FrontendModel -> Maybe Monster
+getMonster model =
+    case model.gameState of
+        Playing snapshot ->
+            (Snapshot.getValue snapshot).monster
+
+        _ ->
+            Nothing
+
+
 setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
 setActivity newActivity =
     mapGame (\game -> Game.setActivity newActivity game)
+
+
+setMonster : Maybe Monster -> FrontendModel -> FrontendModel
+setMonster newMonster =
+    mapGame (\game -> Game.setMonster newMonster game)
 
 
 updatePointer : Float -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -455,21 +472,42 @@ update msg model =
                 |> Task.attempt (\_ -> NoOp)
             )
 
-        HandleMonsterSelect monster ->
-            ( { model
-                | gameState =
-                    case model.gameState of
-                        Playing snapshot ->
-                            snapshot
-                                |> Snapshot.map (Game.setMonster monster)
-                                |> Playing
+        HandleMonsterClick { screenWidth } kind ->
+            let
+                currentMonster : Maybe Monster
+                currentMonster =
+                    getMonster model
 
-                        _ ->
-                            model.gameState
-              }
-            , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
-                |> Task.attempt (\_ -> NoOp)
-            )
+                clickingActiveMonster : Bool
+                clickingActiveMonster =
+                    case currentMonster of
+                        Just k ->
+                            k == kind
+
+                        Nothing ->
+                            False
+
+                newMonster : Maybe Monster
+                newMonster =
+                    if clickingActiveMonster then
+                        Nothing
+
+                    else
+                        Just kind
+            in
+            if ViewUtils.screenSupportsRighRail screenWidth then
+                ( model
+                    |> setMonster newMonster
+                    |> setActivityExpanded (not clickingActiveMonster)
+                , Cmd.none
+                )
+
+            else
+                ( model
+                    |> setMonster newMonster
+                    |> setActivityExpanded False
+                , Cmd.none
+                )
 
         HandleActivityClick { screenWidth } kind ->
             let

@@ -70,6 +70,7 @@ updateByKind kind f record =
 
 type alias Stats =
     { title : String
+    , image : Icon
     }
 
 
@@ -80,6 +81,6 @@ getStats kind =
 
 allStats : Record Stats
 allStats =
-    { monster1 = { title = "Monster 1" }
-    , monster2 = { title = "Monster 2" }
+    { monster1 = { title = "Monster 1", image = Icon.letter "M1" }
+    , monster2 = { title = "Monster 2", image = Icon.letter "M2" }
     }

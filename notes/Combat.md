@@ -41,3 +41,7 @@ Mastery in combat is not done on a per-monster basis but on a per-tag basis. Eac
 * Mysterious cult played for laughs. They say ominous things and make threats but they seem to be empty. "You play your part in the sinful entreaty." Other factions don't take them seriously. 
 
 # Random concepts
+* Each monster has a trinket. This trinket has a very low chance to drop every time you kill the monster. The trinket should be equippable in a special "trinket" slot for the player.
+    * What bonus should the trinket give? Something to help with combat with the monster, so if it drops before you've completed its mastery grind it will help with that. Also something to help with skilling though? It should be thematic.
+    * Second trinket slot unlocked as a big reward at some point in the game?
+* Fight monsters in two modes: regular mode, scaled mode. In regular mode it has a fixed strength and you get the base rewards for defeating it. In scaled mode its stats are scaled to yours so that it always presents a challenge, even when it's an "early" enemy and you are high level. The reason to enable scaled mode is you get 50% more MXP when defeating it? So the progress should look like: Not able to fight -> Able to fight -> Can easily beat -> Turn on scaled mode and optimize your build against it.

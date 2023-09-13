@@ -4722,10 +4722,6 @@ body[dir="rtl"] .checkbox:checked,
   color: hsl(var(--wac, var(--nc)) / var(--tw-text-opacity));
 }
 
-.text-opacity-40 {
-  --tw-text-opacity: 0.4;
-}
-
 .text-opacity-50 {
   --tw-text-opacity: 0.5;
 }
@@ -5014,10 +5010,6 @@ body[dir="rtl"] .checkbox:checked,
 @media (min-width: 1024px) {
   .lg\:block {
     display: block;
-  }
-
-  .lg\:flex {
-    display: flex;
   }
 
   .lg\:hidden {
