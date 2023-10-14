@@ -61,8 +61,15 @@ type alias PointerState =
 
 
 type Mode
-    = Skill
-    | Combat
+    = Skilling
+    | Adventuring
+
+
+type alias ModeState =
+    { activeTab : Tab
+    , preview : Maybe Preview
+    , activityExpanded : Bool
+    }
 
 
 type alias FrontendModel =
@@ -71,15 +78,13 @@ type alias FrontendModel =
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
     , mode : Mode
-    , activeSkillTab : Tab
-    , activeCombatTab : Tab
+    , skillingState : ModeState
+    , adventuringState : ModeState
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
-    , preview : Maybe Preview -- Thing we're previewing in the detail view
-    , activityExpanded : Bool -- If the activity in game exists and preview does not exist this Bool is used to show or hide the detail view in mobile/tablet screen size
-    , pointerState : Maybe PointerState
+    , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
     }
 
 

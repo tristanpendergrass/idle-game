@@ -18,10 +18,10 @@ renderDrawer isDrawerOpen mode activeTab =
         setActiveTab : Tab -> FrontendMsg
         setActiveTab tab =
             case mode of
-                Skill ->
+                Skilling ->
                     SetActiveSkillTab tab
 
-                Combat ->
+                Adventuring ->
                     SetActiveCombatTab tab
 
         underConstructionIcon =
@@ -75,19 +75,19 @@ renderDrawer isDrawerOpen mode activeTab =
                 newMode : Mode
                 newMode =
                     case mode of
-                        Skill ->
-                            Combat
+                        Skilling ->
+                            Adventuring
 
-                        Combat ->
-                            Skill
+                        Adventuring ->
+                            Skilling
 
                 label : String
                 label =
                     case newMode of
-                        Skill ->
+                        Skilling ->
                             "Skilling"
 
-                        Combat ->
+                        Adventuring ->
                             "Combat"
             in
             button [ class "btn btn-secondary flex items-center gap-2", onClick (SwitchMode newMode) ]
@@ -169,10 +169,10 @@ renderDrawer isDrawerOpen mode activeTab =
              , div [ class "h-4" ] []
              ]
                 ++ (case mode of
-                        Skill ->
+                        Skilling ->
                             skillTabs
 
-                        Combat ->
+                        Adventuring ->
                             combatTabs
                    )
             )

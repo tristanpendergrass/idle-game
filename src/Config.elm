@@ -17,8 +17,8 @@ type alias Flags =
     , showTimePasses : Bool
     , showDebugPanel : Bool
     , defaultMode : Mode
-    , defaultSkillTab : Tab
-    , defaultCombatTab : Tab
+    , defaultTabSkilling : Tab
+    , defaultTabAdventuring : Tab
     , defaultDetailViewExpanded : Bool
     }
 
@@ -42,9 +42,9 @@ devFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultMode = Combat
-    , defaultSkillTab = Tab.Shop
-    , defaultCombatTab = Tab.CombatTab1
+    , defaultMode = Adventuring
+    , defaultTabSkilling = Tab.Shop
+    , defaultTabAdventuring = Tab.CombatTab1
     , defaultDetailViewExpanded = False
     }
 
@@ -56,8 +56,8 @@ prodFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = False
-    , defaultMode = Skill
-    , defaultSkillTab = Tab.Shop
-    , defaultCombatTab = Tab.Chores
+    , defaultMode = Skilling
+    , defaultTabSkilling = Tab.Shop
+    , defaultTabAdventuring = Tab.Chores
     , defaultDetailViewExpanded = False
     }

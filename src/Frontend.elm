@@ -76,14 +76,20 @@ init _ key =
       , tray = Toast.tray
       , isDrawerOpen = False
       , mode = Config.flags.defaultMode
-      , activeSkillTab = Config.flags.defaultSkillTab
-      , activeCombatTab = Config.flags.defaultCombatTab
+      , skillingState =
+            { activeTab = Config.flags.defaultTabSkilling
+            , preview = Nothing
+            , activityExpanded = Config.flags.defaultDetailViewExpanded
+            }
+      , adventuringState =
+            { activeTab = Config.flags.defaultTabAdventuring
+            , preview = Nothing
+            , activityExpanded = Config.flags.defaultDetailViewExpanded
+            }
       , isVisible = True
       , activeModal = Nothing
       , saveGameTimer = Timer.create
       , gameState = Initializing
-      , activityExpanded = Config.flags.defaultDetailViewExpanded
-      , preview = Nothing
       , pointerState = Nothing
       }
     , Cmd.none
@@ -173,14 +179,32 @@ createTimePassesModal oldSnap newSnap =
         |> Maybe.map (TimePassesModal timePassed)
 
 
-setActiveSkillTab : Tab -> FrontendModel -> FrontendModel
-setActiveSkillTab tab model =
-    { model | activeSkillTab = tab }
+setTabSkilling : Tab -> FrontendModel -> FrontendModel
+setTabSkilling tab model =
+    let
+        skillingState : ModeState
+        skillingState =
+            model.skillingState
+
+        newSkillingState : ModeState
+        newSkillingState =
+            { skillingState | activeTab = tab }
+    in
+    { model | skillingState = newSkillingState }
 
 
-setActiveCombatTab : Tab -> FrontendModel -> FrontendModel
-setActiveCombatTab tab model =
-    { model | activeCombatTab = tab }
+setTabAdventuring : Tab -> FrontendModel -> FrontendModel
+setTabAdventuring tab model =
+    let
+        adventuringState : ModeState
+        adventuringState =
+            model.adventuringState
+
+        newAdventuringState : ModeState
+        newAdventuringState =
+            { adventuringState | activeTab = tab }
+    in
+    { model | adventuringState = newAdventuringState }
 
 
 setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
@@ -256,14 +280,60 @@ performantTick =
         (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
 
 
-setPreview : Maybe Preview -> FrontendModel -> FrontendModel
-setPreview maybePreview model =
-    { model | preview = maybePreview }
+setPreviewSkilling : Maybe Preview -> FrontendModel -> FrontendModel
+setPreviewSkilling maybePreview model =
+    let
+        skillingState : ModeState
+        skillingState =
+            model.skillingState
+
+        newSkillingState : ModeState
+        newSkillingState =
+            { skillingState | preview = maybePreview }
+    in
+    { model | skillingState = newSkillingState }
 
 
-setActivityExpanded : Bool -> FrontendModel -> FrontendModel
-setActivityExpanded activityExpanded model =
-    { model | activityExpanded = activityExpanded }
+setPreviewAdventuring : Maybe Preview -> FrontendModel -> FrontendModel
+setPreviewAdventuring maybePreview model =
+    let
+        adventuringState : ModeState
+        adventuringState =
+            model.adventuringState
+
+        newAdventuringState : ModeState
+        newAdventuringState =
+            { adventuringState | preview = maybePreview }
+    in
+    { model | adventuringState = newAdventuringState }
+
+
+setActivityExpandedSkilling : Bool -> FrontendModel -> FrontendModel
+setActivityExpandedSkilling activityExpanded model =
+    let
+        skillingState : ModeState
+        skillingState =
+            model.skillingState
+
+        newSkillingState : ModeState
+        newSkillingState =
+            { skillingState | activityExpanded = activityExpanded }
+    in
+    { model | skillingState = newSkillingState }
+
+
+setActivityExpandedAdventuring : Bool -> FrontendModel -> FrontendModel
+setActivityExpandedAdventuring activityExpanded model =
+    let
+        adventuringState : ModeState
+        adventuringState =
+            model.adventuringState
+
+        newAdventuringState : ModeState
+        newAdventuringState =
+            { adventuringState | activityExpanded = activityExpanded }
+    in
+    { model | adventuringState = newAdventuringState }
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
@@ -366,27 +436,49 @@ update msg model =
 
         ClosePreview ->
             ( model
-                |> setPreview Nothing
+                |> setPreviewAdventuring Nothing
             , Cmd.none
             )
 
         CollapseActivity ->
             ( model
-                |> setActivityExpanded False
+                |> setActivityExpandedSkilling False
             , Cmd.none
             )
 
         ExpandActivity ->
             ( model
-                |> setActivityExpanded True
+                |> setActivityExpandedSkilling True
             , Cmd.none
             )
 
         CollapseDetailView ->
-            ( { model | activityExpanded = False }, Cmd.none )
+            case model.mode of
+                Skilling ->
+                    ( model
+                        |> setActivityExpandedSkilling False
+                    , Cmd.none
+                    )
+
+                Adventuring ->
+                    ( model
+                        |> setActivityExpandedAdventuring False
+                    , Cmd.none
+                    )
 
         ExpandDetailView ->
-            ( { model | activityExpanded = True }, Cmd.none )
+            case model.mode of
+                Skilling ->
+                    ( model
+                        |> setActivityExpandedSkilling True
+                    , Cmd.none
+                    )
+
+                Adventuring ->
+                    ( model
+                        |> setActivityExpandedAdventuring True
+                    , Cmd.none
+                    )
 
         CloseDebugPanel ->
             ( { model | showDebugPanel = False }, Cmd.none )
@@ -498,14 +590,14 @@ update msg model =
             if ViewUtils.screenSupportsRighRail screenWidth then
                 ( model
                     |> setMonster newMonster
-                    |> setActivityExpanded (not clickingActiveMonster)
+                    |> setActivityExpandedSkilling (not clickingActiveMonster)
                 , Cmd.none
                 )
 
             else
                 ( model
                     |> setMonster newMonster
-                    |> setActivityExpanded False
+                    |> setActivityExpandedSkilling False
                 , Cmd.none
                 )
 
@@ -535,14 +627,14 @@ update msg model =
             if ViewUtils.screenSupportsRighRail screenWidth then
                 ( model
                     |> setActivity newActivity
-                    |> setActivityExpanded (not clickingActiveActivity)
+                    |> setActivityExpandedSkilling (not clickingActiveActivity)
                 , Cmd.none
                 )
 
             else
                 ( model
                     |> setActivity newActivity
-                    |> setActivityExpanded False
+                    |> setActivityExpandedSkilling False
                 , Cmd.none
                 )
 
@@ -562,8 +654,8 @@ update msg model =
                             False
             in
             ( model
-                |> setPreview (Just (Preview activity))
-                |> setActivityExpanded
+                |> setPreviewAdventuring (Just (Preview activity))
+                |> setActivityExpandedSkilling
                     (if clickingActiveActivity then
                         True
 
@@ -576,15 +668,15 @@ update msg model =
         HandlePlayClick kind ->
             ( model
                 |> setActivity (Just ( kind, Timer.create ))
-                |> setPreview Nothing
-                |> setActivityExpanded True
+                |> setPreviewAdventuring Nothing
+                |> setActivityExpandedSkilling True
             , Cmd.none
             )
 
         HandleStopClick kind ->
             ( model
                 |> mapGame (\game -> Game.setActivity Nothing game)
-                |> setPreview (Just (Preview kind))
+                |> setPreviewAdventuring (Just (Preview kind))
             , Cmd.none
             )
 
@@ -715,14 +807,14 @@ update msg model =
 
         SetActiveSkillTab tab ->
             ( model
-                |> setActiveSkillTab tab
+                |> setTabSkilling tab
                 |> setIsDrawerOpen False
             , Cmd.none
             )
 
         SetActiveCombatTab tab ->
             ( model
-                |> setActiveCombatTab tab
+                |> setTabAdventuring tab
                 |> setIsDrawerOpen False
             , Cmd.none
             )
@@ -1004,7 +1096,7 @@ renderBottomRightItems model =
           else
             []
          )
-            ++ (case model.activeSkillTab of
+            ++ (case model.skillingState.activeTab of
                     Tab.Chores ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
@@ -1060,7 +1152,7 @@ view model =
 
                     detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
-                        getDetailViewState game.activity model.preview model.activityExpanded
+                        getDetailViewState game.activity model.skillingState.preview model.skillingState.activityExpanded
 
                     extraBottomPadding : Bool
                     extraBottomPadding =
@@ -1086,11 +1178,11 @@ view model =
                     activeTab : Tab
                     activeTab =
                         case model.mode of
-                            Skill ->
-                                model.activeSkillTab
+                            Skilling ->
+                                model.skillingState.activeTab
 
-                            Combat ->
-                                model.activeCombatTab
+                            Adventuring ->
+                                model.adventuringState.activeTab
                 in
                 div [ class "flex h-screen relative" ]
                     [ Toast.render viewToast model.tray toastConfig
