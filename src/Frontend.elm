@@ -340,7 +340,12 @@ getActivity : FrontendModel -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
         Playing snapshot ->
-            (Snapshot.getValue snapshot).activity
+            case model.mode of
+                Skilling ->
+                    (Snapshot.getValue snapshot).activitySkilling
+
+                Adventuring ->
+                    (Snapshot.getValue snapshot).activityAdventuring
 
         _ ->
             Nothing
@@ -1147,12 +1152,18 @@ view model =
 
             Playing snapshot ->
                 let
+                    game : Game
                     game =
                         Snapshot.getValue snapshot
 
                     detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
-                        getDetailViewState game.activity model.skillingState.preview model.skillingState.activityExpanded
+                        case model.mode of
+                            Skilling ->
+                                getDetailViewState game.activitySkilling model.skillingState.preview model.skillingState.activityExpanded
+
+                            Adventuring ->
+                                getDetailViewState game.activityAdventuring model.adventuringState.preview model.adventuringState.activityExpanded
 
                     extraBottomPadding : Bool
                     extraBottomPadding =

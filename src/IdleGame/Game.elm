@@ -37,7 +37,8 @@ type alias Game =
     , xp : Skill.Record Xp
     , mxp : Activity.Record Xp
     , choresMxp : Xp
-    , activity : Maybe ( Activity, Timer )
+    , activitySkilling : Maybe ( Activity, Timer )
+    , activityAdventuring : Maybe ( Activity, Timer )
     , monster : Maybe Monster
     , coin : Coin
     , resources : Resource.Record Int
@@ -57,7 +58,8 @@ create seed =
         }
     , mxp = Activity.createRecord (Xp.int 0)
     , choresMxp = Xp.int 0
-    , activity = Nothing
+    , activitySkilling = Nothing
+    , activityAdventuring = Nothing
     , monster = Nothing
     , coin = Coin.int 0
     , resources = Resource.emptyResourceRecord
@@ -178,7 +180,7 @@ toggleActivity kind game =
         let
             newActivity : Maybe ( Activity, Timer )
             newActivity =
-                case game.activity of
+                case game.activitySkilling of
                     Just ( k, _ ) ->
                         if kind == k then
                             Nothing
@@ -194,7 +196,7 @@ toggleActivity kind game =
 
 activityIsActive : Activity -> Game -> Bool
 activityIsActive kind game =
-    case game.activity of
+    case game.activitySkilling of
         Just ( k, _ ) ->
             kind == k
 
@@ -204,7 +206,7 @@ activityIsActive kind game =
 
 setActivity : Maybe ( Activity, Timer ) -> Game -> Game
 setActivity activity g =
-    { g | activity = activity }
+    { g | activitySkilling = activity }
 
 
 setMonster : Maybe Monster -> Game -> Game
@@ -347,9 +349,9 @@ tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
         ( newActivity, events ) =
-            case game.activity of
+            case game.activitySkilling of
                 Nothing ->
-                    ( game.activity, [] )
+                    ( game.activitySkilling, [] )
 
                 Just ( activityKind, timer ) ->
                     let

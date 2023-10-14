@@ -141,7 +141,7 @@ renderActivity activity game screenWidth =
     let
         maybeTimer : Maybe Timer
         maybeTimer =
-            game.activity
+            game.activitySkilling
                 |> Maybe.andThen
                     (\( activeType, timer ) ->
                         if activity == activeType then
