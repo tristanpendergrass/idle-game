@@ -4,11 +4,13 @@ module IdleGame.Skill exposing (..)
 type Kind
     = Chores
     | Hexes
+    | Adventuring
 
 
 type alias Record a =
     { chores : a
     , hexes : a
+    , adventuring : a
     }
 
 
@@ -21,6 +23,9 @@ getByKind kind data =
         Hexes ->
             data.hexes
 
+        Adventuring ->
+            data.adventuring
+
 
 setByKind : Kind -> a -> Record a -> Record a
 setByKind kind value data =
@@ -30,6 +35,9 @@ setByKind kind value data =
 
         Hexes ->
             { data | hexes = value }
+
+        Adventuring ->
+            { data | adventuring = value }
 
 
 updateByKind : Kind -> (a -> a) -> Record a -> Record a
@@ -45,3 +53,6 @@ getLabel kind =
 
         Hexes ->
             "Hexes"
+
+        Adventuring ->
+            "Adventuring"

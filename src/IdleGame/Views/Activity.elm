@@ -36,10 +36,6 @@ renderActivityListItem game item =
         Game.LockedActivity level ->
             renderLockedActivity level
 
-        Game.MonsterListItem monster ->
-            renderMonster monster game
-                |> Utils.withScreenWidth
-
 
 activityHeight : String
 activityHeight =
@@ -114,26 +110,46 @@ activityCoin coin =
         ]
 
 
-renderMonster : Monster -> Game -> Utils.ScreenWidth -> Html FrontendMsg
-renderMonster monster game screenWidth =
-    -- TODO: Move to its own file
-    div [ class "relative" ]
-        [ div
-            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
-            , onClick (HandleMonsterClick { screenWidth = screenWidth } monster)
-            ]
-            [ -- preview image
-              div [ class "h-24 relative" ]
-                [ monsterImage monster
-                ]
-            , div [ class "relative card-body" ]
-                [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
-                    -- Activity title
-                    [ monsterTitle monster
-                    ]
-                ]
-            ]
-        ]
+either : Maybe a -> Maybe a -> Maybe a
+either a b =
+    case a of
+        Just _ ->
+            a
+
+        _ ->
+            b
+
+
+getTimerForActivity : Activity -> Game -> Maybe Timer
+getTimerForActivity activity game =
+    let
+        maybeTimerSkilling : Maybe Timer
+        maybeTimerSkilling =
+            case game.activitySkilling of
+                Just ( activeType, timer ) ->
+                    if activity == activeType then
+                        Just timer
+
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+
+        maybeTimerAdventuring : Maybe Timer
+        maybeTimerAdventuring =
+            case game.activityAdventuring of
+                Just ( activeType, timer ) ->
+                    if activity == activeType then
+                        Just timer
+
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+    in
+    either maybeTimerSkilling maybeTimerAdventuring
 
 
 renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
@@ -141,15 +157,7 @@ renderActivity activity game screenWidth =
     let
         maybeTimer : Maybe Timer
         maybeTimer =
-            game.activitySkilling
-                |> Maybe.andThen
-                    (\( activeType, timer ) ->
-                        if activity == activeType then
-                            Just timer
-
-                        else
-                            Nothing
-                    )
+            getTimerForActivity activity game
 
         stats : Activity.Stats
         stats =

@@ -10,7 +10,6 @@ import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
-import IdleGame.Views.Adventuring
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
 import IdleGame.Views.CombatTab1
@@ -67,9 +66,6 @@ renderContent game activeTab =
 
             Tab.Shop ->
                 IdleGame.Views.Shop.render game
-
-            Tab.Adventuring ->
-                IdleGame.Views.Adventuring.render game
 
             Tab.CombatTab1 ->
                 IdleGame.Views.CombatTab1.render game

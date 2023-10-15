@@ -13,7 +13,6 @@ import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat as Adventuring
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -26,7 +25,6 @@ import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity
-import IdleGame.Views.Adventuring
 import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
 import IdleGame.Views.DetailViewContent
@@ -280,60 +278,78 @@ performantTick =
         (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
 
 
-setPreviewSkilling : Maybe Preview -> FrontendModel -> FrontendModel
-setPreviewSkilling maybePreview model =
+setPreview : Mode -> Maybe Preview -> FrontendModel -> FrontendModel
+setPreview mode =
     let
-        skillingState : ModeState
-        skillingState =
-            model.skillingState
+        setPreviewSkilling : Maybe Preview -> FrontendModel -> FrontendModel
+        setPreviewSkilling maybePreview model =
+            let
+                skillingState : ModeState
+                skillingState =
+                    model.skillingState
 
-        newSkillingState : ModeState
-        newSkillingState =
-            { skillingState | preview = maybePreview }
+                newSkillingState : ModeState
+                newSkillingState =
+                    { skillingState | preview = maybePreview }
+            in
+            { model | skillingState = newSkillingState }
+
+        setPreviewAdventuring : Maybe Preview -> FrontendModel -> FrontendModel
+        setPreviewAdventuring maybePreview model =
+            let
+                adventuringState : ModeState
+                adventuringState =
+                    model.adventuringState
+
+                newAdventuringState : ModeState
+                newAdventuringState =
+                    { adventuringState | preview = maybePreview }
+            in
+            { model | adventuringState = newAdventuringState }
     in
-    { model | skillingState = newSkillingState }
+    case mode of
+        Skilling ->
+            setPreviewSkilling
+
+        Adventuring ->
+            setPreviewAdventuring
 
 
-setPreviewAdventuring : Maybe Preview -> FrontendModel -> FrontendModel
-setPreviewAdventuring maybePreview model =
+setActivityExpanded : Mode -> Bool -> FrontendModel -> FrontendModel
+setActivityExpanded mode =
     let
-        adventuringState : ModeState
-        adventuringState =
-            model.adventuringState
+        setActivityExpandedSkilling : Bool -> FrontendModel -> FrontendModel
+        setActivityExpandedSkilling activityExpanded model =
+            let
+                skillingState : ModeState
+                skillingState =
+                    model.skillingState
 
-        newAdventuringState : ModeState
-        newAdventuringState =
-            { adventuringState | preview = maybePreview }
+                newSkillingState : ModeState
+                newSkillingState =
+                    { skillingState | activityExpanded = activityExpanded }
+            in
+            { model | skillingState = newSkillingState }
+
+        setActivityExpandedAdventuring : Bool -> FrontendModel -> FrontendModel
+        setActivityExpandedAdventuring activityExpanded model =
+            let
+                adventuringState : ModeState
+                adventuringState =
+                    model.adventuringState
+
+                newAdventuringState : ModeState
+                newAdventuringState =
+                    { adventuringState | activityExpanded = activityExpanded }
+            in
+            { model | adventuringState = newAdventuringState }
     in
-    { model | adventuringState = newAdventuringState }
+    case mode of
+        Skilling ->
+            setActivityExpandedSkilling
 
-
-setActivityExpandedSkilling : Bool -> FrontendModel -> FrontendModel
-setActivityExpandedSkilling activityExpanded model =
-    let
-        skillingState : ModeState
-        skillingState =
-            model.skillingState
-
-        newSkillingState : ModeState
-        newSkillingState =
-            { skillingState | activityExpanded = activityExpanded }
-    in
-    { model | skillingState = newSkillingState }
-
-
-setActivityExpandedAdventuring : Bool -> FrontendModel -> FrontendModel
-setActivityExpandedAdventuring activityExpanded model =
-    let
-        adventuringState : ModeState
-        adventuringState =
-            model.adventuringState
-
-        newAdventuringState : ModeState
-        newAdventuringState =
-            { adventuringState | activityExpanded = activityExpanded }
-    in
-    { model | adventuringState = newAdventuringState }
+        Adventuring ->
+            setActivityExpandedAdventuring
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
@@ -351,24 +367,17 @@ getActivity model =
             Nothing
 
 
-getMonster : FrontendModel -> Maybe Monster
-getMonster model =
-    case model.gameState of
-        Playing snapshot ->
-            (Snapshot.getValue snapshot).monster
+setActivity : Mode -> Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
+setActivity mode newActivity =
+    mapGame
+        (\game ->
+            case mode of
+                Skilling ->
+                    Game.setActivitySkilling newActivity game
 
-        _ ->
-            Nothing
-
-
-setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
-setActivity newActivity =
-    mapGame (\game -> Game.setActivity newActivity game)
-
-
-setMonster : Maybe Monster -> FrontendModel -> FrontendModel
-setMonster newMonster =
-    mapGame (\game -> Game.setMonster newMonster game)
+                Adventuring ->
+                    Game.setActivityAdventuring newActivity game
+        )
 
 
 updatePointer : Float -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -441,49 +450,33 @@ update msg model =
 
         ClosePreview ->
             ( model
-                |> setPreviewAdventuring Nothing
+                |> setPreview model.mode Nothing
             , Cmd.none
             )
 
         CollapseActivity ->
             ( model
-                |> setActivityExpandedSkilling False
+                |> setActivityExpanded model.mode False
             , Cmd.none
             )
 
         ExpandActivity ->
             ( model
-                |> setActivityExpandedSkilling True
+                |> setActivityExpanded model.mode True
             , Cmd.none
             )
 
         CollapseDetailView ->
-            case model.mode of
-                Skilling ->
-                    ( model
-                        |> setActivityExpandedSkilling False
-                    , Cmd.none
-                    )
-
-                Adventuring ->
-                    ( model
-                        |> setActivityExpandedAdventuring False
-                    , Cmd.none
-                    )
+            ( model
+                |> setActivityExpanded model.mode False
+            , Cmd.none
+            )
 
         ExpandDetailView ->
-            case model.mode of
-                Skilling ->
-                    ( model
-                        |> setActivityExpandedSkilling True
-                    , Cmd.none
-                    )
-
-                Adventuring ->
-                    ( model
-                        |> setActivityExpandedAdventuring True
-                    , Cmd.none
-                    )
+            ( model
+                |> setActivityExpanded model.mode True
+            , Cmd.none
+            )
 
         CloseDebugPanel ->
             ( { model | showDebugPanel = False }, Cmd.none )
@@ -550,62 +543,6 @@ update msg model =
                     -- Shouldn't normally happen
                     noOp
 
-        StartFight ->
-            ( model
-                |> mapGame Game.startFight
-            , Cmd.none
-            )
-
-        StopFight ->
-            ( model
-                |> mapGame Game.stopFight
-            , Cmd.none
-            )
-
-        HandlePlayerMoveSelect index playerMove ->
-            ( model
-                |> mapGame (Game.setPlayerMove index playerMove)
-            , Browser.Dom.focus IdleGame.Views.Adventuring.fightButtonId
-                |> Task.attempt (\_ -> NoOp)
-            )
-
-        HandleMonsterClick { screenWidth } kind ->
-            let
-                currentMonster : Maybe Monster
-                currentMonster =
-                    getMonster model
-
-                clickingActiveMonster : Bool
-                clickingActiveMonster =
-                    case currentMonster of
-                        Just k ->
-                            k == kind
-
-                        Nothing ->
-                            False
-
-                newMonster : Maybe Monster
-                newMonster =
-                    if clickingActiveMonster then
-                        Nothing
-
-                    else
-                        Just kind
-            in
-            if ViewUtils.screenSupportsRighRail screenWidth then
-                ( model
-                    |> setMonster newMonster
-                    |> setActivityExpandedSkilling (not clickingActiveMonster)
-                , Cmd.none
-                )
-
-            else
-                ( model
-                    |> setMonster newMonster
-                    |> setActivityExpandedSkilling False
-                , Cmd.none
-                )
-
         HandleActivityClick { screenWidth } kind ->
             let
                 currentActivity : Maybe ( Activity, Timer )
@@ -631,15 +568,15 @@ update msg model =
             in
             if ViewUtils.screenSupportsRighRail screenWidth then
                 ( model
-                    |> setActivity newActivity
-                    |> setActivityExpandedSkilling (not clickingActiveActivity)
+                    |> setActivity model.mode newActivity
+                    |> setActivityExpanded model.mode (not clickingActiveActivity)
                 , Cmd.none
                 )
 
             else
                 ( model
-                    |> setActivity newActivity
-                    |> setActivityExpandedSkilling False
+                    |> setActivity model.mode newActivity
+                    |> setActivityExpanded model.mode False
                 , Cmd.none
                 )
 
@@ -659,8 +596,8 @@ update msg model =
                             False
             in
             ( model
-                |> setPreviewAdventuring (Just (Preview activity))
-                |> setActivityExpandedSkilling
+                |> setPreview model.mode (Just (Preview activity))
+                |> setActivityExpanded model.mode
                     (if clickingActiveActivity then
                         True
 
@@ -672,16 +609,16 @@ update msg model =
 
         HandlePlayClick kind ->
             ( model
-                |> setActivity (Just ( kind, Timer.create ))
-                |> setPreviewAdventuring Nothing
-                |> setActivityExpandedSkilling True
+                |> setActivity model.mode (Just ( kind, Timer.create ))
+                |> setPreview model.mode Nothing
+                |> setActivityExpanded model.mode True
             , Cmd.none
             )
 
         HandleStopClick kind ->
             ( model
-                |> mapGame (\game -> Game.setActivity Nothing game)
-                |> setPreviewAdventuring (Just (Preview kind))
+                |> setActivity model.mode Nothing
+                |> setPreview model.mode (Just (Preview kind))
             , Cmd.none
             )
 

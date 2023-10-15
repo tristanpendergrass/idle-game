@@ -3,10 +3,8 @@ module IdleGame.Game exposing (..)
 import Duration exposing (Duration)
 import Html.Attributes exposing (download)
 import IdleGame.Activity as Activity
-import IdleGame.Adventuring as Adventuring exposing (Adventuring)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event as Event exposing (..)
@@ -43,7 +41,6 @@ type alias Game =
     , coin : Coin
     , resources : Resource.Record Int
     , shopItems : ShopItems
-    , adventuring : Adventuring
     , combatsWon : Int
     , combatsLost : Int
     }
@@ -51,11 +48,16 @@ type alias Game =
 
 create : Random.Seed -> Game
 create seed =
+    let
+        xp : Skill.Record Xp
+        xp =
+            { chores = Xp.int 0
+            , hexes = Xp.int 0
+            , adventuring = Xp.int 0
+            }
+    in
     { seed = seed
-    , xp =
-        { chores = Xp.int 0
-        , hexes = Xp.int 0
-        }
+    , xp = xp
     , mxp = Activity.createRecord (Xp.int 0)
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
@@ -64,7 +66,6 @@ create seed =
     , coin = Coin.int 0
     , resources = Resource.emptyResourceRecord
     , shopItems = ShopItems.create
-    , adventuring = Adventuring.create
     , combatsWon = 0
     , combatsLost = 0
     }
@@ -73,18 +74,6 @@ create seed =
 type ActivityListItem
     = LockedActivity Int
     | ActivityListItem Activity
-    | MonsterListItem Monster
-
-
-getMonsterListItems : Game -> List ActivityListItem
-getMonsterListItems game =
-    let
-        monsters : List Monster
-        monsters =
-            Monster.allMonsters
-    in
-    monsters
-        |> List.map (\monster -> MonsterListItem monster)
 
 
 getActivityListItems : Skill.Kind -> Game -> List ActivityListItem
@@ -136,9 +125,6 @@ getActivityListItems skill game =
 
                             LockedActivity _ ->
                                 True
-
-                            MonsterListItem _ ->
-                                False
                 in
                 { items = newItems, lockedItem = newItemIsLocked }
 
@@ -191,7 +177,7 @@ toggleActivity kind game =
                     Nothing ->
                         Just ( kind, Timer.create )
         in
-        setActivity newActivity game
+        setActivitySkilling newActivity game
 
 
 activityIsActive : Activity -> Game -> Bool
@@ -204,29 +190,14 @@ activityIsActive kind game =
             False
 
 
-setActivity : Maybe ( Activity, Timer ) -> Game -> Game
-setActivity activity g =
+setActivitySkilling : Maybe ( Activity, Timer ) -> Game -> Game
+setActivitySkilling activity g =
     { g | activitySkilling = activity }
 
 
-setMonster : Maybe Monster -> Game -> Game
-setMonster newMonster game =
-    { game | monster = newMonster }
-
-
-startFight : Game -> Game
-startFight game =
-    { game | adventuring = Adventuring.startFight game.adventuring }
-
-
-stopFight : Game -> Game
-stopFight game =
-    { game | adventuring = Adventuring.stopFight game.adventuring }
-
-
-setPlayerMove : Int -> Combat.PlayerMove -> Game -> Game
-setPlayerMove index move game =
-    { game | adventuring = Adventuring.setPlayerMove index move game.adventuring }
+setActivityAdventuring : Maybe ( Activity, Timer ) -> Game -> Game
+setActivityAdventuring activity g =
+    { g | activityAdventuring = activity }
 
 
 applyIntervalMods : List IntervalMod -> Duration -> Duration
@@ -348,10 +319,37 @@ combatReward =
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActivity, events ) =
+        ( newActivitySkilling, eventsSkilling ) =
             case game.activitySkilling of
                 Nothing ->
                     ( game.activitySkilling, [] )
+
+                Just ( activityKind, timer ) ->
+                    let
+                        stats : Activity.Stats
+                        stats =
+                            Activity.getStats activityKind
+
+                        activityDuration : Duration
+                        activityDuration =
+                            getModdedDuration game activityKind
+
+                        ( newTimer, completions ) =
+                            timer
+                                |> Timer.increment activityDuration delta
+
+                        newEvents : List Event
+                        newEvents =
+                            List.repeat completions stats.event
+                    in
+                    ( Just ( activityKind, newTimer )
+                    , newEvents
+                    )
+
+        ( newActivityAdventuring, eventsAdventuring ) =
+            case game.activityAdventuring of
+                Nothing ->
+                    ( game.activityAdventuring, [] )
 
                 Just ( activityKind, timer ) ->
                     let
@@ -393,9 +391,9 @@ tick delta game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
-                |> setActivity newActivity
-                -- |> (\g -> updateAdventuring delta (Random.constant ( g, [] )))
-                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) events)
+                |> setActivitySkilling newActivitySkilling
+                |> setActivityAdventuring newActivityAdventuring
+                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) (eventsSkilling ++ eventsAdventuring))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -660,6 +658,9 @@ addXp skill amount game =
 
         Skill.Hexes ->
             { game | xp = Skill.updateByKind Skill.Hexes (Quantity.plus amount) game.xp }
+
+        Skill.Adventuring ->
+            { game | xp = Skill.updateByKind Skill.Adventuring (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game

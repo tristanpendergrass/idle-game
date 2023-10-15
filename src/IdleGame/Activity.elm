@@ -31,6 +31,11 @@ allHexes =
     allActivitiesBySkill Skill.Hexes
 
 
+allAdventuring : List Activity
+allAdventuring =
+    allActivitiesBySkill Skill.Adventuring
+
+
 getActivities : Skill.Kind -> List Activity
 getActivities skill =
     case skill of
@@ -40,6 +45,9 @@ getActivities skill =
         Skill.Hexes ->
             allHexes
 
+        Skill.Adventuring ->
+            allAdventuring
+
 
 allKinds : List Activity
 allKinds =
@@ -47,6 +55,8 @@ allKinds =
     , IdleGame.Kinds.Activities.CleanBigBubba
     , IdleGame.Kinds.Activities.Hex1
     , IdleGame.Kinds.Activities.Jinx1
+    , IdleGame.Kinds.Activities.FightMonster1
+    , IdleGame.Kinds.Activities.FightMonster2
     ]
 
 
@@ -55,12 +65,14 @@ type alias Record a =
     , cleanBigBubba : a
     , hex1 : a
     , jinx1 : a
+    , fightMonster1 : a
+    , fightMonster2 : a
     }
 
 
 createRecord : a -> Record a
 createRecord d =
-    Record d d d d
+    Record d d d d d d
 
 
 getByKind : Activity -> Record a -> a
@@ -78,6 +90,12 @@ getByKind kind record =
         IdleGame.Kinds.Activities.Jinx1 ->
             record.jinx1
 
+        IdleGame.Kinds.Activities.FightMonster1 ->
+            record.fightMonster1
+
+        IdleGame.Kinds.Activities.FightMonster2 ->
+            record.fightMonster2
+
 
 setByKind : Activity -> a -> Record a -> Record a
 setByKind kind value record =
@@ -93,6 +111,12 @@ setByKind kind value record =
 
         IdleGame.Kinds.Activities.Jinx1 ->
             { record | jinx1 = value }
+
+        IdleGame.Kinds.Activities.FightMonster1 ->
+            { record | fightMonster1 = value }
+
+        IdleGame.Kinds.Activities.FightMonster2 ->
+            { record | fightMonster2 = value }
 
 
 updateByKind : Activity -> (a -> a) -> Record a -> Record a
@@ -127,6 +151,8 @@ allStats =
     , cleanBigBubba = cleanBigBubbaStats
     , hex1 = hex1Stats
     , jinx1 = jinx1Stats
+    , fightMonster1 = fightMonster1Stats
+    , fightMonster2 = fightMonster2Stats
     }
 
 
@@ -209,4 +235,28 @@ jinx1Stats =
                 , Event.gainResource 1 Resource.Jinx1
                 ]
             }
+    }
+
+
+fightMonster1Stats : Stats
+fightMonster1Stats =
+    { skill = Skill.Adventuring
+    , title = "Fight Monster I"
+    , image = ActivityIcon (Icon.letter "M1")
+    , unlockLevel = 1
+    , unlockSkill = Skill.Adventuring
+    , duration = Duration.seconds 5
+    , event = Event.Event { effects = [] }
+    }
+
+
+fightMonster2Stats : Stats
+fightMonster2Stats =
+    { skill = Skill.Adventuring
+    , title = "Fight Monster II"
+    , image = ActivityIcon (Icon.letter "M2")
+    , unlockLevel = 1
+    , unlockSkill = Skill.Adventuring
+    , duration = Duration.seconds 5
+    , event = Event.Event { effects = [] }
     }

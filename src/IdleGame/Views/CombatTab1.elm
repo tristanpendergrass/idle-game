@@ -29,5 +29,5 @@ render game =
     div [ Utils.skills.wrapper ]
         [ Utils.xpSection (Xp.int 0)
         , div [ Utils.skills.grid ]
-            (List.map (ActivityView.renderActivityListItem game) (Game.getMonsterListItems game))
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Skill.Adventuring game))
         ]

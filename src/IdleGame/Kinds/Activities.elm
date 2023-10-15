@@ -8,3 +8,6 @@ type Activity
       -- Hexes
     | Hex1
     | Jinx1
+      -- Adventuring
+    | FightMonster1
+    | FightMonster2

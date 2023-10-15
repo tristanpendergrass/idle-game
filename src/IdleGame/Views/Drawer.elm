@@ -88,7 +88,7 @@ renderDrawer isDrawerOpen mode activeTab =
                             "Skilling"
 
                         Adventuring ->
-                            "Combat"
+                            "Adventuring"
             in
             button [ class "btn btn-secondary flex items-center gap-2", onClick (SwitchMode newMode) ]
                 [ Icon.go
@@ -102,7 +102,6 @@ renderDrawer isDrawerOpen mode activeTab =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [ onClick (SetActiveSkillTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
                 , li [ onClick (SetActiveSkillTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
-                , li [ onClick (SetActiveSkillTab Tab.Adventuring) ] [ renderTab { tab = Tab.Adventuring, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []

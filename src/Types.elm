@@ -6,7 +6,6 @@ import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
 import IdleGame.Chore as Chore
-import IdleGame.Combat as Adventuring
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -128,12 +127,7 @@ type FrontendMsg
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel
-      -- Adventuring
-    | StartFight
-    | StopFight
-    | HandlePlayerMoveSelect Int Adventuring.PlayerMove
       -- Activities
-    | HandleMonsterClick { screenWidth : ViewUtils.ScreenWidth } Monster
     | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
     | HandlePreviewClick Activity
     | HandlePlayClick Activity
