@@ -38,7 +38,7 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.2
-- [ ] Add hexes
+- [x] Add hexes
   - [x] Craft them for free
   - [x] Require parchment
   - [ ] Mastery bonuses
@@ -49,6 +49,11 @@ $ npm test -- --watch
 - [x] Activity status bar at bottom for mobile
 - [ ] Move Item Mastery (M) info to detail sidebar
 - [ ] Remove mastery pool logic from game
+- [ ] Add monster fighting proof of concept
+  - [ ] Add rewards for fighting monster
+  - [ ] Add monster strength
+  - [ ] Add spell selector
+  - [ ] Add combat resolution logic
 
 ## Future
 ### Tech stuff
@@ -64,12 +69,16 @@ $ npm test -- --watch
 - [ ] Add change log section
   - [ ] Add notification that shows that update happened
 - [ ] Address long fast forward times somehow (with a cap?)
-- [ ] Prevent activity starting if it will fail and show error message
+- [ ] Better communication on required materials for skill
+  - [ ] UI should show how many of mat you have in detail view
+  - [ ] UI should show if you cannot start the activity in detail and content view
+  - [ ] Prevent activity starting when clicked if it will fail and show error message
 
 ### Features
 - [ ] Skill 3
 - [ ] Skill 4
 - [ ] Combat
+  - [ ] Regen period after loss
 
 ### Glitz
 - [ ] Progress bar animations
