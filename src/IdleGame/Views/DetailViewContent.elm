@@ -14,7 +14,8 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils
+import IdleGame.Views.Utils as Utils
+import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Types exposing (..)
 
@@ -181,6 +182,36 @@ renderContent obj extraBottomPadding game =
             (List.map (EffectView.render game mods) orderedEffects
                 ++ [ fade isPreview ]
             )
+        , div [ class "divider" ] []
+        , mxpSection (Xp.int 1500)
+        ]
+
+
+mxpSection : Xp -> Html msg
+mxpSection mxp =
+    let
+        skillLevel : String
+        skillLevel =
+            Xp.level Xp.defaultSchedule mxp
+                |> Utils.intToString
+
+        skillPercent : Percent
+        skillPercent =
+            Xp.levelPercent Xp.defaultSchedule mxp
+    in
+    div [ class "w-full" ]
+        [ div [ class "t-column" ]
+            [ div [ class "w-full flex items-center justify-between" ]
+                [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
+                ]
+            , div [ class "w-full flex items-center gap-2" ]
+                [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
+                    [ text skillLevel ]
+                , div [ class "flex-1 bg-base-200 rounded-full h-1.5" ]
+                    [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage skillPercent) ++ "%") ] []
+                    ]
+                ]
+            ]
         ]
 
 

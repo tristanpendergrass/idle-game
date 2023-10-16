@@ -38,6 +38,10 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.2
+- [x] Add second "mode": Adventuring
+  - [x] Show different tabs in each mode
+  - [x] Button to switch between them in left nav
+  - [x] Separate preview and activity state for each mode
 - [x] Add hexes
   - [x] Craft them for free
   - [x] Require parchment

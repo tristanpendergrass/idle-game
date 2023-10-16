@@ -192,7 +192,7 @@ xpSection xp =
                 [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
                     [ text skillLevel ]
                 , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                    [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toFloat skillPercent) ++ "%") ] []
+                    [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage skillPercent) ++ "%") ] []
                     ]
                 ]
             ]

@@ -45,7 +45,7 @@ devFlags =
     , defaultMode = Adventuring
     , defaultTabSkilling = Tab.Shop
     , defaultTabAdventuring = Tab.CombatTab1
-    , defaultDetailViewExpanded = False
+    , defaultDetailViewExpanded = True
     }
 
 
