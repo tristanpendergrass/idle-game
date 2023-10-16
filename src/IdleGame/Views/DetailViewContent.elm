@@ -237,6 +237,9 @@ masterySection mxp mastery =
                         Activity.BoostEffects ->
                             "Boost effects"
 
+                        Activity.GameMod mod ->
+                            Event.modLabelToString mod.label
+
                 isAchieved : Bool
                 isAchieved =
                     Xp.level Xp.defaultSchedule mxp >= level

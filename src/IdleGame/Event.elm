@@ -401,11 +401,11 @@ increaseSuccessTransformer buff repetitions effect =
             NoChange
 
 
-devGlobalXpBuff : Mod
-devGlobalXpBuff =
+xpBuff : Float -> Mod
+xpBuff amount =
     { tags = [ XpTag ]
     , label = XpModLabel 1
-    , transformer = xpTransformer 1.0
+    , transformer = xpTransformer amount
     , source = AdminCrimes
     , repetitions = 1
     }

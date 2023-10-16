@@ -134,6 +134,7 @@ type MasteryReward
     | SecondaryEnabled -- Spell can be used as secondary
     | ImbueEnabled -- Spell can be embued with elements
     | BoostEffects -- Spell effects are boosted
+    | GameMod Event.Mod
 
 
 type alias Mastery =
@@ -187,7 +188,7 @@ cleanStablesStats =
                     ]
                 ]
             }
-    , mastery = Nothing
+    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.CleanStables)
     }
 
 
@@ -210,7 +211,7 @@ cleanBigBubbaStats =
                     ]
                 ]
             }
-    , mastery = Nothing
+    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.CleanBigBubba)
     }
 
 
@@ -230,7 +231,7 @@ hex1Stats =
                 , Event.gainResource 1 Resource.Hex1
                 ]
             }
-    , mastery = Nothing
+    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Hex1)
     }
 
 
@@ -250,8 +251,22 @@ jinx1Stats =
                 , Event.gainResource 1 Resource.Jinx1
                 ]
             }
-    , mastery = Nothing
+    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Jinx1)
     }
+
+
+getActivityMastery : Activity -> Mastery
+getActivityMastery chore =
+    [ ( 10
+      , GameMod
+            (Event.xpBuff 0.25
+                |> Event.modWithTags [ Event.ActivityTag chore ]
+            )
+      )
+    , ( 35, GameMod (Event.xpBuff 0.25) )
+    , ( 65, GameMod (Event.xpBuff 0.25) )
+    , ( 95, GameMod (Event.xpBuff 0.35) )
+    ]
 
 
 defaultSpellMastery : Mastery
