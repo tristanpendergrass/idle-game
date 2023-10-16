@@ -58,7 +58,7 @@ create seed =
     in
     { seed = seed
     , xp = xp
-    , mxp = Activity.createRecord (Xp.int 0)
+    , mxp = Activity.createRecord (Xp.int 10000)
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing

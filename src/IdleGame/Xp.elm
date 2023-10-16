@@ -56,10 +56,8 @@ levelHelp schedule xp prevLevel =
 
 levelPercent : LevelingSchedule -> Xp -> Percent
 levelPercent schedule xp =
-    Debug.log "percent"
-        (levelPercentHelp schedule (Debug.log "xp" xp) 0
-            |> Percent.fromFloat
-        )
+    levelPercentHelp schedule xp 0
+        |> Percent.fromFloat
 
 
 levelPercentHelp : LevelingSchedule -> Xp -> Int -> Float

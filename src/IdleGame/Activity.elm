@@ -129,6 +129,17 @@ type ActivityImage
     | ActivityIcon Icon
 
 
+type MasteryReward
+    = SpellAvailable -- Spell can now be used
+    | SecondaryEnabled -- Spell can be used as secondary
+    | ImbueEnabled -- Spell can be embued with elements
+    | BoostEffects -- Spell effects are boosted
+
+
+type alias Mastery =
+    List ( Int, MasteryReward )
+
+
 type alias Stats =
     { skill : Skill.Kind
     , title : String
@@ -137,6 +148,7 @@ type alias Stats =
     , unlockLevel : Int
     , duration : Duration
     , event : Event
+    , mastery : Maybe Mastery
     }
 
 
@@ -175,6 +187,7 @@ cleanStablesStats =
                     ]
                 ]
             }
+    , mastery = Nothing
     }
 
 
@@ -197,6 +210,7 @@ cleanBigBubbaStats =
                     ]
                 ]
             }
+    , mastery = Nothing
     }
 
 
@@ -216,6 +230,7 @@ hex1Stats =
                 , Event.gainResource 1 Resource.Hex1
                 ]
             }
+    , mastery = Nothing
     }
 
 
@@ -235,7 +250,17 @@ jinx1Stats =
                 , Event.gainResource 1 Resource.Jinx1
                 ]
             }
+    , mastery = Nothing
     }
+
+
+defaultSpellMastery : Mastery
+defaultSpellMastery =
+    [ ( 25, SpellAvailable )
+    , ( 50, SecondaryEnabled )
+    , ( 75, ImbueEnabled )
+    , ( 100, BoostEffects )
+    ]
 
 
 fightMonster1Stats : Stats
@@ -247,6 +272,7 @@ fightMonster1Stats =
     , unlockSkill = Skill.Adventuring
     , duration = Duration.seconds 5
     , event = Event.Event { effects = [] }
+    , mastery = Just defaultSpellMastery
     }
 
 
@@ -259,4 +285,5 @@ fightMonster2Stats =
     , unlockSkill = Skill.Adventuring
     , duration = Duration.seconds 5
     , event = Event.Event { effects = [] }
+    , mastery = Just defaultSpellMastery
     }

@@ -105,6 +105,14 @@ renderContent obj extraBottomPadding game =
                 DetailViewPreview (Preview k) ->
                     k
 
+        stats : Activity.Stats
+        stats =
+            Activity.getStats kind
+
+        mxp : Xp
+        mxp =
+            Activity.getByKind kind game.mxp
+
         event : Event
         event =
             (Activity.getStats kind).event
@@ -178,13 +186,84 @@ renderContent obj extraBottomPadding game =
             [ ActivityView.activityDuration (Game.getModdedDuration game kind)
             , fade isPreview
             ]
+
+        -- The effects of the activity
         , div [ class "t-column relative" ]
             (List.map (EffectView.render game mods) orderedEffects
                 ++ [ fade isPreview ]
             )
         , div [ class "divider" ] []
-        , mxpSection (Xp.int 1500)
+
+        -- The current mastery level
+        , mxpSection mxp
+
+        -- The mastery rewards for this activity
+        , case stats.mastery of
+            Just mastery ->
+                masterySection mxp mastery
+
+            Nothing ->
+                div [] []
         ]
+
+
+
+-- defaultSpellMastery : Mastery
+-- defaultSpellMastery =
+--     [ ( 25, SpellAvailable )
+--     , ( 50, SecondaryEnabled )
+--     , ( 75, ImbueEnabled )
+--     , ( 100, BoostEffects )
+--     ]
+
+
+masterySection : Xp -> Activity.Mastery -> Html msg
+masterySection mxp mastery =
+    let
+        renderMasteryReward : ( Int, Activity.MasteryReward ) -> Html msg
+        renderMasteryReward ( level, reward ) =
+            let
+                rewardText =
+                    case reward of
+                        Activity.SpellAvailable ->
+                            "Spell available"
+
+                        Activity.SecondaryEnabled ->
+                            "Secondary enabled"
+
+                        Activity.ImbueEnabled ->
+                            "Imbue enabled"
+
+                        Activity.BoostEffects ->
+                            "Boost effects"
+
+                isAchieved : Bool
+                isAchieved =
+                    Xp.level Xp.defaultSchedule mxp >= level
+
+                textColor : String
+                textColor =
+                    if isAchieved then
+                        "text-success"
+
+                    else
+                        ""
+            in
+            div [ class "flex justify-between w-full" ]
+                [ span [ class "flex items-center gap-4" ]
+                    [ Icon.checkmark
+                        |> Icon.withVisibility isAchieved
+                        |> Icon.withSize Icon.Medium
+                        |> Icon.toHtml
+                    , span [] [ text (Utils.intToString level) ]
+                    ]
+                , span [ class textColor ] [ text rewardText ]
+                ]
+    in
+    div [ class "t-column w-full" ]
+        (mastery
+            |> List.map renderMasteryReward
+        )
 
 
 mxpSection : Xp -> Html msg

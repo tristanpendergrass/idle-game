@@ -14,6 +14,7 @@ type Size
 
 type alias Params =
     { size : Size
+    , isVisible : Bool
     }
 
 
@@ -26,6 +27,7 @@ type Icon
 defaultParams : Params
 defaultParams =
     { size = Medium
+    , isVisible = True
     }
 
 
@@ -45,6 +47,11 @@ mapParams fn icon =
 withSize : Size -> Icon -> Icon
 withSize size =
     mapParams (\params -> { params | size = size })
+
+
+withVisibility : Bool -> Icon -> Icon
+withVisibility isVisible =
+    mapParams (\params -> { params | isVisible = isVisible })
 
 
 sizeToRem : Size -> Float
@@ -79,24 +86,48 @@ sizeToTailwindClass size =
             "w-24 h-24 text-4xl font-bold"
 
 
+getParams : Icon -> Params
+getParams icon =
+    case icon of
+        IconFeather _ p ->
+            p
+
+        IconPublic _ p ->
+            p
+
+        IconString _ p ->
+            p
+
+
 toHtml : Icon -> Html msg
 toHtml icon =
+    let
+        visibilityClass : String
+        visibilityClass =
+            if (getParams icon).isVisible then
+                ""
+
+            else
+                "invisible"
+    in
     case icon of
         IconFeather featherIcon params ->
             featherIcon
                 |> FeatherIcons.withSize (sizeToRem params.size)
                 |> FeatherIcons.withSizeUnit "rem"
+                |> FeatherIcons.withClass visibilityClass
                 |> FeatherIcons.toHtml []
 
         IconPublic iconSrc params ->
             img
                 [ src iconSrc
                 , class (sizeToTailwindClass params.size)
+                , class visibilityClass
                 ]
                 []
 
         IconString str params ->
-            div [ class "avatar" ]
+            div [ class "avatar", class visibilityClass ]
                 [ div
                     [ class (sizeToTailwindClass params.size)
                     , class "mask mask-hexagon bg-warning text-warning-content"
@@ -361,3 +392,8 @@ eye =
 go : Icon
 go =
     createIconFeather FeatherIcons.logIn
+
+
+checkmark : Icon
+checkmark =
+    createIconFeather FeatherIcons.check
