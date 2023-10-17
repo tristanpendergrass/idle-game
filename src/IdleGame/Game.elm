@@ -6,6 +6,7 @@ import IdleGame.Activity as Activity exposing (ActivityImage)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event as Event exposing (..)
 import IdleGame.GameTypes exposing (..)
@@ -234,7 +235,7 @@ getModdedDuration game kind =
 
 combatReward : Event
 combatReward =
-    Event { effects = [ gainCoin (Coin.int 25) ] }
+    Event { effects = [ Effect.gainCoin (Coin.int 25) ] }
 
 
 
@@ -411,7 +412,7 @@ getPurchaseEvent amount resource =
                 |> Quantity.multiplyBy -1
     in
     Event.Event
-        { effects = [ gainCoin cost, gainResource amount resource ]
+        { effects = [ Effect.gainCoin cost, Effect.gainResource amount resource ]
         }
 
 
@@ -437,7 +438,7 @@ applyEvent event =
     Random.andThen
         (\( game, toasts ) ->
             let
-                effects : List Effect
+                effects : List Effect.Effect
                 effects =
                     case event of
                         Event data ->
@@ -464,7 +465,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Effect -> Game -> ApplyEffectsResultGenerator
+applyEffects : List Effect.Effect -> Game -> ApplyEffectsResultGenerator
 applyEffects effects game =
     case effects of
         [] ->
@@ -492,7 +493,7 @@ applyEffects effects game =
                                     toasts =
                                         applyEffectVal.toasts
 
-                                    additionalEffects : List Effect
+                                    additionalEffects : List Effect.Effect
                                     additionalEffects =
                                         applyEffectVal.additionalEffects
                                 in
@@ -583,17 +584,17 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List Effect }
+    { game : Game, toasts : List Toast, additionalEffects : List Effect.Effect }
 
 
 type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-applyEffect : Effect -> Game -> ApplyEffectResultGenerator
+applyEffect : Effect.Effect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
-    case getType effect of
-        VariableSuccess { successProbability, successEffects, failureEffects } ->
+    case Effect.getType effect of
+        Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             successGenerator successProbability
                 |> Random.andThen
                     (\succeeded ->
@@ -608,7 +609,7 @@ applyEffect effect game =
                         Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
                     )
 
-        GainCoin { base, multiplier } ->
+        Effect.GainCoin { base, multiplier } ->
             let
                 product : Coin
                 product =
@@ -617,11 +618,11 @@ applyEffect effect game =
             addCoin product game
                 |> Random.constant
 
-        GainResource quantity resource ->
+        Effect.GainResource quantity resource ->
             intGenerator quantity
                 |> Random.map (\amount -> addResource resource amount game)
 
-        GainXp quantity skill ->
+        Effect.GainXp quantity skill ->
             { game = addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game
             , toasts = []
             , additionalEffects = []
@@ -629,7 +630,7 @@ applyEffect effect game =
                 |> Random.constant
                 |> Random.map Ok
 
-        GainMxp quantity kind ->
+        Effect.GainMxp quantity kind ->
             let
                 base : Xp
                 base =

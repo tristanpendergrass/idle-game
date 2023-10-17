@@ -53,10 +53,10 @@ $ npm test -- --watch
 - [x] Move Item Mastery (M) info to detail sidebar
 - [x] Remove mastery pool logic from game
 - [ ] Add monster fighting proof of concept
-  - [ ] Add rewards for fighting monster
   - [ ] Add monster strength
-  - [ ] Add spell selector
   - [ ] Add combat resolution logic
+  - [ ] Add spell selector
+  - [ ] Add rewards for fighting monster
 - [ ] Finalize gameplay values
   - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards

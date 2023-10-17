@@ -7,7 +7,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Event as Event exposing (Effect, Event)
+import IdleGame.Effect as Effect
+import IdleGame.Event as Event exposing (Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -171,13 +172,13 @@ renderActivity activity game screenWidth =
         mods =
             Game.getAllMods game
 
-        effects : List Event.Effect
+        effects : List Effect.Effect
         effects =
             Event.getEffects event
 
-        orderedEffects : List Event.Effect
+        orderedEffects : List Effect.Effect
         orderedEffects =
-            List.sortWith Event.orderEffects effects
+            List.sortWith Effect.orderEffects effects
 
         duration : Duration
         duration =

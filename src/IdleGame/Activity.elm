@@ -3,6 +3,7 @@ module IdleGame.Activity exposing (..)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -182,13 +183,13 @@ cleanStablesStats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.int 5) Skill.Chores
-                , Event.gainCoin (Coin.int 1)
-                , Event.gainMxp IdleGame.Kinds.Activities.CleanStables
-                , Event.gainWithProbability 0.5
-                    [ Event.gainResource 3 Resource.Manure
+                [ Effect.gainXp (Xp.int 5) Skill.Chores
+                , Effect.gainCoin (Coin.int 1)
+                , Effect.gainMxp IdleGame.Kinds.Activities.CleanStables
+                , Effect.gainWithProbability 0.5
+                    [ Effect.gainResource 3 Resource.Manure
                     ]
-                    |> Event.withTags [ Event.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
+                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
                 ]
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
@@ -206,13 +207,13 @@ cleanBigBubbaStats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.int 10) Skill.Chores
-                , Event.gainCoin (Coin.int 1)
-                , Event.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
-                , Event.gainWithProbability 0.5
-                    [ Event.gainResource 3 Resource.Manure
+                [ Effect.gainXp (Xp.int 10) Skill.Chores
+                , Effect.gainCoin (Coin.int 1)
+                , Effect.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
+                , Effect.gainWithProbability 0.5
+                    [ Effect.gainResource 3 Resource.Manure
                     ]
-                    |> Event.withTags [ Event.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
+                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
                 ]
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
@@ -230,9 +231,9 @@ hex1Stats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.int 5) Skill.Hexes
-                , Event.gainResource -1 Resource.Parchment
-                , Event.gainResource 1 Resource.Hex1
+                [ Effect.gainXp (Xp.int 5) Skill.Hexes
+                , Effect.gainResource -1 Resource.Parchment
+                , Effect.gainResource 1 Resource.Hex1
                 ]
             }
     , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Hex1)
@@ -250,9 +251,9 @@ jinx1Stats =
     , event =
         Event.Event
             { effects =
-                [ Event.gainXp (Xp.int 10) Skill.Hexes
-                , Event.gainResource -1 Resource.Parchment
-                , Event.gainResource 1 Resource.Jinx1
+                [ Effect.gainXp (Xp.int 10) Skill.Hexes
+                , Effect.gainResource -1 Resource.Parchment
+                , Effect.gainResource 1 Resource.Jinx1
                 ]
             }
     , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Jinx1)
@@ -264,7 +265,7 @@ getActivityMastery chore =
     [ ( 10
       , GameMod
             (Event.xpBuff 0.25
-                |> Event.modWithTags [ Event.ActivityTag chore ]
+                |> Event.modWithTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 35, GameMod (Event.xpBuff 0.25) )
@@ -278,7 +279,7 @@ getChoresMastery chore =
     [ ( 10
       , GameMod
             (Event.mxpBuff 0.25
-                |> Event.modWithTags [ Event.ActivityTag chore ]
+                |> Event.modWithTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 35
@@ -291,13 +292,13 @@ getChoresMastery chore =
     , ( 65
       , GameMod
             (Event.resourceBuff 0.2
-                |> Event.modWithTags [ Event.ActivityTag chore ]
+                |> Event.modWithTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 95
       , GameMod
             (Event.successBuff 0.2
-                |> Event.modWithTags [ Event.ActivityTag chore ]
+                |> Event.modWithTags [ Effect.ActivityTag chore ]
             )
       )
     ]

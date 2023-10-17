@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect
 import IdleGame.Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -19,33 +20,33 @@ import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
-render : Game -> List IdleGame.Event.Mod -> IdleGame.Event.Effect -> Html FrontendMsg
+render : Game -> List IdleGame.Event.Mod -> Effect.Effect -> Html FrontendMsg
 render game mods effect =
     IdleGame.Event.applyModsToEffect mods effect
         |> Tuple.first
         |> renderModdedEffect game
 
 
-renderModdedEffect : Game -> IdleGame.Event.Effect -> Html FrontendMsg
+renderModdedEffect : Game -> Effect.Effect -> Html FrontendMsg
 renderModdedEffect game effect =
-    case IdleGame.Event.getType effect of
-        IdleGame.Event.GainCoin coin ->
+    case Effect.getType effect of
+        Effect.GainCoin coin ->
             renderCoin coin
 
-        IdleGame.Event.GainResource { base, doublingChance } kind ->
+        Effect.GainResource { base, doublingChance } kind ->
             renderResource { base = base, doublingChance = doublingChance } kind
 
-        IdleGame.Event.GainXp multiplicable skill ->
+        Effect.GainXp multiplicable skill ->
             renderXp multiplicable skill
 
-        IdleGame.Event.GainMxp multiplier activity ->
+        Effect.GainMxp multiplier activity ->
             renderMxp game multiplier activity
 
-        IdleGame.Event.VariableSuccess { successProbability, successEffects, failureEffects } ->
+        Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             case successEffects of
                 [ e ] ->
-                    case IdleGame.Event.getType e of
-                        IdleGame.Event.GainResource _ kind ->
+                    case Effect.getType e of
+                        Effect.GainResource _ kind ->
                             renderVariableResource successProbability kind
 
                         _ ->

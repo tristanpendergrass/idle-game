@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
+import IdleGame.Effect as Effect
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
@@ -121,13 +122,13 @@ renderContent obj extraBottomPadding game =
         mods =
             Game.getAllMods game
 
-        effects : List Event.Effect
+        effects : List Effect.Effect
         effects =
             Event.getEffects event
 
-        orderedEffects : List Event.Effect
+        orderedEffects : List Effect.Effect
         orderedEffects =
-            List.sortWith Event.orderEffects effects
+            List.sortWith Effect.orderEffects effects
 
         playButtonState : PlayButtonState
         playButtonState =

@@ -7,7 +7,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Event as Event exposing (Effect, Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
