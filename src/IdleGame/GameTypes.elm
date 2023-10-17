@@ -4,6 +4,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
+import Percent as Percent exposing (Percent)
 
 
 type Toast
@@ -11,7 +12,12 @@ type Toast
     | GainedResource Int Resource.Kind
 
 
+type IntervalModLabel
+    = IntervalModLabel Percent
+
+
 type alias IntervalMod =
     { kind : Activity
-    , percentChange : Float -- e.g. 0.25 -> 25% faster
+    , percentChange : Percent -- e.g. 0.25 -> 25% faster
+    , label : IntervalModLabel
     }

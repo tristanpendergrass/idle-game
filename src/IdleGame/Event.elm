@@ -3,11 +3,13 @@ module IdleGame.Event exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
 
 
 
@@ -486,6 +488,13 @@ modLabelToString modLabel =
 
         CoinModLabel buff ->
             "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Coin"
+
+
+intervalModLabelToString : IntervalModLabel -> String
+intervalModLabelToString modLabel =
+    case modLabel of
+        IntervalModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
 
 
 orderEffects : Effect -> Effect -> Order

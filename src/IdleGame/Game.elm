@@ -206,6 +206,7 @@ applyIntervalMods mods duration =
         multiplier =
             (mods
                 |> List.map .percentChange
+                |> List.map Percent.toFloat
                 |> List.sum
             )
                 + 1
@@ -838,7 +839,59 @@ getShopItemIntervalMods game =
 
 getMasteryIntervalMods : Game -> List IntervalMod
 getMasteryIntervalMods game =
-    []
+    let
+        allActivities : List Activity
+        allActivities =
+            Activity.allKinds
+
+        masteryRewards : List Activity.MasteryReward
+        masteryRewards =
+            allActivities
+                |> List.concatMap
+                    (\activity ->
+                        let
+                            stats : Activity.Stats
+                            stats =
+                                Activity.getStats activity
+
+                            mxp : Xp
+                            mxp =
+                                Activity.getByKind activity game.mxp
+
+                            masteryLevel : Int
+                            masteryLevel =
+                                Xp.level Xp.defaultSchedule mxp
+                        in
+                        case stats.mastery of
+                            Just mastery ->
+                                mastery
+                                    |> List.filterMap
+                                        (\( level, reward ) ->
+                                            if masteryLevel >= level then
+                                                Just reward
+
+                                            else
+                                                Nothing
+                                        )
+
+                            Nothing ->
+                                []
+                    )
+
+        mods : List IntervalMod
+        mods =
+            masteryRewards
+                |> List.filterMap
+                    (\reward ->
+                        case reward of
+                            Activity.IntervalMod mod ->
+                                Just mod
+
+                            _ ->
+                                Nothing
+                    )
+    in
+    mods
 
 
 getActivityMods : Game -> List Mod

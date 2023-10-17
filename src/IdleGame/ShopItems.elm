@@ -9,6 +9,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
+import Percent exposing (Percent)
 
 
 type Kind
@@ -36,9 +37,14 @@ type alias Stats =
     }
 
 
+intervalMod : Activity -> Percent -> IntervalMod
+intervalMod kind percentChange =
+    { kind = kind, percentChange = percentChange, label = IntervalModLabel percentChange }
+
+
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 0.1 } ]
+    ShopItemIntervalMod [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 0.1) ]
 
 
 shovelStats : Stats
@@ -49,8 +55,8 @@ shovelStats =
     , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
-            [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 0.05 }
-            , { kind = IdleGame.Kinds.Activities.CleanBigBubba, percentChange = 0.05 }
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 0.05)
+            , intervalMod IdleGame.Kinds.Activities.CleanBigBubba (Percent.fromFloat 0.05)
             ]
     , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
     , getter = .shovel
@@ -66,7 +72,9 @@ beginnerDualWieldingStats =
     , unlockLevel = 35
 
     -- , reward = ShopItemIntervalMod [ { kind = Activity.WaterGreenhousePlants, percentChange = 1.0 } ]
-    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+    , reward =
+        ShopItemIntervalMod
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
     , description = "+100% faster at Water Greenhouse Plants"
     , getter = .beginnerDualWielding
     , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
@@ -83,7 +91,9 @@ keyringStats =
     -- , reward =
     -- ShopItemIntervalMod
     -- (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Activity.allKinds)
-    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+    , reward =
+        ShopItemIntervalMod
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
     , description = "+10% faster at All Chores"
     , getter = .keyring
     , setter = \owned ownedItems -> { ownedItems | keyring = owned }
@@ -96,7 +106,9 @@ readingGlassesStats =
     , icon = Icon.readingGlasses
     , price = Coin.int 3000
     , unlockLevel = 55
-    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+    , reward =
+        ShopItemIntervalMod
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
 
     -- , reward =
     --     ShopItemMod
@@ -123,7 +135,9 @@ oversizedBagStats =
     , icon = Icon.oversizedBag
     , price = Coin.int 5000
     , unlockLevel = 65
-    , reward = ShopItemIntervalMod [ { kind = IdleGame.Kinds.Activities.CleanStables, percentChange = 1.0 } ]
+    , reward =
+        ShopItemIntervalMod
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
 
     -- , reward =
     --     ShopItemMod

@@ -207,16 +207,6 @@ renderContent obj extraBottomPadding game =
         ]
 
 
-
--- defaultSpellMastery : Mastery
--- defaultSpellMastery =
---     [ ( 25, SpellAvailable )
---     , ( 50, SecondaryEnabled )
---     , ( 75, ImbueEnabled )
---     , ( 100, BoostEffects )
---     ]
-
-
 masterySection : Xp -> Activity.Mastery -> Html msg
 masterySection mxp mastery =
     let
@@ -240,8 +230,8 @@ masterySection mxp mastery =
                         Activity.GameMod mod ->
                             Event.modLabelToString mod.label
 
-                        Activity.IntervalMod ->
-                            "Interval modd"
+                        Activity.IntervalMod mod ->
+                            Event.intervalModLabelToString mod.label
 
                 isAchieved : Bool
                 isAchieved =

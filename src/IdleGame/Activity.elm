@@ -10,6 +10,7 @@ import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
 
 
 allActivitiesBySkill : Skill.Kind -> List Activity
@@ -134,7 +135,7 @@ type MasteryReward
     | SecondaryEnabled -- Spell can be used as secondary
     | ImbueEnabled -- Spell can be embued with elements
     | BoostEffects -- Spell effects are boosted
-    | IntervalMod -- Activity interval decreased by this much
+    | IntervalMod IntervalMod -- Activity interval decreased by this much
     | GameMod Event.Mod -- Apply mod to game
 
 
@@ -281,10 +282,11 @@ getChoresMastery chore =
             )
       )
     , ( 35
-      , GameMod
-            (Event.coinBuff 0.1
-                |> Event.modWithTags [ Event.ActivityTag chore ]
-            )
+      , IntervalMod
+            { kind = chore
+            , percentChange = Percent.fromFloat 0.15
+            , label = IntervalModLabel (Percent.fromFloat 0.15)
+            }
       )
     , ( 65
       , GameMod
