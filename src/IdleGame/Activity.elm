@@ -134,7 +134,8 @@ type MasteryReward
     | SecondaryEnabled -- Spell can be used as secondary
     | ImbueEnabled -- Spell can be embued with elements
     | BoostEffects -- Spell effects are boosted
-    | GameMod Event.Mod
+    | IntervalMod -- Activity interval decreased by this much
+    | GameMod Event.Mod -- Apply mod to game
 
 
 type alias Mastery =
@@ -186,9 +187,10 @@ cleanStablesStats =
                 , Event.gainWithProbability 0.5
                     [ Event.gainResource 3 Resource.Manure
                     ]
+                    |> Event.withTags [ Event.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
                 ]
             }
-    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.CleanStables)
+    , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
     }
 
 
@@ -209,9 +211,10 @@ cleanBigBubbaStats =
                 , Event.gainWithProbability 0.5
                     [ Event.gainResource 3 Resource.Manure
                     ]
+                    |> Event.withTags [ Event.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
                 ]
             }
-    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.CleanBigBubba)
+    , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
     }
 
 
@@ -266,6 +269,35 @@ getActivityMastery chore =
     , ( 35, GameMod (Event.xpBuff 0.25) )
     , ( 65, GameMod (Event.xpBuff 0.25) )
     , ( 95, GameMod (Event.xpBuff 0.35) )
+    ]
+
+
+getChoresMastery : Activity -> Mastery
+getChoresMastery chore =
+    [ ( 10
+      , GameMod
+            (Event.mxpBuff 0.25
+                |> Event.modWithTags [ Event.ActivityTag chore ]
+            )
+      )
+    , ( 35
+      , GameMod
+            (Event.coinBuff 0.1
+                |> Event.modWithTags [ Event.ActivityTag chore ]
+            )
+      )
+    , ( 65
+      , GameMod
+            (Event.resourceBuff 0.2
+                |> Event.modWithTags [ Event.ActivityTag chore ]
+            )
+      )
+    , ( 95
+      , GameMod
+            (Event.successBuff 0.2
+                |> Event.modWithTags [ Event.ActivityTag chore ]
+            )
+      )
     ]
 
 

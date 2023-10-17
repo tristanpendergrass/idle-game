@@ -404,7 +404,7 @@ increaseSuccessTransformer buff repetitions effect =
 xpBuff : Float -> Mod
 xpBuff amount =
     { tags = [ XpTag ]
-    , label = XpModLabel 1
+    , label = XpModLabel amount
     , transformer = xpTransformer amount
     , source = AdminCrimes
     , repetitions = 1
@@ -421,9 +421,9 @@ choresXpBuff buff =
     }
 
 
-choresCoinBuff : Float -> Mod
-choresCoinBuff buff =
-    { tags = [ SkillTag Skill.Chores ]
+coinBuff : Float -> Mod
+coinBuff buff =
+    { tags = []
     , label = CoinModLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
@@ -431,9 +431,9 @@ choresCoinBuff buff =
     }
 
 
-choresMxpBuff : Float -> Mod
-choresMxpBuff buff =
-    { tags = []
+mxpBuff : Float -> Mod
+mxpBuff buff =
+    { tags = [ MxpTag ]
     , label = MxpModLabel buff
     , transformer = mxpTransformer buff
     , source = AdminCrimes
@@ -441,9 +441,9 @@ choresMxpBuff buff =
     }
 
 
-choresResourceBuff : Float -> Mod
-choresResourceBuff buff =
-    { tags = [ SkillTag Skill.Chores ]
+resourceBuff : Float -> Mod
+resourceBuff buff =
+    { tags = []
     , label = ResourceModLabel buff
     , transformer = resourceTransformer buff
     , source = AdminCrimes

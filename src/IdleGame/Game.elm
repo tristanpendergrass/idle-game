@@ -2,7 +2,7 @@ module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
 import Html.Attributes exposing (download)
-import IdleGame.Activity as Activity
+import IdleGame.Activity as Activity exposing (ActivityImage)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
@@ -801,60 +801,6 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-type alias MasteryPoolCheckpoints =
-    { ten : Mod
-    , twentyFive : Mod
-    , fifty : Mod
-    , ninetyFive : Mod
-    }
-
-
-choreMasteryPoolCheckpoints : MasteryPoolCheckpoints
-choreMasteryPoolCheckpoints =
-    { ten = choresXpBuff 0.25
-    , twentyFive = choresCoinBuff 0.15
-    , fifty = choresMxpBuff 0.25
-    , ninetyFive =
-        choresResourceBuff 1.0
-            |> includeVariableEffects
-    }
-
-
-getChoreMasteryPoolMods : Game -> List Mod
-getChoreMasteryPoolMods game =
-    let
-        mxpPercent =
-            Xp.levelPercent Xp.defaultSchedule game.choresMxp
-                |> Percent.toPercentage
-
-        checkpoints =
-            choreMasteryPoolCheckpoints
-    in
-    if mxpPercent >= 95 then
-        [ checkpoints.ten
-        , checkpoints.twentyFive
-        , checkpoints.fifty
-        , checkpoints.ninetyFive
-        ]
-
-    else if mxpPercent >= 50 then
-        [ checkpoints.ten
-        , checkpoints.twentyFive
-        , checkpoints.fifty
-        ]
-
-    else if mxpPercent >= 25 then
-        [ checkpoints.ten
-        , checkpoints.twentyFive
-        ]
-
-    else if mxpPercent >= 10 then
-        [ checkpoints.ten ]
-
-    else
-        []
-
-
 getShopItemMods : Game -> List Mod
 getShopItemMods game =
     game.shopItems
@@ -892,38 +838,70 @@ getShopItemIntervalMods game =
 
 getMasteryIntervalMods : Game -> List IntervalMod
 getMasteryIntervalMods game =
-    Activity.allKinds
-        |> List.map
-            (\kind ->
-                let
-                    mxp : Xp
-                    mxp =
-                        Activity.getByKind kind game.mxp
+    []
 
-                    masteryLevel : Int
-                    masteryLevel =
-                        Xp.level Xp.defaultSchedule mxp
 
-                    timesToApplyMod =
-                        if masteryLevel >= 99 then
-                            2
+getActivityMods : Game -> List Mod
+getActivityMods game =
+    let
+        allActivities : List Activity
+        allActivities =
+            Activity.allKinds
 
-                        else if masteryLevel >= 50 then
-                            1
+        masteryRewards : List Activity.MasteryReward
+        masteryRewards =
+            allActivities
+                |> List.concatMap
+                    (\activity ->
+                        let
+                            stats : Activity.Stats
+                            stats =
+                                Activity.getStats activity
 
-                        else
-                            0
-                in
-                { kind = kind
-                , percentChange = timesToApplyMod * 0.1
-                }
-            )
+                            mxp : Xp
+                            mxp =
+                                Activity.getByKind activity game.mxp
+
+                            masteryLevel : Int
+                            masteryLevel =
+                                Xp.level Xp.defaultSchedule mxp
+                        in
+                        case stats.mastery of
+                            Just mastery ->
+                                mastery
+                                    |> List.filterMap
+                                        (\( level, reward ) ->
+                                            if masteryLevel >= level then
+                                                Just reward
+
+                                            else
+                                                Nothing
+                                        )
+
+                            Nothing ->
+                                []
+                    )
+
+        mods : List Mod
+        mods =
+            masteryRewards
+                |> List.filterMap
+                    (\reward ->
+                        case reward of
+                            Activity.GameMod mod ->
+                                Just mod
+
+                            _ ->
+                                Nothing
+                    )
+    in
+    mods
 
 
 getAllMods : Game -> List Mod
 getAllMods game =
-    getChoreMasteryPoolMods game
-        -- ++ getChoreUnlocksMods game
+    []
+        ++ getActivityMods game
         ++ getShopItemMods game
 
 

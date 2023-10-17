@@ -240,6 +240,9 @@ masterySection mxp mastery =
                         Activity.GameMod mod ->
                             Event.modLabelToString mod.label
 
+                        Activity.IntervalMod ->
+                            "Interval modd"
+
                 isAchieved : Bool
                 isAchieved =
                     Xp.level Xp.defaultSchedule mxp >= level

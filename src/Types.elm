@@ -25,7 +25,6 @@ import Url exposing (Url)
 
 type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
-    | ChoreMasteryCheckpointsModal
     | ChoreItemUnlocksModal
     | ShopResourceModal Int Resource.Kind
 
@@ -116,7 +115,6 @@ type FrontendMsg
     | SetDrawerOpen Bool
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
-    | OpenMasteryCheckpointsModal
     | OpenMasteryUnlocksModal
     | SetActiveSkillTab Tab
     | SetActiveCombatTab Tab

@@ -32,7 +32,6 @@ import IdleGame.Views.DetailViewWrapper
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.MasteryCheckpoints
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.ShopResourceModal
@@ -735,12 +734,6 @@ update msg model =
             , Cmd.none
             )
 
-        OpenMasteryCheckpointsModal ->
-            ( model
-                |> setActiveModal (Just ChoreMasteryCheckpointsModal)
-            , Cmd.none
-            )
-
         OpenMasteryUnlocksModal ->
             ( model
                 |> setActiveModal (Just ChoreItemUnlocksModal)
@@ -999,15 +992,6 @@ renderModal activeModal game =
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
-                |> IdleGame.Views.ModalWrapper.render
-
-        Just ChoreMasteryCheckpointsModal ->
-            let
-                children =
-                    IdleGame.Views.MasteryCheckpoints.render { poolXp = game.choresMxp, checkpoints = Game.choreMasteryPoolCheckpoints }
-            in
-            IdleGame.Views.ModalWrapper.create children
-                |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
                 |> IdleGame.Views.ModalWrapper.render
 
         Just ChoreItemUnlocksModal ->
