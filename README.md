@@ -45,19 +45,23 @@ $ npm test -- --watch
 - [x] Add hexes
   - [x] Craft them for free
   - [x] Require parchment
-  - [ ] Mastery bonuses
 - [x] Add parchment to shop
 - [x] Activity detail sidebar
 	- [x] desktop
 	- [x] mobile
 - [x] Activity status bar at bottom for mobile
-- [ ] Move Item Mastery (M) info to detail sidebar
-- [ ] Remove mastery pool logic from game
+- [x] Move Item Mastery (M) info to detail sidebar
+- [x] Remove mastery pool logic from game
 - [ ] Add monster fighting proof of concept
   - [ ] Add rewards for fighting monster
   - [ ] Add monster strength
   - [ ] Add spell selector
   - [ ] Add combat resolution logic
+- [ ] Finalize gameplay values
+  - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
+  - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
+  - [ ] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
+  - [ ] Shop items -- redesign. Only need a few of these
 
 ## Future
 ### Tech stuff
