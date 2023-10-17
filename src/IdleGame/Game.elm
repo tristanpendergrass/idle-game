@@ -73,7 +73,7 @@ create seed =
 
 
 type ActivityListItem
-    = LockedActivity Int
+    = LockedActivity ( Skill.Kind, Int )
     | ActivityListItem Activity
 
 
@@ -86,21 +86,22 @@ getActivityListItems skill game =
 
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
-            let
-                currentLevel : Int
-                currentLevel =
-                    Skill.getByKind skill game.xp
-                        |> Xp.level Xp.defaultSchedule
+            case (Activity.getStats kind).unlockRequirements of
+                Just ( unlockSkill, unlockLevel ) ->
+                    let
+                        currentLevel : Int
+                        currentLevel =
+                            Skill.getByKind unlockSkill game.xp
+                                |> Xp.level Xp.defaultSchedule
+                    in
+                    if currentLevel >= unlockLevel then
+                        ActivityListItem kind
 
-                requiredLevel : Int
-                requiredLevel =
-                    (Activity.getStats kind).unlockLevel
-            in
-            if currentLevel >= requiredLevel then
-                ActivityListItem kind
+                    else
+                        LockedActivity ( unlockSkill, unlockLevel )
 
-            else
-                LockedActivity requiredLevel
+                Nothing ->
+                    ActivityListItem kind
 
         reducer : Activity -> { items : List ActivityListItem, lockedItem : Bool } -> { items : List ActivityListItem, lockedItem : Bool }
         reducer kind accum =
@@ -150,17 +151,22 @@ toggleActivity kind game =
         stats =
             Activity.getStats kind
 
-        currentLevel : Int
-        currentLevel =
-            game.xp
-                |> Skill.getByKind stats.unlockSkill
-                |> Xp.level Xp.defaultSchedule
+        canToggle : Bool
+        canToggle =
+            case stats.unlockRequirements of
+                Just ( unlockSkill, unlockLevel ) ->
+                    let
+                        currentLevel : Int
+                        currentLevel =
+                            Skill.getByKind unlockSkill game.xp
+                                |> Xp.level Xp.defaultSchedule
+                    in
+                    currentLevel >= unlockLevel
 
-        requiredLevel : Int
-        requiredLevel =
-            stats.unlockLevel
+                Nothing ->
+                    True
     in
-    if currentLevel < requiredLevel then
+    if canToggle then
         game
 
     else

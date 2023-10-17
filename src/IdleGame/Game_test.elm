@@ -6,6 +6,7 @@ import Fuzz exposing (Fuzzer)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
+import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Event as Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
@@ -112,7 +113,7 @@ initialGame =
     Game.create (Random.initialSeed 0)
 
 
-testEffects : String -> { effects : List Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects : String -> { effects : List Effect.Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
 testEffects name { effects, check } =
     Test.Random.check
         name
@@ -123,7 +124,7 @@ testEffects name { effects, check } =
 testEffectsDistribution :
     String
     ->
-        { effects : List Effect
+        { effects : List Effect.Effect
         , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
         }
     -> Test
@@ -143,50 +144,50 @@ applyEffectsTest =
     describe "applyEffects"
         [ describe "GainCoin"
             [ testEffects "can get a coin"
-                { effects = [ Event.gainCoin (Coin.int 5) ]
+                { effects = [ Effect.gainCoin (Coin.int 5) ]
                 , check = expectOk (expectCoin (Coin.int 5))
                 }
             , testEffects "can add and remove coin"
                 { effects =
-                    [ Event.gainCoin (Coin.int 5)
-                    , Event.gainCoin (Coin.int -4)
+                    [ Effect.gainCoin (Coin.int 5)
+                    , Effect.gainCoin (Coin.int -4)
                     ]
                 , check = expectOk (expectCoin (Coin.int 1))
                 }
             , testEffects "cannot go below zero coin"
-                { effects = [ Event.gainCoin (Coin.int -5) ]
+                { effects = [ Effect.gainCoin (Coin.int -5) ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffects "cannot go below zero coin and order matters"
                 { effects =
-                    [ Event.gainCoin (Coin.int 5)
-                    , Event.gainCoin (Coin.int -6)
-                    , Event.gainCoin (Coin.int 2)
+                    [ Effect.gainCoin (Coin.int 5)
+                    , Effect.gainCoin (Coin.int -6)
+                    , Effect.gainCoin (Coin.int 2)
                     ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
         , describe "GainXp"
             [ testEffects "can get Xp for Chores"
-                { effects = [ Event.gainXp (Xp.int 5) Skill.Chores ]
+                { effects = [ Effect.gainXp (Xp.int 5) Skill.Chores ]
                 , check = expectOk (expectXp (Xp.int 5) Skill.Chores)
                 }
             , testEffects "can get Xp for Hexes"
-                { effects = [ Event.gainXp (Xp.int 5) Skill.Hexes ]
+                { effects = [ Effect.gainXp (Xp.int 5) Skill.Hexes ]
                 , check = expectOk (expectXp (Xp.int 5) Skill.Hexes)
                 }
             ]
         , describe "GainResource"
             [ testEffects "can get resources"
-                { effects = [ Event.gainResource 1 Resource.EmptyBottle ]
+                { effects = [ Effect.gainResource 1 Resource.EmptyBottle ]
                 , check = expectOk (expectResource 1 Resource.EmptyBottle)
                 }
             , testEffects "cannot go below 0 of a resource"
-                { effects = [ Event.gainResource -1 Resource.EmptyBottle ]
+                { effects = [ Effect.gainResource -1 Resource.EmptyBottle ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffectsDistribution "doubling chance of 50% works"
-                { effects = [ Event.gainResourceWithDoubling 1 Resource.EmptyBottle 0.5 ]
+                { effects = [ Effect.gainResourceWithDoubling 1 Resource.EmptyBottle 0.5 ]
                 , distribution =
                     Test.expectDistribution
                         [ ( Test.Distribution.atLeast 45
@@ -212,8 +213,8 @@ applyEffectsTest =
         , describe "variable effects"
             [ testEffectsDistribution "can have a 50% chance to gain a resource"
                 { effects =
-                    [ Event.gainWithProbability 0.5
-                        [ Event.gainResource 1 Resource.EmptyBottle ]
+                    [ Effect.gainWithProbability 0.5
+                        [ Effect.gainResource 1 Resource.EmptyBottle ]
                     ]
                 , distribution =
                     Test.expectDistribution

@@ -80,18 +80,9 @@ type alias SimpleTransformer =
     Effect.EffectType -> Effect.EffectType
 
 
-effectHasTags : List Effect.Tag -> Effect.Effect -> Bool
-effectHasTags mandatoryTags (Effect.Effect { tags }) =
-    List.all
-        (\tag ->
-            List.member tag tags
-        )
-        mandatoryTags
-
-
 scopeTransformerToTags : List Effect.Tag -> Transformer -> Transformer
 scopeTransformerToTags tags transformer multiplier effect =
-    if effectHasTags tags effect then
+    if Effect.hasTags tags effect then
         transformer multiplier effect
 
     else
@@ -206,7 +197,7 @@ useSimpleTransformerHelp depth transformFn repetitions effect =
 
 applyModToEffect : Mod -> ( Effect.Effect, List Effect.Effect ) -> ( Effect.Effect, List Effect.Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
-    if effectHasTags mod.tags effectAccum then
+    if Effect.hasTags mod.tags effectAccum then
         case mod.transformer mod.repetitions effectAccum of
             NoChange ->
                 ( effectAccum, furtherEffectsAccum )
@@ -237,7 +228,7 @@ applyModsToEffectHelp depth mods effect =
         ( newEffect, furtherEffects ) =
             List.foldl
                 (\mod accum ->
-                    if effectHasTags mod.tags effect then
+                    if Effect.hasTags mod.tags effect then
                         applyModToEffect mod accum
 
                     else

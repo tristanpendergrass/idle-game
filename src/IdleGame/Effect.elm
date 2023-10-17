@@ -101,8 +101,8 @@ withTags newTags (Effect { type_, tags }) =
         }
 
 
-orderEffects : Effect -> Effect -> Order
-orderEffects effect1 effect2 =
+order : Effect -> Effect -> Order
+order effect1 effect2 =
     case ( getType effect1, getType effect2 ) of
         -- Coin comes at front
         ( GainCoin _, _ ) ->
@@ -133,3 +133,12 @@ orderEffects effect1 effect2 =
 
         _ ->
             EQ
+
+
+hasTags : List Tag -> Effect -> Bool
+hasTags mandatoryTags (Effect { tags }) =
+    List.all
+        (\tag ->
+            List.member tag tags
+        )
+        mandatoryTags

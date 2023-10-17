@@ -15,7 +15,7 @@ import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
-import IdleGame.Skill exposing (Kind(..))
+import IdleGame.Skill as Skill exposing (Kind(..))
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -34,8 +34,8 @@ renderActivityListItem game item =
             renderActivity activity game
                 |> Utils.withScreenWidth
 
-        Game.LockedActivity level ->
-            renderLockedActivity level
+        Game.LockedActivity ( unlockSkill, unlockLevel ) ->
+            renderLockedActivity unlockSkill unlockLevel
 
 
 activityHeight : String
@@ -178,7 +178,7 @@ renderActivity activity game screenWidth =
 
         orderedEffects : List Effect.Effect
         orderedEffects =
-            List.sortWith Effect.orderEffects effects
+            List.sortWith Effect.order effects
 
         duration : Duration
         duration =
@@ -229,8 +229,8 @@ renderActivity activity game screenWidth =
         ]
 
 
-renderLockedActivity : Int -> Html FrontendMsg
-renderLockedActivity level =
+renderLockedActivity : Skill.Kind -> Int -> Html FrontendMsg
+renderLockedActivity unlockSkill unlockLevel =
     div
         [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer"
 
@@ -247,7 +247,12 @@ renderLockedActivity level =
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
-                , div [ class "text-lg font-semibold" ] [ text <| "Level " ++ Utils.intToString level ]
+                , div [ class "text-lg font-semibold" ]
+                    [ text <|
+                        Skill.getLabel unlockSkill
+                            ++ " level "
+                            ++ Utils.intToString unlockLevel
+                    ]
                 ]
             ]
         ]

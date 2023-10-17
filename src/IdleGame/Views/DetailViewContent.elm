@@ -128,7 +128,7 @@ renderContent obj extraBottomPadding game =
 
         orderedEffects : List Effect.Effect
         orderedEffects =
-            List.sortWith Effect.orderEffects effects
+            List.sortWith Effect.order effects
 
         playButtonState : PlayButtonState
         playButtonState =

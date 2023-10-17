@@ -144,12 +144,17 @@ type alias Mastery =
     List ( Int, MasteryReward )
 
 
+
+-- Todos:
+-- Refactor unlockSkill/unlockLevel into their own custom type and make it optional
+-- Refactor event into ActivityDetails with a list of types like ResourceCreator, MonsterFighter, ResourceTransformer, etc.
+
+
 type alias Stats =
     { skill : Skill.Kind
     , title : String
     , image : ActivityImage
-    , unlockSkill : Skill.Kind
-    , unlockLevel : Int
+    , unlockRequirements : Maybe ( Skill.Kind, Int )
     , duration : Duration
     , event : Event
     , mastery : Maybe Mastery
@@ -177,8 +182,7 @@ cleanStablesStats =
     { skill = Skill.Chores
     , title = "Clean Stables"
     , image = ActivityLandscape "/chores/stable.png"
-    , unlockLevel = 1
-    , unlockSkill = Skill.Chores
+    , unlockRequirements = Nothing
     , duration = Duration.seconds 5
     , event =
         Event.Event
@@ -201,8 +205,7 @@ cleanBigBubbaStats =
     { skill = Skill.Chores
     , title = "Clean Big Bubba's Stall"
     , image = ActivityLandscape "/chores/bubba4.png"
-    , unlockLevel = 10
-    , unlockSkill = Skill.Chores
+    , unlockRequirements = Just ( Skill.Chores, 10 )
     , duration = Duration.seconds 5
     , event =
         Event.Event
@@ -225,8 +228,7 @@ hex1Stats =
     { skill = Skill.Hexes
     , title = "Hex I"
     , image = ActivityIcon (Resource.getStats Resource.Hex1).icon
-    , unlockLevel = 1
-    , unlockSkill = Skill.Hexes
+    , unlockRequirements = Nothing
     , duration = Duration.seconds 5
     , event =
         Event.Event
@@ -245,8 +247,7 @@ jinx1Stats =
     { skill = Skill.Hexes
     , title = "Jinx I"
     , image = ActivityIcon (Resource.getStats Resource.Jinx1).icon
-    , unlockLevel = 10
-    , unlockSkill = Skill.Hexes
+    , unlockRequirements = Just ( Skill.Hexes, 10 )
     , duration = Duration.seconds 5
     , event =
         Event.Event
@@ -318,8 +319,7 @@ fightMonster1Stats =
     { skill = Skill.Adventuring
     , title = "Fight Monster I"
     , image = ActivityIcon (Icon.letter "M1")
-    , unlockLevel = 1
-    , unlockSkill = Skill.Adventuring
+    , unlockRequirements = Nothing
     , duration = Duration.seconds 5
     , event = Event.Event { effects = [] }
     , mastery = Just defaultSpellMastery
@@ -331,8 +331,7 @@ fightMonster2Stats =
     { skill = Skill.Adventuring
     , title = "Fight Monster II"
     , image = ActivityIcon (Icon.letter "M2")
-    , unlockLevel = 1
-    , unlockSkill = Skill.Adventuring
+    , unlockRequirements = Nothing
     , duration = Duration.seconds 5
     , event = Event.Event { effects = [] }
     , mastery = Just defaultSpellMastery
