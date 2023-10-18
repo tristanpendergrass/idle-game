@@ -10,6 +10,7 @@ import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
+import Task exposing (fail)
 
 
 type
@@ -34,6 +35,7 @@ type EffectType
     | GainXp { base : Xp, multiplier : Float } Skill.Kind
     | GainMxp { multiplier : Float } Activity
     | GainCoin { base : Coin, multiplier : Float }
+    | ResolveCombat { difficulty : Int, successEffects : List Effect, failureEffects : List Effect }
 
 
 getType : Effect -> EffectType

@@ -146,7 +146,6 @@ type alias Mastery =
 
 
 -- Todos:
--- Refactor unlockSkill/unlockLevel into their own custom type and make it optional
 -- Refactor event into ActivityDetails with a list of types like ResourceCreator, MonsterFighter, ResourceTransformer, etc.
 
 
