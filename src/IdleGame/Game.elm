@@ -5,6 +5,7 @@ import Html.Attributes exposing (download)
 import IdleGame.Activity as Activity exposing (ActivityImage)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
@@ -607,6 +608,21 @@ applyEffect effect game =
                         let
                             chosenEffects =
                                 if succeeded then
+                                    successEffects
+
+                                else
+                                    failureEffects
+                        in
+                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
+                    )
+
+        Effect.ResolveCombat { combat, successEffects, failureEffects } ->
+            Combat.resolve combat
+                |> Random.andThen
+                    (\{ playerWon } ->
+                        let
+                            chosenEffects =
+                                if playerWon then
                                     successEffects
 
                                 else

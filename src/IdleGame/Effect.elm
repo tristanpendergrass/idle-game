@@ -2,6 +2,7 @@ module IdleGame.Effect exposing (..)
 
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -35,7 +36,7 @@ type EffectType
     | GainXp { base : Xp, multiplier : Float } Skill.Kind
     | GainMxp { multiplier : Float } Activity
     | GainCoin { base : Coin, multiplier : Float }
-    | ResolveCombat { difficulty : Int, successEffects : List Effect, failureEffects : List Effect }
+    | ResolveCombat { combat : Combat, successEffects : List Effect, failureEffects : List Effect }
 
 
 getType : Effect -> EffectType
@@ -91,6 +92,11 @@ gainResourceWithDoubling quantity kind doubling =
 gainWithProbability : Float -> List Effect -> Effect
 gainWithProbability probability successEffects =
     Effect { type_ = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }, tags = [] }
+
+
+resolveCombat : Combat -> List Effect -> Effect
+resolveCombat combat successEffects =
+    Effect { type_ = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }, tags = [] }
 
 
 withTags : List Tag -> Effect -> Effect

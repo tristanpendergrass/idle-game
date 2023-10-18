@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.Event
@@ -54,6 +55,9 @@ renderModdedEffect game effect =
 
                 _ ->
                     div [] []
+
+        Effect.ResolveCombat { combat } ->
+            renderCombat combat
 
 
 renderCoin : { base : Coin, multiplier : Float } -> Html msg
@@ -145,4 +149,20 @@ renderVariableResource probability kind =
         , div [] [ text ":" ]
         , (Resource.getStats kind).icon
             |> Icon.toHtml
+        ]
+
+
+renderCombat : Combat -> Html msg
+renderCombat combat =
+    let
+        monsterStrength : Int
+        monsterStrength =
+            Combat.getMonsterStrength combat
+    in
+    div [ class "flex items-center gap-1" ]
+        [ Icon.adventuring
+            |> Icon.toHtml
+        , span []
+            [ text (Utils.intToString monsterStrength)
+            ]
         ]

@@ -2,6 +2,7 @@ module IdleGame.Activity exposing (..)
 
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.Event as Event exposing (Event)
@@ -320,7 +321,14 @@ fightMonster1Stats =
     , image = ActivityIcon (Icon.letter "M1")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event = Event.Event { effects = [] }
+    , event =
+        Event.Event
+            { effects =
+                [ Effect.resolveCombat
+                    (Combat.create { monsterStrength = 1, playerStrength = 1 })
+                    [ Effect.gainCoin (Coin.int 1) ]
+                ]
+            }
     , mastery = Just defaultSpellMastery
     }
 
@@ -332,6 +340,13 @@ fightMonster2Stats =
     , image = ActivityIcon (Icon.letter "M2")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event = Event.Event { effects = [] }
+    , event =
+        Event.Event
+            { effects =
+                [ Effect.resolveCombat
+                    (Combat.create { monsterStrength = 2, playerStrength = 1 })
+                    [ Effect.gainCoin (Coin.int 2) ]
+                ]
+            }
     , mastery = Just defaultSpellMastery
     }
