@@ -52,9 +52,9 @@ $ npm test -- --watch
 - [x] Activity status bar at bottom for mobile
 - [x] Move Item Mastery (M) info to detail sidebar
 - [x] Remove mastery pool logic from game
-- [ ] Add monster fighting proof of concept
-  - [ ] Add monster strength
-  - [ ] Add combat resolution logic
+- [x] Add monster fighting proof of concept
+  - [x] Add monster strength
+  - [x] Add combat resolution logic
   - [ ] Add spell selector
   - [ ] Add rewards for fighting monster
 - [ ] Finalize gameplay values
@@ -97,6 +97,7 @@ $ npm test -- --watch
 - [ ] Make right rail not have slide animation when going from empty to active
 - [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
 - [ ] Remove animation on right rail
+- [ ] Add a way of giving hints to the player. Old wise man?
 
 # Changelog
 
