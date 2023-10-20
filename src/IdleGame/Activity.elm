@@ -158,6 +158,7 @@ type alias Stats =
     , duration : Duration
     , event : Event
     , mastery : Maybe Mastery
+    , hasSpellSelector : Bool
     }
 
 
@@ -197,6 +198,7 @@ cleanStablesStats =
                 ]
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
+    , hasSpellSelector = False
     }
 
 
@@ -220,6 +222,7 @@ cleanBigBubbaStats =
                 ]
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
+    , hasSpellSelector = False
     }
 
 
@@ -239,6 +242,7 @@ hex1Stats =
                 ]
             }
     , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Hex1)
+    , hasSpellSelector = False
     }
 
 
@@ -258,6 +262,7 @@ jinx1Stats =
                 ]
             }
     , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Jinx1)
+    , hasSpellSelector = False
     }
 
 
@@ -330,6 +335,7 @@ fightMonster1Stats =
                 ]
             }
     , mastery = Just defaultSpellMastery
+    , hasSpellSelector = True
     }
 
 
@@ -349,4 +355,5 @@ fightMonster2Stats =
                 ]
             }
     , mastery = Just defaultSpellMastery
+    , hasSpellSelector = True
     }

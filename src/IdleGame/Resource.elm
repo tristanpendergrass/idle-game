@@ -29,6 +29,7 @@ type
 
 allResources : List Kind
 allResources =
+    -- Don't forget to add to `allSpells` when you add a spell here!
     [ Manure
     , Soot
     , GreenhouseDirt
@@ -38,6 +39,20 @@ allResources =
     , Ectoplasm
     , Parchment
     , Hex1
+    , Jinx1
+    , Curse1
+    , Hex2
+    , Jinx2
+    , Curse2
+    , Hex3
+    , Jinx3
+    , Curse3
+    ]
+
+
+allSpells : List Kind
+allSpells =
+    [ Hex1
     , Jinx1
     , Curse1
     , Hex2

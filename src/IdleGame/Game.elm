@@ -17,6 +17,7 @@ import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Skill as Skill
+import IdleGame.SpellSelector as SpellSelector exposing (SpellSelector)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -45,6 +46,7 @@ type alias Game =
     , shopItems : ShopItems
     , combatsWon : Int
     , combatsLost : Int
+    , spellSelectors : Activity.Record (Maybe SpellSelector)
     }
 
 
@@ -70,6 +72,7 @@ create seed =
     , shopItems = ShopItems.create
     , combatsWon = 0
     , combatsLost = 0
+    , spellSelectors = Activity.createRecord Nothing
     }
 
 
