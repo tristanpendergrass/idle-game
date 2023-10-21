@@ -56,6 +56,7 @@ $ npm test -- --watch
   - [x] Add monster strength
   - [x] Add combat resolution logic
   - [x] Add spell selector
+  - [ ] Check spell mods from getAllMods
 - [ ] Finalize gameplay values
   - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards

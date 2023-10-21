@@ -8,6 +8,7 @@ import IdleGame.Effect as Effect
 import IdleGame.Event as Event exposing (Event)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
@@ -161,7 +162,7 @@ type alias Stats =
     , event : Event
     , mastery : Maybe Mastery
     , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
-    , teachesSpell : Maybe Spell.Kind -- Does this activity represent training a specific spell
+    , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell
     }
 
 
@@ -248,7 +249,7 @@ hex1Stats =
             }
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spell.Hex1
+    , teachesSpell = Just Spells.Hex1
     }
 
 
@@ -269,7 +270,7 @@ hex2Stats =
             }
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spell.Hex2
+    , teachesSpell = Just Spells.Hex2
     }
 
 
@@ -337,8 +338,9 @@ fightMonster1Stats =
         Event.Event
             { effects =
                 [ Effect.resolveCombat
-                    (Combat.create { monsterStrength = 1, playerStrength = 1 })
+                    (Combat.create { monsterPower = 1, playerPower = 1 })
                     [ Effect.gainCoin (Coin.int 1) ]
+                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster1 ]
                 ]
             }
     , mastery = Nothing
@@ -358,8 +360,9 @@ fightMonster2Stats =
         Event.Event
             { effects =
                 [ Effect.resolveCombat
-                    (Combat.create { monsterStrength = 2, playerStrength = 1 })
+                    (Combat.create { monsterPower = 2, playerPower = 1 })
                     [ Effect.gainCoin (Coin.int 2) ]
+                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster2 ]
                 ]
             }
     , mastery = Nothing
@@ -368,6 +371,6 @@ fightMonster2Stats =
     }
 
 
-getBySpell : Spell.Kind -> Maybe Activity
+getBySpell : Spell -> Maybe Activity
 getBySpell spell =
     List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities

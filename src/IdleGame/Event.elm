@@ -2,10 +2,12 @@ module IdleGame.Event exposing (..)
 
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Spells as Spell exposing (Spell)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
@@ -361,6 +363,27 @@ increaseSuccessTransformer buff repetitions effect =
             NoChange
 
 
+powerTransformer : Int -> Transformer
+powerTransformer buff repetitions effect =
+    case Effect.getType effect of
+        Effect.ResolveCombat { combat, successEffects, failureEffects } ->
+            let
+                newCombat : Combat
+                newCombat =
+                    Combat.addPlayerPower (buff * repetitions) combat
+
+                newEffectType : Effect.EffectType
+                newEffectType =
+                    Effect.ResolveCombat { combat = newCombat, successEffects = successEffects, failureEffects = failureEffects }
+            in
+            effect
+                |> Effect.setType newEffectType
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
 xpBuff : Float -> Mod
 xpBuff amount =
     { tags = [ Effect.XpTag ]
@@ -421,12 +444,23 @@ successBuff buff =
     }
 
 
+powerBuff : Int -> Mod
+powerBuff buff =
+    { tags = []
+    , label = PowerModLabel buff
+    , transformer = powerTransformer buff
+    , source = AdminCrimes
+    , repetitions = 1
+    }
+
+
 type ModLabel
     = XpModLabel Float
     | MxpModLabel Float
     | ResourceModLabel Float
     | SuccessModLabel Float
     | CoinModLabel Float
+    | PowerModLabel Int
 
 
 modLabelToString : ModLabel -> String
@@ -446,6 +480,9 @@ modLabelToString modLabel =
 
         CoinModLabel buff ->
             "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Coin"
+
+        PowerModLabel buff ->
+            "+" ++ IdleGame.Views.Utils.intToString buff ++ " Power"
 
 
 intervalModLabelToString : IntervalModLabel -> String

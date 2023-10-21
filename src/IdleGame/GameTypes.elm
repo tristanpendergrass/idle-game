@@ -10,6 +10,7 @@ import Percent as Percent exposing (Percent)
 type Toast
     = GainedCoin Coin
     | GainedResource Int Resource.Kind
+    | LostCombat
 
 
 type IntervalModLabel

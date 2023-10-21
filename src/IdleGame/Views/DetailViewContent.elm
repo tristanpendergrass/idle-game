@@ -10,6 +10,7 @@ import IdleGame.Event as Event exposing (Event)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
@@ -153,7 +154,7 @@ renderContent obj extraBottomPadding game =
         skillLabel =
             Skill.getLabel (Activity.getStats activity).skill
 
-        selectedSpell : Maybe Spell.Kind
+        selectedSpell : Maybe Spell
         selectedSpell =
             Activity.getByKind activity game.spellSelectors
     in
@@ -214,7 +215,7 @@ renderContent obj extraBottomPadding game =
 
                                 spellUnlocked : Bool
                                 spellUnlocked =
-                                    Game.isSpellUnlocked spell game
+                                    Game.isSpellLearned game spell
                             in
                             option
                                 [ selected (selectedSpell == Just spell)
@@ -229,7 +230,12 @@ renderContent obj extraBottomPadding game =
         , div [ class "divider" ] []
 
         -- The current mastery level
-        , mxpSection mxp
+        , if stats.mastery /= Nothing then
+            mxpSection mxp
+
+          else
+            -- Don't show the current mastery level if there are no mastery rewards for this activity
+            div [] []
 
         -- The mastery rewards for this activity
         , case stats.mastery of

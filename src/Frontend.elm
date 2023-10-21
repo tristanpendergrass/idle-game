@@ -18,6 +18,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -627,7 +628,7 @@ update msg model =
                 |> mapGame
                     (\game ->
                         let
-                            maybeSpell : Maybe Spell.Kind
+                            maybeSpell : Maybe Spell
                             maybeSpell =
                                 Spell.getByTitle spellTitle
                         in
@@ -992,6 +993,10 @@ toastToHtml notification =
                 , stats.icon
                     |> Icon.toHtml
                 ]
+
+        LostCombat ->
+            div []
+                [ text "Lost combat" ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg

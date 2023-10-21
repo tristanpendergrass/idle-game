@@ -152,18 +152,34 @@ renderVariableResource probability kind =
         ]
 
 
-renderCombat : Combat -> Html msg
-renderCombat combat =
-    let
-        monsterStrength : Int
-        monsterStrength =
-            Combat.getMonsterStrength combat
-    in
+renderMonsterPower : Int -> Html msg
+renderMonsterPower strength =
     div [ class "flex items-center gap-4" ]
         [ Icon.adventuring
             |> Icon.withSize Icon.Large
             |> Icon.toHtml
         , span [ class "text-5xl font-bold leading-none" ]
-            [ text (Utils.intToString monsterStrength)
+            [ text (Utils.intToString strength)
+            ]
+        ]
+
+
+renderCombat : Combat -> Html msg
+renderCombat combat =
+    let
+        monsterPower : Int
+        monsterPower =
+            Combat.getMonsterPower combat
+
+        playerPower : Int
+        playerPower =
+            Combat.getPlayerPower combat
+    in
+    div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
+        [ renderMonsterPower monsterPower
+        , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
+        , div [ class "t-column gap-0" ]
+            [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
+            , div [ class "text-sm" ] [ text "Player Power" ]
             ]
         ]

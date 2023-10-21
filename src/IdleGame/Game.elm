@@ -13,6 +13,7 @@ import IdleGame.Event as Event exposing (..)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Kinds.Spells as Spell exposing (Spell)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -46,7 +47,7 @@ type alias Game =
     , shopItems : ShopItems
     , combatsWon : Int
     , combatsLost : Int
-    , spellSelectors : Activity.Record (Maybe Spell.Kind)
+    , spellSelectors : Activity.Record (Maybe Spell)
     }
 
 
@@ -76,7 +77,7 @@ create seed =
     }
 
 
-selectSpell : { activity : Activity, maybeSpell : Maybe Spell.Kind } -> Game -> Game
+selectSpell : { activity : Activity, maybeSpell : Maybe Spell } -> Game -> Game
 selectSpell { activity, maybeSpell } game =
     { game | spellSelectors = Activity.updateByKind activity (\_ -> maybeSpell) game.spellSelectors }
 
@@ -629,14 +630,14 @@ applyEffect effect game =
                 |> Random.andThen
                     (\{ playerWon } ->
                         let
-                            chosenEffects =
+                            ( chosenEffects, toasts ) =
                                 if playerWon then
-                                    successEffects
+                                    ( successEffects, [] )
 
                                 else
-                                    failureEffects
+                                    ( failureEffects, [ LostCombat ] )
                         in
-                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
+                        Random.constant (Ok (ApplyEffectValue game toasts chosenEffects))
                     )
 
         Effect.GainCoin { base, multiplier } ->
@@ -959,37 +960,50 @@ getMasteryRewards game activity =
 getActivityMods : Game -> List Mod
 getActivityMods game =
     let
+        getGameMod : Activity.MasteryReward -> Maybe Mod
+        getGameMod reward =
+            case reward of
+                Activity.GameMod mod ->
+                    Just mod
+
+                _ ->
+                    Nothing
+    in
+    Activity.allActivities
+        |> List.concatMap (getMasteryRewards game)
+        |> List.filterMap getGameMod
+
+
+getSpellMods : Game -> List Mod
+getSpellMods game =
+    -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
+    let
         allActivities : List Activity
         allActivities =
             Activity.allActivities
-
-        masteryRewards : List Activity.MasteryReward
-        masteryRewards =
-            allActivities
-                |> List.concatMap
-                    (\activity ->
-                        getMasteryRewards game activity
-                    )
-
-        mods : List Mod
-        mods =
-            masteryRewards
-                |> List.filterMap
-                    (\reward ->
-                        case reward of
-                            Activity.GameMod mod ->
-                                Just mod
-
-                            _ ->
-                                Nothing
-                    )
     in
-    mods
+    allActivities
+        |> List.filterMap
+            (\activity ->
+                case Activity.getByKind activity game.spellSelectors of
+                    Just spell ->
+                        Just (addActivityTagToMods activity (Spell.getStats spell).mods)
+
+                    Nothing ->
+                        Nothing
+            )
+        |> List.concat
+
+
+addActivityTagToMods : Activity -> List Mod -> List Mod
+addActivityTagToMods activity =
+    List.map (Event.modWithTags [ Effect.ActivityTag activity ])
 
 
 getAllMods : Game -> List Mod
 getAllMods game =
     []
+        ++ getSpellMods game
         ++ getActivityMods game
         ++ getShopItemMods game
 
@@ -1014,8 +1028,11 @@ getAllIntervalMods game =
 --
 
 
-isSpellUnlocked : Spell.Kind -> Game -> Bool
-isSpellUnlocked spell game =
+isSpellLearned : Game -> Spell -> Bool
+isSpellLearned game spell =
+    -- NOTE this is not the same as the Activity corresponding to the spell being unlocked.
+    -- As of current writing all spells require Mastery level 25 to let the spell be "learned" enough to use
+    -- which is what this function indicates
     let
         maybeActivity : Maybe Activity
         maybeActivity =

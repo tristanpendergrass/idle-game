@@ -1,8 +1,9 @@
 module IdleGame.Combat exposing
     ( Combat
-    , addPlayerStrength
+    , addPlayerPower
     , create
-    , getMonsterStrength
+    , getMonsterPower
+    , getPlayerPower
     , resolve
     )
 
@@ -14,27 +15,32 @@ type Combat
 
 
 type alias CombatState =
-    { monsterStrength : Int
-    , playerStrength : Int
+    { monsterPower : Int
+    , playerPower : Int
     }
 
 
-create : { monsterStrength : Int, playerStrength : Int } -> Combat
-create { monsterStrength, playerStrength } =
+create : { monsterPower : Int, playerPower : Int } -> Combat
+create { monsterPower, playerPower } =
     Combat
-        { monsterStrength = monsterStrength
-        , playerStrength = playerStrength
+        { monsterPower = monsterPower
+        , playerPower = playerPower
         }
 
 
-getMonsterStrength : Combat -> Int
-getMonsterStrength (Combat state) =
-    state.monsterStrength
+getMonsterPower : Combat -> Int
+getMonsterPower (Combat state) =
+    state.monsterPower
 
 
-addPlayerStrength : Int -> Combat -> Combat
-addPlayerStrength amount (Combat state) =
-    Combat { state | playerStrength = state.playerStrength + amount }
+getPlayerPower : Combat -> Int
+getPlayerPower (Combat state) =
+    state.playerPower
+
+
+addPlayerPower : Int -> Combat -> Combat
+addPlayerPower amount (Combat state) =
+    Combat { state | playerPower = state.playerPower + amount }
 
 
 type alias CombatResult =
@@ -45,11 +51,26 @@ type alias CombatResultGenerator =
     Random.Generator CombatResult
 
 
+bool : Random.Generator Bool
+bool =
+    Random.map (\n -> n < 20) (Random.int 1 100)
+
+
 resolve : Combat -> CombatResultGenerator
-resolve (Combat { monsterStrength, playerStrength }) =
-    Random.map2
-        (\monsterRoll playerRoll ->
-            { playerWon = playerRoll >= monsterRoll }
+resolve (Combat { monsterPower, playerPower }) =
+    Random.map3
+        (\monsterRoll playerRoll tieBreaker ->
+            let
+                playerWon : Bool
+                playerWon =
+                    if monsterRoll == playerRoll then
+                        tieBreaker
+
+                    else
+                        playerRoll > monsterRoll
+            in
+            { playerWon = playerWon }
         )
-        (Random.int 1 monsterStrength)
-        (Random.int 1 playerStrength)
+        (Random.int 1 monsterPower)
+        (Random.int 1 playerPower)
+        bool
