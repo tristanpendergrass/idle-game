@@ -22,6 +22,7 @@ import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
+import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity
@@ -618,6 +619,20 @@ update msg model =
             ( model
                 |> setActivity model.mode Nothing
                 |> setPreview model.mode (Just (Preview kind))
+            , Cmd.none
+            )
+
+        HandleSpellSelect activity spellTitle ->
+            ( model
+                |> mapGame
+                    (\game ->
+                        let
+                            maybeSpell : Maybe Spell.Kind
+                            maybeSpell =
+                                Spell.getByTitle spellTitle
+                        in
+                        Game.selectSpell { activity = activity, maybeSpell = maybeSpell } game
+                    )
             , Cmd.none
             )
 

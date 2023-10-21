@@ -10,14 +10,16 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
+import IdleGame.Spell as Spell
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
+import List.Extra
 import Percent exposing (Percent)
 
 
 allActivitiesBySkill : Skill.Kind -> List Activity
 allActivitiesBySkill skill =
-    allKinds
+    allActivities
         |> List.filter
             (\kind ->
                 (getStats kind).skill == skill
@@ -52,12 +54,12 @@ getActivities skill =
             allAdventuring
 
 
-allKinds : List Activity
-allKinds =
+allActivities : List Activity
+allActivities =
     [ IdleGame.Kinds.Activities.CleanStables
     , IdleGame.Kinds.Activities.CleanBigBubba
     , IdleGame.Kinds.Activities.Hex1
-    , IdleGame.Kinds.Activities.Jinx1
+    , IdleGame.Kinds.Activities.Hex2
     , IdleGame.Kinds.Activities.FightMonster1
     , IdleGame.Kinds.Activities.FightMonster2
     ]
@@ -67,7 +69,7 @@ type alias Record a =
     { cleanStables : a
     , cleanBigBubba : a
     , hex1 : a
-    , jinx1 : a
+    , hex2 : a
     , fightMonster1 : a
     , fightMonster2 : a
     }
@@ -90,8 +92,8 @@ getByKind kind record =
         IdleGame.Kinds.Activities.Hex1 ->
             record.hex1
 
-        IdleGame.Kinds.Activities.Jinx1 ->
-            record.jinx1
+        IdleGame.Kinds.Activities.Hex2 ->
+            record.hex2
 
         IdleGame.Kinds.Activities.FightMonster1 ->
             record.fightMonster1
@@ -112,8 +114,8 @@ setByKind kind value record =
         IdleGame.Kinds.Activities.Hex1 ->
             { record | hex1 = value }
 
-        IdleGame.Kinds.Activities.Jinx1 ->
-            { record | jinx1 = value }
+        IdleGame.Kinds.Activities.Hex2 ->
+            { record | hex2 = value }
 
         IdleGame.Kinds.Activities.FightMonster1 ->
             { record | fightMonster1 = value }
@@ -158,7 +160,8 @@ type alias Stats =
     , duration : Duration
     , event : Event
     , mastery : Maybe Mastery
-    , hasSpellSelector : Bool
+    , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
+    , teachesSpell : Maybe Spell.Kind -- Does this activity represent training a specific spell
     }
 
 
@@ -172,7 +175,7 @@ allStats =
     { cleanStables = cleanStablesStats
     , cleanBigBubba = cleanBigBubbaStats
     , hex1 = hex1Stats
-    , jinx1 = jinx1Stats
+    , hex2 = hex2Stats
     , fightMonster1 = fightMonster1Stats
     , fightMonster2 = fightMonster2Stats
     }
@@ -199,6 +202,7 @@ cleanStablesStats =
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
     , hasSpellSelector = False
+    , teachesSpell = Nothing
     }
 
 
@@ -223,6 +227,7 @@ cleanBigBubbaStats =
             }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
     , hasSpellSelector = False
+    , teachesSpell = Nothing
     }
 
 
@@ -237,32 +242,34 @@ hex1Stats =
         Event.Event
             { effects =
                 [ Effect.gainXp (Xp.int 5) Skill.Hexes
+                , Effect.gainMxp IdleGame.Kinds.Activities.Hex1
                 , Effect.gainResource -1 Resource.Parchment
-                , Effect.gainResource 1 Resource.Hex1
                 ]
             }
-    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Hex1)
+    , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
+    , teachesSpell = Just Spell.Hex1
     }
 
 
-jinx1Stats : Stats
-jinx1Stats =
+hex2Stats : Stats
+hex2Stats =
     { skill = Skill.Hexes
-    , title = "Jinx I"
-    , image = ActivityIcon (Resource.getStats Resource.Jinx1).icon
+    , title = "Hex II"
+    , image = ActivityIcon (Resource.getStats Resource.Hex2).icon
     , unlockRequirements = Just ( Skill.Hexes, 10 )
     , duration = Duration.seconds 5
     , event =
         Event.Event
             { effects =
                 [ Effect.gainXp (Xp.int 10) Skill.Hexes
+                , Effect.gainMxp IdleGame.Kinds.Activities.Hex2
                 , Effect.gainResource -1 Resource.Parchment
-                , Effect.gainResource 1 Resource.Jinx1
                 ]
             }
-    , mastery = Just (getActivityMastery IdleGame.Kinds.Activities.Jinx1)
+    , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
+    , teachesSpell = Just Spell.Hex2
     }
 
 
@@ -334,8 +341,9 @@ fightMonster1Stats =
                     [ Effect.gainCoin (Coin.int 1) ]
                 ]
             }
-    , mastery = Just defaultSpellMastery
+    , mastery = Nothing
     , hasSpellSelector = True
+    , teachesSpell = Nothing
     }
 
 
@@ -354,6 +362,12 @@ fightMonster2Stats =
                     [ Effect.gainCoin (Coin.int 2) ]
                 ]
             }
-    , mastery = Just defaultSpellMastery
+    , mastery = Nothing
     , hasSpellSelector = True
+    , teachesSpell = Nothing
     }
+
+
+getBySpell : Spell.Kind -> Maybe Activity
+getBySpell spell =
+    List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities

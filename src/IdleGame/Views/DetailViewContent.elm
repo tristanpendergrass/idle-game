@@ -11,6 +11,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Skill as Skill
+import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
@@ -97,8 +98,8 @@ fade shouldFade =
 renderContent : DetailViewObject -> Bool -> Game -> Html FrontendMsg
 renderContent obj extraBottomPadding game =
     let
-        kind : Activity
-        kind =
+        activity : Activity
+        activity =
             case obj of
                 DetailViewActivity ( k, _ ) ->
                     k
@@ -108,15 +109,15 @@ renderContent obj extraBottomPadding game =
 
         stats : Activity.Stats
         stats =
-            Activity.getStats kind
+            Activity.getStats activity
 
         mxp : Xp
         mxp =
-            Activity.getByKind kind game.mxp
+            Activity.getByKind activity game.mxp
 
         event : Event
         event =
-            (Activity.getStats kind).event
+            (Activity.getStats activity).event
 
         mods : List Event.Mod
         mods =
@@ -150,7 +151,11 @@ renderContent obj extraBottomPadding game =
 
         skillLabel : String
         skillLabel =
-            Skill.getLabel (Activity.getStats kind).skill
+            Skill.getLabel (Activity.getStats activity).skill
+
+        selectedSpell : Maybe Spell.Kind
+        selectedSpell =
+            Activity.getByKind activity game.spellSelectors
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
@@ -163,13 +168,13 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ ActivityView.activityImage kind
+            [ ActivityView.activityImage activity
             , fade isPreview
             ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]
-            [ text (Activity.getStats kind).title
+            [ text (Activity.getStats activity).title
             , fade isPreview
             ]
 
@@ -182,10 +187,38 @@ renderContent obj extraBottomPadding game =
                 div [ class "h-1" ] []
 
         -- Play/pause button
-        , playPauseButton playButtonState kind
+        , playPauseButton playButtonState activity
         , div [ class "relative" ]
-            [ ActivityView.activityDuration (Game.getModdedDuration game kind)
+            [ ActivityView.activityDuration (Game.getModdedDuration game activity)
             , fade isPreview
+            ]
+
+        -- Spell selector
+        , div [ class "flex flex-col items-start gap-1", classList [ ( "hidden", not stats.hasSpellSelector ) ] ]
+            [ label [ for "selector" ] [ text "Spell selector" ]
+            , select [ id "selector", class "select w-full", onInput (HandleSpellSelect activity) ]
+                ([ option [ selected (selectedSpell == Nothing), value "" ] [ text "None" ]
+                 ]
+                    ++ List.map
+                        (\spell ->
+                            let
+                                title : String
+                                title =
+                                    (Spell.getStats spell).title
+
+                                spellUnlocked : Bool
+                                spellUnlocked =
+                                    Game.isSpellUnlocked spell game
+                            in
+                            option
+                                [ selected (selectedSpell == Just spell)
+                                , disabled (not spellUnlocked)
+                                , value title
+                                ]
+                                [ text title ]
+                        )
+                        Spell.allSpells
+                )
             ]
 
         -- The effects of the activity

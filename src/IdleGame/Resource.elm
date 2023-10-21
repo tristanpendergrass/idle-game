@@ -50,20 +50,6 @@ allResources =
     ]
 
 
-allSpells : List Kind
-allSpells =
-    [ Hex1
-    , Jinx1
-    , Curse1
-    , Hex2
-    , Jinx2
-    , Curse2
-    , Hex3
-    , Jinx3
-    , Curse3
-    ]
-
-
 type alias Record a =
     { manure : a
     , soot : a

@@ -7,7 +7,7 @@ type Activity
     | CleanBigBubba
       -- Hexes
     | Hex1
-    | Jinx1
+    | Hex2
       -- Adventuring
     | FightMonster1
     | FightMonster2

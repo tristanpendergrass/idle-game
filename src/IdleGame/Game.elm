@@ -17,7 +17,7 @@ import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Skill as Skill
-import IdleGame.SpellSelector as SpellSelector exposing (SpellSelector)
+import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -46,7 +46,7 @@ type alias Game =
     , shopItems : ShopItems
     , combatsWon : Int
     , combatsLost : Int
-    , spellSelectors : Activity.Record (Maybe SpellSelector)
+    , spellSelectors : Activity.Record (Maybe Spell.Kind)
     }
 
 
@@ -62,7 +62,7 @@ create seed =
     in
     { seed = seed
     , xp = xp
-    , mxp = Activity.createRecord (Xp.int 10000)
+    , mxp = Activity.createRecord (Xp.int 0)
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
@@ -74,6 +74,11 @@ create seed =
     , combatsLost = 0
     , spellSelectors = Activity.createRecord Nothing
     }
+
+
+selectSpell : { activity : Activity, maybeSpell : Maybe Spell.Kind } -> Game -> Game
+selectSpell { activity, maybeSpell } game =
+    { game | spellSelectors = Activity.updateByKind activity (\_ -> maybeSpell) game.spellSelectors }
 
 
 type ActivityListItem
@@ -868,7 +873,7 @@ getMasteryIntervalMods game =
     let
         allActivities : List Activity
         allActivities =
-            Activity.allKinds
+            Activity.allActivities
 
         masteryRewards : List Activity.MasteryReward
         masteryRewards =
@@ -920,45 +925,50 @@ getMasteryIntervalMods game =
     mods
 
 
+getMasteryRewards : Game -> Activity -> List Activity.MasteryReward
+getMasteryRewards game activity =
+    let
+        stats : Activity.Stats
+        stats =
+            Activity.getStats activity
+
+        mxp : Xp
+        mxp =
+            Activity.getByKind activity game.mxp
+
+        masteryLevel : Int
+        masteryLevel =
+            Xp.level Xp.defaultSchedule mxp
+    in
+    case stats.mastery of
+        Just mastery ->
+            mastery
+                |> List.filterMap
+                    (\( level, reward ) ->
+                        if masteryLevel >= level then
+                            Just reward
+
+                        else
+                            Nothing
+                    )
+
+        Nothing ->
+            []
+
+
 getActivityMods : Game -> List Mod
 getActivityMods game =
     let
         allActivities : List Activity
         allActivities =
-            Activity.allKinds
+            Activity.allActivities
 
         masteryRewards : List Activity.MasteryReward
         masteryRewards =
             allActivities
                 |> List.concatMap
                     (\activity ->
-                        let
-                            stats : Activity.Stats
-                            stats =
-                                Activity.getStats activity
-
-                            mxp : Xp
-                            mxp =
-                                Activity.getByKind activity game.mxp
-
-                            masteryLevel : Int
-                            masteryLevel =
-                                Xp.level Xp.defaultSchedule mxp
-                        in
-                        case stats.mastery of
-                            Just mastery ->
-                                mastery
-                                    |> List.filterMap
-                                        (\( level, reward ) ->
-                                            if masteryLevel >= level then
-                                                Just reward
-
-                                            else
-                                                Nothing
-                                        )
-
-                            Nothing ->
-                                []
+                        getMasteryRewards game activity
                     )
 
         mods : List Mod
@@ -1002,3 +1012,23 @@ getAllIntervalMods game =
 
 
 --
+
+
+isSpellUnlocked : Spell.Kind -> Game -> Bool
+isSpellUnlocked spell game =
+    let
+        maybeActivity : Maybe Activity
+        maybeActivity =
+            Activity.getBySpell spell
+    in
+    case maybeActivity of
+        Nothing ->
+            False
+
+        Just activity ->
+            let
+                masteryRewards : List Activity.MasteryReward
+                masteryRewards =
+                    getMasteryRewards game activity
+            in
+            List.member Activity.SpellAvailable masteryRewards

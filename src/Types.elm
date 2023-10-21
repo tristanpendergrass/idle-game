@@ -13,6 +13,7 @@ import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
+import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
 import IdleGame.Views.Utils as ViewUtils
@@ -130,6 +131,7 @@ type FrontendMsg
     | HandlePreviewClick Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity
+    | HandleSpellSelect Activity String
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
