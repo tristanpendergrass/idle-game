@@ -55,8 +55,7 @@ $ npm test -- --watch
 - [x] Add monster fighting proof of concept
   - [x] Add monster strength
   - [x] Add combat resolution logic
-  - [ ] Add spell selector
-  - [ ] Add rewards for fighting monster
+  - [x] Add spell selector
 - [ ] Finalize gameplay values
   - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards

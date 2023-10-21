@@ -193,6 +193,12 @@ renderContent obj extraBottomPadding game =
             , fade isPreview
             ]
 
+        -- The effects of the activity
+        , div [ class "t-column relative" ]
+            (List.map (EffectView.render game mods) orderedEffects
+                ++ [ fade isPreview ]
+            )
+
         -- Spell selector
         , div [ class "flex flex-col items-start gap-1", classList [ ( "hidden", not stats.hasSpellSelector ) ] ]
             [ label [ for "selector" ] [ text "Spell selector" ]
@@ -220,12 +226,6 @@ renderContent obj extraBottomPadding game =
                         Spell.allSpells
                 )
             ]
-
-        -- The effects of the activity
-        , div [ class "t-column relative" ]
-            (List.map (EffectView.render game mods) orderedEffects
-                ++ [ fade isPreview ]
-            )
         , div [ class "divider" ] []
 
         -- The current mastery level

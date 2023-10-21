@@ -261,13 +261,13 @@ resourceAndQuantity { resource, quantity, iconSize } =
         resourceStats =
             Resource.getStats resource
     in
-    div [ class "border-2 border-primary bg-primary/50 rounded relative w-24" ]
+    div [ class "border-2 border-primary bg-primary/50 rounded relative" ]
         [ resourceStats.icon
             |> Icon.withSize iconSize
             |> Icon.toHtml
 
         -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
-        , div [ class "t-absolute-center-x -bottom-3 max-w-full" ]
+        , div [ class "t-absolute-center-x -bottom-3" ]
             [ span [ class "px-4 bg-base-100 text-base-content border border-1 border-base-content rounded-xl text-sm font-semibold max-w-full" ]
                 [ text (intToString quantity)
                 ]

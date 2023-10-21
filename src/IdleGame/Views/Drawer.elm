@@ -81,20 +81,20 @@ renderDrawer isDrawerOpen mode activeTab =
                         Adventuring ->
                             Skilling
 
-                label : String
+                label : Html msg
                 label =
                     case newMode of
                         Skilling ->
-                            "Skilling"
+                            span [] [ text "Studying" ]
 
                         Adventuring ->
-                            "Adventuring"
+                            span [ class "text-2xs" ] [ text "Adventuring" ]
             in
-            button [ class "btn btn-secondary flex items-center gap-2", onClick (SwitchMode newMode) ]
+            button [ class "btn btn-secondary btn-sm flex items-center gap-2", onClick (SwitchMode newMode) ]
                 [ Icon.go
                     |> Icon.withSize Icon.Medium
                     |> Icon.toHtml
-                , span [] [ text label ]
+                , label
                 ]
 
         skillTabs : List (Html FrontendMsg)

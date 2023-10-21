@@ -159,10 +159,11 @@ renderCombat combat =
         monsterStrength =
             Combat.getMonsterStrength combat
     in
-    div [ class "flex items-center gap-1" ]
+    div [ class "flex items-center gap-4" ]
         [ Icon.adventuring
+            |> Icon.withSize Icon.Large
             |> Icon.toHtml
-        , span []
+        , span [ class "text-5xl font-bold leading-none" ]
             [ text (Utils.intToString monsterStrength)
             ]
         ]
