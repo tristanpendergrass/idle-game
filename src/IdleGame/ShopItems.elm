@@ -4,7 +4,7 @@ import Html exposing (..)
 import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Event as Event exposing (Event)
+import IdleGame.Event as Event
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)

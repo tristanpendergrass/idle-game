@@ -4,8 +4,8 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect
-import IdleGame.Event as Event exposing (Event)
+import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Event as Event
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
@@ -159,7 +159,7 @@ type alias Stats =
     , image : ActivityImage
     , unlockRequirements : Maybe ( Skill.Kind, Int )
     , duration : Duration
-    , event : Event
+    , effects : List Effect
     , mastery : Maybe Mastery
     , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
     , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell
@@ -189,18 +189,15 @@ cleanStablesStats =
     , image = ActivityLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.gainXp (Xp.int 5) Skill.Chores
-                , Effect.gainCoin (Coin.int 1)
-                , Effect.gainMxp IdleGame.Kinds.Activities.CleanStables
-                , Effect.gainWithProbability 0.5
-                    [ Effect.gainResource 3 Resource.Manure
-                    ]
-                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
-                ]
-            }
+    , effects =
+        [ Effect.gainXp (Xp.int 5) Skill.Chores
+        , Effect.gainCoin (Coin.int 1)
+        , Effect.gainMxp IdleGame.Kinds.Activities.CleanStables
+        , Effect.gainWithProbability 0.5
+            [ Effect.gainResource 3 Resource.Manure
+            ]
+            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
+        ]
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
     , hasSpellSelector = False
     , teachesSpell = Nothing
@@ -214,18 +211,15 @@ cleanBigBubbaStats =
     , image = ActivityLandscape "/chores/bubba4.png"
     , unlockRequirements = Just ( Skill.Chores, 10 )
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.gainXp (Xp.int 10) Skill.Chores
-                , Effect.gainCoin (Coin.int 1)
-                , Effect.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
-                , Effect.gainWithProbability 0.5
-                    [ Effect.gainResource 3 Resource.Manure
-                    ]
-                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
-                ]
-            }
+    , effects =
+        [ Effect.gainXp (Xp.int 10) Skill.Chores
+        , Effect.gainCoin (Coin.int 1)
+        , Effect.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
+        , Effect.gainWithProbability 0.5
+            [ Effect.gainResource 3 Resource.Manure
+            ]
+            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
+        ]
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
     , hasSpellSelector = False
     , teachesSpell = Nothing
@@ -239,14 +233,11 @@ hex1Stats =
     , image = ActivityIcon (Resource.getStats Resource.Hex1).icon
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.gainXp (Xp.int 5) Skill.Hexes
-                , Effect.gainMxp IdleGame.Kinds.Activities.Hex1
-                , Effect.gainResource -1 Resource.Parchment
-                ]
-            }
+    , effects =
+        [ Effect.gainXp (Xp.int 5) Skill.Hexes
+        , Effect.gainMxp IdleGame.Kinds.Activities.Hex1
+        , Effect.gainResource -1 Resource.Parchment
+        ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
     , teachesSpell = Just Spells.Hex1
@@ -260,14 +251,11 @@ hex2Stats =
     , image = ActivityIcon (Resource.getStats Resource.Hex2).icon
     , unlockRequirements = Just ( Skill.Hexes, 10 )
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.gainXp (Xp.int 10) Skill.Hexes
-                , Effect.gainMxp IdleGame.Kinds.Activities.Hex2
-                , Effect.gainResource -1 Resource.Parchment
-                ]
-            }
+    , effects =
+        [ Effect.gainXp (Xp.int 10) Skill.Hexes
+        , Effect.gainMxp IdleGame.Kinds.Activities.Hex2
+        , Effect.gainResource -1 Resource.Parchment
+        ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
     , teachesSpell = Just Spells.Hex2
@@ -334,15 +322,12 @@ fightMonster1Stats =
     , image = ActivityIcon (Icon.letter "M1")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.resolveCombat
-                    (Combat.create { monsterPower = 1, playerPower = 1 })
-                    [ Effect.gainCoin (Coin.int 1) ]
-                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster1 ]
-                ]
-            }
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 1, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 1) ]
+            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster1 ]
+        ]
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -356,15 +341,12 @@ fightMonster2Stats =
     , image = ActivityIcon (Icon.letter "M2")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
-    , event =
-        Event.Event
-            { effects =
-                [ Effect.resolveCombat
-                    (Combat.create { monsterPower = 2, playerPower = 1 })
-                    [ Effect.gainCoin (Coin.int 2) ]
-                    |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster2 ]
-                ]
-            }
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 2, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 2) ]
+            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster2 ]
+        ]
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing

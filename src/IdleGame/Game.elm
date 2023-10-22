@@ -7,9 +7,9 @@ import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.Event as Event exposing (..)
+import IdleGame.Event as Event
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
@@ -249,9 +249,9 @@ getModdedDuration game kind =
         |> applyIntervalMods mods
 
 
-combatReward : Event
+combatReward : List Effect
 combatReward =
-    Event { effects = [ Effect.gainCoin (Coin.int 25) ] }
+    [ Effect.gainCoin (Coin.int 25) ]
 
 
 
@@ -337,7 +337,7 @@ combatReward =
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActivitySkilling, eventsSkilling ) =
+        ( newActivitySkilling, effectsSkilling ) =
             case game.activitySkilling of
                 Nothing ->
                     ( game.activitySkilling, [] )
@@ -356,15 +356,15 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEvents : List Event
-                        newEvents =
-                            List.repeat completions stats.event
+                        newEffects : List (List Effect)
+                        newEffects =
+                            List.repeat completions stats.effects
                     in
                     ( Just ( activityKind, newTimer )
-                    , newEvents
+                    , newEffects
                     )
 
-        ( newActivityAdventuring, eventsAdventuring ) =
+        ( newActivityAdventuring, effectsAdventuring ) =
             case game.activityAdventuring of
                 Nothing ->
                     ( game.activityAdventuring, [] )
@@ -383,12 +383,12 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEvents : List Event
-                        newEvents =
-                            List.repeat completions stats.event
+                        newEffects : List (List Effect)
+                        newEffects =
+                            List.repeat completions stats.effects
                     in
                     ( Just ( activityKind, newTimer )
-                    , newEvents
+                    , newEffects
                     )
 
         -- modifiedEvents =
@@ -411,7 +411,7 @@ tick delta game =
             game
                 |> setActivitySkilling newActivitySkilling
                 |> setActivityAdventuring newActivityAdventuring
-                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) (eventsSkilling ++ eventsAdventuring))
+                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) (effectsSkilling ++ effectsAdventuring))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -419,29 +419,27 @@ tick delta game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-getPurchaseEvent : Int -> Resource.Kind -> Event
-getPurchaseEvent amount resource =
+getPurchaseEffects : Int -> Resource.Kind -> List Effect
+getPurchaseEffects amount resource =
     let
         cost : Coin.Coin
         cost =
             Quantity.multiplyBy (toFloat amount) (Coin.int 10)
                 |> Quantity.multiplyBy -1
     in
-    Event.Event
-        { effects = [ Effect.gainCoin cost, Effect.gainResource amount resource ]
-        }
+    [ Effect.gainCoin cost, Effect.gainResource amount resource ]
 
 
 attemptPurchaseResource : Int -> Resource.Kind -> Game -> ( Game, List Toast )
 attemptPurchaseResource amount resource game =
     let
-        event : Event
-        event =
-            getPurchaseEvent amount resource
+        effects : List Effect
+        effects =
+            getPurchaseEffects amount resource
 
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
-            applyEvent event (Random.constant ( game, [] ))
+            applyEvent effects (Random.constant ( game, [] ))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -449,17 +447,11 @@ attemptPurchaseResource amount resource game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-applyEvent : Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-applyEvent event =
+applyEvent : List Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent effects =
+    -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
         (\( game, toasts ) ->
-            let
-                effects : List Effect.Effect
-                effects =
-                    case event of
-                        Event data ->
-                            data.effects
-            in
             applyEffects effects game
                 |> Random.andThen
                     (\res ->
@@ -481,7 +473,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Effect.Effect -> Game -> ApplyEffectsResultGenerator
+applyEffects : List Effect -> Game -> ApplyEffectsResultGenerator
 applyEffects effects game =
     case effects of
         [] ->
@@ -490,7 +482,7 @@ applyEffects effects game =
         effect :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
-                    applyModsToEffect (getAllMods game) effect
+                    Event.applyModsToEffect (getAllMods game) effect
             in
             applyEffect moddedEffect game
                 |> Random.andThen
@@ -834,7 +826,7 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-getShopItemMods : Game -> List Mod
+getShopItemMods : Game -> List Event.Mod
 getShopItemMods game =
     game.shopItems
         |> ShopItems.toOwnedItems
@@ -957,10 +949,10 @@ getMasteryRewards game activity =
             []
 
 
-getActivityMods : Game -> List Mod
+getActivityMods : Game -> List Event.Mod
 getActivityMods game =
     let
-        getGameMod : Activity.MasteryReward -> Maybe Mod
+        getGameMod : Activity.MasteryReward -> Maybe Event.Mod
         getGameMod reward =
             case reward of
                 Activity.GameMod mod ->
@@ -974,7 +966,7 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-getSpellMods : Game -> List Mod
+getSpellMods : Game -> List Event.Mod
 getSpellMods game =
     -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
     let
@@ -995,12 +987,12 @@ getSpellMods game =
         |> List.concat
 
 
-addActivityTagToMods : Activity -> List Mod -> List Mod
+addActivityTagToMods : Activity -> List Event.Mod -> List Event.Mod
 addActivityTagToMods activity =
     List.map (Event.modWithTags [ Effect.ActivityTag activity ])
 
 
-getAllMods : Game -> List Mod
+getAllMods : Game -> List Event.Mod
 getAllMods game =
     []
         ++ getSpellMods game

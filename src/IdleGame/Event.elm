@@ -25,37 +25,6 @@ type ModSource
 
 
 
--- Events
-
-
-type alias EventData =
-    { effects : List Effect.Effect
-    }
-
-
-type Event
-    = Event EventData
-
-
-type ModdedEvent
-    = ModdedEvent EventData
-
-
-
--- Effects
-
-
-getEffects : Event -> List Effect.Effect
-getEffects (Event { effects }) =
-    effects
-
-
-getEffectsModded : ModdedEvent -> List Effect.Effect
-getEffectsModded (ModdedEvent { effects }) =
-    effects
-
-
-
 -- Mods
 
 

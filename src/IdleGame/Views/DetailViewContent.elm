@@ -5,8 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
-import IdleGame.Effect as Effect
-import IdleGame.Event as Event exposing (Event)
+import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Event as Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -116,17 +116,13 @@ renderContent obj extraBottomPadding game =
         mxp =
             Activity.getByKind activity game.mxp
 
-        event : Event
-        event =
-            (Activity.getStats activity).event
+        effects : List Effect
+        effects =
+            (Activity.getStats activity).effects
 
         mods : List Event.Mod
         mods =
             Game.getAllMods game
-
-        effects : List Effect.Effect
-        effects =
-            Event.getEffects event
 
         orderedEffects : List Effect.Effect
         orderedEffects =
