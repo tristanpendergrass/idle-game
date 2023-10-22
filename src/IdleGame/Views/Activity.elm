@@ -8,11 +8,11 @@ import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
-import IdleGame.Event as Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
+import IdleGame.Mod as Event
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill exposing (Kind(..))

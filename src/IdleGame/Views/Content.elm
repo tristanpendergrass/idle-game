@@ -5,8 +5,8 @@ module IdleGame.Views.Content exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Event exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.Mod exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity

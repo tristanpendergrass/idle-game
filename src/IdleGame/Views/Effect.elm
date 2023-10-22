@@ -8,10 +8,10 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
-import IdleGame.Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -21,9 +21,9 @@ import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
-render : Game -> List IdleGame.Event.Mod -> Effect.Effect -> Html FrontendMsg
+render : Game -> List Mod -> Effect.Effect -> Html FrontendMsg
 render game mods effect =
-    IdleGame.Event.applyModsToEffect mods effect
+    Mod.applyModsToEffect mods effect
         |> Tuple.first
         |> renderModdedEffect game
 

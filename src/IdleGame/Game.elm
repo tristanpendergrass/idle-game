@@ -9,11 +9,11 @@ import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.Event as Event
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Kinds.Spells as Spell exposing (Spell)
+import IdleGame.Mod as Event
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)

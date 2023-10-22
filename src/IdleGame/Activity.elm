@@ -5,10 +5,10 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
-import IdleGame.Event as Event
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
+import IdleGame.Mod as Event
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell

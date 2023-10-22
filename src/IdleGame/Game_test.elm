@@ -8,9 +8,9 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
 import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.Event as Event exposing (..)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Mod as Event exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)

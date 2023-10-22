@@ -6,11 +6,11 @@ import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Chore as Chore
 import IdleGame.Effect as Effect exposing (Effect)
-import IdleGame.Event as Event
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
+import IdleGame.Mod as Event
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)

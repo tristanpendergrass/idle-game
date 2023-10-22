@@ -1,7 +1,7 @@
 module IdleGame.Spell exposing (..)
 
-import IdleGame.Event as Event
 import IdleGame.Kinds.Spells as Spells exposing (Spell(..))
+import IdleGame.Mod as Event
 import List.Extra
 
 
