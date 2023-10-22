@@ -1,7 +1,7 @@
 module IdleGame.Mod exposing (..)
 
 import IdleGame.Combat as Combat exposing (Combat)
-import IdleGame.Effect as Effect
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Skill as Skill
@@ -24,17 +24,17 @@ type alias Mod =
 
 
 type alias Transformer =
-    Int -> Effect.Effect -> TransformerResult
+    Int -> Effect.TaggedEffect -> TransformerResult
 
 
 type TransformerResult
     = NoChange
-    | ChangeEffect Effect.Effect
-    | ChangeAndAddEffects Effect.Effect (List Effect.Effect)
+    | ChangeEffect Effect.TaggedEffect
+    | ChangeAndAddEffects Effect.TaggedEffect (List Effect.TaggedEffect)
 
 
 type alias SimpleTransformer =
-    Effect.EffectType -> Effect.EffectType
+    Effect -> Effect
 
 
 scopeTransformerToTags : List Effect.Tag -> Transformer -> Transformer
@@ -49,10 +49,10 @@ scopeTransformerToTags tags transformer multiplier effect =
 
 -- variableEffectsTransformer : Transformer
 -- variableEffectsTransformer multiplier effect =
---     case Effect.getType effect of
+--     case Effect.getEffect effect of
 --         Effect.VariableSuccess {successProbability, successEffects, failureEffects} ->
 --             effect
---                 |> Effect.setType (Effect.VariableSuccess
+--                 |> Effect.setEffect (Effect.VariableSuccess
 --                     { successProbability = successProbability
 --                     , successEffects =
 --                     }
@@ -66,14 +66,14 @@ includeVariableEffects mod =
         transformer =
             mod.transformer
 
-        newTransformer : Int -> Effect.Effect -> TransformerResult
-        newTransformer multiplier effect =
-            case Effect.getType effect of
+        newTransformer : Int -> Effect.TaggedEffect -> TransformerResult
+        newTransformer multiplier taggedEffect =
+            case taggedEffect.effect of
                 Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
                     let
                         ( successEffectsDidChange, newSuccessEffects ) =
                             let
-                                newEffects : List Effect.Effect
+                                newEffects : List Effect.TaggedEffect
                                 newEffects =
                                     successEffects
                                         |> List.concatMap
@@ -89,7 +89,7 @@ includeVariableEffects mod =
 
                         ( failureEffectsDidChange, newFailureEffects ) =
                             let
-                                newEffects : List Effect.Effect
+                                newEffects : List Effect.TaggedEffect
                                 newEffects =
                                     successEffects
                                         |> List.concatMap
@@ -107,8 +107,8 @@ includeVariableEffects mod =
                             successEffectsDidChange || failureEffectsDidChange
                     in
                     if effectDidChange then
-                        effect
-                            |> Effect.setType
+                        taggedEffect
+                            |> Effect.setEffect
                                 (Effect.VariableSuccess
                                     { successProbability = successProbability
                                     , successEffects = newSuccessEffects
@@ -121,7 +121,7 @@ includeVariableEffects mod =
                         NoChange
 
                 _ ->
-                    transformer multiplier effect
+                    transformer multiplier taggedEffect
     in
     { mod | transformer = newTransformer }
 
@@ -133,14 +133,14 @@ useSimpleTransformer =
 
 
 useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
-useSimpleTransformerHelp depth transformFn repetitions effect =
+useSimpleTransformerHelp depth transformFn repetitions taggedEffect =
     let
         newEffectType =
-            transformFn (Effect.getType effect)
+            transformFn (Effect.getEffect taggedEffect)
 
         newEffect =
-            effect
-                |> Effect.setType newEffectType
+            taggedEffect
+                |> Effect.setEffect newEffectType
     in
     if repetitions > 1 && depth < 20 then
         useSimpleTransformerHelp (depth + 1) transformFn (repetitions - 1) newEffect
@@ -152,7 +152,7 @@ useSimpleTransformerHelp depth transformFn repetitions effect =
         ChangeEffect newEffect
 
 
-applyModToEffect : Mod -> ( Effect.Effect, List Effect.Effect ) -> ( Effect.Effect, List Effect.Effect )
+applyModToEffect : Mod -> ( Effect.TaggedEffect, List Effect.TaggedEffect ) -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if Effect.hasTags mod.tags effectAccum then
         case mod.transformer mod.repetitions effectAccum of
@@ -169,7 +169,7 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : List Mod -> Effect.Effect -> ( Effect.Effect, List Effect.Effect )
+applyModsToEffect : List Mod -> Effect.TaggedEffect -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
 applyModsToEffect =
     applyModsToEffectHelp 0
 
@@ -179,7 +179,7 @@ tupleToList ( x, xs ) =
     x :: xs
 
 
-applyModsToEffectHelp : Int -> List Mod -> Effect.Effect -> ( Effect.Effect, List Effect.Effect )
+applyModsToEffectHelp : Int -> List Mod -> Effect.TaggedEffect -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
 applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
@@ -236,7 +236,7 @@ modWithTags tags mod =
 
 xpTransformer : Float -> Transformer
 xpTransformer buff repetitions effect =
-    case Effect.getType effect of
+    case Effect.getEffect effect of
         Effect.GainXp quantity skill ->
             let
                 adjustedBuff =
@@ -246,7 +246,7 @@ xpTransformer buff repetitions effect =
                     { quantity | multiplier = quantity.multiplier * adjustedBuff }
             in
             effect
-                |> Effect.setType (Effect.GainXp adjustedMultiplicable skill)
+                |> Effect.setEffect (Effect.GainXp adjustedMultiplicable skill)
                 |> ChangeEffect
 
         _ ->
@@ -254,15 +254,15 @@ xpTransformer buff repetitions effect =
 
 
 coinTransformer : Float -> Transformer
-coinTransformer buff repetitions effect =
-    case Effect.getType effect of
+coinTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
         Effect.GainCoin quantity ->
             let
                 adjustedMultiplicable =
                     { quantity | multiplier = quantity.multiplier + (buff * toFloat repetitions) }
             in
-            effect
-                |> Effect.setType (Effect.GainCoin adjustedMultiplicable)
+            taggedEffect
+                |> Effect.setEffect (Effect.GainCoin adjustedMultiplicable)
                 |> ChangeEffect
 
         _ ->
@@ -270,8 +270,8 @@ coinTransformer buff repetitions effect =
 
 
 mxpTransformer : Float -> Transformer
-mxpTransformer buff repetitions effect =
-    case Effect.getType effect of
+mxpTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
         Effect.GainMxp quantity chore ->
             let
                 adjustedBuff =
@@ -280,8 +280,8 @@ mxpTransformer buff repetitions effect =
                 adjustedMultiplicable =
                     { quantity | multiplier = quantity.multiplier * adjustedBuff }
             in
-            effect
-                |> Effect.setType (Effect.GainMxp adjustedMultiplicable chore)
+            taggedEffect
+                |> Effect.setEffect (Effect.GainMxp adjustedMultiplicable chore)
                 |> ChangeEffect
 
         _ ->
@@ -289,11 +289,11 @@ mxpTransformer buff repetitions effect =
 
 
 resourceTransformer : Float -> Transformer
-resourceTransformer buff repetitions effect =
-    case Effect.getType effect of
+resourceTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
         Effect.GainResource { base, doublingChance } kind ->
-            effect
-                |> Effect.setType (Effect.GainResource { base = base, doublingChance = doublingChance + (buff * toFloat repetitions) } kind)
+            taggedEffect
+                |> Effect.setEffect (Effect.GainResource { base = base, doublingChance = doublingChance + (buff * toFloat repetitions) } kind)
                 |> ChangeEffect
 
         _ ->
@@ -301,38 +301,38 @@ resourceTransformer buff repetitions effect =
 
 
 increaseSuccessTransformer : Float -> Transformer
-increaseSuccessTransformer buff repetitions effect =
-    case Effect.getType effect of
+increaseSuccessTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
         Effect.VariableSuccess params ->
             let
                 newSuccessProbability =
                     (params.successProbability + buff * toFloat repetitions)
                         |> min 1.0
 
-                newEffectType =
+                newEffect =
                     Effect.VariableSuccess { params | successProbability = newSuccessProbability }
             in
-            ChangeEffect (Effect.setType newEffectType effect)
+            ChangeEffect (Effect.setEffect newEffect taggedEffect)
 
         _ ->
             NoChange
 
 
 powerTransformer : Int -> Transformer
-powerTransformer buff repetitions effect =
-    case Effect.getType effect of
+powerTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
         Effect.ResolveCombat { combat, successEffects, failureEffects } ->
             let
                 newCombat : Combat
                 newCombat =
                     Combat.addPlayerPower (buff * repetitions) combat
 
-                newEffectType : Effect.EffectType
-                newEffectType =
+                newEffect : Effect
+                newEffect =
                     Effect.ResolveCombat { combat = newCombat, successEffects = successEffects, failureEffects = failureEffects }
             in
-            effect
-                |> Effect.setType newEffectType
+            taggedEffect
+                |> Effect.setEffect newEffect
                 |> ChangeEffect
 
         _ ->

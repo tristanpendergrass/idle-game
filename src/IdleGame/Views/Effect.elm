@@ -7,7 +7,7 @@ import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -21,16 +21,16 @@ import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
-render : Game -> List Mod -> Effect.Effect -> Html FrontendMsg
+render : Game -> List Mod -> Effect.TaggedEffect -> Html FrontendMsg
 render game mods effect =
     Mod.applyModsToEffect mods effect
         |> Tuple.first
         |> renderModdedEffect game
 
 
-renderModdedEffect : Game -> Effect.Effect -> Html FrontendMsg
+renderModdedEffect : Game -> Effect.TaggedEffect -> Html FrontendMsg
 renderModdedEffect game effect =
-    case Effect.getType effect of
+    case Effect.getEffect effect of
         Effect.GainCoin coin ->
             renderCoin coin
 
@@ -46,7 +46,7 @@ renderModdedEffect game effect =
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             case successEffects of
                 [ e ] ->
-                    case Effect.getType e of
+                    case Effect.getEffect e of
                         Effect.GainResource _ kind ->
                             renderVariableResource successProbability kind
 

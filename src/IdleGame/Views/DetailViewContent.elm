@@ -116,7 +116,7 @@ renderContent obj extraBottomPadding game =
         mxp =
             Activity.getByKind activity game.mxp
 
-        effects : List Effect
+        effects : List Effect.TaggedEffect
         effects =
             (Activity.getStats activity).effects
 
@@ -124,7 +124,7 @@ renderContent obj extraBottomPadding game =
         mods =
             Game.getAllMods game
 
-        orderedEffects : List Effect.Effect
+        orderedEffects : List Effect.TaggedEffect
         orderedEffects =
             List.sortWith Effect.order effects
 

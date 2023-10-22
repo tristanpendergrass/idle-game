@@ -153,13 +153,21 @@ type alias Mastery =
 -- Refactor event into ActivityDetails with a list of types like ResourceCreator, MonsterFighter, ResourceTransformer, etc.
 
 
+type
+    ActivityEffects
+    -- TODO: continue
+    = ChoreEffects { xp : { effect : Effect.GainXpParams, tags : List Effect.Tag } }
+
+
 type alias Stats =
     { skill : Skill.Kind
     , title : String
     , image : ActivityImage
     , unlockRequirements : Maybe ( Skill.Kind, Int )
     , duration : Duration
-    , effects : List Effect
+
+    -- , effects : ActivityEffects
+    , effects : List Effect.TaggedEffect
     , mastery : Maybe Mastery
     , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
     , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell

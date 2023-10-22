@@ -249,7 +249,7 @@ getModdedDuration game kind =
         |> applyIntervalMods mods
 
 
-combatReward : List Effect
+combatReward : List Effect.TaggedEffect
 combatReward =
     [ Effect.gainCoin (Coin.int 25) ]
 
@@ -356,7 +356,7 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect)
+                        newEffects : List (List Effect.TaggedEffect)
                         newEffects =
                             List.repeat completions stats.effects
                     in
@@ -383,7 +383,7 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect)
+                        newEffects : List (List Effect.TaggedEffect)
                         newEffects =
                             List.repeat completions stats.effects
                     in
@@ -419,7 +419,7 @@ tick delta game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-getPurchaseEffects : Int -> Resource.Kind -> List Effect
+getPurchaseEffects : Int -> Resource.Kind -> List Effect.TaggedEffect
 getPurchaseEffects amount resource =
     let
         cost : Coin.Coin
@@ -433,7 +433,7 @@ getPurchaseEffects amount resource =
 attemptPurchaseResource : Int -> Resource.Kind -> Game -> ( Game, List Toast )
 attemptPurchaseResource amount resource game =
     let
-        effects : List Effect
+        effects : List Effect.TaggedEffect
         effects =
             getPurchaseEffects amount resource
 
@@ -447,7 +447,7 @@ attemptPurchaseResource amount resource game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-applyEvent : List Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent : List Effect.TaggedEffect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 applyEvent effects =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
@@ -473,7 +473,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Effect -> Game -> ApplyEffectsResultGenerator
+applyEffects : List Effect.TaggedEffect -> Game -> ApplyEffectsResultGenerator
 applyEffects effects game =
     case effects of
         [] ->
@@ -501,7 +501,7 @@ applyEffects effects game =
                                     toasts =
                                         applyEffectVal.toasts
 
-                                    additionalEffects : List Effect.Effect
+                                    additionalEffects : List Effect.TaggedEffect
                                     additionalEffects =
                                         applyEffectVal.additionalEffects
                                 in
@@ -592,16 +592,16 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List Effect.Effect }
+    { game : Game, toasts : List Toast, additionalEffects : List Effect.TaggedEffect }
 
 
 type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-applyEffect : Effect.Effect -> Game -> ApplyEffectResultGenerator
+applyEffect : Effect.TaggedEffect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
-    case Effect.getType effect of
+    case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             successGenerator successProbability
                 |> Random.andThen

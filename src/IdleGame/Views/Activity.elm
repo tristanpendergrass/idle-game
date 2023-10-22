@@ -164,7 +164,7 @@ renderActivity activity game screenWidth =
         stats =
             Activity.getStats activity
 
-        effects : List Effect
+        effects : List Effect.TaggedEffect
         effects =
             stats.effects
 
@@ -172,7 +172,7 @@ renderActivity activity game screenWidth =
         mods =
             Game.getAllMods game
 
-        orderedEffects : List Effect.Effect
+        orderedEffects : List Effect.TaggedEffect
         orderedEffects =
             List.sortWith Effect.order effects
 

@@ -14,104 +14,106 @@ import Percent exposing (Percent)
 import Task exposing (fail)
 
 
-type
-    Tag
-    -- TODO: refactor into a Tag module so references can be Tag.Skill?
+type Tag
     = SkillTag Skill.Kind
     | XpTag
     | MxpTag
     | ActivityTag Activity
 
 
+type alias TaggedEffect =
+    { effect : Effect
+    , tags : List Tag
+    }
+
+
+type alias GainXpParams =
+    { base : Xp
+    , multiplier : Float
+    , skill : Skill.Kind
+    }
+
+
 type Effect
-    = Effect
-        { type_ : EffectType
-        , tags : List Tag
-        }
-
-
-type EffectType
-    = VariableSuccess { successProbability : Float, successEffects : List Effect, failureEffects : List Effect }
+    = VariableSuccess { successProbability : Float, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
     | GainResource { base : Int, doublingChance : Float } Resource.Kind
+      -- | GainXp GainXpParams
     | GainXp { base : Xp, multiplier : Float } Skill.Kind
     | GainMxp { multiplier : Float } Activity
     | GainCoin { base : Coin, multiplier : Float }
-    | ResolveCombat { combat : Combat, successEffects : List Effect, failureEffects : List Effect }
+    | ResolveCombat { combat : Combat, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
 
 
-getType : Effect -> EffectType
-getType (Effect { type_ }) =
-    type_
+getEffect : TaggedEffect -> Effect
+getEffect { effect } =
+    effect
 
 
-setType : EffectType -> Effect -> Effect
-setType newType (Effect data) =
-    Effect { data | type_ = newType }
+setEffect : Effect -> TaggedEffect -> TaggedEffect
+setEffect newEffect taggedEffect =
+    { taggedEffect | effect = newEffect }
 
 
-gainXp : Xp -> Skill.Kind -> Effect
+gainXp : Xp -> Skill.Kind -> TaggedEffect
 gainXp quantity skill =
-    Effect
-        { type_ = GainXp { base = quantity, multiplier = 1 } skill
-        , tags = []
-        }
+    { effect = GainXp { base = quantity, multiplier = 1 } skill
+    , tags = []
+    }
 
 
-gainCoin : Coin -> Effect
+gainCoin : Coin -> TaggedEffect
 gainCoin quantity =
-    Effect
-        { type_ = GainCoin { base = quantity, multiplier = 1 }
-        , tags = []
-        }
+    { effect = GainCoin { base = quantity, multiplier = 1 }
+    , tags = []
+    }
 
 
-gainMxp : Activity -> Effect
+gainMxp : Activity -> TaggedEffect
 gainMxp activity =
-    Effect
-        { type_ = GainMxp { multiplier = 1 } activity
-        , tags = []
-        }
+    { effect = GainMxp { multiplier = 1 } activity
+    , tags = []
+    }
 
 
-gainResource : Int -> Resource.Kind -> Effect
+gainResource : Int -> Resource.Kind -> TaggedEffect
 gainResource quantity kind =
-    Effect
-        { type_ = GainResource { base = quantity, doublingChance = 0 } kind
-        , tags = []
-        }
+    { effect = GainResource { base = quantity, doublingChance = 0 } kind
+    , tags = []
+    }
 
 
-gainResourceWithDoubling : Int -> Resource.Kind -> Float -> Effect
+gainResourceWithDoubling : Int -> Resource.Kind -> Float -> TaggedEffect
 gainResourceWithDoubling quantity kind doubling =
-    Effect
-        { type_ = GainResource { base = quantity, doublingChance = doubling } kind
-        , tags = []
-        }
+    { effect = GainResource { base = quantity, doublingChance = doubling } kind
+    , tags = []
+    }
 
 
-gainWithProbability : Float -> List Effect -> Effect
+gainWithProbability : Float -> List TaggedEffect -> TaggedEffect
 gainWithProbability probability successEffects =
-    Effect { type_ = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }, tags = [] }
+    { effect = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }
+    , tags = []
+    }
 
 
-resolveCombat : Combat -> List Effect -> Effect
+resolveCombat : Combat -> List TaggedEffect -> TaggedEffect
 resolveCombat combat successEffects =
-    Effect { type_ = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }, tags = [] }
+    { effect = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }
+    , tags = []
+    }
 
 
-withTags : List Tag -> Effect -> Effect
-withTags newTags (Effect { type_, tags }) =
-    Effect
-        { type_ = type_
-
-        -- TODO: dedupe tags?
-        , tags = tags ++ newTags
-        }
+withTags : List Tag -> TaggedEffect -> TaggedEffect
+withTags newTags taggedEffect =
+    { taggedEffect
+      -- TODO: dedupe tags?
+        | tags = taggedEffect.tags ++ newTags
+    }
 
 
-order : Effect -> Effect -> Order
+order : TaggedEffect -> TaggedEffect -> Order
 order effect1 effect2 =
-    case ( getType effect1, getType effect2 ) of
+    case ( getEffect effect1, getEffect effect2 ) of
         -- Coin comes at front
         ( GainCoin _, _ ) ->
             LT
@@ -143,10 +145,10 @@ order effect1 effect2 =
             EQ
 
 
-hasTags : List Tag -> Effect -> Bool
-hasTags mandatoryTags (Effect { tags }) =
+hasTags : List Tag -> TaggedEffect -> Bool
+hasTags requiredTags { tags } =
     List.all
         (\tag ->
             List.member tag tags
         )
-        mandatoryTags
+        requiredTags
