@@ -8,7 +8,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities as Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
-import IdleGame.Mod as Event
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
@@ -230,7 +230,7 @@ type MasteryReward
     | ImbueEnabled -- Spell can be embued with elements
     | BoostEffects -- Spell effects are boosted
     | IntervalMod IntervalMod -- Activity interval decreased by this much
-    | GameMod Event.Mod -- Apply mod to game
+    | GameMod Mod -- Apply mod to game
 
 
 type alias Mastery =
@@ -540,22 +540,22 @@ getActivityMastery : Activity -> Mastery
 getActivityMastery chore =
     [ ( 10
       , GameMod
-            (Event.xpBuff 0.25
-                |> Event.modWithTags [ Effect.ActivityTag chore ]
+            (Mod.xpBuff 0.25
+                |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
-    , ( 35, GameMod (Event.xpBuff 0.25) )
-    , ( 65, GameMod (Event.xpBuff 0.25) )
-    , ( 95, GameMod (Event.xpBuff 0.35) )
+    , ( 35, GameMod (Mod.xpBuff 0.25) )
+    , ( 65, GameMod (Mod.xpBuff 0.25) )
+    , ( 95, GameMod (Mod.xpBuff 0.35) )
     ]
 
 
 getChoresMastery : Activity -> Mastery
 getChoresMastery chore =
-    [ ( 10
+    [ ( 25
       , GameMod
-            (Event.mxpBuff 0.25
-                |> Event.modWithTags [ Effect.ActivityTag chore ]
+            (Mod.coinBuff 0.1
+                |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 35
@@ -567,14 +567,14 @@ getChoresMastery chore =
       )
     , ( 65
       , GameMod
-            (Event.resourceBuff 0.2
-                |> Event.modWithTags [ Effect.ActivityTag chore ]
+            (Mod.resourceBuff 0.2
+                |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 95
       , GameMod
-            (Event.successBuff 0.2
-                |> Event.modWithTags [ Effect.ActivityTag chore ]
+            (Mod.successBuff 0.2
+                |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
     ]

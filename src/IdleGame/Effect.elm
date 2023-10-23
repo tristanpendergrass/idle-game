@@ -1,6 +1,5 @@
 module IdleGame.Effect exposing (..)
 
-import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)

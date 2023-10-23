@@ -5,7 +5,6 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
-import IdleGame.Chore as Chore
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)

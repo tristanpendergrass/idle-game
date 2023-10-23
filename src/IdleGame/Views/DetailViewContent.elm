@@ -4,7 +4,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
-import IdleGame.Chore as Chore
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)

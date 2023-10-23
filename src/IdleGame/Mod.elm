@@ -229,8 +229,8 @@ withSource source mod =
     { mod | source = source }
 
 
-modWithTags : List Effect.Tag -> Mod -> Mod
-modWithTags tags mod =
+withTags : List Effect.Tag -> Mod -> Mod
+withTags tags mod =
     { mod | tags = mod.tags ++ tags }
 
 

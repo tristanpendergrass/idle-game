@@ -1,7 +1,6 @@
 module IdleGame.ShopItems exposing (..)
 
 import Html exposing (..)
-import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)

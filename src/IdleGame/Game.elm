@@ -3,7 +3,6 @@ module IdleGame.Game exposing (..)
 import Duration exposing (Duration)
 import Html.Attributes exposing (download)
 import IdleGame.Activity as Activity exposing (ActivityImage)
-import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
@@ -921,7 +920,7 @@ getSpellMods game =
 
 addActivityTagToMods : Activity -> List Event.Mod -> List Event.Mod
 addActivityTagToMods activity =
-    List.map (Event.modWithTags [ Effect.ActivityTag activity ])
+    List.map (Event.withTags [ Effect.ActivityTag activity ])
 
 
 getAllMods : Game -> List Event.Mod

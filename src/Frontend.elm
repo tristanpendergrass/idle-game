@@ -11,7 +11,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
-import IdleGame.Chore as Chore
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
