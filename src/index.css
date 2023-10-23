@@ -72,7 +72,6 @@
 }
 
 .toast {
-  @apply bg-success text-success-content rounded py-1 px-2;
   box-sizing: content-box;
   display: flex;
   position: relative;

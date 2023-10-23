@@ -456,13 +456,25 @@ applyEvent effects =
                 |> Random.andThen
                     (\res ->
                         case res of
-                            Err _ ->
-                                Random.constant ( game, toasts )
+                            Err err ->
+                                let
+                                    toast : Toast
+                                    toast =
+                                        getToastForErr err
+                                in
+                                Random.constant ( game, toast :: toasts )
 
                             Ok val ->
                                 Random.constant ( val.game, toasts ++ val.toasts )
                     )
         )
+
+
+getToastForErr : EffectErr -> Toast
+getToastForErr err =
+    case err of
+        EffectErr.NegativeAmount ->
+            NegativeAmountErr
 
 
 type alias ApplyEffectsValue =

@@ -970,9 +970,22 @@ toastConfig =
 
 toastToHtml : Toast -> Html msg
 toastToHtml notification =
+    let
+        baseClass : Html.Attribute msg
+        baseClass =
+            class "px-2 py-1 rounded"
+
+        successClass : Html.Attribute msg
+        successClass =
+            class "bg-success text-success-content"
+
+        errClass : Html.Attribute msg
+        errClass =
+            class "bg-error text-error-content"
+    in
     case notification of
         GainedCoin amount ->
-            div [ class "flex gap-1 items-center" ]
+            div [ baseClass, successClass, class "flex gap-1 items-center" ]
                 [ span []
                     [ amount
                         |> Coin.toInt
@@ -988,15 +1001,19 @@ toastToHtml notification =
                 stats =
                     Resource.getStats resource
             in
-            div [ class "flex gap-1 items-center" ]
+            div [ baseClass, successClass, class "flex gap-1 items-center" ]
                 [ span [] [ text <| "+" ++ ViewUtils.intToString amount ]
                 , stats.icon
                     |> Icon.toHtml
                 ]
 
         LostCombat ->
-            div []
+            div [ baseClass, errClass ]
                 [ text "Lost combat" ]
+
+        NegativeAmountErr ->
+            div [ baseClass, errClass ]
+                [ text "Missing resources" ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg

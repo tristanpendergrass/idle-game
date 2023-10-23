@@ -11,6 +11,7 @@ type Toast
     = GainedCoin Coin
     | GainedResource Int Resource.Kind
     | LostCombat
+    | NegativeAmountErr
 
 
 type IntervalModLabel
