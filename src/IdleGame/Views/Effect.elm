@@ -21,15 +21,20 @@ import Quantity exposing (Quantity)
 import Types exposing (..)
 
 
-render : Game -> List Mod -> Effect.TaggedEffect -> Html FrontendMsg
-render game mods effect =
+type RenderType
+    = ForCard
+    | ForDetailView
+
+
+render : { game : Game, mods : List Mod, effect : Effect.TaggedEffect, renderType : RenderType } -> Html FrontendMsg
+render { game, mods, effect, renderType } =
     Mod.applyModsToEffect mods effect
         |> Tuple.first
-        |> renderModdedEffect game
+        |> renderModdedEffect renderType game
 
 
-renderModdedEffect : Game -> Effect.TaggedEffect -> Html FrontendMsg
-renderModdedEffect game effect =
+renderModdedEffect : RenderType -> Game -> Effect.TaggedEffect -> Html FrontendMsg
+renderModdedEffect renderType game effect =
     case Effect.getEffect effect of
         Effect.GainCoin coin ->
             renderCoin coin
@@ -57,7 +62,7 @@ renderModdedEffect game effect =
                     div [] []
 
         Effect.ResolveCombat { combat } ->
-            renderCombat combat
+            renderCombat renderType combat
 
 
 renderCoin : { base : Coin, multiplier : Float } -> Html msg
@@ -164,8 +169,8 @@ renderMonsterPower strength =
         ]
 
 
-renderCombat : Combat -> Html msg
-renderCombat combat =
+renderCombat : RenderType -> Combat -> Html msg
+renderCombat renderType combat =
     let
         monsterPower : Int
         monsterPower =
@@ -176,10 +181,16 @@ renderCombat combat =
             Combat.getPlayerPower combat
     in
     div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
-        [ renderMonsterPower monsterPower
-        , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
-        , div [ class "t-column gap-0" ]
-            [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
-            , div [ class "text-sm" ] [ text "Player Power" ]
-            ]
-        ]
+        (case renderType of
+            ForDetailView ->
+                [ renderMonsterPower monsterPower
+                , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
+                , div [ class "t-column gap-0" ]
+                    [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
+                    , div [ class "text-sm" ] [ text "Player Power" ]
+                    ]
+                ]
+
+            ForCard ->
+                [ renderMonsterPower monsterPower ]
+        )

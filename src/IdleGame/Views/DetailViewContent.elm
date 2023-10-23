@@ -192,7 +192,16 @@ renderContent obj extraBottomPadding game =
 
         -- The effects of the activity
         , div [ class "t-column relative" ]
-            (List.map (EffectView.render game mods) orderedEffects
+            (List.map
+                (\taggedEffect ->
+                    EffectView.render
+                        { game = game
+                        , mods = mods
+                        , effect = taggedEffect
+                        , renderType = EffectView.ForDetailView
+                        }
+                )
+                orderedEffects
                 ++ [ fade isPreview ]
             )
 

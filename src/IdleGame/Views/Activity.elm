@@ -205,7 +205,16 @@ renderActivity activity game screenWidth =
                     ([ activityTitle activity
                      , activityDuration duration
                      ]
-                        ++ List.map (EffectView.render game mods) orderedEffects
+                        ++ List.map
+                            (\taggedEffect ->
+                                EffectView.render
+                                    { game = game
+                                    , mods = mods
+                                    , effect = taggedEffect
+                                    , renderType = EffectView.ForCard
+                                    }
+                            )
+                            orderedEffects
                     )
                 ]
 

@@ -58,7 +58,7 @@ $ npm test -- --watch
   - [x] Add spell selector
   - [x] Check spell mods from getAllMods
 - [x] Add notification when no more resource
-- [ ] Fix monsters showing player power on activity card
+- [x] Fix monsters showing player power on activity card
 - [ ] Finalize gameplay values
   - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
