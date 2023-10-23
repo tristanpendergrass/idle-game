@@ -34,13 +34,28 @@ type alias GainXpParams =
     }
 
 
+type alias GainMxpParams =
+    { multiplier : Float
+    , activity : Activity
+    }
+
+
+type alias GainCoinParams =
+    { base : Coin
+    , multiplier : Float
+    }
+
+
+type alias GainResourceParams =
+    { base : Int, doublingChance : Float, resource : Resource.Kind }
+
+
 type Effect
     = VariableSuccess { successProbability : Float, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
-    | GainResource { base : Int, doublingChance : Float } Resource.Kind
-      -- | GainXp GainXpParams
-    | GainXp { base : Xp, multiplier : Float } Skill.Kind
-    | GainMxp { multiplier : Float } Activity
-    | GainCoin { base : Coin, multiplier : Float }
+    | GainResource GainResourceParams
+    | GainXp GainXpParams
+    | GainMxp GainMxpParams
+    | GainCoin GainCoinParams
     | ResolveCombat { combat : Combat, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
 
 
@@ -56,7 +71,7 @@ setEffect newEffect taggedEffect =
 
 gainXp : Xp -> Skill.Kind -> TaggedEffect
 gainXp quantity skill =
-    { effect = GainXp { base = quantity, multiplier = 1 } skill
+    { effect = GainXp { base = quantity, multiplier = 1, skill = skill }
     , tags = []
     }
 
@@ -70,21 +85,21 @@ gainCoin quantity =
 
 gainMxp : Activity -> TaggedEffect
 gainMxp activity =
-    { effect = GainMxp { multiplier = 1 } activity
+    { effect = GainMxp { multiplier = 1, activity = activity }
     , tags = []
     }
 
 
 gainResource : Int -> Resource.Kind -> TaggedEffect
 gainResource quantity kind =
-    { effect = GainResource { base = quantity, doublingChance = 0 } kind
+    { effect = GainResource { base = quantity, doublingChance = 0, resource = kind }
     , tags = []
     }
 
 
 gainResourceWithDoubling : Int -> Resource.Kind -> Float -> TaggedEffect
 gainResourceWithDoubling quantity kind doubling =
-    { effect = GainResource { base = quantity, doublingChance = doubling } kind
+    { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
     , tags = []
     }
 
@@ -122,23 +137,23 @@ order effect1 effect2 =
             GT
 
         -- XP comes before MXP
-        ( GainXp _ _, GainMxp _ _ ) ->
+        ( GainXp _, GainMxp _ ) ->
             LT
 
-        ( GainMxp _ _, GainXp _ _ ) ->
+        ( GainMxp _, GainXp _ ) ->
             GT
 
         -- Both types of XP come at the end
-        ( GainXp _ _, _ ) ->
+        ( GainXp _, _ ) ->
             GT
 
-        ( GainMxp _ _, _ ) ->
+        ( GainMxp _, _ ) ->
             GT
 
-        ( _, GainXp _ _ ) ->
+        ( _, GainXp _ ) ->
             LT
 
-        ( _, GainMxp _ _ ) ->
+        ( _, GainMxp _ ) ->
             LT
 
         _ ->

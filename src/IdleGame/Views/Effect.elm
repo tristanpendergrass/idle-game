@@ -34,21 +34,21 @@ renderModdedEffect game effect =
         Effect.GainCoin coin ->
             renderCoin coin
 
-        Effect.GainResource { base, doublingChance } kind ->
-            renderResource { base = base, doublingChance = doublingChance } kind
+        Effect.GainResource params ->
+            renderResource params
 
-        Effect.GainXp multiplicable skill ->
-            renderXp multiplicable skill
+        Effect.GainXp params ->
+            renderXp params
 
-        Effect.GainMxp multiplier activity ->
-            renderMxp game multiplier activity
+        Effect.GainMxp params ->
+            renderMxp game params
 
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             case successEffects of
                 [ e ] ->
                     case Effect.getEffect e of
-                        Effect.GainResource _ kind ->
-                            renderVariableResource successProbability kind
+                        Effect.GainResource { resource } ->
+                            renderVariableResource successProbability resource
 
                         _ ->
                             div [] []
@@ -83,8 +83,8 @@ renderCoin { base, multiplier } =
         ]
 
 
-renderResource : { base : Int, doublingChance : Float } -> Resource.Kind -> Html msg
-renderResource { base, doublingChance } kind =
+renderResource : Effect.GainResourceParams -> Html msg
+renderResource { base, resource } =
     let
         isNegative : Bool
         isNegative =
@@ -96,17 +96,17 @@ renderResource { base, doublingChance } kind =
                 |> Utils.intToString
                 |> text
             ]
-        , (Resource.getStats kind).icon
+        , (Resource.getStats resource).icon
             |> Icon.toHtml
         ]
 
 
-renderXp : { base : Xp, multiplier : Float } -> Skill.Kind -> Html msg
-renderXp xp skill =
+renderXp : Effect.GainXpParams -> Html msg
+renderXp params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.skillXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ Quantity.multiplyBy xp.multiplier xp.base
+            [ Quantity.multiplyBy params.multiplier params.base
                 |> Xp.toInt
                 |> Utils.intToString
                 |> text
@@ -114,17 +114,17 @@ renderXp xp skill =
         ]
 
 
-renderMxp : Game -> { multiplier : Float } -> Activity -> Html msg
-renderMxp game mxp activity =
+renderMxp : Game -> Effect.GainMxpParams -> Html msg
+renderMxp game params =
     let
         base : Xp
         base =
-            Game.calculateActivityMxp activity game
+            Game.calculateActivityMxp params.activity game
     in
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ Quantity.multiplyBy mxp.multiplier base
+            [ Quantity.multiplyBy params.multiplier base
                 |> Xp.toInt
                 |> Utils.intToString
                 |> text

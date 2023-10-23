@@ -237,16 +237,18 @@ modWithTags tags mod =
 xpTransformer : Float -> Transformer
 xpTransformer buff repetitions effect =
     case Effect.getEffect effect of
-        Effect.GainXp quantity skill ->
+        Effect.GainXp params ->
             let
+                adjustedBuff : Float
                 adjustedBuff =
                     buff * toFloat repetitions
 
-                adjustedMultiplicable =
-                    { quantity | multiplier = quantity.multiplier * adjustedBuff }
+                newParams : Effect.GainXpParams
+                newParams =
+                    { params | multiplier = params.multiplier * adjustedBuff }
             in
             effect
-                |> Effect.setEffect (Effect.GainXp adjustedMultiplicable skill)
+                |> Effect.setEffect (Effect.GainXp newParams)
                 |> ChangeEffect
 
         _ ->
@@ -272,16 +274,18 @@ coinTransformer buff repetitions taggedEffect =
 mxpTransformer : Float -> Transformer
 mxpTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
-        Effect.GainMxp quantity chore ->
+        Effect.GainMxp params ->
             let
+                adjustedBuff : Float
                 adjustedBuff =
                     buff * toFloat repetitions
 
-                adjustedMultiplicable =
-                    { quantity | multiplier = quantity.multiplier * adjustedBuff }
+                newParams : Effect.GainMxpParams
+                newParams =
+                    { params | multiplier = params.multiplier * adjustedBuff }
             in
             taggedEffect
-                |> Effect.setEffect (Effect.GainMxp adjustedMultiplicable chore)
+                |> Effect.setEffect (Effect.GainMxp newParams)
                 |> ChangeEffect
 
         _ ->
@@ -291,9 +295,15 @@ mxpTransformer buff repetitions taggedEffect =
 resourceTransformer : Float -> Transformer
 resourceTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
-        Effect.GainResource { base, doublingChance } kind ->
+        Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
-                |> Effect.setEffect (Effect.GainResource { base = base, doublingChance = doublingChance + (buff * toFloat repetitions) } kind)
+                |> Effect.setEffect
+                    (Effect.GainResource
+                        { base = base
+                        , doublingChance = doublingChance + (buff * toFloat repetitions)
+                        , resource = resource
+                        }
+                    )
                 |> ChangeEffect
 
         _ ->

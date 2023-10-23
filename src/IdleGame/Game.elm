@@ -641,35 +641,35 @@ applyEffect effect game =
             addCoin product game
                 |> Random.constant
 
-        Effect.GainResource quantity resource ->
-            intGenerator quantity
-                |> Random.map (\amount -> addResource resource amount game)
+        Effect.GainResource params ->
+            intGenerator { base = params.base, doublingChance = params.doublingChance }
+                |> Random.map (\amount -> addResource params.resource amount game)
 
-        Effect.GainXp quantity skill ->
-            { game = addXp skill (Quantity.multiplyBy quantity.multiplier quantity.base) game
+        Effect.GainXp { base, multiplier, skill } ->
+            { game = addXp skill (Quantity.multiplyBy multiplier base) game
             , toasts = []
             , additionalEffects = []
             }
                 |> Random.constant
                 |> Random.map Ok
 
-        Effect.GainMxp quantity kind ->
+        Effect.GainMxp params ->
             let
                 base : Xp
                 base =
-                    calculateActivityMxp kind game
+                    calculateActivityMxp params.activity game
 
                 mxp : Xp
                 mxp =
-                    Quantity.multiplyBy quantity.multiplier base
+                    Quantity.multiplyBy params.multiplier base
 
                 masteryPoolXp : Xp
                 masteryPoolXp =
-                    Quantity.multiplyBy quantity.multiplier base
+                    Quantity.multiplyBy params.multiplier base
                         |> Quantity.multiplyBy 0.5
             in
             game
-                |> addMxp kind mxp
+                |> addMxp params.activity mxp
                 |> addMasteryPoolXp masteryPoolXp
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok

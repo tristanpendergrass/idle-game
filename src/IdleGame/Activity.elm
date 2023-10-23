@@ -148,15 +148,47 @@ type alias Mastery =
     List ( Int, MasteryReward )
 
 
+choreEffects :
+    { activity : Activity
+    , xp : Xp
+    , coin : Coin
+    , maybeResource : Maybe { resource : Resource.Kind, amount : Int, probability : Float }
+    }
+    -> List Effect.TaggedEffect
+choreEffects { activity, xp, coin, maybeResource } =
+    let
+        choreTags : List Effect.Tag
+        choreTags =
+            [ Effect.ActivityTag activity ]
+    in
+    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Skill.Chores }, tags = choreTags }
+    , { effect = Effect.GainCoin { base = coin, multiplier = 1 }, tags = choreTags }
+    , { effect = Effect.GainMxp { activity = activity, multiplier = 1 }, tags = choreTags }
+    ]
+        ++ (case maybeResource of
+                Nothing ->
+                    []
 
--- Todos:
--- Refactor event into ActivityDetails with a list of types like ResourceCreator, MonsterFighter, ResourceTransformer, etc.
-
-
-type
-    ActivityEffects
-    -- TODO: continue
-    = ChoreEffects { xp : { effect : Effect.GainXpParams, tags : List Effect.Tag } }
+                Just { resource, amount, probability } ->
+                    [ { effect =
+                            Effect.VariableSuccess
+                                { successProbability = probability
+                                , successEffects =
+                                    [ { effect =
+                                            Effect.GainResource
+                                                { base = amount
+                                                , doublingChance = 0
+                                                , resource = resource
+                                                }
+                                      , tags = choreTags
+                                      }
+                                    ]
+                                , failureEffects = []
+                                }
+                      , tags = choreTags
+                      }
+                    ]
+           )
 
 
 type alias Stats =
@@ -165,8 +197,6 @@ type alias Stats =
     , image : ActivityImage
     , unlockRequirements : Maybe ( Skill.Kind, Int )
     , duration : Duration
-
-    -- , effects : ActivityEffects
     , effects : List Effect.TaggedEffect
     , mastery : Maybe Mastery
     , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
@@ -198,14 +228,12 @@ cleanStablesStats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 5
     , effects =
-        [ Effect.gainXp (Xp.int 5) Skill.Chores
-        , Effect.gainCoin (Coin.int 1)
-        , Effect.gainMxp IdleGame.Kinds.Activities.CleanStables
-        , Effect.gainWithProbability 0.5
-            [ Effect.gainResource 3 Resource.Manure
-            ]
-            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanStables ]
-        ]
+        choreEffects
+            { activity = IdleGame.Kinds.Activities.CleanStables
+            , xp = Xp.int 5
+            , coin = Coin.int 1
+            , maybeResource = Just { resource = Resource.Manure, amount = 3, probability = 0.5 }
+            }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
     , hasSpellSelector = False
     , teachesSpell = Nothing
@@ -220,14 +248,12 @@ cleanBigBubbaStats =
     , unlockRequirements = Just ( Skill.Chores, 10 )
     , duration = Duration.seconds 5
     , effects =
-        [ Effect.gainXp (Xp.int 10) Skill.Chores
-        , Effect.gainCoin (Coin.int 1)
-        , Effect.gainMxp IdleGame.Kinds.Activities.CleanBigBubba
-        , Effect.gainWithProbability 0.5
-            [ Effect.gainResource 3 Resource.Manure
-            ]
-            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.CleanBigBubba ]
-        ]
+        choreEffects
+            { activity = IdleGame.Kinds.Activities.CleanBigBubba
+            , xp = Xp.int 10
+            , coin = Coin.int 2
+            , maybeResource = Just { resource = Resource.Manure, amount = 5, probability = 0.5 }
+            }
     , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
     , hasSpellSelector = False
     , teachesSpell = Nothing
