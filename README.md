@@ -58,6 +58,7 @@ $ npm test -- --watch
   - [x] Add spell selector
   - [x] Check spell mods from getAllMods
 - [x] Add notification when no more resource
+- [ ] Fix monsters showing player power on activity card
 - [ ] Finalize gameplay values
   - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
@@ -99,6 +100,7 @@ $ npm test -- --watch
 - [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
 - [ ] Remove animation on right rail
 - [ ] Add a way of giving hints to the player. Old wise man?
+- [ ] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 
 # Changelog
 

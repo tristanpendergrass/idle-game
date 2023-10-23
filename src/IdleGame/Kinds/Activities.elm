@@ -5,6 +5,13 @@ type Activity
     = -- Chores
       CleanStables
     | CleanBigBubba
+    | SweepChimneys
+    | WaterGreenhousePlants
+    | WashAndIronRobes
+    | OrganizePotionIngredients
+    | RepairInstruments
+    | FlushDrainDemons
+    | OrganizeSpellBooks
       -- Hexes
     | Hex1
     | Hex2

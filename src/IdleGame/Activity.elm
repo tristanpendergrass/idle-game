@@ -6,7 +6,7 @@ import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds.Activities as Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Mod as Event
 import IdleGame.Resource as Resource
@@ -16,6 +16,26 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import List.Extra
 import Percent exposing (Percent)
+
+
+
+-- type Activity
+--     = -- Chores
+--       CleanStables
+--     | CleanBigBubba
+--     | SweepChimneys
+--     | WaterGreenhousePlants
+--     | WashAndIronRobes
+--     | OrganizePotionIngredients
+--     | RepairInstruments
+--     | FlushDrainDemons
+--     | OrganizeSpellBooks
+--       -- Hexes
+--     | Hex1
+--     | Hex2
+--       -- Adventuring
+--     | FightMonster1
+--     | FightMonster2
 
 
 allActivitiesBySkill : Skill.Kind -> List Activity
@@ -57,18 +77,32 @@ getActivities skill =
 
 allActivities : List Activity
 allActivities =
-    [ IdleGame.Kinds.Activities.CleanStables
-    , IdleGame.Kinds.Activities.CleanBigBubba
-    , IdleGame.Kinds.Activities.Hex1
-    , IdleGame.Kinds.Activities.Hex2
-    , IdleGame.Kinds.Activities.FightMonster1
-    , IdleGame.Kinds.Activities.FightMonster2
+    [ Activities.CleanStables
+    , Activities.CleanBigBubba
+    , Activities.SweepChimneys
+    , Activities.WaterGreenhousePlants
+    , Activities.WashAndIronRobes
+    , Activities.OrganizePotionIngredients
+    , Activities.RepairInstruments
+    , Activities.FlushDrainDemons
+    , Activities.OrganizeSpellBooks
+    , Activities.Hex1
+    , Activities.Hex2
+    , Activities.FightMonster1
+    , Activities.FightMonster2
     ]
 
 
 type alias Record a =
     { cleanStables : a
     , cleanBigBubba : a
+    , sweepChimneys : a
+    , waterGreenhousePlants : a
+    , washAndIronRobes : a
+    , organizePotionIngredients : a
+    , repairInstruments : a
+    , flushDrainDemons : a
+    , organizeSpellBooks : a
     , hex1 : a
     , hex2 : a
     , fightMonster1 : a
@@ -78,50 +112,105 @@ type alias Record a =
 
 createRecord : a -> Record a
 createRecord d =
-    Record d d d d d d
+    { cleanStables = d
+    , cleanBigBubba = d
+    , sweepChimneys = d
+    , waterGreenhousePlants = d
+    , washAndIronRobes = d
+    , organizePotionIngredients = d
+    , repairInstruments = d
+    , flushDrainDemons = d
+    , organizeSpellBooks = d
+    , hex1 = d
+    , hex2 = d
+    , fightMonster1 = d
+    , fightMonster2 = d
+    }
 
 
 getByKind : Activity -> Record a -> a
 getByKind kind record =
     case kind of
-        IdleGame.Kinds.Activities.CleanStables ->
+        Activities.CleanStables ->
             record.cleanStables
 
-        IdleGame.Kinds.Activities.CleanBigBubba ->
+        Activities.CleanBigBubba ->
             record.cleanBigBubba
 
-        IdleGame.Kinds.Activities.Hex1 ->
+        Activities.SweepChimneys ->
+            record.sweepChimneys
+
+        Activities.WaterGreenhousePlants ->
+            record.waterGreenhousePlants
+
+        Activities.WashAndIronRobes ->
+            record.washAndIronRobes
+
+        Activities.OrganizePotionIngredients ->
+            record.organizePotionIngredients
+
+        Activities.RepairInstruments ->
+            record.repairInstruments
+
+        Activities.FlushDrainDemons ->
+            record.flushDrainDemons
+
+        Activities.OrganizeSpellBooks ->
+            record.organizeSpellBooks
+
+        Activities.Hex1 ->
             record.hex1
 
-        IdleGame.Kinds.Activities.Hex2 ->
+        Activities.Hex2 ->
             record.hex2
 
-        IdleGame.Kinds.Activities.FightMonster1 ->
+        Activities.FightMonster1 ->
             record.fightMonster1
 
-        IdleGame.Kinds.Activities.FightMonster2 ->
+        Activities.FightMonster2 ->
             record.fightMonster2
 
 
 setByKind : Activity -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        IdleGame.Kinds.Activities.CleanStables ->
+        Activities.CleanStables ->
             { record | cleanStables = value }
 
-        IdleGame.Kinds.Activities.CleanBigBubba ->
+        Activities.CleanBigBubba ->
             { record | cleanBigBubba = value }
 
-        IdleGame.Kinds.Activities.Hex1 ->
+        Activities.SweepChimneys ->
+            { record | sweepChimneys = value }
+
+        Activities.WaterGreenhousePlants ->
+            { record | waterGreenhousePlants = value }
+
+        Activities.WashAndIronRobes ->
+            { record | washAndIronRobes = value }
+
+        Activities.OrganizePotionIngredients ->
+            { record | organizePotionIngredients = value }
+
+        Activities.RepairInstruments ->
+            { record | repairInstruments = value }
+
+        Activities.FlushDrainDemons ->
+            { record | flushDrainDemons = value }
+
+        Activities.OrganizeSpellBooks ->
+            { record | organizeSpellBooks = value }
+
+        Activities.Hex1 ->
             { record | hex1 = value }
 
-        IdleGame.Kinds.Activities.Hex2 ->
+        Activities.Hex2 ->
             { record | hex2 = value }
 
-        IdleGame.Kinds.Activities.FightMonster1 ->
+        Activities.FightMonster1 ->
             { record | fightMonster1 = value }
 
-        IdleGame.Kinds.Activities.FightMonster2 ->
+        Activities.FightMonster2 ->
             { record | fightMonster2 = value }
 
 
@@ -213,11 +302,140 @@ allStats : Record Stats
 allStats =
     { cleanStables = cleanStablesStats
     , cleanBigBubba = cleanBigBubbaStats
+    , sweepChimneys = sweepChimneyStats
+    , waterGreenhousePlants = waterGreenhousePlantsStats
+    , washAndIronRobes = washAndIronRobesStats
+    , organizePotionIngredients = organizePotionIngredientsStats
+    , repairInstruments = repairInstrumentsStats
+    , flushDrainDemons = flushDrainDemonsStats
+    , organizeSpellBooks = organizeSpellBooksStats
     , hex1 = hex1Stats
     , hex2 = hex2Stats
     , fightMonster1 = fightMonster1Stats
     , fightMonster2 = fightMonster2Stats
     }
+
+
+
+-- Legacy chores stats
+-- cleanStablesStats : Stats
+-- cleanStablesStats =
+--     { title = "Clean Stables"
+--     , imgSrc = "/chores/stable.png"
+--     , unlockLevel = 1
+--     , outcome =
+--         { xp = Xp.int 10
+--         , duration = Duration.seconds 3
+--         , extraResourceProbability = 0.25
+--         , extraResource = Resource.Manure
+--         , coin = 1
+--         }
+--     }
+-- cleanBigBubbaStats : Stats
+-- cleanBigBubbaStats =
+--     { title = "Clean Big Bubba's Stall"
+--     , imgSrc = "/chores/bubba4.png"
+--     , unlockLevel = 10
+--     , outcome =
+--         { xp = Xp.int 25
+--         , duration = Duration.seconds 6
+--         , extraResourceProbability = 0.75
+--         , extraResource = Resource.Manure
+--         , coin = 3
+--         }
+--     }
+-- sweepChimneysStats : Stats
+-- sweepChimneysStats =
+--     { title = "Sweep Chimneys"
+--     , imgSrc = "/chores/chimney.png"
+--     , unlockLevel = 25
+--     , outcome =
+--         { xp = Xp.int 37
+--         , duration = Duration.seconds 8
+--         , extraResourceProbability = 0.5
+--         , extraResource = Resource.Soot
+--         , coin = 6
+--         }
+--     }
+-- waterGreenhousePlantsStats : Stats
+-- waterGreenhousePlantsStats =
+--     { title = "Water Greenhouse Plants"
+--     , imgSrc = "/chores/greenhouse_3.png"
+--     , unlockLevel = 35
+--     , outcome =
+--         { xp = Xp.int 12
+--         , duration = Duration.seconds 2
+--         , extraResourceProbability = 0.6
+--         , extraResource = Resource.GreenhouseDirt
+--         , coin = 2
+--         }
+--     }
+-- washAndIronRobesStats : Stats
+-- washAndIronRobesStats =
+--     { title = "Wash and Iron Robes"
+--     , imgSrc = "/chores/washRobes.png"
+--     , unlockLevel = 45
+--     , outcome =
+--         { xp = Xp.int 50
+--         , duration = Duration.seconds 8
+--         , extraResourceProbability = 0.2
+--         , extraResource = Resource.WashWater
+--         , coin = 9
+--         }
+--     }
+-- organizePotionIngredientsStats : Stats
+-- organizePotionIngredientsStats =
+--     { title = "Organize Potion Ingredients"
+--     , imgSrc = "/chores/potionIngredients_2.png"
+--     , unlockLevel = 55
+--     , outcome =
+--         { xp = Xp.int 165
+--         , duration = Duration.seconds 20
+--         , extraResourceProbability = 0.1
+--         , extraResource = Resource.EmptyBottle
+--         , coin = 12
+--         }
+--     }
+-- repairInstrumentsStats : Stats
+-- repairInstrumentsStats =
+--     { title = "Repair Instruments"
+--     , imgSrc = "/chores/repairInstruments.png"
+--     , unlockLevel = 65
+--     , outcome =
+--         { xp = Xp.int 75
+--         , duration = Duration.seconds 12
+--         , extraResourceProbability = 0.25
+--         , extraResource = Resource.Scrap
+--         , coin = 20
+--         }
+--     }
+-- flushDrainDemonsStats : Stats
+-- flushDrainDemonsStats =
+--     { title = "Flush the Drain Demons"
+--     , imgSrc = "/chores/drainDemons.png"
+--     , unlockLevel = 75
+--     , outcome =
+--         { xp = Xp.int 90
+--         , duration = Duration.seconds 10
+--         , extraResourceProbability = 0.5
+--         , extraResource = Resource.Ectoplasm
+--         , coin = 14
+--         }
+--     }
+-- organizeSpellBooksStats : Stats
+-- organizeSpellBooksStats =
+--     { title = "Organize Spell Books"
+--     , imgSrc = "/chores/spellBooks.png"
+--     , unlockLevel = 90
+--     , outcome =
+--         { xp = Xp.int 210
+--         , duration = Duration.seconds 20
+--         , extraResourceProbability = 0.1
+--         , extraResource = Resource.Parchment
+--         , coin = 30
+--         }
+--     }
+-- Current chores stats
 
 
 cleanStablesStats : Stats
@@ -226,15 +444,15 @@ cleanStablesStats =
     , title = "Clean Stables"
     , image = ActivityLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
-    , duration = Duration.seconds 5
+    , duration = Duration.seconds 3
     , effects =
         choreEffects
-            { activity = IdleGame.Kinds.Activities.CleanStables
-            , xp = Xp.int 5
+            { activity = Activities.CleanStables
+            , xp = Xp.int 10
             , coin = Coin.int 1
-            , maybeResource = Just { resource = Resource.Manure, amount = 3, probability = 0.5 }
+            , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.25 }
             }
-    , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanStables)
+    , mastery = Just (getChoresMastery Activities.CleanStables)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -246,18 +464,162 @@ cleanBigBubbaStats =
     , title = "Clean Big Bubba's Stall"
     , image = ActivityLandscape "/chores/bubba4.png"
     , unlockRequirements = Just ( Skill.Chores, 10 )
-    , duration = Duration.seconds 5
+    , duration = Duration.seconds 6
     , effects =
         choreEffects
-            { activity = IdleGame.Kinds.Activities.CleanBigBubba
-            , xp = Xp.int 10
-            , coin = Coin.int 2
-            , maybeResource = Just { resource = Resource.Manure, amount = 5, probability = 0.5 }
+            { activity = Activities.CleanBigBubba
+            , xp = Xp.int 25
+            , coin = Coin.int 3
+            , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.75 }
             }
-    , mastery = Just (getChoresMastery IdleGame.Kinds.Activities.CleanBigBubba)
+    , mastery = Just (getChoresMastery Activities.CleanBigBubba)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
+
+
+sweepChimneyStats : Stats
+sweepChimneyStats =
+    { skill = Skill.Chores
+    , title = "Sweep Chimneys"
+    , image = ActivityLandscape "/chores/chimney.png"
+    , unlockRequirements = Just ( Skill.Chores, 25 )
+    , duration = Duration.seconds 8
+    , effects =
+        choreEffects
+            { activity = Activities.SweepChimneys
+            , xp = Xp.int 37
+            , coin = Coin.int 6
+            , maybeResource = Just { resource = Resource.Soot, amount = 1, probability = 0.5 }
+            }
+    , mastery = Just (getChoresMastery Activities.SweepChimneys)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+waterGreenhousePlantsStats : Stats
+waterGreenhousePlantsStats =
+    { skill = Skill.Chores
+    , title = "Water Greenhouse Plants"
+    , image = ActivityLandscape "/chores/greenhouse_3.png"
+    , unlockRequirements = Just ( Skill.Chores, 35 )
+    , duration = Duration.seconds 2
+    , effects =
+        choreEffects
+            { activity = Activities.WaterGreenhousePlants
+            , xp = Xp.int 12
+            , coin = Coin.int 2
+            , maybeResource = Just { resource = Resource.GreenhouseDirt, amount = 1, probability = 0.6 }
+            }
+    , mastery = Just (getChoresMastery Activities.WaterGreenhousePlants)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+washAndIronRobesStats : Stats
+washAndIronRobesStats =
+    { skill = Skill.Chores
+    , title = "Wash and Iron Robes"
+    , image = ActivityLandscape "/chores/washRobes.png"
+    , unlockRequirements = Just ( Skill.Chores, 45 )
+    , duration = Duration.seconds 8
+    , effects =
+        choreEffects
+            { activity = Activities.WashAndIronRobes
+            , xp = Xp.int 50
+            , coin = Coin.int 9
+            , maybeResource = Just { resource = Resource.WashWater, amount = 1, probability = 0.2 }
+            }
+    , mastery = Just (getChoresMastery Activities.WashAndIronRobes)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+organizePotionIngredientsStats : Stats
+organizePotionIngredientsStats =
+    { skill = Skill.Chores
+    , title = "Organize Potion Ingredients"
+    , image = ActivityLandscape "/chores/potionIngredients_2.png"
+    , unlockRequirements = Just ( Skill.Chores, 55 )
+    , duration = Duration.seconds 20
+    , effects =
+        choreEffects
+            { activity = Activities.OrganizePotionIngredients
+            , xp = Xp.int 165
+            , coin = Coin.int 12
+            , maybeResource = Just { resource = Resource.EmptyBottle, amount = 1, probability = 0.1 }
+            }
+    , mastery = Just (getChoresMastery Activities.OrganizePotionIngredients)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+repairInstrumentsStats : Stats
+repairInstrumentsStats =
+    { skill = Skill.Chores
+    , title = "Repair Instruments"
+    , image = ActivityLandscape "/chores/repairInstruments.png"
+    , unlockRequirements = Just ( Skill.Chores, 65 )
+    , duration = Duration.seconds 12
+    , effects =
+        choreEffects
+            { activity = Activities.RepairInstruments
+            , xp = Xp.int 75
+            , coin = Coin.int 20
+            , maybeResource = Just { resource = Resource.Scrap, amount = 1, probability = 0.25 }
+            }
+    , mastery = Just (getChoresMastery Activities.RepairInstruments)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+flushDrainDemonsStats : Stats
+flushDrainDemonsStats =
+    { skill = Skill.Chores
+    , title = "Flush the Drain Demons"
+    , image = ActivityLandscape "/chores/drainDemons.png"
+    , unlockRequirements = Just ( Skill.Chores, 75 )
+    , duration = Duration.seconds 10
+    , effects =
+        choreEffects
+            { activity = Activities.FlushDrainDemons
+            , xp = Xp.int 90
+            , coin = Coin.int 14
+            , maybeResource = Just { resource = Resource.Ectoplasm, amount = 1, probability = 0.5 }
+            }
+    , mastery = Just (getChoresMastery Activities.FlushDrainDemons)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+organizeSpellBooksStats : Stats
+organizeSpellBooksStats =
+    { skill = Skill.Chores
+    , title = "Organize Spell Books"
+    , image = ActivityLandscape "/chores/spellBooks.png"
+    , unlockRequirements = Just ( Skill.Chores, 90 )
+    , duration = Duration.seconds 20
+    , effects =
+        choreEffects
+            { activity = Activities.OrganizeSpellBooks
+            , xp = Xp.int 210
+            , coin = Coin.int 30
+            , maybeResource = Just { resource = Resource.Parchment, amount = 1, probability = 0.1 }
+            }
+    , mastery = Just (getChoresMastery Activities.OrganizeSpellBooks)
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+
+-- Hexes
 
 
 hex1Stats : Stats
@@ -269,7 +631,7 @@ hex1Stats =
     , duration = Duration.seconds 5
     , effects =
         [ Effect.gainXp (Xp.int 5) Skill.Hexes
-        , Effect.gainMxp IdleGame.Kinds.Activities.Hex1
+        , Effect.gainMxp Activities.Hex1
         , Effect.gainResource -1 Resource.Parchment
         ]
     , mastery = Just defaultSpellMastery
@@ -287,7 +649,7 @@ hex2Stats =
     , duration = Duration.seconds 5
     , effects =
         [ Effect.gainXp (Xp.int 10) Skill.Hexes
-        , Effect.gainMxp IdleGame.Kinds.Activities.Hex2
+        , Effect.gainMxp Activities.Hex2
         , Effect.gainResource -1 Resource.Parchment
         ]
     , mastery = Just defaultSpellMastery
@@ -360,7 +722,7 @@ fightMonster1Stats =
         [ Effect.resolveCombat
             (Combat.create { monsterPower = 1, playerPower = 1 })
             [ Effect.gainCoin (Coin.int 1) ]
-            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster1 ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster1 ]
         ]
     , mastery = Nothing
     , hasSpellSelector = True
@@ -379,7 +741,7 @@ fightMonster2Stats =
         [ Effect.resolveCombat
             (Combat.create { monsterPower = 2, playerPower = 1 })
             [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag IdleGame.Kinds.Activities.FightMonster2 ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
         ]
     , mastery = Nothing
     , hasSpellSelector = True
