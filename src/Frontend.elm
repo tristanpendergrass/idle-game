@@ -982,37 +982,70 @@ toastToHtml notification =
         errClass : Html.Attribute msg
         errClass =
             class "bg-error text-error-content"
+
+        warningClass : Html.Attribute msg
+        warningClass =
+            class "bg-warning text-warning-content"
     in
     case notification of
         GainedCoin amount ->
-            div [ baseClass, successClass, class "flex gap-1 items-center" ]
-                [ span []
-                    [ amount
-                        |> Coin.toInt
-                        |> ViewUtils.intToString
-                        |> text
-                    ]
+            let
+                plusOrMinus : String
+                plusOrMinus =
+                    if Coin.toInt amount >= 0 then
+                        "+"
+
+                    else
+                        "-"
+
+                colorClass : Attribute msg
+                colorClass =
+                    if Coin.toInt amount >= 0 then
+                        successClass
+
+                    else
+                        errClass
+            in
+            div [ baseClass, colorClass, class "flex gap-1 items-center" ]
+                [ span [] [ text <| plusOrMinus ++ ViewUtils.intToString (abs (Coin.toInt amount)) ]
                 , Icon.coin
                     |> Icon.toHtml
                 ]
 
         GainedResource amount resource ->
             let
+                stats : Resource.Stats
                 stats =
                     Resource.getStats resource
+
+                plusOrMinus : String
+                plusOrMinus =
+                    if amount >= 0 then
+                        "+"
+
+                    else
+                        "-"
+
+                colorClass : Attribute msg
+                colorClass =
+                    if amount >= 0 then
+                        successClass
+
+                    else
+                        errClass
             in
-            div [ baseClass, successClass, class "flex gap-1 items-center" ]
-                [ span [] [ text <| "+" ++ ViewUtils.intToString amount ]
+            div [ baseClass, colorClass, class "flex gap-1 items-center" ]
+                [ span [] [ text <| plusOrMinus ++ ViewUtils.intToString (abs amount) ]
                 , stats.icon
                     |> Icon.toHtml
                 ]
 
         LostCombat ->
-            div [ baseClass, errClass ]
+            div [ baseClass, warningClass ]
                 [ text "Lost combat" ]
 
         NegativeAmountErr ->
-            div [ baseClass, errClass ]
+            div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
 
 

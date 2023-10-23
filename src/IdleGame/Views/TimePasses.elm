@@ -133,7 +133,16 @@ render timePassed timePassesData =
                         |> Resource.mapDiff
                             (\amount resource ->
                                 li [ class "flex items-center gap-2", classList [ ( "hidden", amount == 0 ) ] ]
-                                    [ span [ class "text-success" ] [ text <| Utils.intToString amount ]
+                                    [ span
+                                        [ class
+                                            (if amount >= 0 then
+                                                "text-success"
+
+                                             else
+                                                "text-error"
+                                            )
+                                        ]
+                                        [ text <| Utils.intToString amount ]
                                     , (Resource.getStats resource).icon
                                         |> Icon.toHtml
                                     , span [] [ text <| (Resource.getStats resource).title ]

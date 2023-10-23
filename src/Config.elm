@@ -40,9 +40,9 @@ devFlags =
     -- c(")(")
     { showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
-    , showTimePasses = False
+    , showTimePasses = True
     , showDebugPanel = True
-    , defaultMode = Adventuring
+    , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.CombatTab1
     , defaultDetailViewExpanded = True
