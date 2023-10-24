@@ -292,6 +292,7 @@ masterySection mxp mastery =
         renderMasteryReward : ( Int, Activity.MasteryReward ) -> Html msg
         renderMasteryReward ( level, reward ) =
             let
+                rewardText : String
                 rewardText =
                     case reward of
                         Activity.SpellAvailable ->
@@ -302,9 +303,6 @@ masterySection mxp mastery =
 
                         Activity.ImbueEnabled ->
                             "Imbue enabled"
-
-                        Activity.BoostEffects ->
-                            "Boost effects"
 
                         Activity.GameMod mod ->
                             modLabelToString mod

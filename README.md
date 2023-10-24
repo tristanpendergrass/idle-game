@@ -59,6 +59,7 @@ $ npm test -- --watch
   - [x] Check spell mods from getAllMods
 - [x] Add notification when no more resource
 - [x] Fix monsters showing player power on activity card
+- [ ] Show spell effects in preview somehow -- optional
 - [ ] Finalize gameplay values
   - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
@@ -73,6 +74,7 @@ $ npm test -- --watch
 - [ ] Find a way to unit test performance of tick
 
 ### Fundamentals
+- [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
 - [ ] Show what mods there are on an effect/interval and where they came from
 - [ ] Show Time Passes during Fast Forward with real time change

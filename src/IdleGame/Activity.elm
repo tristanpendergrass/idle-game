@@ -228,7 +228,6 @@ type MasteryReward
     = SpellAvailable -- Spell can now be used
     | SecondaryEnabled -- Spell can be used as secondary
     | ImbueEnabled -- Spell can be embued with elements
-    | BoostEffects -- Spell effects are boosted
     | IntervalMod IntervalMod -- Activity interval decreased by this much
     | GameMod Mod -- Apply mod to game
 
@@ -428,7 +427,7 @@ washAndIronRobesStats =
             { activity = Activities.WashAndIronRobes
             , xp = Xp.int 50
             , coin = Coin.int 9
-            , maybeResource = Nothing
+            , maybeResource = Just { resource = Resource.WashWater, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery Activities.WashAndIronRobes)
     , hasSpellSelector = False
@@ -448,7 +447,7 @@ organizePotionIngredientsStats =
             { activity = Activities.OrganizePotionIngredients
             , xp = Xp.int 165
             , coin = Coin.int 12
-            , maybeResource = Just { resource = Resource.EmptyBottle, amount = 1, probability = 0.1 }
+            , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery Activities.OrganizePotionIngredients)
     , hasSpellSelector = False
@@ -488,7 +487,7 @@ flushDrainDemonsStats =
             { activity = Activities.FlushDrainDemons
             , xp = Xp.int 90
             , coin = Coin.int 14
-            , maybeResource = Nothing
+            , maybeResource = Just { resource = Resource.Ectoplasm, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery Activities.FlushDrainDemons)
     , hasSpellSelector = False
@@ -508,7 +507,7 @@ organizeSpellBooksStats =
             { activity = Activities.OrganizeSpellBooks
             , xp = Xp.int 210
             , coin = Coin.int 30
-            , maybeResource = Just { resource = Resource.Parchment, amount = 1, probability = 0.1 }
+            , maybeResource = Just { resource = Resource.Parchment, amount = 1, probability = 0.05 }
             }
     , mastery = Just (getChoresMastery Activities.OrganizeSpellBooks)
     , hasSpellSelector = False
@@ -605,7 +604,7 @@ defaultSpellMastery =
     [ ( 25, SpellAvailable )
     , ( 50, SecondaryEnabled )
     , ( 75, ImbueEnabled )
-    , ( 100, BoostEffects )
+    , ( 100, GameMod (Mod.powerBuff 1) )
     ]
 
 
