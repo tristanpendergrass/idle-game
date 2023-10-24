@@ -9,7 +9,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
-import IdleGame.Mod as Event
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
@@ -119,7 +119,7 @@ renderContent obj extraBottomPadding game =
         effects =
             (Activity.getStats activity).effects
 
-        mods : List Event.Mod
+        mods : List Mod
         mods =
             Game.getAllMods game
 
@@ -251,6 +251,38 @@ renderContent obj extraBottomPadding game =
         ]
 
 
+modLabelToString : Mod.ModLabel -> String
+modLabelToString modLabel =
+    case modLabel of
+        Mod.XpActivityLabel buff ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% XP"
+
+        Mod.XpSkillLabel buff skill ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% " ++ Skill.getLabel skill ++ " XP"
+
+        Mod.MxpModLabel buff ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Mastery XP"
+
+        Mod.ResourceModLabel buff ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
+
+        Mod.SuccessModLabel buff ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
+
+        Mod.CoinModLabel buff ->
+            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Coin"
+
+        Mod.PowerModLabel buff ->
+            "+" ++ Utils.intToString buff ++ " Power"
+
+
+intervalModLabelToString : IntervalModLabel -> String
+intervalModLabelToString modLabel =
+    case modLabel of
+        IntervalModLabel buff ->
+            "+" ++ Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
+
+
 masterySection : Xp -> Activity.Mastery -> Html msg
 masterySection mxp mastery =
     let
@@ -272,10 +304,10 @@ masterySection mxp mastery =
                             "Boost effects"
 
                         Activity.GameMod mod ->
-                            Event.modLabelToString mod.label
+                            modLabelToString mod.label
 
                         Activity.IntervalMod mod ->
-                            Event.intervalModLabelToString mod.label
+                            intervalModLabelToString mod.label
 
                 isAchieved : Bool
                 isAchieved =

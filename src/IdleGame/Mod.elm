@@ -349,10 +349,20 @@ powerTransformer buff repetitions taggedEffect =
             NoChange
 
 
-xpBuff : Float -> Mod
-xpBuff amount =
-    { tags = [ Effect.XpTag ]
-    , label = XpModLabel amount
+activityXpBuff : Activity -> Float -> Mod
+activityXpBuff activity amount =
+    { tags = [ Effect.XpTag, Effect.ActivityTag activity ]
+    , label = XpActivityLabel amount
+    , transformer = xpTransformer amount
+    , source = AdminCrimes
+    , repetitions = 1
+    }
+
+
+skillXpBuff : Skill.Kind -> Float -> Mod
+skillXpBuff skill amount =
+    { tags = [ Effect.XpTag, Effect.SkillTag skill ]
+    , label = XpSkillLabel amount skill
     , transformer = xpTransformer amount
     , source = AdminCrimes
     , repetitions = 1
@@ -362,7 +372,7 @@ xpBuff amount =
 choresXpBuff : Float -> Mod
 choresXpBuff buff =
     { tags = [ Effect.SkillTag Skill.Chores, Effect.XpTag ]
-    , label = XpModLabel buff
+    , label = XpActivityLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
     , repetitions = 1
@@ -420,38 +430,10 @@ powerBuff buff =
 
 
 type ModLabel
-    = XpModLabel Float
+    = XpActivityLabel Float
+    | XpSkillLabel Float Skill.Kind
     | MxpModLabel Float
     | ResourceModLabel Float
     | SuccessModLabel Float
     | CoinModLabel Float
     | PowerModLabel Int
-
-
-modLabelToString : ModLabel -> String
-modLabelToString modLabel =
-    case modLabel of
-        XpModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% XP"
-
-        MxpModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Mastery XP"
-
-        ResourceModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
-
-        SuccessModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
-
-        CoinModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString (floor (buff * 100)) ++ "% Coin"
-
-        PowerModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.intToString buff ++ " Power"
-
-
-intervalModLabelToString : IntervalModLabel -> String
-intervalModLabelToString modLabel =
-    case modLabel of
-        IntervalModLabel buff ->
-            "+" ++ IdleGame.Views.Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"

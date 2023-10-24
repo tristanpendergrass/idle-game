@@ -537,16 +537,16 @@ hex2Stats =
 
 
 getActivityMastery : Activity -> Mastery
-getActivityMastery chore =
+getActivityMastery activity =
     [ ( 10
       , GameMod
-            (Mod.xpBuff 0.25
-                |> Mod.withTags [ Effect.ActivityTag chore ]
+            (Mod.activityXpBuff activity 0.25
+                |> Mod.withTags [ Effect.ActivityTag activity ]
             )
       )
-    , ( 35, GameMod (Mod.xpBuff 0.25) )
-    , ( 65, GameMod (Mod.xpBuff 0.25) )
-    , ( 95, GameMod (Mod.xpBuff 0.35) )
+    , ( 35, GameMod (Mod.activityXpBuff activity 0.25) )
+    , ( 65, GameMod (Mod.activityXpBuff activity 0.25) )
+    , ( 95, GameMod (Mod.activityXpBuff activity 0.35) )
     ]
 
 
@@ -558,23 +558,23 @@ getChoresMastery chore =
                 |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
-    , ( 35
-      , IntervalMod
-            { kind = chore
-            , percentChange = Percent.fromFloat 0.15
-            , label = IntervalModLabel (Percent.fromFloat 0.15)
-            }
-      )
-    , ( 65
+    , ( 50
       , GameMod
-            (Mod.resourceBuff 0.2
+            (Mod.activityXpBuff chore 0.25
                 |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
-    , ( 95
+    , ( 75
+      , IntervalMod
+            { kind = chore
+            , percentChange = Percent.fromFloat 0.1
+            , label = IntervalModLabel (Percent.fromFloat 0.1)
+            }
+      )
+    , ( 100
       , GameMod
-            (Mod.successBuff 0.2
-                |> Mod.withTags [ Effect.ActivityTag chore ]
+            (Mod.skillXpBuff Skill.Chores 0.05
+                |> Mod.withTags [ Effect.SkillTag Skill.Chores ]
             )
       )
     ]
