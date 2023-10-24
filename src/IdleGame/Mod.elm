@@ -4,6 +4,7 @@ import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Utils
 import Percent exposing (Percent)
@@ -16,7 +17,7 @@ type ModSource
 
 type alias Mod =
     { tags : List Effect.Tag
-    , label : ModLabel
+    , label : Label
     , transformer : Transformer
     , repetitions : Int
     , source : ModSource
@@ -292,8 +293,8 @@ mxpTransformer buff repetitions taggedEffect =
             NoChange
 
 
-resourceTransformer : Float -> Transformer
-resourceTransformer buff repetitions taggedEffect =
+resourceDoublingTransformer : Float -> Transformer
+resourceDoublingTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
@@ -301,6 +302,24 @@ resourceTransformer buff repetitions taggedEffect =
                     (Effect.GainResource
                         { base = base
                         , doublingChance = doublingChance + (buff * toFloat repetitions)
+                        , resource = resource
+                        }
+                    )
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
+resourceBaseTransformer : Int -> Transformer
+resourceBaseTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
+        Effect.GainResource { base, doublingChance, resource } ->
+            taggedEffect
+                |> Effect.setEffect
+                    (Effect.GainResource
+                        { base = base + (buff * repetitions)
+                        , doublingChance = doublingChance
                         , resource = resource
                         }
                     )
@@ -382,7 +401,7 @@ choresXpBuff buff =
 coinBuff : Float -> Mod
 coinBuff buff =
     { tags = []
-    , label = CoinModLabel buff
+    , label = CoinLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
     , repetitions = 1
@@ -402,8 +421,8 @@ mxpBuff buff =
 resourceBuff : Float -> Mod
 resourceBuff buff =
     { tags = []
-    , label = ResourceModLabel buff
-    , transformer = resourceTransformer buff
+    , label = ResourceDoublingLabel buff
+    , transformer = resourceDoublingTransformer buff
     , source = AdminCrimes
     , repetitions = 1
     }
@@ -412,7 +431,7 @@ resourceBuff buff =
 successBuff : Float -> Mod
 successBuff buff =
     { tags = []
-    , label = SuccessModLabel buff
+    , label = SuccessLabel buff
     , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
     , repetitions = 1
@@ -422,18 +441,19 @@ successBuff buff =
 powerBuff : Int -> Mod
 powerBuff buff =
     { tags = []
-    , label = PowerModLabel buff
+    , label = PowerLabel buff
     , transformer = powerTransformer buff
     , source = AdminCrimes
     , repetitions = 1
     }
 
 
-type ModLabel
+type Label
     = XpActivityLabel Float
     | XpSkillLabel Float Skill.Kind
     | MxpModLabel Float
-    | ResourceModLabel Float
-    | SuccessModLabel Float
-    | CoinModLabel Float
-    | PowerModLabel Int
+    | ResourceDoublingLabel Float
+    | MoreManure
+    | SuccessLabel Float
+    | CoinLabel Float
+    | PowerLabel Int

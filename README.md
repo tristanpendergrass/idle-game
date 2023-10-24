@@ -60,7 +60,7 @@ $ npm test -- --watch
 - [x] Add notification when no more resource
 - [x] Fix monsters showing player power on activity card
 - [ ] Finalize gameplay values
-  - [ ] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
+  - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
   - [ ] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
   - [ ] Shop items -- redesign. Only need a few of these

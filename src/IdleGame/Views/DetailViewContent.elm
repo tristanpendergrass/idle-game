@@ -251,9 +251,9 @@ renderContent obj extraBottomPadding game =
         ]
 
 
-modLabelToString : Mod.ModLabel -> String
-modLabelToString modLabel =
-    case modLabel of
+modLabelToString : Mod -> String
+modLabelToString mod =
+    case mod.label of
         Mod.XpActivityLabel buff ->
             "+" ++ Utils.intToString (floor (buff * 100)) ++ "% XP"
 
@@ -263,16 +263,19 @@ modLabelToString modLabel =
         Mod.MxpModLabel buff ->
             "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Mastery XP"
 
-        Mod.ResourceModLabel buff ->
+        Mod.ResourceDoublingLabel buff ->
             "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
 
-        Mod.SuccessModLabel buff ->
+        Mod.MoreManure ->
+            "More manure"
+
+        Mod.SuccessLabel buff ->
             "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
 
-        Mod.CoinModLabel buff ->
+        Mod.CoinLabel buff ->
             "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Coin"
 
-        Mod.PowerModLabel buff ->
+        Mod.PowerLabel buff ->
             "+" ++ Utils.intToString buff ++ " Power"
 
 
@@ -304,7 +307,7 @@ masterySection mxp mastery =
                             "Boost effects"
 
                         Activity.GameMod mod ->
-                            modLabelToString mod.label
+                            modLabelToString mod
 
                         Activity.IntervalMod mod ->
                             intervalModLabelToString mod.label

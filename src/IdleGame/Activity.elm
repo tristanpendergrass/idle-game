@@ -328,7 +328,7 @@ cleanStablesStats =
             { activity = Activities.CleanStables
             , xp = Xp.int 10
             , coin = Coin.int 1
-            , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.25 }
+            , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery Activities.CleanStables)
     , hasSpellSelector = False
@@ -350,7 +350,27 @@ cleanBigBubbaStats =
             , coin = Coin.int 3
             , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.75 }
             }
-    , mastery = Just (getChoresMastery Activities.CleanBigBubba)
+    , mastery =
+        let
+            choresMastery : Mastery
+            choresMastery =
+                getChoresMastery Activities.CleanBigBubba
+
+            bigBubbaMastery : Mastery
+            bigBubbaMastery =
+                List.Extra.setAt 3
+                    ( 100
+                    , GameMod
+                        { tags = [ Effect.ActivityTag Activities.CleanBigBubba ]
+                        , label = Mod.MoreManure
+                        , transformer = Mod.resourceBaseTransformer 1
+                        , source = Mod.AdminCrimes
+                        , repetitions = 1
+                        }
+                    )
+                    choresMastery
+        in
+        Just bigBubbaMastery
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -368,7 +388,7 @@ sweepChimneyStats =
             { activity = Activities.SweepChimneys
             , xp = Xp.int 37
             , coin = Coin.int 6
-            , maybeResource = Just { resource = Resource.Soot, amount = 1, probability = 0.5 }
+            , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery Activities.SweepChimneys)
     , hasSpellSelector = False
@@ -408,7 +428,7 @@ washAndIronRobesStats =
             { activity = Activities.WashAndIronRobes
             , xp = Xp.int 50
             , coin = Coin.int 9
-            , maybeResource = Just { resource = Resource.WashWater, amount = 1, probability = 0.2 }
+            , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery Activities.WashAndIronRobes)
     , hasSpellSelector = False
@@ -468,7 +488,7 @@ flushDrainDemonsStats =
             { activity = Activities.FlushDrainDemons
             , xp = Xp.int 90
             , coin = Coin.int 14
-            , maybeResource = Just { resource = Resource.Ectoplasm, amount = 1, probability = 0.5 }
+            , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery Activities.FlushDrainDemons)
     , hasSpellSelector = False
