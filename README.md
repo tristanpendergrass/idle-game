@@ -37,38 +37,8 @@ $ npm test -- --watch
 
 # Todos
 
-## Version 0.2
-- [x] Add second "mode": Adventuring
-  - [x] Show different tabs in each mode
-  - [x] Button to switch between them in left nav
-  - [x] Separate preview and activity state for each mode
-- [x] Add hexes
-  - [x] Craft them for free
-  - [x] Require parchment
-- [x] Add parchment to shop
-- [x] Activity detail sidebar
-	- [x] desktop
-	- [x] mobile
-- [x] Activity status bar at bottom for mobile
-- [x] Move Item Mastery (M) info to detail sidebar
-- [x] Remove mastery pool logic from game
-- [x] Add monster fighting proof of concept
-  - [x] Add monster strength
-  - [x] Add combat resolution logic
-  - [x] Add spell selector
-  - [x] Check spell mods from getAllMods
-- [x] Add notification when no more resource
-- [x] Fix monsters showing player power on activity card
-- [x] Show spell effects in preview somehow -- optional
-- [x] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
-- [x] Remove Skill level section from combat tab
-- [x] Show rewards from combat
-- [x] Finalize gameplay values
-  - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
-  - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
-  - [x] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
-  - [x] Shop items -- redesign. Only need a few of these
-  - [x] Rename "Combat Tab 1"
+## Version 0.2.1
+- [ ] Stuff
 
 ## Future
 ### Tech stuff
@@ -114,6 +84,39 @@ $ npm test -- --watch
 - [ ] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 
 # Changelog
+
+## Version 0.2
+- [x] Add second "mode": Adventuring
+  - [x] Show different tabs in each mode
+  - [x] Button to switch between them in left nav
+  - [x] Separate preview and activity state for each mode
+- [x] Add hexes
+  - [x] Craft them for free
+  - [x] Require parchment
+- [x] Add parchment to shop
+- [x] Activity detail sidebar
+	- [x] desktop
+	- [x] mobile
+- [x] Activity status bar at bottom for mobile
+- [x] Move Item Mastery (M) info to detail sidebar
+- [x] Remove mastery pool logic from game
+- [x] Add monster fighting proof of concept
+  - [x] Add monster strength
+  - [x] Add combat resolution logic
+  - [x] Add spell selector
+  - [x] Check spell mods from getAllMods
+- [x] Add notification when no more resource
+- [x] Fix monsters showing player power on activity card
+- [x] Show spell effects in preview somehow -- optional
+- [x] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
+- [x] Remove Skill level section from combat tab
+- [x] Show rewards from combat
+- [x] Finalize gameplay values
+  - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
+  - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
+  - [x] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
+  - [x] Shop items -- redesign. Only need a few of these
+  - [x] Rename "Combat Tab 1"
 
 ## Version 0.1.2
 - [x] Fix bug with notification container preventing clicking anything underneath
