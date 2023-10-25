@@ -6,7 +6,6 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
-import IdleGame.Views.Utils
 import Percent exposing (Percent)
 
 

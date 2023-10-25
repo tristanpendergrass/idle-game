@@ -12,14 +12,17 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
-import IdleGame.Mod as Event
+import IdleGame.Kinds.Spells as Spells exposing (Spell)
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill exposing (Kind(..))
+import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
+import IdleGame.Views.Spell as SpellView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Json.Decode as D
@@ -100,17 +103,6 @@ activityDuration duration =
     div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
 
-activityCoin : Counter -> Html msg
-activityCoin coin =
-    div [ class "flex items-center gap-1" ]
-        [ div [ class "flex items-center gap-1" ]
-            [ span [] [ text (Counter.toString coin) ]
-            , Icon.coin
-                |> Icon.toHtml
-            ]
-        ]
-
-
 either : Maybe a -> Maybe a -> Maybe a
 either a b =
     case a of
@@ -168,7 +160,7 @@ renderActivity activity game screenWidth =
         effects =
             stats.effects
 
-        mods : List Event.Mod
+        mods : List Mod
         mods =
             Game.getAllMods game
 
@@ -205,6 +197,13 @@ renderActivity activity game screenWidth =
                     ([ activityTitle activity
                      , activityDuration duration
                      ]
+                        ++ (case stats.teachesSpell of
+                                Nothing ->
+                                    []
+
+                                Just spell ->
+                                    [ SpellView.renderSpellEffects spell ]
+                           )
                         ++ List.map
                             (\taggedEffect ->
                                 EffectView.render

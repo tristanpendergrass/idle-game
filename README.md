@@ -59,7 +59,7 @@ $ npm test -- --watch
   - [x] Check spell mods from getAllMods
 - [x] Add notification when no more resource
 - [x] Fix monsters showing player power on activity card
-- [ ] Show spell effects in preview somehow -- optional
+- [x] Show spell effects in preview somehow -- optional
 - [x] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
 - [ ] Remove Skill level section from combat tab
 - [x] Show rewards from combat

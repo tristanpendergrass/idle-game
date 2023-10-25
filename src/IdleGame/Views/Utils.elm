@@ -4,7 +4,9 @@ import FormatNumber
 import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
+import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
@@ -273,3 +275,31 @@ resourceAndQuantity { resource, quantity, iconSize } =
                 ]
             ]
         ]
+
+
+modToString : Mod -> String
+modToString mod =
+    case mod.label of
+        Mod.XpActivityLabel buff ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% XP"
+
+        Mod.XpSkillLabel buff skill ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% " ++ Skill.getLabel skill ++ " XP"
+
+        Mod.MxpModLabel buff ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% Mastery XP"
+
+        Mod.ResourceDoublingLabel buff ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% chance to double items"
+
+        Mod.MoreManure ->
+            "More manure"
+
+        Mod.SuccessLabel buff ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% chance to gain an item"
+
+        Mod.CoinLabel buff ->
+            "+" ++ intToString (floor (buff * 100)) ++ "% Coin"
+
+        Mod.PowerLabel buff ->
+            "+" ++ intToString buff ++ " Power"

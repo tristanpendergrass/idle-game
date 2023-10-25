@@ -6,10 +6,7 @@ module IdleGame.Counter exposing
     , isZero
     , multiplyBy
     , subtract
-    , toString
     )
-
-import IdleGame.Views.Utils
 
 
 type Counter
@@ -39,11 +36,6 @@ getValue (Counter val) =
 multiplyBy : Float -> Counter -> Counter
 multiplyBy amount (Counter oldVal) =
     Counter (amount * oldVal)
-
-
-toString : Counter -> String
-toString =
-    getValue >> IdleGame.Views.Utils.intToString
 
 
 isZero : Counter -> Bool

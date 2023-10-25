@@ -16,6 +16,7 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Spell as SpellView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
@@ -184,10 +185,18 @@ renderContent obj extraBottomPadding game =
 
         -- Play/pause button
         , playPauseButton playButtonState activity
+
+        -- Duration
         , div [ class "relative" ]
             [ ActivityView.activityDuration (Game.getModdedDuration game activity)
             , fade isPreview
             ]
+        , case stats.teachesSpell of
+            Nothing ->
+                div [ class "hidden" ] []
+
+            Just spell ->
+                SpellView.renderSpellEffects spell
 
         -- The effects of the activity
         , div [ class "t-column relative" ]
@@ -251,34 +260,6 @@ renderContent obj extraBottomPadding game =
         ]
 
 
-modLabelToString : Mod -> String
-modLabelToString mod =
-    case mod.label of
-        Mod.XpActivityLabel buff ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% XP"
-
-        Mod.XpSkillLabel buff skill ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% " ++ Skill.getLabel skill ++ " XP"
-
-        Mod.MxpModLabel buff ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Mastery XP"
-
-        Mod.ResourceDoublingLabel buff ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to double items"
-
-        Mod.MoreManure ->
-            "More manure"
-
-        Mod.SuccessLabel buff ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% chance to gain an item"
-
-        Mod.CoinLabel buff ->
-            "+" ++ Utils.intToString (floor (buff * 100)) ++ "% Coin"
-
-        Mod.PowerLabel buff ->
-            "+" ++ Utils.intToString buff ++ " Power"
-
-
 intervalModLabelToString : IntervalModLabel -> String
 intervalModLabelToString modLabel =
     case modLabel of
@@ -305,7 +286,7 @@ masterySection mxp mastery =
                             "Imbue enabled"
 
                         Activity.GameMod mod ->
-                            modLabelToString mod
+                            Utils.modToString mod
 
                         Activity.IntervalMod mod ->
                             intervalModLabelToString mod.label
