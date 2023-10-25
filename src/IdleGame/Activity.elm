@@ -912,7 +912,7 @@ curse3Stats =
 
 monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
 monsterEffects { activity, rewards, power } =
-    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 100000 }) rewards
+    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
         |> Effect.withTags [ Effect.ActivityTag activity, Effect.SkillTag Skill.Adventuring ]
     ]
 
