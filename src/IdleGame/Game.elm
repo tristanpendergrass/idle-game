@@ -351,13 +351,18 @@ tick delta game =
 
 getPurchaseEffects : Int -> Resource.Kind -> List Effect.TaggedEffect
 getPurchaseEffects amount resource =
-    let
-        cost : Coin.Coin
-        cost =
-            Quantity.multiplyBy (toFloat amount) (Coin.int 10)
-                |> Quantity.multiplyBy -1
-    in
-    [ Effect.gainCoin cost, Effect.gainResource amount resource ]
+    case (Resource.getStats resource).purchasing of
+        Resource.Purchasable price ->
+            let
+                cost : Coin.Coin
+                cost =
+                    Quantity.multiplyBy (toFloat amount) price
+                        |> Quantity.multiplyBy -1
+            in
+            [ Effect.gainCoin cost, Effect.gainResource amount resource ]
+
+        Resource.NotPurchasable ->
+            []
 
 
 attemptPurchaseResource : Int -> Resource.Kind -> Game -> ( Game, List Toast )
