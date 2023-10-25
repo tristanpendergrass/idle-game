@@ -29,10 +29,16 @@ To make it fun and less of an obvious tutorial we could have the NPC randomly di
 * Need to consider: how to add new early tips to the game in later versions and ensure veterans and new players both see them?
 * Alternative system: each tip gets tagged with a priority, and lower priorities are shown before higher always. So new tips can be added with low priorities and will definitely be shown to verteran players as they won't register as viewed
 * What if we allowed tips to apply to new versions of the game? Telling players about critical functionality that changed (or even just that monsters/items were buffed/nerfed). These should be dynamic maybe. So only users that played on a version older than the new version see these tips.
+# Moving between skills
+I am thinking it would be better to access tips related to a specific skill from that skill's tab instead of having all tips dispensed from the same location. But we don't want to have a different wise man as NPC in each location, that would take up too much space and tips aren't that important.
 
+What if instead there was a special spot for a traveling NPC to hang around in in each skill tab. It would be a small circular portrait near the cards. It would be empty for most skills on most days, but perhaps each day the wise man picks a new tab to visit and if you talk to him from there he'll give a general tip or a tip related to that area. Or a resource related to that area.
+
+This traveling NPC slot could eventually host other characters who show up randomly and have some effect.
 # Tip ideas
 Should the tips be given in the second person?
 * The great wiseman does not desire to speak with you every day! In fact, know that the rewards he bestows upon depend not on how often you speak with him, but on the tides of time...
     * Note this should be programmed to come after a couple of rewards have been given
 * Long press an activity to preview it
     * This one is very important! We might track how often a user uses the preview function and trigger this tip a second time if they haven't used it at all.
+

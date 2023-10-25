@@ -18,26 +18,6 @@ import List.Extra
 import Percent exposing (Percent)
 
 
-
--- type Activity
---     = -- Chores
---       CleanStables
---     | CleanBigBubba
---     | SweepChimneys
---     | WaterGreenhousePlants
---     | WashAndIronRobes
---     | OrganizePotionIngredients
---     | RepairInstruments
---     | FlushDrainDemons
---     | OrganizeSpellBooks
---       -- Hexes
---     | Hex1
---     | Hex2
---       -- Adventuring
---     | FightMonster1
---     | FightMonster2
-
-
 allActivitiesBySkill : Skill.Kind -> List Activity
 allActivitiesBySkill skill =
     allActivities
@@ -87,9 +67,20 @@ allActivities =
     , Activities.FlushDrainDemons
     , Activities.OrganizeSpellBooks
     , Activities.Hex1
+    , Activities.Jinx1
+    , Activities.Curse1
     , Activities.Hex2
+    , Activities.Jinx2
+    , Activities.Curse2
+    , Activities.Hex3
+    , Activities.Jinx3
+    , Activities.Curse3
     , Activities.FightMonster1
     , Activities.FightMonster2
+    , Activities.FightMonster3
+    , Activities.FightMonster4
+    , Activities.FightMonster5
+    , Activities.FightMonster6
     ]
 
 
@@ -104,9 +95,20 @@ type alias Record a =
     , flushDrainDemons : a
     , organizeSpellBooks : a
     , hex1 : a
+    , jinx1 : a
+    , curse1 : a
     , hex2 : a
+    , jinx2 : a
+    , curse2 : a
+    , hex3 : a
+    , jinx3 : a
+    , curse3 : a
     , fightMonster1 : a
     , fightMonster2 : a
+    , fightMonster3 : a
+    , fightMonster4 : a
+    , fightMonster5 : a
+    , fightMonster6 : a
     }
 
 
@@ -122,9 +124,20 @@ createRecord d =
     , flushDrainDemons = d
     , organizeSpellBooks = d
     , hex1 = d
+    , jinx1 = d
+    , curse1 = d
     , hex2 = d
+    , jinx2 = d
+    , curse2 = d
+    , hex3 = d
+    , jinx3 = d
+    , curse3 = d
     , fightMonster1 = d
     , fightMonster2 = d
+    , fightMonster3 = d
+    , fightMonster4 = d
+    , fightMonster5 = d
+    , fightMonster6 = d
     }
 
 
@@ -161,14 +174,47 @@ getByKind kind record =
         Activities.Hex1 ->
             record.hex1
 
+        Activities.Jinx1 ->
+            record.jinx1
+
+        Activities.Curse1 ->
+            record.curse1
+
         Activities.Hex2 ->
             record.hex2
+
+        Activities.Jinx2 ->
+            record.jinx2
+
+        Activities.Curse2 ->
+            record.curse2
+
+        Activities.Hex3 ->
+            record.hex3
+
+        Activities.Jinx3 ->
+            record.jinx3
+
+        Activities.Curse3 ->
+            record.curse3
 
         Activities.FightMonster1 ->
             record.fightMonster1
 
         Activities.FightMonster2 ->
             record.fightMonster2
+
+        Activities.FightMonster3 ->
+            record.fightMonster3
+
+        Activities.FightMonster4 ->
+            record.fightMonster4
+
+        Activities.FightMonster5 ->
+            record.fightMonster5
+
+        Activities.FightMonster6 ->
+            record.fightMonster6
 
 
 setByKind : Activity -> a -> Record a -> Record a
@@ -204,8 +250,29 @@ setByKind kind value record =
         Activities.Hex1 ->
             { record | hex1 = value }
 
+        Activities.Jinx1 ->
+            { record | jinx1 = value }
+
+        Activities.Curse1 ->
+            { record | curse1 = value }
+
         Activities.Hex2 ->
             { record | hex2 = value }
+
+        Activities.Jinx2 ->
+            { record | jinx2 = value }
+
+        Activities.Curse2 ->
+            { record | curse2 = value }
+
+        Activities.Hex3 ->
+            { record | hex3 = value }
+
+        Activities.Jinx3 ->
+            { record | jinx3 = value }
+
+        Activities.Curse3 ->
+            { record | curse3 = value }
 
         Activities.FightMonster1 ->
             { record | fightMonster1 = value }
@@ -213,10 +280,27 @@ setByKind kind value record =
         Activities.FightMonster2 ->
             { record | fightMonster2 = value }
 
+        Activities.FightMonster3 ->
+            { record | fightMonster3 = value }
+
+        Activities.FightMonster4 ->
+            { record | fightMonster4 = value }
+
+        Activities.FightMonster5 ->
+            { record | fightMonster5 = value }
+
+        Activities.FightMonster6 ->
+            { record | fightMonster6 = value }
+
 
 updateByKind : Activity -> (a -> a) -> Record a -> Record a
 updateByKind kind f record =
     setByKind kind (f (getByKind kind record)) record
+
+
+getBySpell : Spell -> Maybe Activity
+getBySpell spell =
+    List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities
 
 
 type ActivityImage
@@ -309,10 +393,55 @@ allStats =
     , flushDrainDemons = flushDrainDemonsStats
     , organizeSpellBooks = organizeSpellBooksStats
     , hex1 = hex1Stats
+    , jinx1 = jinx1Stats
+    , curse1 = curse1Stats
     , hex2 = hex2Stats
+    , jinx2 = jinx2Stats
+    , curse2 = curse2Stats
+    , hex3 = hex3Stats
+    , jinx3 = jinx3Stats
+    , curse3 = curse3Stats
     , fightMonster1 = fightMonster1Stats
     , fightMonster2 = fightMonster2Stats
+    , fightMonster3 = fightMonster3Stats
+    , fightMonster4 = fightMonster4Stats
+    , fightMonster5 = fightMonster5Stats
+    , fightMonster6 = fightMonster6Stats
     }
+
+
+
+-- Chores
+
+
+getChoresMastery : Activity -> Mastery
+getChoresMastery chore =
+    [ ( 25
+      , GameMod
+            (Mod.coinBuff 0.1
+                |> Mod.withTags [ Effect.ActivityTag chore ]
+            )
+      )
+    , ( 50
+      , GameMod
+            (Mod.activityXpBuff chore 0.25
+                |> Mod.withTags [ Effect.ActivityTag chore ]
+            )
+      )
+    , ( 75
+      , IntervalMod
+            { kind = chore
+            , percentChange = Percent.fromFloat 0.1
+            , label = IntervalModLabel (Percent.fromFloat 0.1)
+            }
+      )
+    , ( 100
+      , GameMod
+            (Mod.skillXpBuff Skill.Chores 0.05
+                |> Mod.withTags [ Effect.SkillTag Skill.Chores ]
+            )
+      )
+    ]
 
 
 cleanStablesStats : Stats
@@ -519,86 +648,6 @@ organizeSpellBooksStats =
 -- Hexes
 
 
-hex1Stats : Stats
-hex1Stats =
-    { skill = Skill.Hexes
-    , title = "Hex I"
-    , image = ActivityIcon (Resource.getStats Resource.Hex1).icon
-    , unlockRequirements = Nothing
-    , duration = Duration.seconds 5
-    , effects =
-        [ Effect.gainXp (Xp.int 5) Skill.Hexes
-        , Effect.gainMxp Activities.Hex1
-        , Effect.gainResource -1 Resource.Parchment
-        ]
-    , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
-    , teachesSpell = Just Spells.Hex1
-    }
-
-
-hex2Stats : Stats
-hex2Stats =
-    { skill = Skill.Hexes
-    , title = "Hex II"
-    , image = ActivityIcon (Resource.getStats Resource.Hex2).icon
-    , unlockRequirements = Just ( Skill.Hexes, 10 )
-    , duration = Duration.seconds 5
-    , effects =
-        [ Effect.gainXp (Xp.int 10) Skill.Hexes
-        , Effect.gainMxp Activities.Hex2
-        , Effect.gainResource -1 Resource.Parchment
-        ]
-    , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
-    , teachesSpell = Just Spells.Hex2
-    }
-
-
-getActivityMastery : Activity -> Mastery
-getActivityMastery activity =
-    [ ( 10
-      , GameMod
-            (Mod.activityXpBuff activity 0.25
-                |> Mod.withTags [ Effect.ActivityTag activity ]
-            )
-      )
-    , ( 35, GameMod (Mod.activityXpBuff activity 0.25) )
-    , ( 65, GameMod (Mod.activityXpBuff activity 0.25) )
-    , ( 95, GameMod (Mod.activityXpBuff activity 0.35) )
-    ]
-
-
-getChoresMastery : Activity -> Mastery
-getChoresMastery chore =
-    [ ( 25
-      , GameMod
-            (Mod.coinBuff 0.1
-                |> Mod.withTags [ Effect.ActivityTag chore ]
-            )
-      )
-    , ( 50
-      , GameMod
-            (Mod.activityXpBuff chore 0.25
-                |> Mod.withTags [ Effect.ActivityTag chore ]
-            )
-      )
-    , ( 75
-      , IntervalMod
-            { kind = chore
-            , percentChange = Percent.fromFloat 0.1
-            , label = IntervalModLabel (Percent.fromFloat 0.1)
-            }
-      )
-    , ( 100
-      , GameMod
-            (Mod.skillXpBuff Skill.Chores 0.05
-                |> Mod.withTags [ Effect.SkillTag Skill.Chores ]
-            )
-      )
-    ]
-
-
 defaultSpellMastery : Mastery
 defaultSpellMastery =
     [ ( 25, SpellAvailable )
@@ -608,13 +657,266 @@ defaultSpellMastery =
     ]
 
 
+hex1Stats : Stats
+hex1Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Hex1
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 3.5
+    , effects =
+        [ Effect.gainXp (Xp.int 12) Skill.Hexes
+        , Effect.gainMxp Activities.Hex1
+        , Effect.gainResource -1 Resource.Manure
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Hex1
+    }
+
+
+jinx1Stats : Stats
+jinx1Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Jinx1
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 10 )
+    , duration = Duration.seconds 4.5
+    , effects =
+        [ Effect.gainXp (Xp.int 18) Skill.Hexes
+        , Effect.gainMxp Activities.Jinx1
+        , Effect.gainResource -1 Resource.GreenhouseDirt
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Jinx1
+    }
+
+
+curse1Stats : Stats
+curse1Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Curse1
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 25 )
+    , duration = Duration.seconds 5
+    , effects =
+        [ Effect.gainXp (Xp.int 24) Skill.Hexes
+        , Effect.gainMxp Activities.Curse1
+        , Effect.gainResource -1 Resource.WashWater
+        , Effect.gainResource -1 Resource.Soot
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Curse1
+    }
+
+
+hex2Stats : Stats
+hex2Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Hex2
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 35 )
+    , duration = Duration.seconds 9
+    , effects =
+        [ Effect.gainXp (Xp.int 54) Skill.Hexes
+        , Effect.gainMxp Activities.Hex2
+        , Effect.gainResource -4 Resource.Manure
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Hex2
+    }
+
+
+jinx2Stats : Stats
+jinx2Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Jinx2
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 45 )
+    , duration = Duration.seconds 10.5
+    , effects =
+        [ Effect.gainXp (Xp.int 65) Skill.Hexes
+        , Effect.gainMxp Activities.Jinx2
+        , Effect.gainResource -5 Resource.GreenhouseDirt
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Jinx2
+    }
+
+
+curse2Stats : Stats
+curse2Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Curse2
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 55 )
+    , duration = Duration.seconds 12
+    , effects =
+        [ Effect.gainXp (Xp.int 99) Skill.Hexes
+        , Effect.gainMxp Activities.Curse2
+        , Effect.gainResource -2 Resource.WashWater
+        , Effect.gainResource -1 Resource.Scrap
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Curse2
+    }
+
+
+hex3Stats : Stats
+hex3Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Hex3
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 65 )
+    , duration = Duration.seconds 15
+    , effects =
+        [ Effect.gainXp (Xp.int 94) Skill.Hexes
+        , Effect.gainMxp Activities.Hex3
+        , Effect.gainResource -10 Resource.Manure
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Hex3
+    }
+
+
+jinx3Stats : Stats
+jinx3Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Jinx3
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 75 )
+    , duration = Duration.seconds 16
+    , effects =
+        [ Effect.gainXp (Xp.int 144) Skill.Hexes
+        , Effect.gainMxp Activities.Jinx3
+        , Effect.gainResource -6 Resource.GreenhouseDirt
+        , Effect.gainResource -1 Resource.Ectoplasm
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Jinx3
+    }
+
+
+curse3Stats : Stats
+curse3Stats =
+    let
+        spell : Spell
+        spell =
+            Spells.Curse3
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { skill = Skill.Hexes
+    , title = spellStats.title
+    , image = ActivityIcon spellStats.icon
+    , unlockRequirements = Just ( Skill.Hexes, 90 )
+    , duration = Duration.seconds 19
+    , effects =
+        [ Effect.gainXp (Xp.int 200) Skill.Hexes
+        , Effect.gainMxp Activities.Curse3
+        , Effect.gainResource -2 Resource.WashWater
+        , Effect.gainResource -2 Resource.Soot
+        , Effect.gainResource -2 Resource.Scrap
+        , Effect.gainResource -2 Resource.Manure
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Just Spells.Curse3
+    }
+
+
+
+-- Monsters
+
+
 fightMonster1Stats : Stats
 fightMonster1Stats =
     { skill = Skill.Adventuring
-    , title = "Fight Monster I"
-    , image = ActivityIcon (Icon.letter "M1")
+    , title = "Furball"
+    , image = ActivityIcon (Icon.letter "F")
     , unlockRequirements = Nothing
-    , duration = Duration.seconds 5
+    , duration = Duration.seconds 8
     , effects =
         [ Effect.resolveCombat
             (Combat.create { monsterPower = 1, playerPower = 1 })
@@ -630,10 +932,10 @@ fightMonster1Stats =
 fightMonster2Stats : Stats
 fightMonster2Stats =
     { skill = Skill.Adventuring
-    , title = "Fight Monster II"
-    , image = ActivityIcon (Icon.letter "M2")
+    , title = "Ectoplo"
+    , image = ActivityIcon (Icon.letter "E")
     , unlockRequirements = Nothing
-    , duration = Duration.seconds 5
+    , duration = Duration.seconds 8
     , effects =
         [ Effect.resolveCombat
             (Combat.create { monsterPower = 2, playerPower = 1 })
@@ -646,6 +948,77 @@ fightMonster2Stats =
     }
 
 
-getBySpell : Spell -> Maybe Activity
-getBySpell spell =
-    List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities
+fightMonster3Stats : Stats
+fightMonster3Stats =
+    { skill = Skill.Adventuring
+    , title = "Dreadkin"
+    , image = ActivityIcon (Icon.letter "D")
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 8
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 2, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 2) ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
+        ]
+    , mastery = Nothing
+    , hasSpellSelector = True
+    , teachesSpell = Nothing
+    }
+
+
+fightMonster4Stats : Stats
+fightMonster4Stats =
+    { skill = Skill.Adventuring
+    , title = "Creeping Vine"
+    , image = ActivityIcon (Icon.letter "C")
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 8
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 2, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 2) ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
+        ]
+    , mastery = Nothing
+    , hasSpellSelector = True
+    , teachesSpell = Nothing
+    }
+
+
+fightMonster5Stats : Stats
+fightMonster5Stats =
+    { skill = Skill.Adventuring
+    , title = "Banshee"
+    , image = ActivityIcon (Icon.letter "B")
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 8
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 2, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 2) ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
+        ]
+    , mastery = Nothing
+    , hasSpellSelector = True
+    , teachesSpell = Nothing
+    }
+
+
+fightMonster6Stats : Stats
+fightMonster6Stats =
+    { skill = Skill.Adventuring
+    , title = "Alucard"
+    , image = ActivityIcon (Icon.letter "A")
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 8
+    , effects =
+        [ Effect.resolveCombat
+            (Combat.create { monsterPower = 2, playerPower = 1 })
+            [ Effect.gainCoin (Coin.int 2) ]
+            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
+        ]
+    , mastery = Nothing
+    , hasSpellSelector = True
+    , teachesSpell = Nothing
+    }

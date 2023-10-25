@@ -62,7 +62,7 @@ $ npm test -- --watch
 - [ ] Show spell effects in preview somehow -- optional
 - [ ] Finalize gameplay values
   - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
-  - [ ] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
+  - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
   - [ ] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
   - [ ] Shop items -- redesign. Only need a few of these
 
@@ -74,7 +74,8 @@ $ npm test -- --watch
 - [ ] Find a way to unit test performance of tick
 
 ### Fundamentals
-- [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell
+- [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True?
+- [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
 - [ ] Show what mods there are on an effect/interval and where they came from
 - [ ] Show Time Passes during Fast Forward with real time change

@@ -56,7 +56,7 @@ create seed =
         xp : Skill.Record Xp
         xp =
             { chores = Xp.int 8000000
-            , hexes = Xp.int 0
+            , hexes = Xp.int 8000000
             , adventuring = Xp.int 0
             }
     in

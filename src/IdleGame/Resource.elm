@@ -16,15 +16,6 @@ type
     | Scrap
     | Ectoplasm
     | Parchment
-    | Hex1
-    | Jinx1
-    | Curse1
-    | Hex2
-    | Jinx2
-    | Curse2
-    | Hex3
-    | Jinx3
-    | Curse3
 
 
 allResources : List Kind
@@ -38,15 +29,6 @@ allResources =
     , Scrap
     , Ectoplasm
     , Parchment
-    , Hex1
-    , Jinx1
-    , Curse1
-    , Hex2
-    , Jinx2
-    , Curse2
-    , Hex3
-    , Jinx3
-    , Curse3
     ]
 
 
@@ -59,15 +41,6 @@ type alias Record a =
     , scrap : a
     , ectoplasm : a
     , parchment : a
-    , hex1 : a
-    , jinx1 : a
-    , curse1 : a
-    , hex2 : a
-    , jinx2 : a
-    , curse2 : a
-    , hex3 : a
-    , jinx3 : a
-    , curse3 : a
     }
 
 
@@ -98,33 +71,6 @@ getByKind kind data =
         Parchment ->
             data.parchment
 
-        Hex1 ->
-            data.hex1
-
-        Jinx1 ->
-            data.jinx1
-
-        Curse1 ->
-            data.curse1
-
-        Hex2 ->
-            data.hex2
-
-        Jinx2 ->
-            data.jinx2
-
-        Curse2 ->
-            data.curse2
-
-        Hex3 ->
-            data.hex3
-
-        Jinx3 ->
-            data.jinx3
-
-        Curse3 ->
-            data.curse3
-
 
 setByKind : Kind -> a -> Record a -> Record a
 setByKind kind value data =
@@ -152,33 +98,6 @@ setByKind kind value data =
 
         Parchment ->
             { data | parchment = value }
-
-        Hex1 ->
-            { data | hex1 = value }
-
-        Jinx1 ->
-            { data | jinx1 = value }
-
-        Curse1 ->
-            { data | curse1 = value }
-
-        Hex2 ->
-            { data | hex2 = value }
-
-        Jinx2 ->
-            { data | jinx2 = value }
-
-        Curse2 ->
-            { data | curse2 = value }
-
-        Hex3 ->
-            { data | hex3 = value }
-
-        Jinx3 ->
-            { data | jinx3 = value }
-
-        Curse3 ->
-            { data | curse3 = value }
 
 
 updateByKind : Kind -> (a -> a) -> Record a -> Record a
@@ -208,15 +127,6 @@ allStats =
     , scrap = scrapStats
     , ectoplasm = ectoplasmStats
     , parchment = parchmentStats
-    , hex1 = hex1Stats
-    , jinx1 = jinx1Stats
-    , curse1 = curse1Stats
-    , hex2 = hex2Stats
-    , jinx2 = jinx2Stats
-    , curse2 = curse2Stats
-    , hex3 = hex3Stats
-    , jinx3 = jinx3Stats
-    , curse3 = curse3Stats
     }
 
 
@@ -284,78 +194,6 @@ parchmentStats =
     }
 
 
-hex1Stats : Stats
-hex1Stats =
-    { title = "Hex I"
-    , icon = Icon.letter "Hx1"
-    , purchasing = NotPurchasable
-    }
-
-
-jinx1Stats : Stats
-jinx1Stats =
-    { title = "Jinx I"
-    , icon = Icon.letter "Jx1"
-    , purchasing = NotPurchasable
-    }
-
-
-curse1Stats : Stats
-curse1Stats =
-    { title = "Curse I"
-    , icon = Icon.letter "Cs1"
-    , purchasing = NotPurchasable
-    }
-
-
-hex2Stats : Stats
-hex2Stats =
-    { title = "Hex II"
-    , icon = Icon.letter "Hx2"
-    , purchasing = NotPurchasable
-    }
-
-
-jinx2Stats : Stats
-jinx2Stats =
-    { title = "Jinx II"
-    , icon = Icon.letter "Jx2"
-    , purchasing = NotPurchasable
-    }
-
-
-curse2Stats : Stats
-curse2Stats =
-    { title = "Curse II"
-    , icon = Icon.letter "Cs2"
-    , purchasing = NotPurchasable
-    }
-
-
-hex3Stats : Stats
-hex3Stats =
-    { title = "Hex III"
-    , icon = Icon.letter "Hx3"
-    , purchasing = NotPurchasable
-    }
-
-
-jinx3Stats : Stats
-jinx3Stats =
-    { title = "Jinx III"
-    , icon = Icon.letter "Jx3"
-    , purchasing = NotPurchasable
-    }
-
-
-curse3Stats : Stats
-curse3Stats =
-    { title = "Curse III"
-    , icon = Icon.letter "Cs3"
-    , purchasing = NotPurchasable
-    }
-
-
 getStats : Kind -> Stats
 getStats kind =
     getByKind kind allStats
@@ -376,15 +214,6 @@ emptyResourceRecord =
     , scrap = 0
     , ectoplasm = 0
     , parchment = 0
-    , hex1 = 0
-    , jinx1 = 0
-    , curse1 = 0
-    , hex2 = 0
-    , jinx2 = 0
-    , curse2 = 0
-    , hex3 = 0
-    , jinx3 = 0
-    , curse3 = 0
     }
 
 
@@ -417,15 +246,6 @@ getDiff { original, current } =
     , scrap = current.scrap - original.scrap
     , ectoplasm = current.ectoplasm - original.ectoplasm
     , parchment = current.parchment - original.parchment
-    , hex1 = current.hex1 - original.hex1
-    , jinx1 = current.jinx1 - original.jinx1
-    , curse1 = current.curse1 - original.curse1
-    , hex2 = current.hex2 - original.hex2
-    , jinx2 = current.jinx2 - original.jinx2
-    , curse2 = current.curse2 - original.curse2
-    , hex3 = current.hex3 - original.hex3
-    , jinx3 = current.jinx3 - original.jinx3
-    , curse3 = current.curse3 - original.curse3
     }
 
 
