@@ -192,13 +192,25 @@ renderCombat { renderType, successEffects, combat, game } =
     in
     case renderType of
         DetailView ->
-            div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
-                [ renderMonsterPower monsterPower
-                , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
-                , div [ class "t-column gap-0" ]
-                    [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
-                    , div [ class "text-sm" ] [ text "Player Power" ]
+            let
+                ( predictionText, predictionColorClass ) =
+                    parsePrediction (Combat.getVictoryPrediction combat)
+            in
+            div [ class "t-column max-w-full" ]
+                [ div [ class "flex items-center gap-1 max-w-full overflow-hidden text-sm" ]
+                    [ span [] [ text "Victory:" ]
+                    , span [ predictionColorClass ] [ text predictionText ]
                     ]
+                , div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
+                    [ renderMonsterPower monsterPower
+                    , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
+                    , div [ class "t-column gap-0" ]
+                        [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
+                        , div [ class "text-sm" ] [ text "Player Power" ]
+                        ]
+                    ]
+                , div [ class "flex items-center gap-4 max-w-full overflow-hidden" ]
+                    (List.map (renderModdedEffect renderType game) successEffects)
                 ]
 
         Card ->
@@ -208,3 +220,22 @@ renderCombat { renderType, successEffects, combat, game } =
                 , div [ class "flex items-center gap-4 max-w-full overflow-hidden" ]
                     (List.map (renderModdedEffect renderType game) successEffects)
                 ]
+
+
+parsePrediction : Combat.Prediction -> ( String, Attribute msg )
+parsePrediction prediction =
+    case prediction of
+        Combat.VeryLow ->
+            ( "Doubtful", class "text-error" )
+
+        Combat.Low ->
+            ( "Plausible", class "text-warning" )
+
+        Combat.AboutEven ->
+            ( "Even", class "" )
+
+        Combat.Good ->
+            ( "Hopeful", class "text-success" )
+
+        Combat.VeryGood ->
+            ( "Likely", class "text-success" )

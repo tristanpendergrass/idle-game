@@ -60,7 +60,7 @@ $ npm test -- --watch
 - [x] Add notification when no more resource
 - [x] Fix monsters showing player power on activity card
 - [ ] Show spell effects in preview somehow -- optional
-- [ ] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
+- [x] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
 - [ ] Remove Skill level section from combat tab
 - [x] Show rewards from combat
 - [ ] Finalize gameplay values
@@ -91,10 +91,11 @@ $ npm test -- --watch
   - [ ] Prevent activity starting when clicked if it will fail and show error message
 
 ### Features
+#### Skills
 - [ ] Skill 3
 - [ ] Skill 4
-- [ ] Combat
-  - [ ] Regen period after loss
+#### Combat
+- [ ] Regen period after loss
 
 ### Glitz
 - [ ] Progress bar animations
@@ -127,7 +128,7 @@ $ npm test -- --watch
 
 ## Version 0.1.1
 - [x] Fix some icons not showing in prod for items (soot2?)
-- [x] Fix performance by insuring no calls to intToString in game tick
+- [x] Fix performance by ensuring no calls to intToString in game tick
 - [x] Prevent skill level from exceeding 99
 - [x] Make release checklist. - change dev flags to prod flags, update version number in sidebar
 

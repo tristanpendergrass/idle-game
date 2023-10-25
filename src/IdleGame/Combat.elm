@@ -1,9 +1,11 @@
 module IdleGame.Combat exposing
     ( Combat
+    , Prediction(..)
     , addPlayerPower
     , create
     , getMonsterPower
     , getPlayerPower
+    , getVictoryPrediction
     , resolve
     )
 
@@ -74,3 +76,38 @@ resolve (Combat { monsterPower, playerPower }) =
         (Random.int 1 monsterPower)
         (Random.int 1 playerPower)
         bool
+
+
+type Prediction
+    = VeryLow
+    | Low
+    | AboutEven
+    | Good
+    | VeryGood
+
+
+getVictoryPrediction : Combat -> Prediction
+getVictoryPrediction (Combat { monsterPower, playerPower }) =
+    let
+        difference : Int
+        difference =
+            playerPower - monsterPower
+
+        percentDifference : Float
+        percentDifference =
+            toFloat difference / toFloat monsterPower
+    in
+    if percentDifference < -0.25 then
+        VeryLow
+
+    else if percentDifference < -0.1 then
+        Low
+
+    else if percentDifference < 0.1 then
+        AboutEven
+
+    else if percentDifference < 0.25 then
+        Good
+
+    else
+        VeryGood
