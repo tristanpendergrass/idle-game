@@ -21,8 +21,8 @@ import Types exposing (..)
 
 
 type RenderType
-    = ForCard
-    | ForDetailView
+    = Card
+    | DetailView
 
 
 render : { game : Game, mods : List Mod, effect : Effect.TaggedEffect, renderType : RenderType } -> Html FrontendMsg
@@ -32,7 +32,7 @@ render { game, mods, effect, renderType } =
         |> renderModdedEffect renderType game
 
 
-renderModdedEffect : RenderType -> Game -> Effect.TaggedEffect -> Html FrontendMsg
+renderModdedEffect : RenderType -> Game -> Effect.TaggedEffect -> Html msg
 renderModdedEffect renderType game effect =
     case Effect.getEffect effect of
         Effect.GainCoin coin ->
@@ -60,8 +60,13 @@ renderModdedEffect renderType game effect =
                 _ ->
                     div [] []
 
-        Effect.ResolveCombat { combat } ->
-            renderCombat renderType combat
+        Effect.ResolveCombat { combat, successEffects } ->
+            renderCombat
+                { renderType = renderType
+                , combat = combat
+                , successEffects = successEffects
+                , game = game
+                }
 
 
 renderCoin : { base : Coin, multiplier : Float } -> Html msg
@@ -168,8 +173,14 @@ renderMonsterPower strength =
         ]
 
 
-renderCombat : RenderType -> Combat -> Html msg
-renderCombat renderType combat =
+renderCombat :
+    { renderType : RenderType
+    , successEffects : List Effect.TaggedEffect
+    , combat : Combat
+    , game : Game
+    }
+    -> Html msg
+renderCombat { renderType, successEffects, combat, game } =
     let
         monsterPower : Int
         monsterPower =
@@ -179,9 +190,9 @@ renderCombat renderType combat =
         playerPower =
             Combat.getPlayerPower combat
     in
-    div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
-        (case renderType of
-            ForDetailView ->
+    case renderType of
+        DetailView ->
+            div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
                 [ renderMonsterPower monsterPower
                 , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
                 , div [ class "t-column gap-0" ]
@@ -190,6 +201,10 @@ renderCombat renderType combat =
                     ]
                 ]
 
-            ForCard ->
-                [ renderMonsterPower monsterPower ]
-        )
+        Card ->
+            div [ class "t-column max-w-full" ]
+                [ div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
+                    [ renderMonsterPower monsterPower ]
+                , div [ class "flex items-center gap-4 max-w-full overflow-hidden" ]
+                    (List.map (renderModdedEffect renderType game) successEffects)
+                ]

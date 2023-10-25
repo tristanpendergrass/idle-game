@@ -60,10 +60,13 @@ $ npm test -- --watch
 - [x] Add notification when no more resource
 - [x] Fix monsters showing player power on activity card
 - [ ] Show spell effects in preview somehow -- optional
+- [ ] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
+- [ ] Remove Skill level section from combat tab
+- [x] Show rewards from combat
 - [ ] Finalize gameplay values
   - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
-  - [ ] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
+  - [x] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
   - [ ] Shop items -- redesign. Only need a few of these
 
 ## Future

@@ -211,7 +211,7 @@ renderActivity activity game screenWidth =
                                     { game = game
                                     , mods = mods
                                     , effect = taggedEffect
-                                    , renderType = EffectView.ForCard
+                                    , renderType = EffectView.Card
                                     }
                             )
                             orderedEffects

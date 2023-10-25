@@ -910,6 +910,13 @@ curse3Stats =
 -- Monsters
 
 
+monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
+monsterEffects { activity, rewards, power } =
+    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
+        |> Effect.withTags [ Effect.ActivityTag activity ]
+    ]
+
+
 fightMonster1Stats : Stats
 fightMonster1Stats =
     { skill = Skill.Adventuring
@@ -918,11 +925,11 @@ fightMonster1Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 1, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 1) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster1 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster1
+            , rewards = [ Effect.gainCoin (Coin.int 1) ]
+            , power = 1
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -937,11 +944,11 @@ fightMonster2Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 2, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster2
+            , rewards = [ Effect.gainResource 1 Resource.Ectoplasm ]
+            , power = 8
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -956,11 +963,11 @@ fightMonster3Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 2, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster3
+            , rewards = [ Effect.gainCoin (Coin.int 5) ]
+            , power = 22
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -975,11 +982,11 @@ fightMonster4Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 2, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster4
+            , rewards = [ Effect.gainResource 1 Resource.GreenhouseDirt ]
+            , power = 45
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -994,11 +1001,11 @@ fightMonster5Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 2, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster5
+            , rewards = [ Effect.gainCoin (Coin.int 15) ]
+            , power = 75
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing
@@ -1013,11 +1020,11 @@ fightMonster6Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
-        [ Effect.resolveCombat
-            (Combat.create { monsterPower = 2, playerPower = 1 })
-            [ Effect.gainCoin (Coin.int 2) ]
-            |> Effect.withTags [ Effect.ActivityTag Activities.FightMonster2 ]
-        ]
+        monsterEffects
+            { activity = Activities.FightMonster6
+            , rewards = [ Effect.gainResource 1 Resource.Scrap, Effect.gainResource 1 Resource.Soot, Effect.gainCoin (Coin.int 20) ]
+            , power = 110
+            }
     , mastery = Nothing
     , hasSpellSelector = True
     , teachesSpell = Nothing

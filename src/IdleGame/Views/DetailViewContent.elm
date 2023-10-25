@@ -197,7 +197,7 @@ renderContent obj extraBottomPadding game =
                         { game = game
                         , mods = mods
                         , effect = taggedEffect
-                        , renderType = EffectView.ForDetailView
+                        , renderType = EffectView.DetailView
                         }
                 )
                 orderedEffects
