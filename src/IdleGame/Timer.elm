@@ -19,7 +19,7 @@ type Timer
 
 create : Timer
 create =
-    Timer { current = Percent.fromFloat 0 }
+    Timer { current = Percent.float 0 }
 
 
 percentComplete : Timer -> Percent
@@ -32,7 +32,7 @@ increment totalDuration delta (Timer { current }) =
     let
         additionalPercent =
             Quantity.ratio delta totalDuration
-                |> Percent.fromFloat
+                |> Percent.float
 
         sum =
             Quantity.plus current additionalPercent
@@ -45,7 +45,7 @@ increment totalDuration delta (Timer { current }) =
         newCurrent =
             Percent.toFloat sum
                 - toFloat (floor (Percent.toFloat sum))
-                |> Percent.fromFloat
+                |> Percent.float
     in
     ( Timer { current = newCurrent }, completions )
 

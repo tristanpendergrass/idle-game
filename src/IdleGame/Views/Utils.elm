@@ -292,6 +292,9 @@ modToString mod =
         Mod.ResourceDoublingLabel buff ->
             "+" ++ intToString (floor (buff * 100)) ++ "% chance to double items"
 
+        Mod.ResourceBaseLabel buff ->
+            "+" ++ intToString buff ++ " item"
+
         Mod.MoreManure ->
             "More manure"
 

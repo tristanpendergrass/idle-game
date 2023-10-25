@@ -12,7 +12,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Kinds.Spells as Spell exposing (Spell)
-import IdleGame.Mod as Event
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -50,8 +50,34 @@ type alias Game =
     }
 
 
-create : Random.Seed -> Game
-create seed =
+createProd : Random.Seed -> Game
+createProd seed =
+    let
+        xp : Skill.Record Xp
+        xp =
+            { chores = Xp.int 0
+            , hexes = Xp.int 0
+            , adventuring = Xp.int 0
+            }
+    in
+    { seed = seed
+    , xp = xp
+    , mxp = Activity.createRecord (Xp.int 0)
+    , choresMxp = Xp.int 0
+    , activitySkilling = Nothing
+    , activityAdventuring = Nothing
+    , monster = Nothing
+    , coin = Coin.int 0
+    , resources = Resource.emptyResourceRecord
+    , shopItems = ShopItems.create
+    , combatsWon = 0
+    , combatsLost = 0
+    , spellSelectors = Activity.createRecord Nothing
+    }
+
+
+createDev : Random.Seed -> Game
+createDev seed =
     let
         xp : Skill.Record Xp
         xp =
@@ -67,7 +93,7 @@ create seed =
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
     , monster = Nothing
-    , coin = Coin.int 0
+    , coin = Coin.int 100000
     , resources = Resource.emptyResourceRecord
     , shopItems = ShopItems.create
     , combatsWon = 0
@@ -310,21 +336,6 @@ tick delta game =
                     , newEffects
                     )
 
-        -- modifiedEvents =
-        --     case events of
-        --         -- Optimization so we don't calculate mods if there's no effects to apply them to
-        --         [] ->
-        --             []
-        --         _ ->
-        --             let
-        --                 mods =
-        --                     getAllMods game
-        --             in
-        --             List.map (applyMods mods) events
-        -- effects : List Effect
-        -- effects =
-        --     modifiedEvents
-        --         |> List.concatMap (\(ModdedEvent eventData) -> eventData.effects)
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
@@ -413,7 +424,7 @@ applyEffects effects game =
         effect :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
-                    Event.applyModsToEffect (getAllMods game) effect
+                    Mod.applyModsToEffect (getAllMods game) effect
             in
             applyEffect moddedEffect game
                 |> Random.andThen
@@ -757,7 +768,7 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-getShopItemMods : Game -> List Event.Mod
+getShopItemMods : Game -> List Mod
 getShopItemMods game =
     game.shopItems
         |> ShopItems.toOwnedItems
@@ -880,10 +891,10 @@ getMasteryRewards game activity =
             []
 
 
-getActivityMods : Game -> List Event.Mod
+getActivityMods : Game -> List Mod
 getActivityMods game =
     let
-        getGameMod : Activity.MasteryReward -> Maybe Event.Mod
+        getGameMod : Activity.MasteryReward -> Maybe Mod
         getGameMod reward =
             case reward of
                 Activity.GameMod mod ->
@@ -897,7 +908,7 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-getSpellMods : Game -> List Event.Mod
+getSpellMods : Game -> List Mod
 getSpellMods game =
     -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
     let
@@ -918,12 +929,12 @@ getSpellMods game =
         |> List.concat
 
 
-addActivityTagToMods : Activity -> List Event.Mod -> List Event.Mod
+addActivityTagToMods : Activity -> List Mod -> List Mod
 addActivityTagToMods activity =
-    List.map (Event.withTags [ Effect.ActivityTag activity ])
+    List.map (Mod.withTags [ Effect.ActivityTag activity ])
 
 
-getAllMods : Game -> List Event.Mod
+getAllMods : Game -> List Mod
 getAllMods game =
     []
         ++ getSpellMods game
@@ -932,6 +943,8 @@ getAllMods game =
 
 
 
+-- |> List.map Mod.includeVariableEffects
+-- Originally thought we might want only some mods to have this, now I think all should?
 -- Interval Mods
 
 

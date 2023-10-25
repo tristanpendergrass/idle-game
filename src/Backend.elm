@@ -1,7 +1,8 @@
 module Backend exposing (app)
 
+import Config
 import Dict
-import IdleGame.Game exposing (..)
+import IdleGame.Game as Game exposing (..)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import Lamdera exposing (ClientId, SessionId)
 import Random
@@ -37,11 +38,19 @@ update msg model =
                 ( seedForGame, newSeed ) =
                     Random.step Random.independentSeed model.seed
 
+                createGame : Random.Seed -> Game
+                createGame =
+                    if Config.flags.isDev then
+                        Game.createDev
+
+                    else
+                        Game.createProd
+
                 snapshot : Snapshot Game
                 snapshot =
                     Dict.get sessionId model.sessionGameMap
                         |> Maybe.withDefault
-                            (Snapshot.fromTuple ( now, IdleGame.Game.create seedForGame ))
+                            (Snapshot.fromTuple ( now, createGame seedForGame ))
             in
             ( model
                 |> setSeed newSeed

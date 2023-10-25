@@ -11,8 +11,8 @@ type alias Percent =
     Quantity Float Percentile
 
 
-fromFloat : Float -> Percent
-fromFloat p =
+float : Float -> Percent
+float p =
     Quantity p
 
 

@@ -135,22 +135,16 @@ render game =
                 ]
             ]
         , div [ class "divider" ] []
+        , div [ class "text-xl font-bold" ] [ text "Reagents" ]
+        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
+            (List.map renderResource purchasableResources)
+        , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []
+        , div [ class "text-xl font-bold" ] [ text "Upgrades" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map
                 (\kind ->
-                    let
-                        unlockLevel =
-                            (ShopItems.getStats kind).unlockLevel
-                    in
-                    if unlockLevel > choresSkillLevel then
-                        renderLockedShopItem unlockLevel
-
-                    else
-                        renderShopItem game.shopItems kind
+                    renderShopItem game.shopItems kind
                 )
                 ShopItems.allKinds
             )
-        , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []
-        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            (List.map renderResource purchasableResources)
         ]

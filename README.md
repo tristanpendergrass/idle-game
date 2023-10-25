@@ -67,7 +67,8 @@ $ npm test -- --watch
   - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
   - [x] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
-  - [ ] Shop items -- redesign. Only need a few of these
+  - [x] Shop items -- redesign. Only need a few of these
+  - [ ] Rename "Combat Tab 1"
 
 ## Future
 ### Tech stuff
@@ -75,8 +76,11 @@ $ npm test -- --watch
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick
+- [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
+- [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
 
 ### Fundamentals
+- [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True?
 - [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements

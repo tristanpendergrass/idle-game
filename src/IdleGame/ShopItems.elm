@@ -1,11 +1,14 @@
 module IdleGame.ShopItems exposing (..)
 
 import Html exposing (..)
+import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
-import IdleGame.Mod as Event
+import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
 import Percent exposing (Percent)
@@ -13,7 +16,7 @@ import Percent exposing (Percent)
 
 type Kind
     = Shovel
-    | BeginnerDualWielding
+    | Book
     | Keyring
     | ReadingGlasses
     | OversizedBag
@@ -21,14 +24,13 @@ type Kind
 
 allKinds : List Kind
 allKinds =
-    [ Shovel, BeginnerDualWielding, ReadingGlasses, OversizedBag, Keyring ]
+    [ Shovel, Keyring, Book, ReadingGlasses, OversizedBag ]
 
 
 type alias Stats =
     { title : String
     , icon : Icon
     , price : Coin
-    , unlockLevel : Int
     , reward : Reward
     , description : String
     , getter : OwnedItems -> Bool
@@ -43,7 +45,7 @@ intervalMod kind percentChange =
 
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 0.1) ]
+    ShopItemIntervalMod [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.float 0.1) ]
 
 
 shovelStats : Stats
@@ -51,11 +53,10 @@ shovelStats =
     { title = "Shovel"
     , icon = Icon.shovel
     , price = Coin.int 50
-    , unlockLevel = 1
     , reward =
         ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 0.05)
-            , intervalMod IdleGame.Kinds.Activities.CleanBigBubba (Percent.fromFloat 0.05)
+            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.float 0.05)
+            , intervalMod IdleGame.Kinds.Activities.CleanBigBubba (Percent.float 0.05)
             ]
     , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
     , getter = .shovel
@@ -63,20 +64,17 @@ shovelStats =
     }
 
 
-beginnerDualWieldingStats : Stats
-beginnerDualWieldingStats =
-    { title = "Beginner Dual Wielding"
+bookStats : Stats
+bookStats =
+    { title = "Spellbook (2022)"
     , icon = Icon.book
     , price = Coin.int 6000
-    , unlockLevel = 35
-
-    -- , reward = ShopItemIntervalMod [ { kind = Activity.WaterGreenhousePlants, percentChange = 1.0 } ]
     , reward =
         ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
-    , description = "+100% faster at Water Greenhouse Plants"
-    , getter = .beginnerDualWielding
-    , setter = \owned ownedItems -> { ownedItems | beginnerDualWielding = owned }
+            (List.map (\activity -> intervalMod activity (Percent.float 0.1)) Activity.allHexes)
+    , description = "+10% faster at studying Hexes"
+    , getter = .book
+    , setter = \owned ownedItems -> { ownedItems | book = owned }
     }
 
 
@@ -84,16 +82,11 @@ keyringStats : Stats
 keyringStats =
     { title = "Keyring"
     , icon = Icon.keyring
-    , price = Coin.int 10000
-    , unlockLevel = 1
-
-    -- , reward =
-    -- ShopItemIntervalMod
-    -- (List.map (\choreKind -> { kind = choreKind, percentChange = 0.1 }) Activity.allKinds)
+    , price = Coin.int 5000
     , reward =
         ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
-    , description = "+10% faster at All Chores"
+            (List.map (\activity -> intervalMod activity (Percent.float 0.1)) Activity.allChores)
+    , description = "+10% faster at all Chores"
     , getter = .keyring
     , setter = \owned ownedItems -> { ownedItems | keyring = owned }
     }
@@ -104,25 +97,8 @@ readingGlassesStats =
     { title = "Reading Glasses"
     , icon = Icon.readingGlasses
     , price = Coin.int 3000
-    , unlockLevel = 55
-    , reward =
-        ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
-
-    -- , reward =
-    --     ShopItemMod
-    --         [ Event.choresMxpBuff 0.2
-    --             |> Event.withSource Event.ShopItem
-    --             |> Event.modWithTags
-    --                 [ Event.ChoreTag Activity.OrganizePotionIngredients
-    --                 ]
-    --         , Event.choresMxpBuff 0.2
-    --             |> Event.withSource Event.ShopItem
-    --             |> Event.modWithTags
-    --                 [ Event.ChoreTag Activity.OrganizeSpellBooks
-    --                 ]
-    --         ]
-    , description = "+20% Mastery XP from Organize Potion Ingredients and Organize Spell Books"
+    , reward = ShopItemMod [ Mod.powerBuff 5 ]
+    , description = "+5 Combat Power"
     , getter = .readingGlasses
     , setter = \owned ownedItems -> { ownedItems | readingGlasses = owned }
     }
@@ -133,19 +109,12 @@ oversizedBagStats =
     { title = "OversizedBag"
     , icon = Icon.oversizedBag
     , price = Coin.int 5000
-    , unlockLevel = 65
     , reward =
-        ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.fromFloat 1.0) ]
-
-    -- , reward =
-    --     ShopItemMod
-    --         [ Event.successBuff 0.75
-    --             |> Event.withSource Event.ShopItem
-    --             |> Event.modWithTags
-    --                 [ Event.ChoreTag Activity.RepairInstruments ]
-    --         ]
-    , description = "Always receive item from Repair Instruments"
+        ShopItemMod
+            [ Mod.coinBuff 1
+                |> Mod.withTags [ Effect.SkillTag Skill.Chores ]
+            ]
+    , description = "Earn double coin from chores"
     , getter = .oversizedBag
     , setter = \owned ownedItems -> { ownedItems | oversizedBag = owned }
     }
@@ -157,8 +126,8 @@ getStats kind =
         Shovel ->
             shovelStats
 
-        BeginnerDualWielding ->
-            beginnerDualWieldingStats
+        Book ->
+            bookStats
 
         Keyring ->
             keyringStats
@@ -172,7 +141,7 @@ getStats kind =
 
 type alias OwnedItems =
     { shovel : Bool
-    , beginnerDualWielding : Bool
+    , book : Bool
     , keyring : Bool
     , readingGlasses : Bool
     , oversizedBag : Bool
@@ -184,7 +153,7 @@ type ShopItems
 
 
 type Reward
-    = ShopItemMod (List Event.Mod)
+    = ShopItemMod (List Mod)
     | ShopItemIntervalMod (List IntervalMod)
 
 
@@ -192,7 +161,7 @@ create : ShopItems
 create =
     ShopItems
         { shovel = False
-        , beginnerDualWielding = False
+        , book = False
         , keyring = False
         , readingGlasses = False
         , oversizedBag = False

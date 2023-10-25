@@ -6,7 +6,7 @@ import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities as Activities exposing (Activity)
+import IdleGame.Kinds.Activities as Activities exposing (Activity(..))
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -320,49 +320,6 @@ type alias Mastery =
     List ( Int, MasteryReward )
 
 
-choreEffects :
-    { activity : Activity
-    , xp : Xp
-    , coin : Coin
-    , maybeResource : Maybe { resource : Resource.Kind, amount : Int, probability : Float }
-    }
-    -> List Effect.TaggedEffect
-choreEffects { activity, xp, coin, maybeResource } =
-    let
-        choreTags : List Effect.Tag
-        choreTags =
-            [ Effect.ActivityTag activity ]
-    in
-    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Skill.Chores }, tags = choreTags }
-    , { effect = Effect.GainCoin { base = coin, multiplier = 1 }, tags = choreTags }
-    , { effect = Effect.GainMxp { activity = activity, multiplier = 1 }, tags = choreTags }
-    ]
-        ++ (case maybeResource of
-                Nothing ->
-                    []
-
-                Just { resource, amount, probability } ->
-                    [ { effect =
-                            Effect.VariableSuccess
-                                { successProbability = probability
-                                , successEffects =
-                                    [ { effect =
-                                            Effect.GainResource
-                                                { base = amount
-                                                , doublingChance = 0
-                                                , resource = resource
-                                                }
-                                      , tags = choreTags
-                                      }
-                                    ]
-                                , failureEffects = []
-                                }
-                      , tags = choreTags
-                      }
-                    ]
-           )
-
-
 type alias Stats =
     { skill : Skill.Kind
     , title : String
@@ -414,6 +371,49 @@ allStats =
 -- Chores
 
 
+choreEffects :
+    { activity : Activity
+    , xp : Xp
+    , coin : Coin
+    , maybeResource : Maybe { resource : Resource.Kind, amount : Int, probability : Float }
+    }
+    -> List Effect.TaggedEffect
+choreEffects { activity, xp, coin, maybeResource } =
+    let
+        choreTags : List Effect.Tag
+        choreTags =
+            [ Effect.ActivityTag activity, Effect.SkillTag Skill.Chores ]
+    in
+    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Skill.Chores }, tags = choreTags }
+    , { effect = Effect.GainCoin { base = coin, multiplier = 1 }, tags = choreTags }
+    , { effect = Effect.GainMxp { activity = activity, multiplier = 1 }, tags = choreTags }
+    ]
+        ++ (case maybeResource of
+                Nothing ->
+                    []
+
+                Just { resource, amount, probability } ->
+                    [ { effect =
+                            Effect.VariableSuccess
+                                { successProbability = probability
+                                , successEffects =
+                                    [ { effect =
+                                            Effect.GainResource
+                                                { base = amount
+                                                , doublingChance = 0
+                                                , resource = resource
+                                                }
+                                      , tags = choreTags
+                                      }
+                                    ]
+                                , failureEffects = []
+                                }
+                      , tags = choreTags
+                      }
+                    ]
+           )
+
+
 getChoresMastery : Activity -> Mastery
 getChoresMastery chore =
     [ ( 25
@@ -431,8 +431,8 @@ getChoresMastery chore =
     , ( 75
       , IntervalMod
             { kind = chore
-            , percentChange = Percent.fromFloat 0.1
-            , label = IntervalModLabel (Percent.fromFloat 0.1)
+            , percentChange = Percent.float 0.1
+            , label = IntervalModLabel (Percent.float 0.1)
             }
       )
     , ( 100
@@ -912,8 +912,8 @@ curse3Stats =
 
 monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
 monsterEffects { activity, rewards, power } =
-    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
-        |> Effect.withTags [ Effect.ActivityTag activity ]
+    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 100000 }) rewards
+        |> Effect.withTags [ Effect.ActivityTag activity, Effect.SkillTag Skill.Adventuring ]
     ]
 
 
@@ -927,7 +927,10 @@ fightMonster1Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster1
-            , rewards = [ Effect.gainCoin (Coin.int 1) ]
+            , rewards =
+                [ Effect.gainCoin (Coin.int 1)
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster1 ]
+                ]
             , power = 1
             }
     , mastery = Nothing
@@ -946,7 +949,10 @@ fightMonster2Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster2
-            , rewards = [ Effect.gainResource 1 Resource.Ectoplasm ]
+            , rewards =
+                [ Effect.gainResource 1 Resource.Ectoplasm
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Skill.Adventuring ]
+                ]
             , power = 8
             }
     , mastery = Nothing
@@ -965,7 +971,10 @@ fightMonster3Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster3
-            , rewards = [ Effect.gainCoin (Coin.int 5) ]
+            , rewards =
+                [ Effect.gainCoin (Coin.int 5)
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster3, Effect.SkillTag Skill.Adventuring ]
+                ]
             , power = 22
             }
     , mastery = Nothing
@@ -984,7 +993,10 @@ fightMonster4Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster4
-            , rewards = [ Effect.gainResource 1 Resource.GreenhouseDirt ]
+            , rewards =
+                [ Effect.gainResource 1 Resource.GreenhouseDirt
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Skill.Adventuring ]
+                ]
             , power = 45
             }
     , mastery = Nothing
@@ -1003,7 +1015,10 @@ fightMonster5Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster5
-            , rewards = [ Effect.gainCoin (Coin.int 15) ]
+            , rewards =
+                [ Effect.gainCoin (Coin.int 15)
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster5, Effect.SkillTag Skill.Adventuring ]
+                ]
             , power = 75
             }
     , mastery = Nothing
@@ -1022,7 +1037,14 @@ fightMonster6Stats =
     , effects =
         monsterEffects
             { activity = Activities.FightMonster6
-            , rewards = [ Effect.gainResource 1 Resource.Scrap, Effect.gainResource 1 Resource.Soot, Effect.gainCoin (Coin.int 20) ]
+            , rewards =
+                [ Effect.gainResource 2 Resource.Scrap
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                , Effect.gainResource 2 Resource.Soot
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                , Effect.gainCoin (Coin.int 20)
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                ]
             , power = 110
             }
     , mastery = Nothing

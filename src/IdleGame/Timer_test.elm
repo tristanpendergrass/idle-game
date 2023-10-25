@@ -44,13 +44,13 @@ timerTest =
             \_ ->
                 Timer.create
                     |> Timer.percentComplete
-                    |> Expect.equal (Percent.fromFloat 0)
+                    |> Expect.equal (Percent.float 0)
         , test "increment works for 50%" <|
             \_ ->
                 Timer.create
                     |> Timer.increment (Duration.seconds 1) (Duration.seconds 0.5)
                     |> Tuple.first
-                    |> expectPercentComplete (Percent.fromFloat 0.5)
+                    |> expectPercentComplete (Percent.float 0.5)
         , test "tracks one completion" <|
             \_ ->
                 Timer.create
@@ -61,7 +61,7 @@ timerTest =
                 Timer.create
                     |> Timer.increment (Duration.seconds 1) (Duration.seconds 1.3)
                     |> Tuple.first
-                    |> expectPercentComplete (Percent.fromFloat 0.3)
+                    |> expectPercentComplete (Percent.float 0.3)
         , test "tracks multiple completions" <|
             \_ ->
                 Timer.create
@@ -72,13 +72,13 @@ timerTest =
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 0.25)
                     |> Tuple.first
-                    |> expectPercentComplete (Percent.fromFloat 0.25)
+                    |> expectPercentComplete (Percent.float 0.25)
         , test "incrementUntilComplete works for a delta that completes the timer" <|
             \_ ->
                 Timer.create
                     |> Timer.incrementUntilComplete (Duration.seconds 1) (Duration.seconds 1.25)
                     |> Tuple.first
-                    |> expectPercentComplete (Percent.fromFloat 0)
+                    |> expectPercentComplete (Percent.float 0)
         , test "incrementUntilComplete returns 0 additional time if not completing the timer" <|
             \_ ->
                 Timer.create

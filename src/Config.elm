@@ -12,7 +12,8 @@ version =
 
 
 type alias Flags =
-    { showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
+    { isDev : Bool -- Catchall boolean for anyting that needs to be different between dev and prod
+    , showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
     , extraFastForwardTime : Duration -- How much time to artificially add to the FastForward on init from backend
     , showTimePasses : Bool
     , showDebugPanel : Bool
@@ -38,12 +39,13 @@ devFlags =
     -- (\_/)
     -- (^_^) < "Here are the dev flags :)"
     -- c(")(")
-    { showFastForwardSpeed = False
+    { isDev = True
+    , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = True
-    , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Hexes
+    , defaultMode = Adventuring
+    , defaultTabSkilling = Tab.Shop
     , defaultTabAdventuring = Tab.CombatTab1
     , defaultDetailViewExpanded = True
     }
@@ -52,7 +54,8 @@ devFlags =
 prodFlags : Flags
 prodFlags =
     -- WARNING!! THESE ARE PROD FLAGS!!
-    { showFastForwardSpeed = False
+    { isDev = False
+    , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = False

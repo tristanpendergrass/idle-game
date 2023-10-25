@@ -134,7 +134,7 @@ manureStats : Stats
 manureStats =
     { title = "Manure"
     , icon = Icon.manure
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 1)
     }
 
 
@@ -142,7 +142,7 @@ sootStats : Stats
 sootStats =
     { title = "Soot"
     , icon = Icon.soot
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 5)
     }
 
 
@@ -150,7 +150,7 @@ greenhouseDirtStats : Stats
 greenhouseDirtStats =
     { title = "Greenhouse Dirt"
     , icon = Icon.greenhouseDirt
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 2)
     }
 
 
@@ -158,7 +158,7 @@ washWaterStats : Stats
 washWaterStats =
     { title = "Wash Water"
     , icon = Icon.washWater
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 4)
     }
 
 
@@ -174,7 +174,7 @@ scrapStats : Stats
 scrapStats =
     { title = "Scrap"
     , icon = Icon.scrap
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 12)
     }
 
 
@@ -182,7 +182,7 @@ ectoplasmStats : Stats
 ectoplasmStats =
     { title = "Ectoplasm"
     , icon = Icon.ectoplasm
-    , purchasing = NotPurchasable
+    , purchasing = Purchasable (Coin.int 6)
     }
 
 
@@ -190,7 +190,7 @@ parchmentStats : Stats
 parchmentStats =
     { title = "Parchment"
     , icon = Icon.parchment
-    , purchasing = Purchasable (Coin.int 10)
+    , purchasing = NotPurchasable
     }
 
 

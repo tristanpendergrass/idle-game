@@ -46,22 +46,9 @@ scopeTransformerToTags tags transformer multiplier effect =
         NoChange
 
 
-
--- variableEffectsTransformer : Transformer
--- variableEffectsTransformer multiplier effect =
---     case Effect.getEffect effect of
---         Effect.VariableSuccess {successProbability, successEffects, failureEffects} ->
---             effect
---                 |> Effect.setEffect (Effect.VariableSuccess
---                     { successProbability = successProbability
---                     , successEffects =
---                     }
---                 )
---                 |> ChangeEffect
-
-
 includeVariableEffects : Mod -> Mod
 includeVariableEffects mod =
+    -- Transforms the mod to apply to not just an effect but all the subeffects of that effect, e.g. the successEffects contained in a VariableSuccess
     let
         transformer =
             mod.transformer
@@ -70,6 +57,58 @@ includeVariableEffects mod =
         newTransformer multiplier taggedEffect =
             case taggedEffect.effect of
                 Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+                    let
+                        ( successEffectsDidChange, newSuccessEffects ) =
+                            let
+                                newEffects : List Effect.TaggedEffect
+                                newEffects =
+                                    successEffects
+                                        |> List.concatMap
+                                            (\successEffect ->
+                                                let
+                                                    ( moddedSuccessEffect, additionalSuccessEffects ) =
+                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] successEffect
+                                                in
+                                                moddedSuccessEffect :: additionalSuccessEffects
+                                            )
+                            in
+                            ( successEffects /= newEffects, newEffects )
+
+                        ( failureEffectsDidChange, newFailureEffects ) =
+                            let
+                                newEffects : List Effect.TaggedEffect
+                                newEffects =
+                                    failureEffects
+                                        |> List.concatMap
+                                            (\failureEffect ->
+                                                let
+                                                    ( moddedFailureEffect, additionalFailureEffects ) =
+                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] failureEffect
+                                                in
+                                                moddedFailureEffect :: additionalFailureEffects
+                                            )
+                            in
+                            ( failureEffects /= newEffects, newEffects )
+
+                        effectDidChange : Bool
+                        effectDidChange =
+                            successEffectsDidChange || failureEffectsDidChange
+                    in
+                    if effectDidChange then
+                        taggedEffect
+                            |> Effect.setEffect
+                                (Effect.VariableSuccess
+                                    { successProbability = successProbability
+                                    , successEffects = newSuccessEffects
+                                    , failureEffects = newFailureEffects
+                                    }
+                                )
+                            |> ChangeEffect
+
+                    else
+                        NoChange
+
+                Effect.ResolveCombat { combat, successEffects, failureEffects } ->
                     let
                         ( successEffectsDidChange, newSuccessEffects ) =
                             let
@@ -103,14 +142,15 @@ includeVariableEffects mod =
                             in
                             ( failureEffects /= newEffects, newEffects )
 
+                        effectDidChange : Bool
                         effectDidChange =
                             successEffectsDidChange || failureEffectsDidChange
                     in
                     if effectDidChange then
                         taggedEffect
                             |> Effect.setEffect
-                                (Effect.VariableSuccess
-                                    { successProbability = successProbability
+                                (Effect.ResolveCombat
+                                    { combat = combat
                                     , successEffects = newSuccessEffects
                                     , failureEffects = newFailureEffects
                                     }
@@ -427,6 +467,16 @@ resourceBuff buff =
     }
 
 
+resourceBaseBuff : Int -> Mod
+resourceBaseBuff buff =
+    { tags = []
+    , label = ResourceBaseLabel buff
+    , transformer = resourceBaseTransformer buff
+    , source = AdminCrimes
+    , repetitions = 1
+    }
+
+
 successBuff : Float -> Mod
 successBuff buff =
     { tags = []
@@ -452,6 +502,7 @@ type Label
     | XpSkillLabel Float Skill.Kind
     | MxpModLabel Float
     | ResourceDoublingLabel Float
+    | ResourceBaseLabel Int
     | MoreManure
     | SuccessLabel Float
     | CoinLabel Float
