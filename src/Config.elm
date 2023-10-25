@@ -58,9 +58,11 @@ prodFlags =
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
-    , showDebugPanel = False
+
+    -- , showDebugPanel = False
+    , showDebugPanel = True -- Setting to True for now so play testers can enjoy
     , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Shop
-    , defaultTabAdventuring = Tab.Chores
+    , defaultTabSkilling = Tab.Chores
+    , defaultTabAdventuring = Tab.CombatTab1
     , defaultDetailViewExpanded = False
     }

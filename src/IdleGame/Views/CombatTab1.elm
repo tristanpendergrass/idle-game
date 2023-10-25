@@ -26,7 +26,6 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection (Xp.int 0)
-        , div [ Utils.skills.grid ]
+        [ div [ Utils.skills.grid ]
             (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Skill.Adventuring game))
         ]

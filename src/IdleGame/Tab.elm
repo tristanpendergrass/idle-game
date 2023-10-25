@@ -97,6 +97,6 @@ getConfig tab =
             }
 
         CombatTab1 ->
-            { title = "Combat Tab 1"
+            { title = "School Grounds"
             , icon = Icon.enchantment
             }

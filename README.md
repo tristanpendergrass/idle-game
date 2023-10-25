@@ -61,14 +61,14 @@ $ npm test -- --watch
 - [x] Fix monsters showing player power on activity card
 - [x] Show spell effects in preview somehow -- optional
 - [x] Show preview of outcome of combat. Victory: "Doubtful" up to "Certain"
-- [ ] Remove Skill level section from combat tab
+- [x] Remove Skill level section from combat tab
 - [x] Show rewards from combat
-- [ ] Finalize gameplay values
+- [x] Finalize gameplay values
   - [x] Chores -- add rest of chores, adjust item and coin values, finalize mastery rewards
   - [x] Hexes -- add rest of hexes, adjust costs of hexes, finalize mastery rewards
   - [x] Combat -- add more monsters and pictures, adjust difficulty, finalize item/coin rewards
   - [x] Shop items -- redesign. Only need a few of these
-  - [ ] Rename "Combat Tab 1"
+  - [x] Rename "Combat Tab 1"
 
 ## Future
 ### Tech stuff
