@@ -1185,7 +1185,7 @@ view model =
                             Adventuring ->
                                 model.adventuringState.activeTab
                 in
-                div [ class "flex h-screen relative" ]
+                div [ class "flex h-full relative" ]
                     [ Toast.render viewToast model.tray toastConfig
                     , div [ class "bg-base-100 drawer drawer-mobile" ]
                         [ input

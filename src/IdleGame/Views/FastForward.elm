@@ -14,7 +14,7 @@ type Speed
 render : Speed -> Html FrontendMsg
 render speed =
     div
-        [ class "w-screen h-screen flex flex-col gap-2 items-center justify-center"
+        [ class "w-screen h-full flex flex-col gap-2 items-center justify-center"
         ]
         [ div [] [ text "Fast Forwarding..." ]
         , progress [ class "progress progress-primary w-56" ] []

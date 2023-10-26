@@ -136,7 +136,7 @@ renderBrowserView props =
                             [ renderStatusBarWrapper props.renderStatusBar activity ]
                         ]
     in
-    div [ class "w-[375px] h-screen border-l-8 border-base-200 overflow-hidden relative" ]
+    div [ class "w-[375px] h-full border-l-8 border-base-200 overflow-hidden relative" ]
         [ backgroundContent
         , div
             [ class "absolute w-full h-full"
@@ -206,7 +206,7 @@ renderMobileView props =
                     Expanded
     in
     div
-        [ class "fixed right-0 w-screen h-screen bg-base-300"
+        [ class "fixed right-0 w-screen h-full bg-base-300"
         , topTransitionClasses
         , IdleGame.Views.Utils.zIndexes.detailViewMobile
         , case height of
