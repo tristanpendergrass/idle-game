@@ -72,6 +72,7 @@ $ npm test -- --watch
 - [ ] Regen period after loss
 
 ### Glitz
+- [ ] Make top of status bar match the one on ios where there's a horizontal line to signal it can be dragged/clicked.
 - [ ] Progress bar animations
 - [ ] Format numbers correctly with commas etc. in Time Passes modal
 - [ ] Close modals on space/escape
