@@ -44,8 +44,8 @@ devFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = True
-    , defaultMode = Adventuring
-    , defaultTabSkilling = Tab.Shop
+    , defaultMode = Skilling
+    , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.CombatTab1
     , defaultDetailViewExpanded = True
     }

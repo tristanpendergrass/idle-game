@@ -3948,12 +3948,20 @@ body[dir="rtl"] .checkbox:checked,
   bottom: 0px;
 }
 
+.bottom-\[-100\%\] {
+  bottom: -100%;
+}
+
 .bottom-\[2rem\] {
   bottom: 2rem;
 }
 
 .bottom-\[5rem\] {
   bottom: 5rem;
+}
+
+.bottom-\[calc\(-100\%\+4rem\)\] {
+  bottom: calc(-100% + 4rem);
 }
 
 .left-0 {
@@ -4106,10 +4114,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .h-full {
   height: 100%;
-}
-
-.h-screen {
-  height: 100vh;
 }
 
 .max-h-\[90\%\] {
@@ -4810,6 +4814,14 @@ body[dir="rtl"] .checkbox:checked,
   left: 50%;
   --tw-translate-x: -50%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
 }
 
 @layer component {

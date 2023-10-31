@@ -176,8 +176,7 @@ closePreviewButton handleClosePreview =
 collapseActivityButton : msg -> Html msg
 collapseActivityButton handleCollapseActivity =
     button
-        [ class "foobaz"
-        , onClick handleCollapseActivity
+        [ onClick handleCollapseActivity
         ]
         [ Icon.chevronDown
             |> Icon.toHtml
