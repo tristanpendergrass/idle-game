@@ -1,4 +1,4 @@
-module IdleGame.Views.DetailViewWrapper exposing (..)
+module IdleGame.Views.DetailViewWrapper2 exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -7,7 +7,14 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
 
 
-type State a p
+
+{--| Rewritten DetailViewWrapper. Kept as "2" for now while we wait to see if bugs with new version.
+-}
+
+
+type
+    State a p
+    -- TODO: rename from State which is confusing name
     = Blank --
     | ActivityExpanded a
     | ActivityCollapsed a
@@ -26,6 +33,33 @@ type alias Props a p msg =
     }
 
 
+type ViewHeight
+    = Expanded
+    | Collapsed
+    | StatusBar
+
+
+closePreviewButton : msg -> Html msg
+closePreviewButton handleClosePreview =
+    button
+        [ class ""
+        , onClick handleClosePreview
+        ]
+        [ Icon.close
+            |> Icon.toHtml
+        ]
+
+
+collapseActivityButton : msg -> Html msg
+collapseActivityButton handleCollapseActivity =
+    button
+        [ onClick handleCollapseActivity
+        ]
+        [ Icon.chevronDown
+            |> Icon.toHtml
+        ]
+
+
 topTransitionClasses : Attribute msg
 topTransitionClasses =
     class "transition-[top] duration-100 ease-in motion-reduce:transition-none lg:transition-none"
@@ -36,50 +70,14 @@ emptyContent =
     div [ class "t-column w-full h-full p-2" ] []
 
 
-render : Props a p msg -> Html msg
-render props =
-    let
-        collapseOrCloseButton : Html msg
-        collapseOrCloseButton =
-            case props.state of
-                Blank ->
-                    div [] []
-
-                ActivityExpanded _ ->
-                    collapseActivityButton props.onCollapseActivity
-
-                ActivityCollapsed _ ->
-                    div [] []
-
-                Preview _ ->
-                    closePreviewButton props.onClosePreview
-
-                PreviewWithActivity _ _ ->
-                    closePreviewButton props.onClosePreview
-    in
-    div [ class "h-full absolute xl:block w-full h-full xl:w-auto xl:h-auto" ]
-        [ div [ class "hidden xl:block h-full relative" ]
-            [ renderBrowserView props
-            , div
-                [ class "absolute top-0 left-0 ml-3 mt-3"
-                ]
-                [ collapseOrCloseButton ]
-            ]
-        , div [ class "xl:hidden relative h-full relative" ]
-            [ renderMobileView props
-            , div
-                [ class "absolute top-0 left-0 ml-3 mt-3 collapseOrCloseButton"
-                , IdleGame.Views.Utils.zIndexes.detailViewMobile
-                ]
-                [ collapseOrCloseButton ]
-            ]
-        ]
+renderStatusBarWrapper : (a -> Html msg) -> a -> Html msg
+renderStatusBarWrapper renderStatusBar activity =
+    div [ class "w-full h-[4rem] rounded-t overflow-hidden status-bar-wrapper" ]
+        [ renderStatusBar activity ]
 
 
-renderBrowserView : Props a p msg -> Html msg
-renderBrowserView props =
-    -- In BrowserView we show the activity or preview on a div with variable height.
-    -- We do need to make an excaption for when there's a preview and activity and in that case the preview shows on the background div instead.
+renderSidebar : Props a p msg -> Html msg
+renderSidebar props =
     let
         foregroundHeight : ViewHeight
         foregroundHeight =
@@ -135,8 +133,29 @@ renderBrowserView props =
                             ]
                             [ renderStatusBarWrapper props.renderStatusBar activity ]
                         ]
+
+        collapseOrCloseButton : Html msg
+        collapseOrCloseButton =
+            case props.state of
+                Blank ->
+                    div [] []
+
+                ActivityExpanded _ ->
+                    collapseActivityButton props.onCollapseActivity
+
+                ActivityCollapsed _ ->
+                    div [] []
+
+                Preview _ ->
+                    closePreviewButton props.onClosePreview
+
+                PreviewWithActivity _ _ ->
+                    closePreviewButton props.onClosePreview
     in
-    div [ class "w-[375px] h-full border-l-8 border-base-200 overflow-hidden relative" ]
+    div
+        [ class "hidden xl:block"
+        , class "w-[375px] right-0 h-full border-l-8 border-base-200 overflow-hidden relative"
+        ]
         [ backgroundContent
         , div
             [ class "absolute w-full h-full"
@@ -153,38 +172,15 @@ renderBrowserView props =
             ]
             [ foregroundContent
             ]
+        , div
+            [ class "absolute top-0 left-0 ml-3 mt-3"
+            ]
+            [ collapseOrCloseButton ]
         ]
 
 
-type ViewHeight
-    = Expanded
-    | Collapsed
-    | StatusBar
-
-
-closePreviewButton : msg -> Html msg
-closePreviewButton handleClosePreview =
-    button
-        [ class ""
-        , onClick handleClosePreview
-        ]
-        [ Icon.close
-            |> Icon.toHtml
-        ]
-
-
-collapseActivityButton : msg -> Html msg
-collapseActivityButton handleCollapseActivity =
-    button
-        [ onClick handleCollapseActivity
-        ]
-        [ Icon.chevronDown
-            |> Icon.toHtml
-        ]
-
-
-renderMobileView : Props a p msg -> Html msg
-renderMobileView props =
+renderFullScreen : Props a p msg -> Html msg
+renderFullScreen props =
     let
         height : ViewHeight
         height =
@@ -203,23 +199,42 @@ renderMobileView props =
 
                 PreviewWithActivity _ _ ->
                     Expanded
+
+        bottomStyle : Attribute msg
+        bottomStyle =
+            case height of
+                Expanded ->
+                    attribute "style" "bottom:0;"
+
+                Collapsed ->
+                    attribute "style" "bottom:-100%;"
+
+                StatusBar ->
+                    attribute "style" "bottom:calc(-100% + 4rem);"
+
+        collapseOrCloseButton : Html msg
+        collapseOrCloseButton =
+            case props.state of
+                Blank ->
+                    div [] []
+
+                ActivityExpanded _ ->
+                    collapseActivityButton props.onCollapseActivity
+
+                ActivityCollapsed _ ->
+                    div [] []
+
+                Preview _ ->
+                    closePreviewButton props.onClosePreview
+
+                PreviewWithActivity _ _ ->
+                    closePreviewButton props.onClosePreview
     in
     div
-        [ class "absolute right-0 w-screen h-full bg-base-300 renderMobileView"
-        , topTransitionClasses
+        [ class "xl:hidden"
+        , class "absolute right-0 w-full h-full bg-base-300"
+        , bottomStyle
         , IdleGame.Views.Utils.zIndexes.detailViewMobile
-        , case height of
-            Expanded ->
-                -- class "bottom-0"
-                attribute "style" "bottom:0;"
-
-            Collapsed ->
-                -- class "bottom-[-100%]"
-                attribute "style" "bottom:-100%;"
-
-            StatusBar ->
-                -- class "bottom-[calc(-100%+4rem)]"
-                attribute "style" "bottom:calc(-100% + 4rem);"
         ]
         [ div
             [ class "w-full h-full"
@@ -252,8 +267,6 @@ renderMobileView props =
                             [ renderStatusBarWrapper props.renderStatusBar activity ]
                         ]
             ]
-
-        -- TODO: Is the below totally redundant??
         , case props.state of
             Blank ->
                 -- todo: replace with emptyContent?
@@ -279,10 +292,8 @@ renderMobileView props =
                     ]
                     [ renderStatusBarWrapper props.renderStatusBar activity
                     ]
+        , div
+            [ class "absolute top-0 left-0 ml-3 mt-3"
+            ]
+            [ collapseOrCloseButton ]
         ]
-
-
-renderStatusBarWrapper : (a -> Html msg) -> a -> Html msg
-renderStatusBarWrapper renderStatusBar activity =
-    div [ class "w-full h-[4rem] rounded-t overflow-hidden status-bar-wrapper" ]
-        [ renderStatusBar activity ]
