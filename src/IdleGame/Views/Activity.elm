@@ -175,7 +175,9 @@ renderActivity activity game screenWidth =
         pointerDownState : PointerState
         pointerDownState =
             { click = HandleActivityClick { screenWidth = screenWidth } activity
-            , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
+
+            -- , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
+            , longPress = Nothing
             }
     in
     div [ class "relative" ]
