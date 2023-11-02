@@ -382,6 +382,12 @@ attemptPurchaseResource amount resource game =
     ( { newGame | seed = newSeed }, notifications )
 
 
+priceToPurchaseResource : Int -> ( Resource.Kind, Coin ) -> Game -> Coin
+priceToPurchaseResource amount ( resource, price ) game =
+    -- TODO: incorporate mods that might alter price
+    Quantity.multiplyBy (toFloat amount) price
+
+
 applyEvent : List Effect.TaggedEffect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 applyEvent effects =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
@@ -990,3 +996,13 @@ isSpellLearned game spell =
                     getMasteryRewards game activity
             in
             List.member Activity.SpellAvailable masteryRewards
+
+
+getMaxPurchase : Coin -> Game -> Int
+getMaxPurchase price game =
+    let
+        playerCoin : Coin
+        playerCoin =
+            game.coin
+    in
+    floor (Quantity.ratio playerCoin price)

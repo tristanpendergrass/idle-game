@@ -27,22 +27,21 @@ render game =
                 [ text "Owned"
                 ]
 
-        priceLabel : Coin -> Html FrontendMsg
-        priceLabel price =
-            div [ class "flex items-center gap-1" ]
-                [ Icon.coin
-                    |> Icon.toHtml
-                , div
-                    [ class "font-bold"
-                    , classList [ ( "text-error", Coin.toInt price > Coin.toInt game.coin ) ]
-                    ]
-                    [ price
-                        |> Coin.toInt
-                        |> IdleGame.Views.Utils.intToString
-                        |> text
-                    ]
-                ]
-
+        -- priceLabel : Coin -> Html FrontendMsg
+        -- priceLabel price =
+        --     div [ class "flex items-center gap-1" ]
+        --         [ Icon.coin
+        --             |> Icon.toHtml
+        --         , div
+        --             [ class "font-bold"
+        --             , classList [ ( "text-error", Coin.toInt price > Coin.toInt game.coin ) ]
+        --             ]
+        --             [ price
+        --                 |> Coin.toInt
+        --                 |> IdleGame.Views.Utils.intToString
+        --                 |> text
+        --             ]
+        --         ]
         renderShopItem : ShopItems.ShopItems -> ShopItems.Kind -> Html FrontendMsg
         renderShopItem shopItems kind =
             let
@@ -67,7 +66,10 @@ render game =
                     ownedLabel
 
                   else
-                    priceLabel stats.price
+                    IdleGame.Views.Utils.priceLabel
+                        { price = stats.price
+                        , isError = Coin.toInt stats.price > Coin.toInt game.coin
+                        }
                 ]
 
         renderLockedShopItem : Int -> Html FrontendMsg
@@ -102,7 +104,10 @@ render game =
                 , div [ class "flex-1 t-column" ]
                     [ span [ class "font-bold" ] [ text resourceStats.title ]
                     ]
-                , priceLabel price
+                , IdleGame.Views.Utils.priceLabel
+                    { price = price
+                    , isError = Coin.toInt price > Coin.toInt game.coin
+                    }
                 ]
 
         purchasableResources : List ( Resource.Kind, Coin )

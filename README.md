@@ -37,18 +37,27 @@ $ npm test -- --watch
 
 # Todos
 
-## Version 0.2.1
-- [ ] Stuff
+## Version 0.3
+- [ ] Shop Improvements
+  - [x] Show price on buy modal
+  - [x] Show cost on the Buy button
+  - [x] Add buttons to change quantity -- Min, Max, Half?
+  - [ ] Close modal when item purchased
+  - [ ] Show toast when item purchased
+  - [ ] Handle case where not enough coin to purchase set quantity
+- [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
 
 ## Future
+### Bugs
+- [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
+- [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.
+
 ### Tech stuff
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick
-- [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
 - [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
-- [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 
 ### Fundamentals
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
@@ -72,6 +81,7 @@ $ npm test -- --watch
 - [ ] Regen period after loss
 
 ### Glitz
+- [ ] Show coin next to shop in left nav
 - [ ] Make top of status bar match the one on ios where there's a horizontal line to signal it can be dragged/clicked.
 - [ ] Progress bar animations
 - [ ] Format numbers correctly with commas etc. in Time Passes modal

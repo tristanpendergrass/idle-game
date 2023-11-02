@@ -5,6 +5,7 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -26,7 +27,7 @@ import Url exposing (Url)
 type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreItemUnlocksModal
-    | ShopResourceModal Int Resource.Kind
+    | ShopResourceModal Int Resource.Kind Coin
 
 
 type PreviousIntervalTimer
@@ -107,6 +108,25 @@ type FrontendMsg
     | CollapseActivity
     | CollapseDetailView
     | ExpandDetailView
+      -- Activities
+    | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
+    | HandlePreviewClick Activity
+    | HandlePlayClick Activity
+    | HandleStopClick Activity
+    | HandleSpellSelect Activity String
+      -- Debug Panel
+    | OpenDebugPanel
+    | CloseDebugPanel
+    | AddTime Duration
+      -- Shop Resource Purchase modal
+    | HandleShopResourceClick Resource.Kind -- Opens the modal
+    | HandleOneLessButtonClick
+    | HandleOneMoreButtonClick
+    | HandleMinButtonClick
+    | HandleMaxButtonClick
+    | HandleShopResourceQuantityChange String
+    | HandleShopResourceBuyClick
+      -- Other
     | ToastMsg Toast.Msg
     | AddToast Toast
     | HandleFastForward Posix
@@ -119,22 +139,9 @@ type FrontendMsg
     | SetActiveSkillTab Tab
     | SetActiveCombatTab Tab
     | HandleShopItemClick ShopItems.Kind
-    | HandleShopResourceClick Resource.Kind
-    | HandleShopResourceQuantityChange String
-    | HandleShopResourcePurchase
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel
-      -- Activities
-    | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
-    | HandlePreviewClick Activity
-    | HandlePlayClick Activity
-    | HandleStopClick Activity
-    | HandleSpellSelect Activity String
-      -- Debug Panel
-    | OpenDebugPanel
-    | CloseDebugPanel
-    | AddTime Duration
 
 
 type ToBackend

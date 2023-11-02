@@ -1,5 +1,6 @@
 {
 	"nodes":[
+		{"id":"092f225e36645c31","x":180,"y":1100,"width":385,"height":406,"color":"6","type":"group","label":"Legend"},
 		{"type":"text","text":"Woodcutting","id":"86fc5a77472bf2ad","x":618,"y":1237,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Fishing","id":"5f3afe32deb48d89","x":618,"y":1320,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Firemaking","id":"19efec2f7c9557e6","x":618,"y":1400,"width":250,"height":60,"color":"4"},
@@ -38,7 +39,10 @@
 		{"type":"text","text":"Conjuration","id":"8d5a721fd7116d9d","x":1340,"y":1610,"width":250,"height":60,"color":"1"},
 		{"type":"text","text":"Enchantment","id":"f6bbe3a7a47ef45e","x":1340,"y":1740,"width":250,"height":60,"color":"5"},
 		{"type":"text","text":"Chronomancy","id":"64624aef464da526","x":1340,"y":1900,"width":250,"height":60,"color":"4"},
-		{"type":"text","text":"Chores","id":"6676e74f480219a5","x":913,"y":1237,"width":250,"height":60,"color":"1"}
+		{"type":"text","text":"Chores","id":"6676e74f480219a5","x":913,"y":1237,"width":250,"height":60,"color":"1"},
+		{"id":"77cc87816d84d1f3","type":"text","text":"Green = Support\nskills that give buffs to other skills","x":200,"y":1390,"width":341,"height":96,"color":"4"},
+		{"id":"4f83be3402ca603b","type":"text","text":"Red = Producers\nSkills that give you resources","x":204,"y":1140,"width":341,"height":80,"color":"1"},
+		{"id":"a0c8efb889aec36e","type":"text","text":"Blue = Spenders\nSkills that consume resources (usually to give you another resource)","x":204,"y":1240,"width":334,"height":115,"color":"5"}
 	],
 	"edges":[]
 }

@@ -4,6 +4,7 @@ import FormatNumber
 import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -257,23 +258,33 @@ screenSupportsRighRail screenWidth =
 
 
 resourceAndQuantity : { resource : Resource.Kind, quantity : Int, iconSize : Icon.Size } -> Html msg
-resourceAndQuantity { resource, quantity, iconSize } =
+resourceAndQuantity params =
+    div [ class "relative" ]
+        [ resource { resource = params.resource, iconSize = params.iconSize }
+        , div [ class "t-absolute-center-x -bottom-3" ]
+            [ resourceQuantity { quantity = params.quantity }
+            ]
+        ]
+
+
+resource : { resource : Resource.Kind, iconSize : Icon.Size } -> Html msg
+resource params =
     let
-        resourceStats : Resource.Stats
-        resourceStats =
-            Resource.getStats resource
+        stats : Resource.Stats
+        stats =
+            Resource.getStats params.resource
     in
     div [ class "border-2 border-primary bg-primary/50 rounded relative" ]
-        [ resourceStats.icon
-            |> Icon.withSize iconSize
+        [ stats.icon
+            |> Icon.withSize params.iconSize
             |> Icon.toHtml
+        ]
 
-        -- , div [ class "absolute left-1/2 transform -translate-x-1/2 bottom-0" ]
-        , div [ class "t-absolute-center-x -bottom-3" ]
-            [ span [ class "px-4 bg-base-100 text-base-content border border-1 border-base-content rounded-xl text-sm font-semibold max-w-full" ]
-                [ text (intToString quantity)
-                ]
-            ]
+
+resourceQuantity : { quantity : Int } -> Html msg
+resourceQuantity { quantity } =
+    span [ class "px-4 bg-base-100 text-base-content border border-1 border-base-content rounded-xl text-sm font-semibold max-w-full bg-neutral text-neutral-content" ]
+        [ text (intToString quantity)
         ]
 
 
@@ -306,3 +317,16 @@ modToString mod =
 
         Mod.PowerLabel buff ->
             "+" ++ intToString buff ++ " Power"
+
+
+priceLabel : { price : Coin, isError : Bool } -> Html msg
+priceLabel { price, isError } =
+    div [ class "flex items-center gap-1 " ]
+        [ Icon.coin
+            |> Icon.toHtml
+        , div
+            [ class "font-bold"
+            , classList [ ( "text-error", isError ) ]
+            ]
+            [ text (intToString (Coin.toInt price)) ]
+        ]

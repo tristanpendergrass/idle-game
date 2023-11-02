@@ -798,35 +798,21 @@ update msg model =
             , Cmd.none
             )
 
-        -- HandleShopResourceClick amount resource ->
-        --     case model.gameState of
-        --         Playing snapshot ->
-        --             let
-        --                 game : Game
-        --                 game =
-        --                     Snapshot.getValue snapshot
-        --                 ( newGame, toasts ) =
-        --                     Game.attemptPurchaseResource amount resource game
-        --                 newModel : FrontendModel
-        --                 newModel =
-        --                     { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
-        --                 notificationCmds : List (Cmd FrontendMsg)
-        --                 notificationCmds =
-        --                     List.map (AddToast >> delay 0) toasts
-        --             in
-        --             ( newModel, Cmd.batch notificationCmds )
-        --         _ ->
-        --             noOp
         HandleShopResourceClick resource ->
-            ( { model
-                | activeModal = Just (ShopResourceModal 1 resource)
-              }
-            , Cmd.none
-            )
+            case (Resource.getStats resource).purchasing of
+                Resource.Purchasable price ->
+                    ( { model
+                        | activeModal = Just (ShopResourceModal 1 resource price)
+                      }
+                    , Cmd.none
+                    )
 
-        HandleShopResourcePurchase ->
+                Resource.NotPurchasable ->
+                    noOp
+
+        HandleShopResourceBuyClick ->
             case model.activeModal of
-                Just (ShopResourceModal quantity resource) ->
+                Just (ShopResourceModal quantity resource _) ->
                     case model.gameState of
                         Playing snapshot ->
                             let
@@ -840,6 +826,7 @@ update msg model =
                                 newModel : FrontendModel
                                 newModel =
                                     { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+                                        |> setActiveModal Nothing
 
                                 notificationCmds : List (Cmd FrontendMsg)
                                 notificationCmds =
@@ -855,7 +842,7 @@ update msg model =
 
         HandleShopResourceQuantityChange string ->
             case model.activeModal of
-                Just (ShopResourceModal _ resource) ->
+                Just (ShopResourceModal _ resource price) ->
                     let
                         maybeQuantity : Maybe Int
                         maybeQuantity =
@@ -864,7 +851,7 @@ update msg model =
                     case maybeQuantity of
                         Just quantity ->
                             ( { model
-                                | activeModal = Just (ShopResourceModal quantity resource)
+                                | activeModal = Just (ShopResourceModal quantity resource price)
                               }
                             , Cmd.none
                             )
@@ -904,6 +891,68 @@ update msg model =
                         |> setGameState (FastForward fastForwardState)
                     , Task.perform HandleFastForward Time.now
                     )
+
+                _ ->
+                    noOp
+
+        HandleOneLessButtonClick ->
+            case model.activeModal of
+                Just (ShopResourceModal quantity resource price) ->
+                    ( { model
+                        | activeModal = Just (ShopResourceModal (Debug.log "new quantity" <| Basics.max 1 (quantity - 1)) resource price)
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noOp
+
+        HandleOneMoreButtonClick ->
+            case model.activeModal of
+                Just (ShopResourceModal quantity resource price) ->
+                    ( { model
+                        | activeModal = Just (ShopResourceModal (quantity + 1) resource price)
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noOp
+
+        HandleMinButtonClick ->
+            case model.activeModal of
+                Just (ShopResourceModal _ resource price) ->
+                    ( { model
+                        | activeModal = Just (ShopResourceModal 1 resource price)
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noOp
+
+        HandleMaxButtonClick ->
+            case model.activeModal of
+                Just (ShopResourceModal _ resource price) ->
+                    case model.gameState of
+                        Playing snapshot ->
+                            let
+                                game : Game
+                                game =
+                                    Snapshot.getValue snapshot
+
+                                maxPurchase : Int
+                                maxPurchase =
+                                    Game.getMaxPurchase price game
+                            in
+                            ( { model
+                                | activeModal = Just (ShopResourceModal maxPurchase resource price)
+                              }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            noOp
 
                 _ ->
                     noOp
@@ -1073,10 +1122,10 @@ renderModal activeModal game =
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
                 |> IdleGame.Views.ModalWrapper.render
 
-        Just (ShopResourceModal amount resource) ->
+        Just (ShopResourceModal amount resource price) ->
             let
                 children =
-                    IdleGame.Views.ShopResourceModal.render game amount resource
+                    IdleGame.Views.ShopResourceModal.render game amount ( resource, price )
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
