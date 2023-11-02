@@ -145,6 +145,16 @@ getTimerForActivity activity game =
     either maybeTimerSkilling maybeTimerAdventuring
 
 
+notMasteryXpEffect : Effect.TaggedEffect -> Bool
+notMasteryXpEffect taggedEffect =
+    case taggedEffect.effect of
+        Effect.GainMxp _ ->
+            False
+
+        _ ->
+            True
+
+
 renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
 renderActivity activity game screenWidth =
     let
@@ -164,9 +174,10 @@ renderActivity activity game screenWidth =
         mods =
             Game.getAllMods game
 
-        orderedEffects : List Effect.TaggedEffect
-        orderedEffects =
+        orderedAndFilteredEffects : List Effect.TaggedEffect
+        orderedAndFilteredEffects =
             List.sortWith Effect.order effects
+                |> List.filter notMasteryXpEffect
 
         duration : Duration
         duration =
@@ -215,7 +226,7 @@ renderActivity activity game screenWidth =
                                     , renderType = EffectView.Card
                                     }
                             )
-                            orderedEffects
+                            orderedAndFilteredEffects
                     )
                 ]
 

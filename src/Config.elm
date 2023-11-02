@@ -45,9 +45,9 @@ devFlags =
     , showTimePasses = False
     , showDebugPanel = True
     , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Shop
+    , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.CombatTab1
-    , defaultDetailViewExpanded = True
+    , defaultDetailViewExpanded = False
     }
 
 

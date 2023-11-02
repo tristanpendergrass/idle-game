@@ -44,7 +44,10 @@ $ npm test -- --watch
   - [x] Add buttons to change quantity -- Min, Max, Half?
   - [x] Close modal when item purchased
   - [x] Handle case where not enough coin to purchase set quantity
-- [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
+- [ ] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
+  - [x] Remove mastery xp
+  - [ ] Show mastery level
+  - [ ] Show dots or something
 
 ## Future
 ### Bugs
@@ -57,6 +60,7 @@ $ npm test -- --watch
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick
 - [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
+- [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
 
 ### Fundamentals
 - [ ] Group toasts together by event. E.g. + coin and + resource from Chore should show in same toast. And cost + resource after buying resource.
@@ -92,7 +96,6 @@ $ npm test -- --watch
 - [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
 - [ ] Remove animation on right rail
 - [ ] Add a way of giving hints to the player. Old wise man?
-- [ ] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 
 # Changelog
 
