@@ -724,7 +724,7 @@ type alias TimePassesResourceLoss =
 type alias TimePassesXpGain =
     { originalXp : Xp
     , currentXp : Xp
-    , title : String
+    , skill : Skill.Kind
     }
 
 
@@ -745,7 +745,7 @@ getTimePassesData originalGame currentGame =
                 []
 
             else
-                [ { title = "Chores", originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
+                [ { skill = Skill.Chores, originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
 
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }

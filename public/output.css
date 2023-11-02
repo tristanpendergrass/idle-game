@@ -3450,6 +3450,11 @@ body[dir="rtl"] .checkbox:checked,
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
 }
 
+.progress-secondary::-moz-progress-bar {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
+}
+
 .progress:indeterminate::after {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--n) / var(--tw-bg-opacity));
@@ -3468,6 +3473,11 @@ body[dir="rtl"] .checkbox:checked,
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
 }
 
+.progress-secondary:indeterminate::after {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
+}
+
 .progress::-webkit-progress-bar {
   background-color: hsl(var(--n) / var(--tw-bg-opacity));
   --tw-bg-opacity: 0.2;
@@ -3483,6 +3493,11 @@ body[dir="rtl"] .checkbox:checked,
 .progress-primary::-webkit-progress-value {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
+}
+
+.progress-secondary::-webkit-progress-value {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
 }
 
 @keyframes progress-loading {
@@ -4245,12 +4260,20 @@ body[dir="rtl"] .checkbox:checked,
   height: 100%;
 }
 
+.h-\[340px\] {
+  height: 340px;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
 
 .min-h-\[12rem\] {
   min-height: 12rem;
+}
+
+.min-h-\[340px\] {
+  min-height: 340px;
 }
 
 .w-10 {
@@ -4335,6 +4358,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-\[5\.5rem\] {
   width: 5.5rem;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .min-w-\[375px\] {
@@ -4664,6 +4691,11 @@ body[dir="rtl"] .checkbox:checked,
   background-color: hsl(var(--n) / var(--tw-bg-opacity));
 }
 
+.bg-secondary {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity));
+}
+
 .bg-opacity-25 {
   --tw-bg-opacity: 0.25;
 }
@@ -4898,6 +4930,11 @@ body[dir="rtl"] .checkbox:checked,
 .text-neutral-content {
   --tw-text-opacity: 1;
   color: hsl(var(--nc) / var(--tw-text-opacity));
+}
+
+.text-secondary-content {
+  --tw-text-opacity: 1;
+  color: hsl(var(--sc) / var(--tw-text-opacity));
 }
 
 .text-opacity-50 {

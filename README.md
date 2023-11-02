@@ -43,11 +43,11 @@ $ npm test -- --watch
   - [x] Show cost on the Buy button
   - [x] Add buttons to change quantity -- Min, Max, Half?
   - [x] Close modal when item purchased
+  - [x] Show toast when item purchased
   - [x] Handle case where not enough coin to purchase set quantity
-- [ ] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
-  - [x] Remove mastery xp
-  - [ ] Show mastery level
-  - [ ] Show dots or something
+- [ ] Fix TimePasses to show xp gains in skills besides chores
+- [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
+- [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
 
 ## Future
 ### Bugs
@@ -63,7 +63,6 @@ $ npm test -- --watch
 - [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
 
 ### Fundamentals
-- [ ] Group toasts together by event. E.g. + coin and + resource from Chore should show in same toast. And cost + resource after buying resource.
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
 - [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements

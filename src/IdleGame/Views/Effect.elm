@@ -113,7 +113,7 @@ renderResource { base, resource } =
 renderXp : Effect.GainXpParams -> Html msg
 renderXp params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-        [ Utils.skillXpBadge
+        [ Utils.skillXpBadge params.skill
         , span [ class "font-bold col-span-4" ]
             [ Quantity.multiplyBy params.multiplier params.base
                 |> Xp.toInt

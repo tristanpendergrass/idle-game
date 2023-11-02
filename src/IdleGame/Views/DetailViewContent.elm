@@ -323,10 +323,9 @@ masterySection mxp mastery =
 mxpSection : Xp -> Html msg
 mxpSection mxp =
     let
-        skillLevel : String
+        skillLevel : Int
         skillLevel =
             Xp.level Xp.defaultSchedule mxp
-                |> Utils.intToString
 
         skillPercent : Percent
         skillPercent =
@@ -337,13 +336,12 @@ mxpSection mxp =
             [ div [ class "w-full flex items-center justify-between" ]
                 [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
                 ]
-            , div [ class "w-full flex items-center gap-2" ]
-                [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
-                    [ text skillLevel ]
-                , div [ class "flex-1 bg-base-200 rounded-full h-1.5" ]
-                    [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage skillPercent) ++ "%") ] []
-                    ]
-                ]
+            , Utils.xpBar
+                { level = skillLevel
+                , percent = skillPercent
+                , primaryOrSecondary = Utils.Secondary
+                , size = Utils.XpBarLarge
+                }
             ]
         ]
 

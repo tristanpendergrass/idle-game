@@ -39,9 +39,9 @@ floatToString decimals =
     FormatNumber.format localeForFloats
 
 
-skillXpBadge : Html msg
-skillXpBadge =
-    div [ class "badge badge-primary badge-xs col-span-8" ] [ text "Skill XP" ]
+skillXpBadge : Skill.Kind -> Html msg
+skillXpBadge skill =
+    div [ class "badge badge-primary badge-xs col-span-8" ] [ text <| Skill.getLabel skill ++ " XP" ]
 
 
 masteryXpBadge : Html msg
@@ -171,10 +171,9 @@ getDurationStringParts millis =
 xpSection : Xp -> Html msg
 xpSection xp =
     let
-        skillLevel : String
+        skillLevel : Int
         skillLevel =
             Xp.level Xp.defaultSchedule xp
-                |> intToString
 
         skillPercent : Percent
         skillPercent =
@@ -191,14 +190,65 @@ xpSection xp =
                         |> text
                     ]
                 ]
-            , div [ class "w-full flex items-center gap-2" ]
-                [ div [ class "text-lg font-bold p-1 bg-primary text-primary-content rounded text-center w-10" ]
-                    [ text skillLevel ]
-                , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-                    [ div [ class "bg-primary h-2 rounded-full", attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage skillPercent) ++ "%") ] []
-                    ]
-                ]
+            , xpBar { level = skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = XpBarLarge }
             ]
+        ]
+
+
+type PrimaryOrSecondary
+    = Primary
+    | Secondary
+
+
+type XpBarSize
+    = XpBarSmall
+    | XpBarLarge
+
+
+xpBar : { level : Int, percent : Percent, primaryOrSecondary : PrimaryOrSecondary, size : XpBarSize } -> Html msg
+xpBar { level, percent, primaryOrSecondary, size } =
+    let
+        ( backgroundClass, textColorClass ) =
+            case primaryOrSecondary of
+                Primary ->
+                    ( class "bg-primary", class "text-primary-content" )
+
+                Secondary ->
+                    ( class "bg-secondary", class "text-secondary-content" )
+
+        ( textSizeClass, levelBoxWidthClass ) =
+            case size of
+                XpBarSmall ->
+                    ( class "text-xs", class "w-8" )
+
+                XpBarLarge ->
+                    ( class "text-lg", class "w-10" )
+    in
+    div [ class "w-full flex items-center gap-2" ]
+        [ div [ class "font-bold p-1 rounded text-center", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]
+            [ text (intToString level) ]
+        , progress
+            [ class "progress w-full"
+            , case primaryOrSecondary of
+                Primary ->
+                    class "progress-primary"
+
+                Secondary ->
+                    class "progress-secondary"
+            , Html.Attributes.max "100"
+            , Html.Attributes.value (String.fromFloat (Percent.toPercentage percent))
+            , attribute "aria-label" "progress towards next experience level"
+            ]
+            []
+
+        -- , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
+        --     [ div
+        --         [ class "h-2 rounded-full"
+        --         , backgroundClass
+        --         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percent) ++ "%")
+        --         ]
+        --         []
+        --     ]
         ]
 
 

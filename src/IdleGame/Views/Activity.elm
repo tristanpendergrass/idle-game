@@ -26,6 +26,7 @@ import IdleGame.Views.Spell as SpellView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Json.Decode as D
+import Maybe.Extra
 import Percent exposing (Percent)
 import Types exposing (..)
 
@@ -34,7 +35,7 @@ renderActivityListItem : Game -> Game.ActivityListItem -> Html FrontendMsg
 renderActivityListItem game item =
     case item of
         Game.ActivityListItem activity ->
-            renderActivity activity game
+            renderActivityCard activity game
                 |> Utils.withScreenWidth
 
         Game.LockedActivity ( unlockSkill, unlockLevel ) ->
@@ -155,8 +156,8 @@ notMasteryXpEffect taggedEffect =
             True
 
 
-renderActivity : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
-renderActivity activity game screenWidth =
+renderActivityCard : Activity -> Game -> Utils.ScreenWidth -> Html FrontendMsg
+renderActivityCard activity game screenWidth =
     let
         maybeTimer : Maybe Timer
         maybeTimer =
@@ -190,10 +191,26 @@ renderActivity activity game screenWidth =
             -- , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
             , longPress = Nothing
             }
+
+        mxp : Xp
+        mxp =
+            Activity.getByKind activity game.mxp
+
+        masteryLevel : Int
+        masteryLevel =
+            Xp.level Xp.defaultSchedule mxp
+
+        masteryPercent : Percent
+        masteryPercent =
+            Xp.levelPercent Xp.defaultSchedule mxp
+
+        showMastery : Bool
+        showMastery =
+            Maybe.Extra.isJust stats.mastery
     in
     div [ class "relative" ]
         [ div
-            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none"
+            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none h-[340px]"
 
             -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
             , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
@@ -204,30 +221,71 @@ renderActivity activity game screenWidth =
               div [ class "h-24 relative" ]
                 [ activityImage activity
                 ]
-            , div [ class "relative card-body" ]
-                [ div [ class "t-column gap-2 h-full", Utils.zIndexes.cardBody ]
-                    -- Activity title
-                    ([ activityTitle activity
-                     , activityDuration duration
-                     ]
-                        ++ (case stats.teachesSpell of
-                                Nothing ->
-                                    []
+            , div [ class "relative card-body h-full" ]
+                [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
+                    [ div [ class "t-column" ]
+                        [ activityTitle activity
+                        , activityDuration duration
+                        ]
+                    , div [ class "t-column" ]
+                        ((case stats.teachesSpell of
+                            Nothing ->
+                                []
 
-                                Just spell ->
-                                    [ SpellView.renderSpellEffects spell ]
-                           )
-                        ++ List.map
-                            (\taggedEffect ->
-                                EffectView.render
-                                    { game = game
-                                    , mods = mods
-                                    , effect = taggedEffect
-                                    , renderType = EffectView.Card
-                                    }
-                            )
-                            orderedAndFilteredEffects
-                    )
+                            Just spell ->
+                                [ SpellView.renderSpellEffects spell ]
+                         )
+                            ++ List.map
+                                (\taggedEffect ->
+                                    EffectView.render
+                                        { game = game
+                                        , mods = mods
+                                        , effect = taggedEffect
+                                        , renderType = EffectView.Card
+                                        }
+                                )
+                                orderedAndFilteredEffects
+                        )
+                    , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
+                        [ Utils.xpBar
+                            { level = masteryLevel
+                            , percent = masteryPercent
+                            , primaryOrSecondary = Utils.Secondary
+                            , size = Utils.XpBarSmall
+                            }
+                        ]
+                    ]
+
+                -- Activity title
+                -- ([ activityTitle activity
+                --  , activityDuration duration
+                --  ]
+                --     ++ (case stats.teachesSpell of
+                --             Nothing ->
+                --                 []
+                --             Just spell ->
+                --                 [ SpellView.renderSpellEffects spell ]
+                --        )
+                --     ++ List.map
+                --         (\taggedEffect ->
+                --             EffectView.render
+                --                 { game = game
+                --                 , mods = mods
+                --                 , effect = taggedEffect
+                --                 , renderType = EffectView.Card
+                --                 }
+                --         )
+                --         orderedAndFilteredEffects
+                --     ++ [ div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
+                --             [ Utils.xpBar
+                --                 { level = masteryLevel
+                --                 , percent = masteryPercent
+                --                 , primaryOrSecondary = Utils.Secondary
+                --                 , size = Utils.XpBarSmall
+                --                 }
+                --             ]
+                --        ]
+                -- )
                 ]
 
             -- Progress bar

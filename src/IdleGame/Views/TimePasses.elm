@@ -97,7 +97,7 @@ render timePassed timePassesData =
                             ]
                     , xpGains
                         |> List.map
-                            (\{ title, originalXp, currentXp } ->
+                            (\{ skill, originalXp, currentXp } ->
                                 let
                                     difference : Xp
                                     difference =
@@ -120,8 +120,9 @@ render timePassed timePassesData =
                                             |> Utils.intToString
                                             |> text
                                         ]
-                                    , span [] [ text title ]
-                                    , Utils.skillXpBadge
+
+                                    -- , span [] [ text title ]
+                                    , Utils.skillXpBadge skill
                                     , if originalLevel /= currentLevel then
                                         span [] [ text <| "(Level " ++ Utils.intToString originalLevel ++ " -> " ++ Utils.intToString currentLevel ++ ")" ]
 
