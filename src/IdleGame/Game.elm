@@ -365,21 +365,32 @@ getPurchaseEffects amount resource =
             []
 
 
-attemptPurchaseResource : Int -> Resource.Kind -> Game -> ( Game, List Toast )
+attemptPurchaseResource : Int -> Resource.Kind -> Game -> Result EffectErr ApplyEffectsValue
 attemptPurchaseResource amount resource game =
     let
         effects : List Effect.TaggedEffect
         effects =
             getPurchaseEffects amount resource
 
-        gameGenerator : Generator ( Game, List Toast )
-        gameGenerator =
-            applyEvent effects (Random.constant ( game, [] ))
+        gen : ApplyEffectsResultGenerator
+        gen =
+            applyEffects effects game
 
-        ( ( newGame, notifications ), newSeed ) =
-            Random.step gameGenerator game.seed
+        ( result, newSeed ) =
+            Random.step gen game.seed
     in
-    ( { newGame | seed = newSeed }, notifications )
+    Result.map
+        (\applyEffectsResult ->
+            { applyEffectsResult
+                | game = setSeed newSeed applyEffectsResult.game
+            }
+        )
+        result
+
+
+setSeed : Random.Seed -> Game -> Game
+setSeed seed game =
+    { game | seed = seed }
 
 
 priceToPurchaseResource : Int -> ( Resource.Kind, Coin ) -> Game -> Coin

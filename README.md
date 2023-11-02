@@ -38,13 +38,12 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
-- [ ] Shop Improvements
+- [x] Shop Improvements
   - [x] Show price on buy modal
   - [x] Show cost on the Buy button
   - [x] Add buttons to change quantity -- Min, Max, Half?
-  - [ ] Close modal when item purchased
-  - [ ] Show toast when item purchased
-  - [ ] Handle case where not enough coin to purchase set quantity
+  - [x] Close modal when item purchased
+  - [x] Handle case where not enough coin to purchase set quantity
 - [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
 
 ## Future
@@ -60,6 +59,7 @@ $ npm test -- --watch
 - [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
 
 ### Fundamentals
+- [ ] Group toasts together by event. E.g. + coin and + resource from Chore should show in same toast. And cost + resource after buying resource.
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
 - [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements

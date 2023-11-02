@@ -397,3 +397,8 @@ go =
 checkmark : Icon
 checkmark =
     createIconFeather FeatherIcons.check
+
+
+insufficientFunds : Icon
+insufficientFunds =
+    createIconFeather FeatherIcons.xCircle

@@ -13,6 +13,7 @@ import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds.Activities exposing (Activity)
@@ -820,19 +821,35 @@ update msg model =
                                 game =
                                     Snapshot.getValue snapshot
 
-                                ( newGame, toasts ) =
+                                purchaseResult : Result EffectErr Game.ApplyEffectsValue
+                                purchaseResult =
                                     Game.attemptPurchaseResource quantity resource game
-
-                                newModel : FrontendModel
-                                newModel =
-                                    { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
-                                        |> setActiveModal Nothing
-
-                                notificationCmds : List (Cmd FrontendMsg)
-                                notificationCmds =
-                                    List.map (AddToast >> delay 0) toasts
                             in
-                            ( newModel, Cmd.batch notificationCmds )
+                            case purchaseResult of
+                                Ok res ->
+                                    let
+                                        newGame : Game
+                                        newGame =
+                                            res.game
+
+                                        toasts : List Toast
+                                        toasts =
+                                            res.toasts
+
+                                        newModel : FrontendModel
+                                        newModel =
+                                            { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+                                                |> setActiveModal Nothing
+
+                                        notificationCmds : List (Cmd FrontendMsg)
+                                        notificationCmds =
+                                            List.map (AddToast >> delay 0) toasts
+                                    in
+                                    ( newModel, Cmd.batch notificationCmds )
+
+                                Err _ ->
+                                    -- We disable the buy button in this case so shouldn't normally reach this spot
+                                    noOp
 
                         _ ->
                             noOp

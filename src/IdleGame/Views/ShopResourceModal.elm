@@ -9,6 +9,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
+import Svg.Attributes exposing (in_)
 import Types exposing (..)
 
 
@@ -40,6 +41,15 @@ render game quantity ( resource, price ) =
                 ++ " for "
                 ++ String.fromInt (Coin.toInt totalPrice)
                 ++ " coin"
+
+        canPurchase : Bool
+        canPurchase =
+            case Game.attemptPurchaseResource quantity resource game of
+                Ok _ ->
+                    True
+
+                Err _ ->
+                    False
     in
     div [ class "t-column gap-6" ]
         [ h3 [ class "font-bold text-lg" ] [ text resourceStats.title ]
@@ -83,12 +93,21 @@ render game quantity ( resource, price ) =
                 [ text "Max"
                 ]
             ]
+        , div
+            [ class "alert alert-error flex justify-start w-auto"
+            , classList [ ( "hidden", canPurchase ) ]
+            ]
+            [ Icon.insufficientFunds
+                |> Icon.toHtml
+            , span [] [ text "Insufficient funds" ]
+            ]
         , div [ class "modal-action flex items-center gap-4" ]
             [ button [ class "btn btn-outline", onClick CloseModal ] [ text "Cancel" ]
             , button
                 [ class "btn btn-primary flex items-center gap-2"
                 , onClick HandleShopResourceBuyClick
                 , attribute "aria-label" buyButtonAccessibleName
+                , disabled (not canPurchase)
                 ]
                 [ IdleGame.Views.Utils.priceLabel { price = totalPrice, isError = False }
                 ]
