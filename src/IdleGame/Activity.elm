@@ -7,7 +7,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -66,15 +65,15 @@ allActivities =
     , RepairInstruments
     , FlushDrainDemons
     , OrganizeSpellBooks
-    , Hex1
-    , Jinx1
-    , Curse1
-    , Hex2
-    , Jinx2
-    , Curse2
-    , Hex3
-    , Jinx3
-    , Curse3
+    , StudyHex1
+    , StudyJinx1
+    , StudyCurse1
+    , StudyHex2
+    , StudyJinx2
+    , StudyCurse2
+    , StudyHex3
+    , StudyJinx3
+    , StudyCurse3
     , FightMonster1
     , FightMonster2
     , FightMonster3
@@ -171,31 +170,31 @@ getByKind kind record =
         OrganizeSpellBooks ->
             record.organizeSpellBooks
 
-        Hex1 ->
+        StudyHex1 ->
             record.hex1
 
-        Jinx1 ->
+        StudyJinx1 ->
             record.jinx1
 
-        Curse1 ->
+        StudyCurse1 ->
             record.curse1
 
-        Hex2 ->
+        StudyHex2 ->
             record.hex2
 
-        Jinx2 ->
+        StudyJinx2 ->
             record.jinx2
 
-        Curse2 ->
+        StudyCurse2 ->
             record.curse2
 
-        Hex3 ->
+        StudyHex3 ->
             record.hex3
 
-        Jinx3 ->
+        StudyJinx3 ->
             record.jinx3
 
-        Curse3 ->
+        StudyCurse3 ->
             record.curse3
 
         FightMonster1 ->
@@ -247,31 +246,31 @@ setByKind kind value record =
         OrganizeSpellBooks ->
             { record | organizeSpellBooks = value }
 
-        Hex1 ->
+        StudyHex1 ->
             { record | hex1 = value }
 
-        Jinx1 ->
+        StudyJinx1 ->
             { record | jinx1 = value }
 
-        Curse1 ->
+        StudyCurse1 ->
             { record | curse1 = value }
 
-        Hex2 ->
+        StudyHex2 ->
             { record | hex2 = value }
 
-        Jinx2 ->
+        StudyJinx2 ->
             { record | jinx2 = value }
 
-        Curse2 ->
+        StudyCurse2 ->
             { record | curse2 = value }
 
-        Hex3 ->
+        StudyHex3 ->
             { record | hex3 = value }
 
-        Jinx3 ->
+        StudyJinx3 ->
             { record | jinx3 = value }
 
-        Curse3 ->
+        StudyCurse3 ->
             { record | curse3 = value }
 
         FightMonster1 ->
@@ -662,7 +661,7 @@ hex1Stats =
     let
         spell : Spell
         spell =
-            Spells.Hex1
+            Hex1
 
         spellStats : Spell.Stats
         spellStats =
@@ -675,12 +674,12 @@ hex1Stats =
     , duration = Duration.seconds 3.5
     , effects =
         [ Effect.gainXp (Xp.int 12) Skill.Hexes
-        , Effect.gainMxp Hex1
+        , Effect.gainMxp StudyHex1
         , Effect.gainResource -1 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Hex1
+    , teachesSpell = Just Hex1
     }
 
 
@@ -689,7 +688,7 @@ jinx1Stats =
     let
         spell : Spell
         spell =
-            Spells.Jinx1
+            Jinx1
 
         spellStats : Spell.Stats
         spellStats =
@@ -702,12 +701,12 @@ jinx1Stats =
     , duration = Duration.seconds 4.5
     , effects =
         [ Effect.gainXp (Xp.int 18) Skill.Hexes
-        , Effect.gainMxp Jinx1
+        , Effect.gainMxp StudyJinx1
         , Effect.gainResource -1 Resource.GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Jinx1
+    , teachesSpell = Just Jinx1
     }
 
 
@@ -716,7 +715,7 @@ curse1Stats =
     let
         spell : Spell
         spell =
-            Spells.Curse1
+            Curse1
 
         spellStats : Spell.Stats
         spellStats =
@@ -729,13 +728,13 @@ curse1Stats =
     , duration = Duration.seconds 5
     , effects =
         [ Effect.gainXp (Xp.int 24) Skill.Hexes
-        , Effect.gainMxp Curse1
+        , Effect.gainMxp StudyCurse1
         , Effect.gainResource -1 Resource.WashWater
         , Effect.gainResource -1 Resource.Soot
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Curse1
+    , teachesSpell = Just Curse1
     }
 
 
@@ -744,7 +743,7 @@ hex2Stats =
     let
         spell : Spell
         spell =
-            Spells.Hex2
+            Hex2
 
         spellStats : Spell.Stats
         spellStats =
@@ -757,12 +756,12 @@ hex2Stats =
     , duration = Duration.seconds 9
     , effects =
         [ Effect.gainXp (Xp.int 54) Skill.Hexes
-        , Effect.gainMxp Hex2
+        , Effect.gainMxp StudyHex2
         , Effect.gainResource -4 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Hex2
+    , teachesSpell = Just Hex2
     }
 
 
@@ -771,7 +770,7 @@ jinx2Stats =
     let
         spell : Spell
         spell =
-            Spells.Jinx2
+            Jinx2
 
         spellStats : Spell.Stats
         spellStats =
@@ -784,12 +783,12 @@ jinx2Stats =
     , duration = Duration.seconds 10.5
     , effects =
         [ Effect.gainXp (Xp.int 65) Skill.Hexes
-        , Effect.gainMxp Jinx2
+        , Effect.gainMxp StudyJinx2
         , Effect.gainResource -5 Resource.GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Jinx2
+    , teachesSpell = Just Jinx2
     }
 
 
@@ -798,7 +797,7 @@ curse2Stats =
     let
         spell : Spell
         spell =
-            Spells.Curse2
+            Curse2
 
         spellStats : Spell.Stats
         spellStats =
@@ -811,13 +810,13 @@ curse2Stats =
     , duration = Duration.seconds 12
     , effects =
         [ Effect.gainXp (Xp.int 99) Skill.Hexes
-        , Effect.gainMxp Curse2
+        , Effect.gainMxp StudyCurse2
         , Effect.gainResource -2 Resource.WashWater
         , Effect.gainResource -1 Resource.Scrap
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Curse2
+    , teachesSpell = Just Curse2
     }
 
 
@@ -826,7 +825,7 @@ hex3Stats =
     let
         spell : Spell
         spell =
-            Spells.Hex3
+            Hex3
 
         spellStats : Spell.Stats
         spellStats =
@@ -839,12 +838,12 @@ hex3Stats =
     , duration = Duration.seconds 15
     , effects =
         [ Effect.gainXp (Xp.int 94) Skill.Hexes
-        , Effect.gainMxp Hex3
+        , Effect.gainMxp StudyHex3
         , Effect.gainResource -10 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Hex3
+    , teachesSpell = Just Hex3
     }
 
 
@@ -853,7 +852,7 @@ jinx3Stats =
     let
         spell : Spell
         spell =
-            Spells.Jinx3
+            Jinx3
 
         spellStats : Spell.Stats
         spellStats =
@@ -866,13 +865,13 @@ jinx3Stats =
     , duration = Duration.seconds 16
     , effects =
         [ Effect.gainXp (Xp.int 144) Skill.Hexes
-        , Effect.gainMxp Jinx3
+        , Effect.gainMxp StudyJinx3
         , Effect.gainResource -6 Resource.GreenhouseDirt
         , Effect.gainResource -1 Resource.Ectoplasm
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Jinx3
+    , teachesSpell = Just Jinx3
     }
 
 
@@ -881,7 +880,7 @@ curse3Stats =
     let
         spell : Spell
         spell =
-            Spells.Curse3
+            Curse3
 
         spellStats : Spell.Stats
         spellStats =
@@ -894,7 +893,7 @@ curse3Stats =
     , duration = Duration.seconds 19
     , effects =
         [ Effect.gainXp (Xp.int 200) Skill.Hexes
-        , Effect.gainMxp Curse3
+        , Effect.gainMxp StudyCurse3
         , Effect.gainResource -2 Resource.WashWater
         , Effect.gainResource -2 Resource.Soot
         , Effect.gainResource -2 Resource.Scrap
@@ -902,7 +901,7 @@ curse3Stats =
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
-    , teachesSpell = Just Spells.Curse3
+    , teachesSpell = Just Curse3
     }
 
 

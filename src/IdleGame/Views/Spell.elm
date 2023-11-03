@@ -3,7 +3,7 @@ module IdleGame.Views.Spell exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Kinds.Spells as Spells exposing (Spell)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Skill as Skill exposing (Kind(..))
 import IdleGame.Spell as Spell

@@ -54,6 +54,7 @@ $ npm test -- --watch
   - [ ] Create Location type and add dict to model tracking state of them all
   - [ ] Visuals of Explore activity
   - [ ] Chance to unlock monster
+- [ ] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
 
 ## Future
 ### Bugs

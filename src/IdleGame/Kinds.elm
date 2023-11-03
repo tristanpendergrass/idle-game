@@ -17,15 +17,15 @@ type Activity
     | FlushDrainDemons
     | OrganizeSpellBooks
       -- Hexes
-    | Hex1
-    | Jinx1
-    | Curse1
-    | Hex2
-    | Jinx2
-    | Curse2
-    | Hex3
-    | Jinx3
-    | Curse3
+    | StudyHex1
+    | StudyJinx1
+    | StudyCurse1
+    | StudyHex2
+    | StudyJinx2
+    | StudyCurse2
+    | StudyHex3
+    | StudyJinx3
+    | StudyCurse3
       -- Adventuring
     | FightMonster1
     | FightMonster2
@@ -33,3 +33,17 @@ type Activity
     | FightMonster4
     | FightMonster5
     | FightMonster6
+
+
+type
+    Spell
+    -- Don't forget to update `Spell.allSpells` when you add stuff here!
+    = Hex1
+    | Hex2
+    | Hex3
+    | Jinx1
+    | Jinx2
+    | Jinx3
+    | Curse1
+    | Curse2
+    | Curse3
