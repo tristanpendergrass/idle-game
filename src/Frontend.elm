@@ -19,7 +19,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
-import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
@@ -774,22 +774,27 @@ update msg model =
                 |> mapGame
                     (\game ->
                         let
-                            stats : ShopItems.Stats
+                            stats : ShopUpgrade.Stats
                             stats =
-                                ShopItems.getStats kind
+                                ShopUpgrade.getStats kind
 
                             canAfford : Bool
                             canAfford =
                                 Coin.toInt stats.price <= Coin.toInt game.coin
 
                             dontOwnItemYet =
-                                not <| ShopItems.isOwned kind game.shopItems
+                                not <| ShopUpgrade.getByKind kind game.ownedShopUpgrades
                         in
                         if canAfford && dontOwnItemYet then
-                            { game
-                                | coin = Quantity.difference game.coin stats.price
-                                , shopItems = ShopItems.addItem kind game.shopItems
-                            }
+                            let
+                                newGame : Game
+                                newGame =
+                                    { game
+                                        | coin = Quantity.difference game.coin stats.price
+                                        , ownedShopUpgrades = ShopUpgrade.setByKind kind True game.ownedShopUpgrades
+                                    }
+                            in
+                            newGame
 
                         else
                             game

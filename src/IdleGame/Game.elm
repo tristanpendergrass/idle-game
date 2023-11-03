@@ -13,7 +13,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
-import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
@@ -41,7 +41,7 @@ type alias Game =
     , monster : Maybe Monster
     , coin : Coin
     , resources : Resource.Record Int
-    , shopItems : ShopItems
+    , ownedShopUpgrades : ShopUpgrade.Record Bool
     , combatsWon : Int
     , combatsLost : Int
     , spellSelectors : Activity.Record (Maybe Spell)
@@ -67,7 +67,7 @@ createProd seed =
     , monster = Nothing
     , coin = Coin.int 0
     , resources = Resource.emptyResourceRecord
-    , shopItems = ShopItems.create
+    , ownedShopUpgrades = ShopUpgrade.createRecord False
     , combatsWon = 0
     , combatsLost = 0
     , spellSelectors = Activity.createRecord Nothing
@@ -93,7 +93,7 @@ createDev seed =
     , monster = Nothing
     , coin = Coin.int 100000
     , resources = Resource.emptyResourceRecord
-    , shopItems = ShopItems.create
+    , ownedShopUpgrades = ShopUpgrade.createRecord False
     , combatsWon = 0
     , combatsLost = 0
     , spellSelectors = Activity.createRecord Nothing
@@ -790,13 +790,13 @@ getTimePassesData originalGame currentGame =
 
 getShopItemMods : Game -> List Mod
 getShopItemMods game =
-    game.shopItems
-        |> ShopItems.toOwnedItems
-        |> List.map (\shopItem -> (ShopItems.getStats shopItem).reward)
+    game.ownedShopUpgrades
+        |> ShopUpgrade.toOwnedItems
+        |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).reward)
         |> List.filterMap
             (\reward ->
                 case reward of
-                    ShopItems.ShopItemMod mods ->
+                    ShopUpgrade.ShopItemMod mods ->
                         Just mods
 
                     _ ->
@@ -807,14 +807,14 @@ getShopItemMods game =
 
 getShopItemIntervalMods : Game -> List IntervalMod
 getShopItemIntervalMods game =
-    game.shopItems
+    game.ownedShopUpgrades
         -- |> (\x -> Debug.log "foobar inside getShopItemIntervalMods" x)
-        |> ShopItems.toOwnedItems
-        |> List.map (\shopItem -> (ShopItems.getStats shopItem).reward)
+        |> ShopUpgrade.toOwnedItems
+        |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).reward)
         |> List.filterMap
             (\reward ->
                 case reward of
-                    ShopItems.ShopItemIntervalMod mods ->
+                    ShopUpgrade.ShopItemIntervalMod mods ->
                         Just mods
 
                     _ ->
