@@ -8,7 +8,7 @@ import IdleGame.Game exposing (Game, attemptPurchaseResource)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
@@ -43,7 +43,7 @@ render game =
         --                 |> text
         --             ]
         --         ]
-        renderShopItem : ShopItems.ShopItems -> ShopItems.Kind -> Html FrontendMsg
+        renderShopItem : ShopItems.ShopItems -> ShopUpgrade -> Html FrontendMsg
         renderShopItem shopItems kind =
             let
                 stats =
@@ -54,7 +54,7 @@ render game =
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
-                , onClick <| HandleShopItemClick kind
+                , onClick <| HandleShopUpgradeClick kind
                 ]
                 [ stats.icon
                     |> Icon.withSize Icon.ExtraLarge

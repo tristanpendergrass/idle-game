@@ -19,7 +19,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
-import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
@@ -769,7 +769,7 @@ update msg model =
             , Cmd.none
             )
 
-        HandleShopItemClick kind ->
+        HandleShopUpgradeClick kind ->
             ( model
                 |> mapGame
                     (\game ->

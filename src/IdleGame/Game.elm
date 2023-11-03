@@ -13,7 +13,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
-import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)

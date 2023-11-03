@@ -76,3 +76,13 @@ type
     -- Don't forget to update IdleGame.Monster! Record + allMonsters
     = Monster1
     | Monster2
+
+
+type
+    ShopUpgrade
+    -- Don't forget to update IdleGame.ShopUpgrade! Record + allShopUpgrades
+    = Shovel
+    | Book
+    | Keyring
+    | ReadingGlasses
+    | OversizedBag

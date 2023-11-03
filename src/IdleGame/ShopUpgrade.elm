@@ -1,4 +1,4 @@
-module IdleGame.ShopItems exposing (..)
+module IdleGame.ShopUpgrade exposing (..)
 
 import Html exposing (..)
 import IdleGame.Activity as Activity
@@ -14,15 +14,7 @@ import List.Extra
 import Percent exposing (Percent)
 
 
-type Kind
-    = Shovel
-    | Book
-    | Keyring
-    | ReadingGlasses
-    | OversizedBag
-
-
-allKinds : List Kind
+allKinds : List ShopUpgrade
 allKinds =
     [ Shovel, Keyring, Book, ReadingGlasses, OversizedBag ]
 
@@ -120,7 +112,7 @@ oversizedBagStats =
     }
 
 
-getStats : Kind -> Stats
+getStats : ShopUpgrade -> Stats
 getStats kind =
     case kind of
         Shovel ->
@@ -168,18 +160,18 @@ create =
         }
 
 
-addItem : Kind -> ShopItems -> ShopItems
+addItem : ShopUpgrade -> ShopItems -> ShopItems
 addItem kind (ShopItems ownedItems) =
     (getStats kind).setter True ownedItems
         |> ShopItems
 
 
-isOwned : Kind -> ShopItems -> Bool
+isOwned : ShopUpgrade -> ShopItems -> Bool
 isOwned kind (ShopItems ownedItems) =
     (getStats kind).getter ownedItems
 
 
-toOwnedItems : ShopItems -> List Kind
+toOwnedItems : ShopItems -> List ShopUpgrade
 toOwnedItems shopItems =
     allKinds
         |> List.filter (\kind -> isOwned kind shopItems)

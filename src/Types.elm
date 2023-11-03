@@ -10,7 +10,7 @@ import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.ShopItems as ShopItems exposing (ShopItems)
+import IdleGame.ShopUpgrade as ShopItems exposing (ShopItems)
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
@@ -137,7 +137,7 @@ type FrontendMsg
     | OpenMasteryUnlocksModal
     | SetActiveSkillTab Tab
     | SetActiveCombatTab Tab
-    | HandleShopItemClick ShopItems.Kind
+    | HandleShopUpgradeClick ShopUpgrade
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel
