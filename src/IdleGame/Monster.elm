@@ -4,7 +4,7 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Locations exposing (Location)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -15,7 +15,7 @@ import IdleGame.Xp as Xp exposing (Xp)
 allMonstersByLocation : Location -> List Monster
 allMonstersByLocation location =
     case location of
-        IdleGame.Kinds.Locations.Location1 ->
+        Location1 ->
             [ IdleGame.Kinds.Monsters.Monster1
             , IdleGame.Kinds.Monsters.Monster2
             ]

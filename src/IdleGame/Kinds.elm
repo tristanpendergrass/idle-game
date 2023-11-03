@@ -47,3 +47,10 @@ type
     | Curse1
     | Curse2
     | Curse3
+
+
+type
+    Location
+    -- Don't forget to update `Location.allLocations` when you add stuff here!
+    = Location1
+    | Location2
