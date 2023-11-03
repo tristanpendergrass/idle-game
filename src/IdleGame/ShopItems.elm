@@ -6,7 +6,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
@@ -45,7 +45,7 @@ intervalMod kind percentChange =
 
 dummyReward : Reward
 dummyReward =
-    ShopItemIntervalMod [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.float 0.1) ]
+    ShopItemIntervalMod [ intervalMod CleanStables (Percent.float 0.1) ]
 
 
 shovelStats : Stats
@@ -55,8 +55,8 @@ shovelStats =
     , price = Coin.int 50
     , reward =
         ShopItemIntervalMod
-            [ intervalMod IdleGame.Kinds.Activities.CleanStables (Percent.float 0.05)
-            , intervalMod IdleGame.Kinds.Activities.CleanBigBubba (Percent.float 0.05)
+            [ intervalMod CleanStables (Percent.float 0.05)
+            , intervalMod CleanBigBubba (Percent.float 0.05)
             ]
     , description = "+5% faster at Clean Stables and Clean Big Bubba's Stall"
     , getter = .shovel

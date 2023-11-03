@@ -3,7 +3,7 @@ module IdleGame.Mod exposing (..)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import Percent exposing (Percent)

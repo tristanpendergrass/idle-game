@@ -6,7 +6,7 @@ import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities as Activities exposing (Activity(..))
+import IdleGame.Kinds exposing (..)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -57,30 +57,30 @@ getActivities skill =
 
 allActivities : List Activity
 allActivities =
-    [ Activities.CleanStables
-    , Activities.CleanBigBubba
-    , Activities.SweepChimneys
-    , Activities.WaterGreenhousePlants
-    , Activities.WashAndIronRobes
-    , Activities.OrganizePotionIngredients
-    , Activities.RepairInstruments
-    , Activities.FlushDrainDemons
-    , Activities.OrganizeSpellBooks
-    , Activities.Hex1
-    , Activities.Jinx1
-    , Activities.Curse1
-    , Activities.Hex2
-    , Activities.Jinx2
-    , Activities.Curse2
-    , Activities.Hex3
-    , Activities.Jinx3
-    , Activities.Curse3
-    , Activities.FightMonster1
-    , Activities.FightMonster2
-    , Activities.FightMonster3
-    , Activities.FightMonster4
-    , Activities.FightMonster5
-    , Activities.FightMonster6
+    [ CleanStables
+    , CleanBigBubba
+    , SweepChimneys
+    , WaterGreenhousePlants
+    , WashAndIronRobes
+    , OrganizePotionIngredients
+    , RepairInstruments
+    , FlushDrainDemons
+    , OrganizeSpellBooks
+    , Hex1
+    , Jinx1
+    , Curse1
+    , Hex2
+    , Jinx2
+    , Curse2
+    , Hex3
+    , Jinx3
+    , Curse3
+    , FightMonster1
+    , FightMonster2
+    , FightMonster3
+    , FightMonster4
+    , FightMonster5
+    , FightMonster6
     ]
 
 
@@ -144,152 +144,152 @@ createRecord d =
 getByKind : Activity -> Record a -> a
 getByKind kind record =
     case kind of
-        Activities.CleanStables ->
+        CleanStables ->
             record.cleanStables
 
-        Activities.CleanBigBubba ->
+        CleanBigBubba ->
             record.cleanBigBubba
 
-        Activities.SweepChimneys ->
+        SweepChimneys ->
             record.sweepChimneys
 
-        Activities.WaterGreenhousePlants ->
+        WaterGreenhousePlants ->
             record.waterGreenhousePlants
 
-        Activities.WashAndIronRobes ->
+        WashAndIronRobes ->
             record.washAndIronRobes
 
-        Activities.OrganizePotionIngredients ->
+        OrganizePotionIngredients ->
             record.organizePotionIngredients
 
-        Activities.RepairInstruments ->
+        RepairInstruments ->
             record.repairInstruments
 
-        Activities.FlushDrainDemons ->
+        FlushDrainDemons ->
             record.flushDrainDemons
 
-        Activities.OrganizeSpellBooks ->
+        OrganizeSpellBooks ->
             record.organizeSpellBooks
 
-        Activities.Hex1 ->
+        Hex1 ->
             record.hex1
 
-        Activities.Jinx1 ->
+        Jinx1 ->
             record.jinx1
 
-        Activities.Curse1 ->
+        Curse1 ->
             record.curse1
 
-        Activities.Hex2 ->
+        Hex2 ->
             record.hex2
 
-        Activities.Jinx2 ->
+        Jinx2 ->
             record.jinx2
 
-        Activities.Curse2 ->
+        Curse2 ->
             record.curse2
 
-        Activities.Hex3 ->
+        Hex3 ->
             record.hex3
 
-        Activities.Jinx3 ->
+        Jinx3 ->
             record.jinx3
 
-        Activities.Curse3 ->
+        Curse3 ->
             record.curse3
 
-        Activities.FightMonster1 ->
+        FightMonster1 ->
             record.fightMonster1
 
-        Activities.FightMonster2 ->
+        FightMonster2 ->
             record.fightMonster2
 
-        Activities.FightMonster3 ->
+        FightMonster3 ->
             record.fightMonster3
 
-        Activities.FightMonster4 ->
+        FightMonster4 ->
             record.fightMonster4
 
-        Activities.FightMonster5 ->
+        FightMonster5 ->
             record.fightMonster5
 
-        Activities.FightMonster6 ->
+        FightMonster6 ->
             record.fightMonster6
 
 
 setByKind : Activity -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        Activities.CleanStables ->
+        CleanStables ->
             { record | cleanStables = value }
 
-        Activities.CleanBigBubba ->
+        CleanBigBubba ->
             { record | cleanBigBubba = value }
 
-        Activities.SweepChimneys ->
+        SweepChimneys ->
             { record | sweepChimneys = value }
 
-        Activities.WaterGreenhousePlants ->
+        WaterGreenhousePlants ->
             { record | waterGreenhousePlants = value }
 
-        Activities.WashAndIronRobes ->
+        WashAndIronRobes ->
             { record | washAndIronRobes = value }
 
-        Activities.OrganizePotionIngredients ->
+        OrganizePotionIngredients ->
             { record | organizePotionIngredients = value }
 
-        Activities.RepairInstruments ->
+        RepairInstruments ->
             { record | repairInstruments = value }
 
-        Activities.FlushDrainDemons ->
+        FlushDrainDemons ->
             { record | flushDrainDemons = value }
 
-        Activities.OrganizeSpellBooks ->
+        OrganizeSpellBooks ->
             { record | organizeSpellBooks = value }
 
-        Activities.Hex1 ->
+        Hex1 ->
             { record | hex1 = value }
 
-        Activities.Jinx1 ->
+        Jinx1 ->
             { record | jinx1 = value }
 
-        Activities.Curse1 ->
+        Curse1 ->
             { record | curse1 = value }
 
-        Activities.Hex2 ->
+        Hex2 ->
             { record | hex2 = value }
 
-        Activities.Jinx2 ->
+        Jinx2 ->
             { record | jinx2 = value }
 
-        Activities.Curse2 ->
+        Curse2 ->
             { record | curse2 = value }
 
-        Activities.Hex3 ->
+        Hex3 ->
             { record | hex3 = value }
 
-        Activities.Jinx3 ->
+        Jinx3 ->
             { record | jinx3 = value }
 
-        Activities.Curse3 ->
+        Curse3 ->
             { record | curse3 = value }
 
-        Activities.FightMonster1 ->
+        FightMonster1 ->
             { record | fightMonster1 = value }
 
-        Activities.FightMonster2 ->
+        FightMonster2 ->
             { record | fightMonster2 = value }
 
-        Activities.FightMonster3 ->
+        FightMonster3 ->
             { record | fightMonster3 = value }
 
-        Activities.FightMonster4 ->
+        FightMonster4 ->
             { record | fightMonster4 = value }
 
-        Activities.FightMonster5 ->
+        FightMonster5 ->
             { record | fightMonster5 = value }
 
-        Activities.FightMonster6 ->
+        FightMonster6 ->
             { record | fightMonster6 = value }
 
 
@@ -453,12 +453,12 @@ cleanStablesStats =
     , duration = Duration.seconds 3
     , effects =
         choreEffects
-            { activity = Activities.CleanStables
+            { activity = CleanStables
             , xp = Xp.int 10
             , coin = Coin.int 1
             , maybeResource = Nothing
             }
-    , mastery = Just (getChoresMastery Activities.CleanStables)
+    , mastery = Just (getChoresMastery CleanStables)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -473,7 +473,7 @@ cleanBigBubbaStats =
     , duration = Duration.seconds 6
     , effects =
         choreEffects
-            { activity = Activities.CleanBigBubba
+            { activity = CleanBigBubba
             , xp = Xp.int 25
             , coin = Coin.int 3
             , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.75 }
@@ -482,14 +482,14 @@ cleanBigBubbaStats =
         let
             choresMastery : Mastery
             choresMastery =
-                getChoresMastery Activities.CleanBigBubba
+                getChoresMastery CleanBigBubba
 
             bigBubbaMastery : Mastery
             bigBubbaMastery =
                 List.Extra.setAt 3
                     ( 100
                     , GameMod
-                        { tags = [ Effect.ActivityTag Activities.CleanBigBubba ]
+                        { tags = [ Effect.ActivityTag CleanBigBubba ]
                         , label = Mod.MoreManure
                         , transformer = Mod.resourceBaseTransformer 1
                         , source = Mod.AdminCrimes
@@ -513,12 +513,12 @@ sweepChimneyStats =
     , duration = Duration.seconds 8
     , effects =
         choreEffects
-            { activity = Activities.SweepChimneys
+            { activity = SweepChimneys
             , xp = Xp.int 37
             , coin = Coin.int 6
             , maybeResource = Nothing
             }
-    , mastery = Just (getChoresMastery Activities.SweepChimneys)
+    , mastery = Just (getChoresMastery SweepChimneys)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -533,12 +533,12 @@ waterGreenhousePlantsStats =
     , duration = Duration.seconds 2
     , effects =
         choreEffects
-            { activity = Activities.WaterGreenhousePlants
+            { activity = WaterGreenhousePlants
             , xp = Xp.int 12
             , coin = Coin.int 2
             , maybeResource = Just { resource = Resource.GreenhouseDirt, amount = 1, probability = 0.6 }
             }
-    , mastery = Just (getChoresMastery Activities.WaterGreenhousePlants)
+    , mastery = Just (getChoresMastery WaterGreenhousePlants)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -553,12 +553,12 @@ washAndIronRobesStats =
     , duration = Duration.seconds 8
     , effects =
         choreEffects
-            { activity = Activities.WashAndIronRobes
+            { activity = WashAndIronRobes
             , xp = Xp.int 50
             , coin = Coin.int 9
             , maybeResource = Just { resource = Resource.WashWater, amount = 1, probability = 0.1 }
             }
-    , mastery = Just (getChoresMastery Activities.WashAndIronRobes)
+    , mastery = Just (getChoresMastery WashAndIronRobes)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -573,12 +573,12 @@ organizePotionIngredientsStats =
     , duration = Duration.seconds 20
     , effects =
         choreEffects
-            { activity = Activities.OrganizePotionIngredients
+            { activity = OrganizePotionIngredients
             , xp = Xp.int 165
             , coin = Coin.int 12
             , maybeResource = Nothing
             }
-    , mastery = Just (getChoresMastery Activities.OrganizePotionIngredients)
+    , mastery = Just (getChoresMastery OrganizePotionIngredients)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -593,12 +593,12 @@ repairInstrumentsStats =
     , duration = Duration.seconds 12
     , effects =
         choreEffects
-            { activity = Activities.RepairInstruments
+            { activity = RepairInstruments
             , xp = Xp.int 75
             , coin = Coin.int 20
             , maybeResource = Just { resource = Resource.Scrap, amount = 1, probability = 0.25 }
             }
-    , mastery = Just (getChoresMastery Activities.RepairInstruments)
+    , mastery = Just (getChoresMastery RepairInstruments)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -613,12 +613,12 @@ flushDrainDemonsStats =
     , duration = Duration.seconds 10
     , effects =
         choreEffects
-            { activity = Activities.FlushDrainDemons
+            { activity = FlushDrainDemons
             , xp = Xp.int 90
             , coin = Coin.int 14
             , maybeResource = Just { resource = Resource.Ectoplasm, amount = 1, probability = 0.1 }
             }
-    , mastery = Just (getChoresMastery Activities.FlushDrainDemons)
+    , mastery = Just (getChoresMastery FlushDrainDemons)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -633,12 +633,12 @@ organizeSpellBooksStats =
     , duration = Duration.seconds 20
     , effects =
         choreEffects
-            { activity = Activities.OrganizeSpellBooks
+            { activity = OrganizeSpellBooks
             , xp = Xp.int 210
             , coin = Coin.int 30
             , maybeResource = Just { resource = Resource.Parchment, amount = 1, probability = 0.05 }
             }
-    , mastery = Just (getChoresMastery Activities.OrganizeSpellBooks)
+    , mastery = Just (getChoresMastery OrganizeSpellBooks)
     , hasSpellSelector = False
     , teachesSpell = Nothing
     }
@@ -675,7 +675,7 @@ hex1Stats =
     , duration = Duration.seconds 3.5
     , effects =
         [ Effect.gainXp (Xp.int 12) Skill.Hexes
-        , Effect.gainMxp Activities.Hex1
+        , Effect.gainMxp Hex1
         , Effect.gainResource -1 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
@@ -702,7 +702,7 @@ jinx1Stats =
     , duration = Duration.seconds 4.5
     , effects =
         [ Effect.gainXp (Xp.int 18) Skill.Hexes
-        , Effect.gainMxp Activities.Jinx1
+        , Effect.gainMxp Jinx1
         , Effect.gainResource -1 Resource.GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
@@ -729,7 +729,7 @@ curse1Stats =
     , duration = Duration.seconds 5
     , effects =
         [ Effect.gainXp (Xp.int 24) Skill.Hexes
-        , Effect.gainMxp Activities.Curse1
+        , Effect.gainMxp Curse1
         , Effect.gainResource -1 Resource.WashWater
         , Effect.gainResource -1 Resource.Soot
         ]
@@ -757,7 +757,7 @@ hex2Stats =
     , duration = Duration.seconds 9
     , effects =
         [ Effect.gainXp (Xp.int 54) Skill.Hexes
-        , Effect.gainMxp Activities.Hex2
+        , Effect.gainMxp Hex2
         , Effect.gainResource -4 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
@@ -784,7 +784,7 @@ jinx2Stats =
     , duration = Duration.seconds 10.5
     , effects =
         [ Effect.gainXp (Xp.int 65) Skill.Hexes
-        , Effect.gainMxp Activities.Jinx2
+        , Effect.gainMxp Jinx2
         , Effect.gainResource -5 Resource.GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
@@ -811,7 +811,7 @@ curse2Stats =
     , duration = Duration.seconds 12
     , effects =
         [ Effect.gainXp (Xp.int 99) Skill.Hexes
-        , Effect.gainMxp Activities.Curse2
+        , Effect.gainMxp Curse2
         , Effect.gainResource -2 Resource.WashWater
         , Effect.gainResource -1 Resource.Scrap
         ]
@@ -839,7 +839,7 @@ hex3Stats =
     , duration = Duration.seconds 15
     , effects =
         [ Effect.gainXp (Xp.int 94) Skill.Hexes
-        , Effect.gainMxp Activities.Hex3
+        , Effect.gainMxp Hex3
         , Effect.gainResource -10 Resource.Manure
         ]
     , mastery = Just defaultSpellMastery
@@ -866,7 +866,7 @@ jinx3Stats =
     , duration = Duration.seconds 16
     , effects =
         [ Effect.gainXp (Xp.int 144) Skill.Hexes
-        , Effect.gainMxp Activities.Jinx3
+        , Effect.gainMxp Jinx3
         , Effect.gainResource -6 Resource.GreenhouseDirt
         , Effect.gainResource -1 Resource.Ectoplasm
         ]
@@ -894,7 +894,7 @@ curse3Stats =
     , duration = Duration.seconds 19
     , effects =
         [ Effect.gainXp (Xp.int 200) Skill.Hexes
-        , Effect.gainMxp Activities.Curse3
+        , Effect.gainMxp Curse3
         , Effect.gainResource -2 Resource.WashWater
         , Effect.gainResource -2 Resource.Soot
         , Effect.gainResource -2 Resource.Scrap
@@ -926,7 +926,7 @@ fightMonster1Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster1
+            { activity = FightMonster1
             , rewards =
                 [ Effect.gainCoin (Coin.int 1)
                     |> Effect.withTags [ Effect.ActivityTag FightMonster1 ]
@@ -948,7 +948,7 @@ fightMonster2Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster2
+            { activity = FightMonster2
             , rewards =
                 [ Effect.gainResource 1 Resource.Ectoplasm
                     |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Skill.Adventuring ]
@@ -970,7 +970,7 @@ fightMonster3Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster3
+            { activity = FightMonster3
             , rewards =
                 [ Effect.gainCoin (Coin.int 5)
                     |> Effect.withTags [ Effect.ActivityTag FightMonster3, Effect.SkillTag Skill.Adventuring ]
@@ -992,7 +992,7 @@ fightMonster4Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster4
+            { activity = FightMonster4
             , rewards =
                 [ Effect.gainResource 1 Resource.GreenhouseDirt
                     |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Skill.Adventuring ]
@@ -1014,7 +1014,7 @@ fightMonster5Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster5
+            { activity = FightMonster5
             , rewards =
                 [ Effect.gainCoin (Coin.int 15)
                     |> Effect.withTags [ Effect.ActivityTag FightMonster5, Effect.SkillTag Skill.Adventuring ]
@@ -1036,7 +1036,7 @@ fightMonster6Stats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = Activities.FightMonster6
+            { activity = FightMonster6
             , rewards =
                 [ Effect.gainResource 2 Resource.Scrap
                     |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]

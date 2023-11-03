@@ -8,7 +8,7 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)

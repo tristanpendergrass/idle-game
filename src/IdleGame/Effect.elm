@@ -4,7 +4,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Xp as Xp exposing (Xp)

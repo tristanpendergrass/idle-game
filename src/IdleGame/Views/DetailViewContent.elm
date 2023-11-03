@@ -7,7 +7,7 @@ import IdleGame.Activity as Activity
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Skill as Skill

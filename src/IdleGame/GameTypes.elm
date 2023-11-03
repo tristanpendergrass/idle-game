@@ -2,9 +2,9 @@ module IdleGame.GameTypes exposing (..)
 
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
-import Percent as Percent exposing (Percent)
+import Percent exposing (Percent)
 
 
 type Toast

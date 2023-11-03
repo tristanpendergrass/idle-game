@@ -16,7 +16,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
-import IdleGame.Kinds.Activities exposing (Activity)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Kinds.Spells as Spells exposing (Spell)
 import IdleGame.Monster as Monster

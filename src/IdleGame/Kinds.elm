@@ -1,4 +1,8 @@
-module IdleGame.Kinds.Activities exposing (..)
+module IdleGame.Kinds exposing (..)
+
+{-| This module contains all the kinds of things in the game.
+This module gets imported everywhere, so it's not allowed to import _anything_ to prevent import cycles!
+-}
 
 
 type Activity
