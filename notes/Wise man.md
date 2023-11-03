@@ -41,4 +41,5 @@ Should the tips be given in the second person?
     * Note this should be programmed to come after a couple of rewards have been given
 * Long press an activity to preview it
     * This one is very important! We might track how often a user uses the preview function and trigger this tip a second time if they haven't used it at all.
+* If you're not one for chit-chat, there's a setting to adjust the chattiness of denizens
 

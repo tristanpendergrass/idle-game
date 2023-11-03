@@ -48,6 +48,12 @@ $ npm test -- --watch
 - [ ] Fix TimePasses to show xp gains in skills besides chores
 - [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 - [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
+- [ ] Add Exploration activity to locations
+  - [ ] Design Location data shape
+  - [ ] Add ExploreLocation Effect variant
+  - [ ] Create Location type and add dict to model tracking state of them all
+  - [ ] Visuals of Explore activity
+  - [ ] Chance to unlock monster
 
 ## Future
 ### Bugs

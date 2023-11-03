@@ -14,7 +14,7 @@ Infusion is always with a corresponding element to make a greater version of the
 
 
 # Connections
-* Commonly requested product in [[Exploration]]. People need shelter from inhospitable elements or the ability to summon favorable conditions for work
+* Commonly requested product in [[Adventuring]]. People need shelter from inhospitable elements or the ability to summon favorable conditions for work
     * Clear Skies for workers transporting lumber down a mountain side
     * Call wind for the sailors in a port town
     * Summon rain for the farmers
