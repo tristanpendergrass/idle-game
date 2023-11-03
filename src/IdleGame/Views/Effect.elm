@@ -146,7 +146,7 @@ probabilityToInt x =
     floor (x * 100)
 
 
-renderVariableResource : Float -> Resource.Kind -> Html msg
+renderVariableResource : Float -> Resource -> Html msg
 renderVariableResource probability kind =
     let
         probabilityStr : String

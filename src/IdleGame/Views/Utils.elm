@@ -5,6 +5,7 @@ import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -307,7 +308,7 @@ screenSupportsRighRail screenWidth =
             True
 
 
-resourceAndQuantity : { resource : Resource.Kind, quantity : Int, iconSize : Icon.Size } -> Html msg
+resourceAndQuantity : { resource : Resource, quantity : Int, iconSize : Icon.Size } -> Html msg
 resourceAndQuantity params =
     div [ class "relative" ]
         [ resource { resource = params.resource, iconSize = params.iconSize }
@@ -317,7 +318,7 @@ resourceAndQuantity params =
         ]
 
 
-resource : { resource : Resource.Kind, iconSize : Icon.Size } -> Html msg
+resource : { resource : Resource, iconSize : Icon.Size } -> Html msg
 resource params =
     let
         stats : Resource.Stats

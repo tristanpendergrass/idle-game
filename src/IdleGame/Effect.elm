@@ -45,7 +45,7 @@ type alias GainCoinParams =
 
 
 type alias GainResourceParams =
-    { base : Int, doublingChance : Float, resource : Resource.Kind }
+    { base : Int, doublingChance : Float, resource : Resource }
 
 
 type Effect
@@ -88,14 +88,14 @@ gainMxp activity =
     }
 
 
-gainResource : Int -> Resource.Kind -> TaggedEffect
+gainResource : Int -> Resource -> TaggedEffect
 gainResource quantity kind =
     { effect = GainResource { base = quantity, doublingChance = 0, resource = kind }
     , tags = []
     }
 
 
-gainResourceWithDoubling : Int -> Resource.Kind -> Float -> TaggedEffect
+gainResourceWithDoubling : Int -> Resource -> Float -> TaggedEffect
 gainResourceWithDoubling quantity kind doubling =
     { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
     , tags = []

@@ -2,23 +2,11 @@ module IdleGame.Resource exposing (..)
 
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
-type
-    Kind
-    -- Don't forget to update `allResources` when you add stuff here!
-    = Manure
-    | Soot
-    | GreenhouseDirt
-    | WashWater
-    | EmptyBottle
-    | Scrap
-    | Ectoplasm
-    | Parchment
-
-
-allResources : List Kind
+allResources : List Resource
 allResources =
     -- Don't forget to add to `allSpells` when you add a spell here!
     [ Manure
@@ -44,7 +32,7 @@ type alias Record a =
     }
 
 
-getByKind : Kind -> Record a -> a
+getByKind : Resource -> Record a -> a
 getByKind kind data =
     case kind of
         Manure ->
@@ -72,7 +60,7 @@ getByKind kind data =
             data.parchment
 
 
-setByKind : Kind -> a -> Record a -> Record a
+setByKind : Resource -> a -> Record a -> Record a
 setByKind kind value data =
     case kind of
         Manure ->
@@ -100,7 +88,7 @@ setByKind kind value data =
             { data | parchment = value }
 
 
-updateByKind : Kind -> (a -> a) -> Record a -> Record a
+updateByKind : Resource -> (a -> a) -> Record a -> Record a
 updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
 
@@ -194,7 +182,7 @@ parchmentStats =
     }
 
 
-getStats : Kind -> Stats
+getStats : Resource -> Stats
 getStats kind =
     getByKind kind allStats
 
@@ -217,7 +205,7 @@ emptyResourceRecord =
     }
 
 
-add : Kind -> Int -> Record Int -> Result EffectErr (Record Int)
+add : Resource -> Int -> Record Int -> Result EffectErr (Record Int)
 add resource amount resources =
     let
         oldAmount : Int
@@ -249,7 +237,7 @@ getDiff { original, current } =
     }
 
 
-mapDiff : (Int -> Kind -> a) -> Record Int -> List a
+mapDiff : (Int -> Resource -> a) -> Record Int -> List a
 mapDiff fn diff =
     allResources
         |> List.map
@@ -270,7 +258,7 @@ isEmptyDiff resourcesDiff =
         |> List.all ((==) 0)
 
 
-mapResources : (Int -> Kind -> a) -> Record Int -> List a
+mapResources : (Int -> Resource -> a) -> Record Int -> List a
 mapResources fn resources =
     allResources
         |> List.map
@@ -284,7 +272,7 @@ mapResources fn resources =
             )
 
 
-toList : Record Int -> List ( Kind, Int )
+toList : Record Int -> List ( Resource, Int )
 toList resources =
     allResources
         |> List.map

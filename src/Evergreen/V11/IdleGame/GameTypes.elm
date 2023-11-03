@@ -7,7 +7,7 @@ import Evergreen.V11.IdleGame.Timer
 
 type Toast
     = GainedCoin Evergreen.V11.IdleGame.Counter.Counter
-    | GainedResource Int Evergreen.V11.IdleGame.Resource.Kind
+    | GainedResource Int Evergreen.V11.IdleGame.Resource
 
 
 type ChoreKind

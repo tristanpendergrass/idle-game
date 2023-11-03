@@ -374,7 +374,7 @@ choreEffects :
     { activity : Activity
     , xp : Xp
     , coin : Coin
-    , maybeResource : Maybe { resource : Resource.Kind, amount : Int, probability : Float }
+    , maybeResource : Maybe { resource : Resource, amount : Int, probability : Float }
     }
     -> List Effect.TaggedEffect
 choreEffects { activity, xp, coin, maybeResource } =
@@ -475,7 +475,7 @@ cleanBigBubbaStats =
             { activity = CleanBigBubba
             , xp = Xp.int 25
             , coin = Coin.int 3
-            , maybeResource = Just { resource = Resource.Manure, amount = 1, probability = 0.75 }
+            , maybeResource = Just { resource = Manure, amount = 1, probability = 0.75 }
             }
     , mastery =
         let
@@ -535,7 +535,7 @@ waterGreenhousePlantsStats =
             { activity = WaterGreenhousePlants
             , xp = Xp.int 12
             , coin = Coin.int 2
-            , maybeResource = Just { resource = Resource.GreenhouseDirt, amount = 1, probability = 0.6 }
+            , maybeResource = Just { resource = GreenhouseDirt, amount = 1, probability = 0.6 }
             }
     , mastery = Just (getChoresMastery WaterGreenhousePlants)
     , hasSpellSelector = False
@@ -555,7 +555,7 @@ washAndIronRobesStats =
             { activity = WashAndIronRobes
             , xp = Xp.int 50
             , coin = Coin.int 9
-            , maybeResource = Just { resource = Resource.WashWater, amount = 1, probability = 0.1 }
+            , maybeResource = Just { resource = WashWater, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery WashAndIronRobes)
     , hasSpellSelector = False
@@ -595,7 +595,7 @@ repairInstrumentsStats =
             { activity = RepairInstruments
             , xp = Xp.int 75
             , coin = Coin.int 20
-            , maybeResource = Just { resource = Resource.Scrap, amount = 1, probability = 0.25 }
+            , maybeResource = Just { resource = Scrap, amount = 1, probability = 0.25 }
             }
     , mastery = Just (getChoresMastery RepairInstruments)
     , hasSpellSelector = False
@@ -615,7 +615,7 @@ flushDrainDemonsStats =
             { activity = FlushDrainDemons
             , xp = Xp.int 90
             , coin = Coin.int 14
-            , maybeResource = Just { resource = Resource.Ectoplasm, amount = 1, probability = 0.1 }
+            , maybeResource = Just { resource = Ectoplasm, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery FlushDrainDemons)
     , hasSpellSelector = False
@@ -635,7 +635,7 @@ organizeSpellBooksStats =
             { activity = OrganizeSpellBooks
             , xp = Xp.int 210
             , coin = Coin.int 30
-            , maybeResource = Just { resource = Resource.Parchment, amount = 1, probability = 0.05 }
+            , maybeResource = Just { resource = Parchment, amount = 1, probability = 0.05 }
             }
     , mastery = Just (getChoresMastery OrganizeSpellBooks)
     , hasSpellSelector = False
@@ -675,7 +675,7 @@ hex1Stats =
     , effects =
         [ Effect.gainXp (Xp.int 12) Skill.Hexes
         , Effect.gainMxp StudyHex1
-        , Effect.gainResource -1 Resource.Manure
+        , Effect.gainResource -1 Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -702,7 +702,7 @@ jinx1Stats =
     , effects =
         [ Effect.gainXp (Xp.int 18) Skill.Hexes
         , Effect.gainMxp StudyJinx1
-        , Effect.gainResource -1 Resource.GreenhouseDirt
+        , Effect.gainResource -1 GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -729,8 +729,8 @@ curse1Stats =
     , effects =
         [ Effect.gainXp (Xp.int 24) Skill.Hexes
         , Effect.gainMxp StudyCurse1
-        , Effect.gainResource -1 Resource.WashWater
-        , Effect.gainResource -1 Resource.Soot
+        , Effect.gainResource -1 WashWater
+        , Effect.gainResource -1 Soot
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -757,7 +757,7 @@ hex2Stats =
     , effects =
         [ Effect.gainXp (Xp.int 54) Skill.Hexes
         , Effect.gainMxp StudyHex2
-        , Effect.gainResource -4 Resource.Manure
+        , Effect.gainResource -4 Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -784,7 +784,7 @@ jinx2Stats =
     , effects =
         [ Effect.gainXp (Xp.int 65) Skill.Hexes
         , Effect.gainMxp StudyJinx2
-        , Effect.gainResource -5 Resource.GreenhouseDirt
+        , Effect.gainResource -5 GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -811,8 +811,8 @@ curse2Stats =
     , effects =
         [ Effect.gainXp (Xp.int 99) Skill.Hexes
         , Effect.gainMxp StudyCurse2
-        , Effect.gainResource -2 Resource.WashWater
-        , Effect.gainResource -1 Resource.Scrap
+        , Effect.gainResource -2 WashWater
+        , Effect.gainResource -1 Scrap
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -839,7 +839,7 @@ hex3Stats =
     , effects =
         [ Effect.gainXp (Xp.int 94) Skill.Hexes
         , Effect.gainMxp StudyHex3
-        , Effect.gainResource -10 Resource.Manure
+        , Effect.gainResource -10 Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -866,8 +866,8 @@ jinx3Stats =
     , effects =
         [ Effect.gainXp (Xp.int 144) Skill.Hexes
         , Effect.gainMxp StudyJinx3
-        , Effect.gainResource -6 Resource.GreenhouseDirt
-        , Effect.gainResource -1 Resource.Ectoplasm
+        , Effect.gainResource -6 GreenhouseDirt
+        , Effect.gainResource -1 Ectoplasm
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -894,10 +894,10 @@ curse3Stats =
     , effects =
         [ Effect.gainXp (Xp.int 200) Skill.Hexes
         , Effect.gainMxp StudyCurse3
-        , Effect.gainResource -2 Resource.WashWater
-        , Effect.gainResource -2 Resource.Soot
-        , Effect.gainResource -2 Resource.Scrap
-        , Effect.gainResource -2 Resource.Manure
+        , Effect.gainResource -2 WashWater
+        , Effect.gainResource -2 Soot
+        , Effect.gainResource -2 Scrap
+        , Effect.gainResource -2 Manure
         ]
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
@@ -949,7 +949,7 @@ fightMonster2Stats =
         monsterEffects
             { activity = FightMonster2
             , rewards =
-                [ Effect.gainResource 1 Resource.Ectoplasm
+                [ Effect.gainResource 1 Ectoplasm
                     |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Skill.Adventuring ]
                 ]
             , power = 8
@@ -993,7 +993,7 @@ fightMonster4Stats =
         monsterEffects
             { activity = FightMonster4
             , rewards =
-                [ Effect.gainResource 1 Resource.GreenhouseDirt
+                [ Effect.gainResource 1 GreenhouseDirt
                     |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Skill.Adventuring ]
                 ]
             , power = 45
@@ -1037,9 +1037,9 @@ fightMonster6Stats =
         monsterEffects
             { activity = FightMonster6
             , rewards =
-                [ Effect.gainResource 2 Resource.Scrap
+                [ Effect.gainResource 2 Scrap
                     |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
-                , Effect.gainResource 2 Resource.Soot
+                , Effect.gainResource 2 Soot
                     |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
                 , Effect.gainCoin (Coin.int 20)
                     |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]

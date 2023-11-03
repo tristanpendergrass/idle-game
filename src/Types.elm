@@ -26,7 +26,7 @@ import Url exposing (Url)
 type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreItemUnlocksModal
-    | ShopResourceModal Int Resource.Kind Coin
+    | ShopResourceModal Int Resource Coin
 
 
 type PreviousIntervalTimer
@@ -118,7 +118,7 @@ type FrontendMsg
     | CloseDebugPanel
     | AddTime Duration
       -- Shop Resource Purchase modal
-    | HandleShopResourceClick Resource.Kind -- Opens the modal
+    | HandleShopResourceClick Resource -- Opens the modal
     | HandleOneLessButtonClick
     | HandleOneMoreButtonClick
     | HandleMinButtonClick

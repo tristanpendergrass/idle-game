@@ -6,7 +6,7 @@ import Evergreen.V10.IdleGame.Resource
 
 type Toast
     = GainedCoin Evergreen.V10.IdleGame.Counter.Counter
-    | GainedResource Int Evergreen.V10.IdleGame.Resource.Kind
+    | GainedResource Int Evergreen.V10.IdleGame.Resource
 
 
 type ChoreKind

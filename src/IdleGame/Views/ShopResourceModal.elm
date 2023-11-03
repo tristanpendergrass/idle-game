@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
@@ -13,7 +14,7 @@ import Svg.Attributes exposing (in_)
 import Types exposing (..)
 
 
-render : Game -> Int -> ( Resource.Kind, Coin ) -> Html FrontendMsg
+render : Game -> Int -> ( Resource, Coin ) -> Html FrontendMsg
 render game quantity ( resource, price ) =
     let
         resourceStats : Resource.Stats

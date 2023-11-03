@@ -40,7 +40,7 @@ type alias ModeState =
 type Modal
     = TimePassesModal Time.Posix Evergreen.V12.IdleGame.Game.TimePassesData
     | ChoreItemUnlocksModal
-    | ShopResourceModal Int Evergreen.V12.IdleGame.Resource.Kind
+    | ShopResourceModal Int Evergreen.V12.IdleGame.Resource
 
 
 type PreviousIntervalTimer
@@ -90,7 +90,7 @@ type FrontendMsg
     | SetActiveSkillTab Evergreen.V12.IdleGame.Tab.Tab
     | SetActiveCombatTab Evergreen.V12.IdleGame.Tab.Tab
     | HandleShopItemClick Evergreen.V12.IdleGame.ShopItems.Kind
-    | HandleShopResourceClick Evergreen.V12.IdleGame.Resource.Kind
+    | HandleShopResourceClick Evergreen.V12.IdleGame.Resource
     | HandleShopResourceQuantityChange String
     | HandleShopResourcePurchase
     | HandlePointerDown PointerState

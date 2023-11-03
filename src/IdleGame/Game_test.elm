@@ -88,12 +88,12 @@ hasCoin amount =
     .coin >> (==) amount
 
 
-expectResource : Int -> Resource.Kind -> (Game -> Expectation)
+expectResource : Int -> Resource -> (Game -> Expectation)
 expectResource amount kind =
     .resources >> Resource.getByKind kind >> Expect.equal amount
 
 
-hasResource : Int -> Resource.Kind -> (Game -> Bool)
+hasResource : Int -> Resource -> (Game -> Bool)
 hasResource amount kind =
     .resources >> Resource.getByKind kind >> (==) amount
 

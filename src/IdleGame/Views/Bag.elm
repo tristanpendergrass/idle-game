@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game exposing (Game)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -16,7 +17,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     let
-        listItem : ( Resource.Kind, Int ) -> Html FrontendMsg
+        listItem : ( Resource, Int ) -> Html FrontendMsg
         listItem ( resource, quantity ) =
             let
                 stats =

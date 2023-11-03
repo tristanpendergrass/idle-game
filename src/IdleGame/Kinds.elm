@@ -6,6 +6,19 @@ This module gets imported everywhere, so it's not allowed to import _anything_ t
 
 
 type
+    Resource
+    -- Don't forget to update IdleGame.Resource! Record + allResources
+    = Manure
+    | Soot
+    | GreenhouseDirt
+    | WashWater
+    | EmptyBottle
+    | Scrap
+    | Ectoplasm
+    | Parchment
+
+
+type
     Activity
     -- Don't forget to update IdleGame.Activity! Record + allActivities
     = -- Chores

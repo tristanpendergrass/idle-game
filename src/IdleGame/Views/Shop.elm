@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game, attemptPurchaseResource)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopItems as ShopItems exposing (ShopItems)
@@ -87,7 +88,7 @@ render game =
                     ]
                 ]
 
-        renderResource : ( Resource.Kind, Coin ) -> Html FrontendMsg
+        renderResource : ( Resource, Coin ) -> Html FrontendMsg
         renderResource ( resource, price ) =
             let
                 resourceStats : Resource.Stats
@@ -110,7 +111,7 @@ render game =
                     }
                 ]
 
-        purchasableResources : List ( Resource.Kind, Coin )
+        purchasableResources : List ( Resource, Coin )
         purchasableResources =
             Resource.allResources
                 |> List.filterMap

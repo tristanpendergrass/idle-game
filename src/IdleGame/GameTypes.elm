@@ -9,7 +9,7 @@ import Percent exposing (Percent)
 
 type Toast
     = GainedCoin Coin
-    | GainedResource Int Resource.Kind
+    | GainedResource Int Resource
     | LostCombat
     | NegativeAmountErr
 

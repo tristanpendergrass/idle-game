@@ -347,7 +347,7 @@ tick delta game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-getPurchaseEffects : Int -> Resource.Kind -> List Effect.TaggedEffect
+getPurchaseEffects : Int -> Resource -> List Effect.TaggedEffect
 getPurchaseEffects amount resource =
     case (Resource.getStats resource).purchasing of
         Resource.Purchasable price ->
@@ -363,7 +363,7 @@ getPurchaseEffects amount resource =
             []
 
 
-attemptPurchaseResource : Int -> Resource.Kind -> Game -> Result EffectErr ApplyEffectsValue
+attemptPurchaseResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
 attemptPurchaseResource amount resource game =
     let
         effects : List Effect.TaggedEffect
@@ -391,7 +391,7 @@ setSeed seed game =
     { game | seed = seed }
 
 
-priceToPurchaseResource : Int -> ( Resource.Kind, Coin ) -> Game -> Coin
+priceToPurchaseResource : Int -> ( Resource, Coin ) -> Game -> Coin
 priceToPurchaseResource amount ( resource, price ) game =
     -- TODO: incorporate mods that might alter price
     Quantity.multiplyBy (toFloat amount) price
@@ -668,7 +668,7 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addResource : Resource.Kind -> Int -> Game -> Result EffectErr ApplyEffectValue
+addResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
 addResource resource amount game =
     let
         newResources : Result EffectErr (Resource.Record Int)
