@@ -5,7 +5,9 @@ This module gets imported everywhere, so it's not allowed to import _anything_ t
 -}
 
 
-type Activity
+type
+    Activity
+    -- Don't forget to update IdleGame.Activity! Record + allActivities
     = -- Chores
       CleanStables
     | CleanBigBubba
@@ -37,7 +39,7 @@ type Activity
 
 type
     Spell
-    -- Don't forget to update `Spell.allSpells` when you add stuff here!
+    -- Don't forget to update IdleGame.Spell! Record + allSpells
     = Hex1
     | Hex2
     | Hex3
@@ -51,6 +53,13 @@ type
 
 type
     Location
-    -- Don't forget to update `Location.allLocations` when you add stuff here!
+    -- Don't forget to update IdleGame.Location! Record + allLocations
     = Location1
     | Location2
+
+
+type
+    Monster
+    -- Don't forget to update IdleGame.Monster! Record + allMonsters
+    = Monster1
+    | Monster2

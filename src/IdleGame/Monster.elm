@@ -5,7 +5,6 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds.Monsters exposing (Monster)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -16,8 +15,8 @@ allMonstersByLocation : Location -> List Monster
 allMonstersByLocation location =
     case location of
         Location1 ->
-            [ IdleGame.Kinds.Monsters.Monster1
-            , IdleGame.Kinds.Monsters.Monster2
+            [ Monster1
+            , Monster2
             ]
 
         _ ->
@@ -26,8 +25,8 @@ allMonstersByLocation location =
 
 allMonsters : List Monster
 allMonsters =
-    [ IdleGame.Kinds.Monsters.Monster1
-    , IdleGame.Kinds.Monsters.Monster2
+    [ Monster1
+    , Monster2
     ]
 
 
@@ -45,20 +44,20 @@ createRecord d =
 getByKind : Monster -> Record a -> a
 getByKind kind record =
     case kind of
-        IdleGame.Kinds.Monsters.Monster1 ->
+        Monster1 ->
             record.monster1
 
-        IdleGame.Kinds.Monsters.Monster2 ->
+        Monster2 ->
             record.monster2
 
 
 setByKind : Monster -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        IdleGame.Kinds.Monsters.Monster1 ->
+        Monster1 ->
             { record | monster1 = value }
 
-        IdleGame.Kinds.Monsters.Monster2 ->
+        Monster2 ->
             { record | monster2 = value }
 
 
