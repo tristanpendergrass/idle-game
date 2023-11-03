@@ -11,7 +11,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill exposing (Kind(..))
+import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
@@ -27,5 +27,5 @@ render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
         [ div [ Utils.skills.grid ]
-            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Skill.Adventuring game))
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Combat game))
         ]

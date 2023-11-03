@@ -1,10 +1,6 @@
 module IdleGame.Skill exposing (..)
 
-
-type Kind
-    = Chores
-    | Hexes
-    | Adventuring
+import IdleGame.Kinds exposing (..)
 
 
 type alias Record a =
@@ -14,7 +10,7 @@ type alias Record a =
     }
 
 
-getByKind : Kind -> Record a -> a
+getByKind : Skill -> Record a -> a
 getByKind kind data =
     case kind of
         Chores ->
@@ -23,11 +19,11 @@ getByKind kind data =
         Hexes ->
             data.hexes
 
-        Adventuring ->
+        Combat ->
             data.adventuring
 
 
-setByKind : Kind -> a -> Record a -> Record a
+setByKind : Skill -> a -> Record a -> Record a
 setByKind kind value data =
     case kind of
         Chores ->
@@ -36,16 +32,16 @@ setByKind kind value data =
         Hexes ->
             { data | hexes = value }
 
-        Adventuring ->
+        Combat ->
             { data | adventuring = value }
 
 
-updateByKind : Kind -> (a -> a) -> Record a -> Record a
+updateByKind : Skill -> (a -> a) -> Record a -> Record a
 updateByKind kind update data =
     setByKind kind (update (getByKind kind data)) data
 
 
-getLabel : Kind -> String
+getLabel : Skill -> String
 getLabel kind =
     case kind of
         Chores ->
@@ -54,5 +50,5 @@ getLabel kind =
         Hexes ->
             "Hexes"
 
-        Adventuring ->
+        Combat ->
             "Adventuring"

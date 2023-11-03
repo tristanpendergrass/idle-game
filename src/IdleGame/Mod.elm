@@ -417,7 +417,7 @@ activityXpBuff activity amount =
     }
 
 
-skillXpBuff : Skill.Kind -> Float -> Mod
+skillXpBuff : Skill -> Float -> Mod
 skillXpBuff skill amount =
     { tags = [ Effect.XpTag, Effect.SkillTag skill ]
     , label = XpSkillLabel amount skill
@@ -429,7 +429,7 @@ skillXpBuff skill amount =
 
 choresXpBuff : Float -> Mod
 choresXpBuff buff =
-    { tags = [ Effect.SkillTag Skill.Chores, Effect.XpTag ]
+    { tags = [ Effect.SkillTag Chores, Effect.XpTag ]
     , label = XpActivityLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
@@ -499,7 +499,7 @@ powerBuff buff =
 
 type Label
     = XpActivityLabel Float
-    | XpSkillLabel Float Skill.Kind
+    | XpSkillLabel Float Skill
     | MxpModLabel Float
     | ResourceDoublingLabel Float
     | ResourceBaseLabel Int

@@ -106,11 +106,11 @@ selectSpell { activity, maybeSpell } game =
 
 
 type ActivityListItem
-    = LockedActivity ( Skill.Kind, Int )
+    = LockedActivity ( Skill, Int )
     | ActivityListItem Activity
 
 
-getActivityListItems : Skill.Kind -> Game -> List ActivityListItem
+getActivityListItems : Skill -> Game -> List ActivityListItem
 getActivityListItems skill game =
     let
         xp : Xp
@@ -637,17 +637,17 @@ applyEffect effect game =
                 |> Random.map Ok
 
 
-addXp : Skill.Kind -> Xp -> Game -> Game
+addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
     case skill of
-        Skill.Chores ->
-            { game | xp = Skill.updateByKind Skill.Chores (Quantity.plus amount) game.xp }
+        Chores ->
+            { game | xp = Skill.updateByKind Chores (Quantity.plus amount) game.xp }
 
-        Skill.Hexes ->
-            { game | xp = Skill.updateByKind Skill.Hexes (Quantity.plus amount) game.xp }
+        Hexes ->
+            { game | xp = Skill.updateByKind Hexes (Quantity.plus amount) game.xp }
 
-        Skill.Adventuring ->
-            { game | xp = Skill.updateByKind Skill.Adventuring (Quantity.plus amount) game.xp }
+        Combat ->
+            { game | xp = Skill.updateByKind Combat (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game
@@ -722,7 +722,7 @@ type alias TimePassesResourceLoss =
 type alias TimePassesXpGain =
     { originalXp : Xp
     , currentXp : Xp
-    , skill : Skill.Kind
+    , skill : Skill
     }
 
 
@@ -743,7 +743,7 @@ getTimePassesData originalGame currentGame =
                 []
 
             else
-                [ { skill = Skill.Chores, originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
+                [ { skill = Chores, originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
 
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }

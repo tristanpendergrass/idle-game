@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -29,5 +30,5 @@ render game =
     div [ Utils.skills.wrapper ]
         [ Utils.xpSection game.xp.hexes
         , div [ Utils.skills.grid ]
-            (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Skill.Hexes game))
+            (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Hexes game))
         ]

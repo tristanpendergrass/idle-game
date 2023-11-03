@@ -5,6 +5,12 @@ This module gets imported everywhere, so it's not allowed to import _anything_ t
 -}
 
 
+type Skill
+    = Chores
+    | Hexes
+    | Combat
+
+
 type
     Resource
     -- Don't forget to update IdleGame.Resource! Record + allResources

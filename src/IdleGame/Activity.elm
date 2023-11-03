@@ -17,7 +17,7 @@ import List.Extra
 import Percent exposing (Percent)
 
 
-allActivitiesBySkill : Skill.Kind -> List Activity
+allActivitiesBySkill : Skill -> List Activity
 allActivitiesBySkill skill =
     allActivities
         |> List.filter
@@ -28,29 +28,29 @@ allActivitiesBySkill skill =
 
 allChores : List Activity
 allChores =
-    allActivitiesBySkill Skill.Chores
+    allActivitiesBySkill Chores
 
 
 allHexes : List Activity
 allHexes =
-    allActivitiesBySkill Skill.Hexes
+    allActivitiesBySkill Hexes
 
 
 allAdventuring : List Activity
 allAdventuring =
-    allActivitiesBySkill Skill.Adventuring
+    allActivitiesBySkill Combat
 
 
-getActivities : Skill.Kind -> List Activity
+getActivities : Skill -> List Activity
 getActivities skill =
     case skill of
-        Skill.Chores ->
+        Chores ->
             allChores
 
-        Skill.Hexes ->
+        Hexes ->
             allHexes
 
-        Skill.Adventuring ->
+        Combat ->
             allAdventuring
 
 
@@ -320,10 +320,10 @@ type alias Mastery =
 
 
 type alias Stats =
-    { skill : Skill.Kind
+    { skill : Skill
     , title : String
     , image : ActivityImage
-    , unlockRequirements : Maybe ( Skill.Kind, Int )
+    , unlockRequirements : Maybe ( Skill, Int )
     , duration : Duration
     , effects : List Effect.TaggedEffect
     , mastery : Maybe Mastery
@@ -381,9 +381,9 @@ choreEffects { activity, xp, coin, maybeResource } =
     let
         choreTags : List Effect.Tag
         choreTags =
-            [ Effect.ActivityTag activity, Effect.SkillTag Skill.Chores ]
+            [ Effect.ActivityTag activity, Effect.SkillTag Chores ]
     in
-    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Skill.Chores }, tags = choreTags }
+    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Chores }, tags = choreTags }
     , { effect = Effect.GainCoin { base = coin, multiplier = 1 }, tags = choreTags }
     , { effect = Effect.GainMxp { activity = activity, multiplier = 1 }, tags = choreTags }
     ]
@@ -436,8 +436,8 @@ getChoresMastery chore =
       )
     , ( 100
       , GameMod
-            (Mod.skillXpBuff Skill.Chores 0.05
-                |> Mod.withTags [ Effect.SkillTag Skill.Chores ]
+            (Mod.skillXpBuff Chores 0.05
+                |> Mod.withTags [ Effect.SkillTag Chores ]
             )
       )
     ]
@@ -445,7 +445,7 @@ getChoresMastery chore =
 
 cleanStablesStats : Stats
 cleanStablesStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Clean Stables"
     , image = ActivityLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
@@ -465,10 +465,10 @@ cleanStablesStats =
 
 cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Clean Big Bubba's Stall"
     , image = ActivityLandscape "/chores/bubba4.png"
-    , unlockRequirements = Just ( Skill.Chores, 10 )
+    , unlockRequirements = Just ( Chores, 10 )
     , duration = Duration.seconds 6
     , effects =
         choreEffects
@@ -505,10 +505,10 @@ cleanBigBubbaStats =
 
 sweepChimneyStats : Stats
 sweepChimneyStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Sweep Chimneys"
     , image = ActivityLandscape "/chores/chimney.png"
-    , unlockRequirements = Just ( Skill.Chores, 25 )
+    , unlockRequirements = Just ( Chores, 25 )
     , duration = Duration.seconds 8
     , effects =
         choreEffects
@@ -525,10 +525,10 @@ sweepChimneyStats =
 
 waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Water Greenhouse Plants"
     , image = ActivityLandscape "/chores/greenhouse_3.png"
-    , unlockRequirements = Just ( Skill.Chores, 35 )
+    , unlockRequirements = Just ( Chores, 35 )
     , duration = Duration.seconds 2
     , effects =
         choreEffects
@@ -545,10 +545,10 @@ waterGreenhousePlantsStats =
 
 washAndIronRobesStats : Stats
 washAndIronRobesStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Wash and Iron Robes"
     , image = ActivityLandscape "/chores/washRobes.png"
-    , unlockRequirements = Just ( Skill.Chores, 45 )
+    , unlockRequirements = Just ( Chores, 45 )
     , duration = Duration.seconds 8
     , effects =
         choreEffects
@@ -565,10 +565,10 @@ washAndIronRobesStats =
 
 organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Organize Potion Ingredients"
     , image = ActivityLandscape "/chores/potionIngredients_2.png"
-    , unlockRequirements = Just ( Skill.Chores, 55 )
+    , unlockRequirements = Just ( Chores, 55 )
     , duration = Duration.seconds 20
     , effects =
         choreEffects
@@ -585,10 +585,10 @@ organizePotionIngredientsStats =
 
 repairInstrumentsStats : Stats
 repairInstrumentsStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Repair Instruments"
     , image = ActivityLandscape "/chores/repairInstruments.png"
-    , unlockRequirements = Just ( Skill.Chores, 65 )
+    , unlockRequirements = Just ( Chores, 65 )
     , duration = Duration.seconds 12
     , effects =
         choreEffects
@@ -605,10 +605,10 @@ repairInstrumentsStats =
 
 flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Flush the Drain Demons"
     , image = ActivityLandscape "/chores/drainDemons.png"
-    , unlockRequirements = Just ( Skill.Chores, 75 )
+    , unlockRequirements = Just ( Chores, 75 )
     , duration = Duration.seconds 10
     , effects =
         choreEffects
@@ -625,10 +625,10 @@ flushDrainDemonsStats =
 
 organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
-    { skill = Skill.Chores
+    { skill = Chores
     , title = "Organize Spell Books"
     , image = ActivityLandscape "/chores/spellBooks.png"
-    , unlockRequirements = Just ( Skill.Chores, 90 )
+    , unlockRequirements = Just ( Chores, 90 )
     , duration = Duration.seconds 20
     , effects =
         choreEffects
@@ -667,13 +667,13 @@ hex1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3.5
     , effects =
-        [ Effect.gainXp (Xp.int 12) Skill.Hexes
+        [ Effect.gainXp (Xp.int 12) Hexes
         , Effect.gainMxp StudyHex1
         , Effect.gainResource -1 Manure
         ]
@@ -694,13 +694,13 @@ jinx1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 10 )
+    , unlockRequirements = Just ( Hexes, 10 )
     , duration = Duration.seconds 4.5
     , effects =
-        [ Effect.gainXp (Xp.int 18) Skill.Hexes
+        [ Effect.gainXp (Xp.int 18) Hexes
         , Effect.gainMxp StudyJinx1
         , Effect.gainResource -1 GreenhouseDirt
         ]
@@ -721,13 +721,13 @@ curse1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 25 )
+    , unlockRequirements = Just ( Hexes, 25 )
     , duration = Duration.seconds 5
     , effects =
-        [ Effect.gainXp (Xp.int 24) Skill.Hexes
+        [ Effect.gainXp (Xp.int 24) Hexes
         , Effect.gainMxp StudyCurse1
         , Effect.gainResource -1 WashWater
         , Effect.gainResource -1 Soot
@@ -749,13 +749,13 @@ hex2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 35 )
+    , unlockRequirements = Just ( Hexes, 35 )
     , duration = Duration.seconds 9
     , effects =
-        [ Effect.gainXp (Xp.int 54) Skill.Hexes
+        [ Effect.gainXp (Xp.int 54) Hexes
         , Effect.gainMxp StudyHex2
         , Effect.gainResource -4 Manure
         ]
@@ -776,13 +776,13 @@ jinx2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 45 )
+    , unlockRequirements = Just ( Hexes, 45 )
     , duration = Duration.seconds 10.5
     , effects =
-        [ Effect.gainXp (Xp.int 65) Skill.Hexes
+        [ Effect.gainXp (Xp.int 65) Hexes
         , Effect.gainMxp StudyJinx2
         , Effect.gainResource -5 GreenhouseDirt
         ]
@@ -803,13 +803,13 @@ curse2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 55 )
+    , unlockRequirements = Just ( Hexes, 55 )
     , duration = Duration.seconds 12
     , effects =
-        [ Effect.gainXp (Xp.int 99) Skill.Hexes
+        [ Effect.gainXp (Xp.int 99) Hexes
         , Effect.gainMxp StudyCurse2
         , Effect.gainResource -2 WashWater
         , Effect.gainResource -1 Scrap
@@ -831,13 +831,13 @@ hex3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 65 )
+    , unlockRequirements = Just ( Hexes, 65 )
     , duration = Duration.seconds 15
     , effects =
-        [ Effect.gainXp (Xp.int 94) Skill.Hexes
+        [ Effect.gainXp (Xp.int 94) Hexes
         , Effect.gainMxp StudyHex3
         , Effect.gainResource -10 Manure
         ]
@@ -858,13 +858,13 @@ jinx3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 75 )
+    , unlockRequirements = Just ( Hexes, 75 )
     , duration = Duration.seconds 16
     , effects =
-        [ Effect.gainXp (Xp.int 144) Skill.Hexes
+        [ Effect.gainXp (Xp.int 144) Hexes
         , Effect.gainMxp StudyJinx3
         , Effect.gainResource -6 GreenhouseDirt
         , Effect.gainResource -1 Ectoplasm
@@ -886,13 +886,13 @@ curse3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Skill.Hexes
+    { skill = Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
-    , unlockRequirements = Just ( Skill.Hexes, 90 )
+    , unlockRequirements = Just ( Hexes, 90 )
     , duration = Duration.seconds 19
     , effects =
-        [ Effect.gainXp (Xp.int 200) Skill.Hexes
+        [ Effect.gainXp (Xp.int 200) Hexes
         , Effect.gainMxp StudyCurse3
         , Effect.gainResource -2 WashWater
         , Effect.gainResource -2 Soot
@@ -912,13 +912,13 @@ curse3Stats =
 monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
 monsterEffects { activity, rewards, power } =
     [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
-        |> Effect.withTags [ Effect.ActivityTag activity, Effect.SkillTag Skill.Adventuring ]
+        |> Effect.withTags [ Effect.ActivityTag activity, Effect.SkillTag Combat ]
     ]
 
 
 fightMonster1Stats : Stats
 fightMonster1Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Furball"
     , image = ActivityIcon (Icon.letter "F")
     , unlockRequirements = Nothing
@@ -940,7 +940,7 @@ fightMonster1Stats =
 
 fightMonster2Stats : Stats
 fightMonster2Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Ectoplo"
     , image = ActivityIcon (Icon.letter "E")
     , unlockRequirements = Nothing
@@ -950,7 +950,7 @@ fightMonster2Stats =
             { activity = FightMonster2
             , rewards =
                 [ Effect.gainResource 1 Ectoplasm
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Combat ]
                 ]
             , power = 8
             }
@@ -962,7 +962,7 @@ fightMonster2Stats =
 
 fightMonster3Stats : Stats
 fightMonster3Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Dreadkin"
     , image = ActivityIcon (Icon.letter "D")
     , unlockRequirements = Nothing
@@ -972,7 +972,7 @@ fightMonster3Stats =
             { activity = FightMonster3
             , rewards =
                 [ Effect.gainCoin (Coin.int 5)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster3, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster3, Effect.SkillTag Combat ]
                 ]
             , power = 22
             }
@@ -984,7 +984,7 @@ fightMonster3Stats =
 
 fightMonster4Stats : Stats
 fightMonster4Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Creeping Vine"
     , image = ActivityIcon (Icon.letter "C")
     , unlockRequirements = Nothing
@@ -994,7 +994,7 @@ fightMonster4Stats =
             { activity = FightMonster4
             , rewards =
                 [ Effect.gainResource 1 GreenhouseDirt
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Combat ]
                 ]
             , power = 45
             }
@@ -1006,7 +1006,7 @@ fightMonster4Stats =
 
 fightMonster5Stats : Stats
 fightMonster5Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Banshee"
     , image = ActivityIcon (Icon.letter "B")
     , unlockRequirements = Nothing
@@ -1016,7 +1016,7 @@ fightMonster5Stats =
             { activity = FightMonster5
             , rewards =
                 [ Effect.gainCoin (Coin.int 15)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster5, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster5, Effect.SkillTag Combat ]
                 ]
             , power = 75
             }
@@ -1028,7 +1028,7 @@ fightMonster5Stats =
 
 fightMonster6Stats : Stats
 fightMonster6Stats =
-    { skill = Skill.Adventuring
+    { skill = Combat
     , title = "Alucard"
     , image = ActivityIcon (Icon.letter "A")
     , unlockRequirements = Nothing
@@ -1038,11 +1038,11 @@ fightMonster6Stats =
             { activity = FightMonster6
             , rewards =
                 [ Effect.gainResource 2 Scrap
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
                 , Effect.gainResource 2 Soot
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
                 , Effect.gainCoin (Coin.int 20)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Skill.Adventuring ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
                 ]
             , power = 110
             }

@@ -13,7 +13,7 @@ import Task exposing (fail)
 
 
 type Tag
-    = SkillTag Skill.Kind
+    = SkillTag Skill
     | XpTag
     | MxpTag
     | ActivityTag Activity
@@ -28,7 +28,7 @@ type alias TaggedEffect =
 type alias GainXpParams =
     { base : Xp
     , multiplier : Float
-    , skill : Skill.Kind
+    , skill : Skill
     }
 
 
@@ -67,7 +67,7 @@ setEffect newEffect taggedEffect =
     { taggedEffect | effect = newEffect }
 
 
-gainXp : Xp -> Skill.Kind -> TaggedEffect
+gainXp : Xp -> Skill -> TaggedEffect
 gainXp quantity skill =
     { effect = GainXp { base = quantity, multiplier = 1, skill = skill }
     , tags = []

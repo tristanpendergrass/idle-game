@@ -40,7 +40,7 @@ floatToString decimals =
     FormatNumber.format localeForFloats
 
 
-skillXpBadge : Skill.Kind -> Html msg
+skillXpBadge : Skill -> Html msg
 skillXpBadge skill =
     div [ class "badge badge-primary badge-xs col-span-8" ] [ text <| Skill.getLabel skill ++ " XP" ]
 
