@@ -5,6 +5,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -54,6 +55,7 @@ updateByKind kind f record =
 
 type alias Stats =
     { title : String
+    , findableMonsters : Monster.Record Bool
     }
 
 
@@ -62,8 +64,44 @@ getStats kind =
     getByKind kind allStats
 
 
+type alias State =
+    { foundMonsters : Monster.Record Bool
+    }
+
+
+createState : State
+createState =
+    { foundMonsters = Monster.createRecord False
+    }
+
+
+foundMonsters : Location -> State -> Monster.Record Bool
+foundMonsters location state =
+    Debug.todo ""
+
+
+findMonster : Monster -> Location -> State -> State
+findMonster monster location state =
+    Debug.todo ""
+
+
+findableMonsters : List Monster -> Monster.Record Bool
+findableMonsters =
+    List.foldl
+        (\monster accum ->
+            Monster.setByKind monster True accum
+        )
+        (Monster.createRecord False)
+
+
 allStats : Record Stats
 allStats =
-    { location1 = { title = "Location 1" }
-    , location2 = { title = "Location 2" }
+    { location1 =
+        { title = "Location 1"
+        , findableMonsters = findableMonsters [ Monster1 ]
+        }
+    , location2 =
+        { title = "Location 2"
+        , findableMonsters = findableMonsters [ Monster2 ]
+        }
     }

@@ -762,7 +762,7 @@ update msg model =
             , Cmd.none
             )
 
-        SetActiveCombatTab tab ->
+        SetActiveAdventuringTab tab ->
             ( model
                 |> setTabAdventuring tab
                 |> setIsDrawerOpen False

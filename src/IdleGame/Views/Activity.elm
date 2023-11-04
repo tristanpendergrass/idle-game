@@ -336,3 +336,8 @@ renderBottomRight =
     -- button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
     -- This is used in Melvor to show e.g. item quick-equip and mastery panel, but we don't need yet as we'll show the mastery info in another place.
     div [] []
+
+
+renderExploreActivity : Game -> Location -> Html FrontendMsg
+renderExploreActivity game location =
+    Debug.todo ""

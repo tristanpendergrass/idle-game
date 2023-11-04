@@ -38,7 +38,9 @@ type alias Record a =
 
 createRecord : a -> Record a
 createRecord d =
-    Record d d
+    { monster1 = d
+    , monster2 = d
+    }
 
 
 getByKind : Monster -> Record a -> a

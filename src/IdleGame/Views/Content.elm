@@ -67,7 +67,7 @@ renderContent game activeTab =
             Tab.Shop ->
                 IdleGame.Views.Shop.render game
 
-            Tab.CombatTab1 ->
+            Tab.Location1 ->
                 IdleGame.Views.CombatTab1.render game
 
             _ ->

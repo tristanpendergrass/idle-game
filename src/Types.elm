@@ -135,7 +135,7 @@ type FrontendMsg
     | CloseModal
     | OpenMasteryUnlocksModal
     | SetActiveSkillTab Tab
-    | SetActiveCombatTab Tab
+    | SetActiveAdventuringTab Tab
     | HandleShopUpgradeClick ShopUpgrade
     | HandlePointerDown PointerState
     | HandlePointerUp

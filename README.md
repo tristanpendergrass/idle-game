@@ -38,6 +38,11 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
+- [ ] Skill: Enchantment
+- [ ] Support spell selector on Chores and Hex studying
+  - [ ] Design system for what spells can be assigned on what activities
+  - [ ] Enable spell selector for Chores/Hexes/Exploring/Enchantment
+- [ ] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
 - [x] Shop Improvements
   - [x] Show price on buy modal
   - [x] Show cost on the Buy button
@@ -49,15 +54,17 @@ $ npm test -- --watch
 - [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 - [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
 - [ ] Add Exploration activity to locations
-  - [ ] Design Location data shape
+  - [x] Design Location data shape
   - [ ] Add ExploreLocation Effect variant
   - [ ] Create Location type and add dict to model tracking state of them all
   - [ ] Visuals of Explore activity
   - [ ] Chance to unlock monster
 - [ ] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
+- [ ] Fix Hex bug YY reported
 
 ## Future
 ### Bugs
+- [ ] Fix Monster fighting card vertical spacing being off
 - [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.
 

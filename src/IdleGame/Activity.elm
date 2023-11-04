@@ -74,6 +74,8 @@ allActivities =
     , StudyHex3
     , StudyJinx3
     , StudyCurse3
+    , ExploreLocation1
+    , ExploreLocation2
     , FightMonster1
     , FightMonster2
     , FightMonster3
@@ -102,6 +104,8 @@ type alias Record a =
     , hex3 : a
     , jinx3 : a
     , curse3 : a
+    , exploreLocation1 : a
+    , exploreLocation2 : a
     , fightMonster1 : a
     , fightMonster2 : a
     , fightMonster3 : a
@@ -131,6 +135,8 @@ createRecord d =
     , hex3 = d
     , jinx3 = d
     , curse3 = d
+    , exploreLocation1 = d
+    , exploreLocation2 = d
     , fightMonster1 = d
     , fightMonster2 = d
     , fightMonster3 = d
@@ -196,6 +202,12 @@ getByKind kind record =
 
         StudyCurse3 ->
             record.curse3
+
+        ExploreLocation1 ->
+            record.exploreLocation1
+
+        ExploreLocation2 ->
+            record.exploreLocation2
 
         FightMonster1 ->
             record.fightMonster1
@@ -272,6 +284,12 @@ setByKind kind value record =
 
         StudyCurse3 ->
             { record | curse3 = value }
+
+        ExploreLocation1 ->
+            { record | exploreLocation1 = value }
+
+        ExploreLocation2 ->
+            { record | exploreLocation2 = value }
 
         FightMonster1 ->
             { record | fightMonster1 = value }
@@ -357,6 +375,8 @@ allStats =
     , hex3 = hex3Stats
     , jinx3 = jinx3Stats
     , curse3 = curse3Stats
+    , exploreLocation1 = exploreLocation1Stats
+    , exploreLocation2 = exploreLocation2Stats
     , fightMonster1 = fightMonster1Stats
     , fightMonster2 = fightMonster2Stats
     , fightMonster3 = fightMonster3Stats
@@ -906,7 +926,35 @@ curse3Stats =
 
 
 
--- Monsters
+-- Adventuring
+
+
+exploreLocation1Stats : Stats
+exploreLocation1Stats =
+    { skill = Combat
+    , title = "Explore"
+    , image = ActivityLandscape "/chores/bubba4.png"
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 4
+    , effects = []
+    , mastery = Nothing
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
+
+
+exploreLocation2Stats : Stats
+exploreLocation2Stats =
+    { skill = Combat
+    , title = "Explore"
+    , image = ActivityLandscape "/chores/bubba4.png"
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 4
+    , effects = []
+    , mastery = Nothing
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
+    }
 
 
 monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect

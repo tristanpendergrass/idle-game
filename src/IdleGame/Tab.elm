@@ -18,8 +18,9 @@ type Tab
     | Potionmaking
     | Conjuration
     | Transmogrification
-      -- Combat
-    | CombatTab1
+      -- Locations
+    | Location1
+    | Location2
 
 
 type alias TabConfig =
@@ -96,7 +97,12 @@ getConfig tab =
             , icon = Icon.transmogrification
             }
 
-        CombatTab1 ->
-            { title = "School Grounds"
+        Location1 ->
+            { title = "Location 1"
+            , icon = Icon.enchantment
+            }
+
+        Location2 ->
+            { title = "Location 2"
             , icon = Icon.enchantment
             }

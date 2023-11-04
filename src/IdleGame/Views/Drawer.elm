@@ -22,7 +22,7 @@ renderDrawer isDrawerOpen mode activeTab =
                     SetActiveSkillTab tab
 
                 Adventuring ->
-                    SetActiveCombatTab tab
+                    SetActiveAdventuringTab tab
 
         underConstructionIcon =
             Icon.underConstruction
@@ -129,10 +129,11 @@ renderDrawer isDrawerOpen mode activeTab =
                 ]
             ]
 
-        combatTabs : List (Html FrontendMsg)
-        combatTabs =
+        adventuringTabs : List (Html FrontendMsg)
+        adventuringTabs =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [ onClick (SetActiveCombatTab Tab.CombatTab1) ] [ renderTab { tab = Tab.CombatTab1, underConstruction = False } ]
+                [ li [ onClick (SetActiveAdventuringTab Tab.Location1) ] [ renderTab { tab = Tab.Location1, underConstruction = False } ]
+                , li [ onClick (SetActiveAdventuringTab Tab.Location2) ] [ renderTab { tab = Tab.Location2, underConstruction = False } ]
                 ]
             ]
     in
@@ -172,7 +173,7 @@ renderDrawer isDrawerOpen mode activeTab =
                             skillTabs
 
                         Adventuring ->
-                            combatTabs
+                            adventuringTabs
                    )
             )
         ]

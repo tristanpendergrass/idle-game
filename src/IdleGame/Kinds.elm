@@ -48,6 +48,8 @@ type
     | StudyJinx3
     | StudyCurse3
       -- Adventuring
+    | ExploreLocation1
+    | ExploreLocation2
     | FightMonster1
     | FightMonster2
     | FightMonster3

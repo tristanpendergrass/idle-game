@@ -44,9 +44,9 @@ devFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultMode = Skilling
+    , defaultMode = Adventuring
     , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.CombatTab1
+    , defaultTabAdventuring = Tab.Location1
     , defaultDetailViewExpanded = False
     }
 
@@ -63,6 +63,6 @@ prodFlags =
     , showDebugPanel = True -- Setting to True for now so play testers can enjoy
     , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.CombatTab1
+    , defaultTabAdventuring = Tab.Location1
     , defaultDetailViewExpanded = False
     }
