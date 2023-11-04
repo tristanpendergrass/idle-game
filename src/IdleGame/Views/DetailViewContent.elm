@@ -50,9 +50,9 @@ renderStatusBar ( activity, timer ) =
         percentComplete =
             Timer.percentComplete timer
 
-        skillLabel : String
-        skillLabel =
-            Skill.getLabel stats.skill
+        belongsLabel : String
+        belongsLabel =
+            Activity.belongsToLabel stats.belongsTo
 
         image : Html FrontendMsg
         image =
@@ -69,7 +69,7 @@ renderStatusBar ( activity, timer ) =
             ]
         , div [ class "grow overflow-hidden h-full flex flex-col items-start justify-center" ]
             [ div [ class "font-bold text-sm leading-tight" ] [ text stats.title ]
-            , div [ class "text-xs text-base-content/70 leading-tight" ] [ text skillLabel ]
+            , div [ class "text-xs text-base-content/70 leading-tight" ] [ text belongsLabel ]
             ]
         , div [ class "absolute bottom-0 left-0 w-full h-[2px]" ]
             [ div
@@ -145,9 +145,9 @@ renderContent obj extraBottomPadding game =
                 DetailViewPreview _ ->
                     True
 
-        skillLabel : String
-        skillLabel =
-            Skill.getLabel (Activity.getStats activity).skill
+        belongsToLabel : String
+        belongsToLabel =
+            Activity.belongsToLabel (Activity.getStats activity).belongsTo
 
         selectedSpell : Maybe Spell
         selectedSpell =
@@ -158,7 +158,7 @@ renderContent obj extraBottomPadding game =
         , classList [ ( "pb-20", extraBottomPadding ) ]
         ]
         [ -- category of activity
-          div [ class "text-sm font-semibold" ] [ text skillLabel ]
+          div [ class "text-sm font-semibold" ] [ text belongsToLabel ]
 
         -- preview image
         , div

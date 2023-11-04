@@ -42,7 +42,8 @@ $ npm test -- --watch
 - [ ] Support spell selector on Chores and Hex studying
   - [ ] Design system for what spells can be assigned on what activities
   - [ ] Enable spell selector for Chores/Hexes/Exploring/Enchantment
-- [ ] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
+- [x] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
+- [x] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
 - [x] Shop Improvements
   - [x] Show price on buy modal
   - [x] Show cost on the Buy button
@@ -59,8 +60,6 @@ $ npm test -- --watch
   - [ ] Create Location type and add dict to model tracking state of them all
   - [ ] Visuals of Explore activity
   - [ ] Chance to unlock monster
-- [ ] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
-- [ ] Fix Hex bug YY reported
 
 ## Future
 ### Bugs

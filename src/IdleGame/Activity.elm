@@ -7,6 +7,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -22,7 +23,7 @@ allActivitiesBySkill skill =
     allActivities
         |> List.filter
             (\kind ->
-                (getStats kind).skill == skill
+                (getStats kind).belongsTo == BelongsToSkill skill
             )
 
 
@@ -337,8 +338,23 @@ type alias Mastery =
     List ( Int, MasteryReward )
 
 
+type BelongsTo
+    = BelongsToSkill Skill
+    | BelongsToLocation Location
+
+
+belongsToLabel : BelongsTo -> String
+belongsToLabel belongsTo =
+    case belongsTo of
+        BelongsToSkill skill ->
+            Skill.getLabel skill
+
+        BelongsToLocation location ->
+            Location.getLabel location
+
+
 type alias Stats =
-    { skill : Skill
+    { belongsTo : BelongsTo
     , title : String
     , image : ActivityImage
     , unlockRequirements : Maybe ( Skill, Int )
@@ -465,7 +481,7 @@ getChoresMastery chore =
 
 cleanStablesStats : Stats
 cleanStablesStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Clean Stables"
     , image = ActivityLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
@@ -485,7 +501,7 @@ cleanStablesStats =
 
 cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Clean Big Bubba's Stall"
     , image = ActivityLandscape "/chores/bubba4.png"
     , unlockRequirements = Just ( Chores, 10 )
@@ -525,7 +541,7 @@ cleanBigBubbaStats =
 
 sweepChimneyStats : Stats
 sweepChimneyStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Sweep Chimneys"
     , image = ActivityLandscape "/chores/chimney.png"
     , unlockRequirements = Just ( Chores, 25 )
@@ -545,7 +561,7 @@ sweepChimneyStats =
 
 waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Water Greenhouse Plants"
     , image = ActivityLandscape "/chores/greenhouse_3.png"
     , unlockRequirements = Just ( Chores, 35 )
@@ -565,7 +581,7 @@ waterGreenhousePlantsStats =
 
 washAndIronRobesStats : Stats
 washAndIronRobesStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Wash and Iron Robes"
     , image = ActivityLandscape "/chores/washRobes.png"
     , unlockRequirements = Just ( Chores, 45 )
@@ -585,7 +601,7 @@ washAndIronRobesStats =
 
 organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Organize Potion Ingredients"
     , image = ActivityLandscape "/chores/potionIngredients_2.png"
     , unlockRequirements = Just ( Chores, 55 )
@@ -605,7 +621,7 @@ organizePotionIngredientsStats =
 
 repairInstrumentsStats : Stats
 repairInstrumentsStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Repair Instruments"
     , image = ActivityLandscape "/chores/repairInstruments.png"
     , unlockRequirements = Just ( Chores, 65 )
@@ -625,7 +641,7 @@ repairInstrumentsStats =
 
 flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Flush the Drain Demons"
     , image = ActivityLandscape "/chores/drainDemons.png"
     , unlockRequirements = Just ( Chores, 75 )
@@ -645,7 +661,7 @@ flushDrainDemonsStats =
 
 organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
-    { skill = Chores
+    { belongsTo = BelongsToSkill Chores
     , title = "Organize Spell Books"
     , image = ActivityLandscape "/chores/spellBooks.png"
     , unlockRequirements = Just ( Chores, 90 )
@@ -687,7 +703,7 @@ hex1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Nothing
@@ -714,7 +730,7 @@ jinx1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 10 )
@@ -741,7 +757,7 @@ curse1Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 25 )
@@ -769,7 +785,7 @@ hex2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 35 )
@@ -796,7 +812,7 @@ jinx2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 45 )
@@ -823,7 +839,7 @@ curse2Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 55 )
@@ -851,7 +867,7 @@ hex3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 65 )
@@ -878,7 +894,7 @@ jinx3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 75 )
@@ -906,7 +922,7 @@ curse3Stats =
         spellStats =
             Spell.getStats spell
     in
-    { skill = Hexes
+    { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
     , image = ActivityIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 90 )
@@ -931,7 +947,7 @@ curse3Stats =
 
 exploreLocation1Stats : Stats
 exploreLocation1Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Explore"
     , image = ActivityLandscape "/chores/bubba4.png"
     , unlockRequirements = Nothing
@@ -945,7 +961,7 @@ exploreLocation1Stats =
 
 exploreLocation2Stats : Stats
 exploreLocation2Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location2
     , title = "Explore"
     , image = ActivityLandscape "/chores/bubba4.png"
     , unlockRequirements = Nothing
@@ -966,7 +982,7 @@ monsterEffects { activity, rewards, power } =
 
 fightMonster1Stats : Stats
 fightMonster1Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Furball"
     , image = ActivityIcon (Icon.letter "F")
     , unlockRequirements = Nothing
@@ -988,7 +1004,7 @@ fightMonster1Stats =
 
 fightMonster2Stats : Stats
 fightMonster2Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Ectoplo"
     , image = ActivityIcon (Icon.letter "E")
     , unlockRequirements = Nothing
@@ -1010,7 +1026,7 @@ fightMonster2Stats =
 
 fightMonster3Stats : Stats
 fightMonster3Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Dreadkin"
     , image = ActivityIcon (Icon.letter "D")
     , unlockRequirements = Nothing
@@ -1032,7 +1048,7 @@ fightMonster3Stats =
 
 fightMonster4Stats : Stats
 fightMonster4Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Creeping Vine"
     , image = ActivityIcon (Icon.letter "C")
     , unlockRequirements = Nothing
@@ -1054,7 +1070,7 @@ fightMonster4Stats =
 
 fightMonster5Stats : Stats
 fightMonster5Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Banshee"
     , image = ActivityIcon (Icon.letter "B")
     , unlockRequirements = Nothing
@@ -1076,7 +1092,7 @@ fightMonster5Stats =
 
 fightMonster6Stats : Stats
 fightMonster6Stats =
-    { skill = Combat
+    { belongsTo = BelongsToLocation Location1
     , title = "Alucard"
     , image = ActivityIcon (Icon.letter "A")
     , unlockRequirements = Nothing

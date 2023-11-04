@@ -64,6 +64,11 @@ getStats kind =
     getByKind kind allStats
 
 
+getLabel : Location -> String
+getLabel kind =
+    (getStats kind).title
+
+
 type alias State =
     { foundMonsters : Monster.Record Bool
     }
