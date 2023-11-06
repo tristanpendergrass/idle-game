@@ -68,6 +68,9 @@ renderModdedEffect renderType game effect =
                 , game = game
                 }
 
+        Effect.Explore _ ->
+            div [] []
+
 
 renderCoin : { base : Coin, multiplier : Float } -> Html msg
 renderCoin { base, multiplier } =

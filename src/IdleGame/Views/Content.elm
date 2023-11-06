@@ -6,15 +6,16 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Game exposing (Game)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
 import IdleGame.Views.Bag
 import IdleGame.Views.Chores
-import IdleGame.Views.CombatTab1
 import IdleGame.Views.Hexes
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Location
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
 import IdleGame.Views.Utils
@@ -68,7 +69,10 @@ renderContent game activeTab =
                 IdleGame.Views.Shop.render game
 
             Tab.Location1 ->
-                IdleGame.Views.CombatTab1.render game
+                IdleGame.Views.Location.render game Location1
+
+            Tab.Location2 ->
+                IdleGame.Views.Location.render game Location2
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

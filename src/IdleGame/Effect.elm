@@ -55,6 +55,7 @@ type Effect
     | GainMxp GainMxpParams
     | GainCoin GainCoinParams
     | ResolveCombat { combat : Combat, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
+    | Explore { location : Location }
 
 
 getEffect : TaggedEffect -> Effect
@@ -112,6 +113,13 @@ gainWithProbability probability successEffects =
 resolveCombat : Combat -> List TaggedEffect -> TaggedEffect
 resolveCombat combat successEffects =
     { effect = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }
+    , tags = []
+    }
+
+
+explore : Location -> TaggedEffect
+explore location =
+    { effect = Explore { location = location }
     , tags = []
     }
 

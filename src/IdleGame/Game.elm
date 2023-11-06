@@ -10,6 +10,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
@@ -35,6 +36,7 @@ type alias Game =
     { seed : Random.Seed
     , xp : Skill.Record Xp
     , mxp : Activity.Record Xp
+    , locations : Location.Record Location.State
     , choresMxp : Xp
     , activitySkilling : Maybe ( Activity, Timer )
     , activityAdventuring : Maybe ( Activity, Timer )
@@ -55,12 +57,12 @@ createProd seed =
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
-            , adventuring = Xp.int 0
             }
     in
     { seed = seed
     , xp = xp
     , mxp = Activity.createRecord (Xp.int 0)
+    , locations = Location.createRecord Location.createState
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
@@ -81,12 +83,12 @@ createDev seed =
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
-            , adventuring = Xp.int 0
             }
     in
     { seed = seed
     , xp = xp
     , mxp = Activity.createRecord (Xp.int 0)
+    , locations = Location.createRecord Location.createState
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
@@ -228,6 +230,11 @@ activityIsActive kind game =
 
         Nothing ->
             False
+
+
+updateLocations : (Location.Record Location.State -> Location.Record Location.State) -> Game -> Game
+updateLocations fn game =
+    { game | locations = fn game.locations }
 
 
 setActivitySkilling : Maybe ( Activity, Timer ) -> Game -> Game
@@ -636,6 +643,24 @@ applyEffect effect game =
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok
 
+        Effect.Explore { location } ->
+            let
+                locationState : Location.State
+                locationState =
+                    Location.getByKind location game.locations
+            in
+            Location.findMonsterGenerator location locationState
+                |> Random.map
+                    (\newLocationState ->
+                        Ok
+                            { game =
+                                game
+                                    |> updateLocations (Location.setByKind location newLocationState)
+                            , toasts = []
+                            , additionalEffects = []
+                            }
+                    )
+
 
 addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
@@ -645,9 +670,6 @@ addXp skill amount game =
 
         Hexes ->
             { game | xp = Skill.updateByKind Hexes (Quantity.plus amount) game.xp }
-
-        Combat ->
-            { game | xp = Skill.updateByKind Combat (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game

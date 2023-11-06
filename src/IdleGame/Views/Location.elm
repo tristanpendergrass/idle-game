@@ -10,6 +10,8 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
+import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
@@ -25,13 +27,24 @@ import Types exposing (..)
 
 render : Game -> Location -> Html FrontendMsg
 render game location =
+    let
+        monsters : List Monster
+        monsters =
+            Location.foundMonsters location (Location.getByKind location game.locations)
+
+        monsterListItems : List Game.ActivityListItem
+        monsterListItems =
+            monsters
+                |> List.map Activity.activityForMonster
+                |> List.map Game.ActivityListItem
+    in
     div [ Utils.skills.wrapper ]
         [ div [ Utils.skills.grid ]
             (List.concat
-                [ [ ActivityView.renderExploreActivity game location ]
+                [ [ ActivityView.renderExploreActivity location game ]
                 , List.map
                     (ActivityView.renderActivityListItem game)
-                    (Game.getActivityListItems Combat game)
+                    monsterListItems
                 ]
             )
         ]

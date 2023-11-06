@@ -27,6 +27,16 @@ allActivitiesBySkill skill =
             )
 
 
+activityForMonster : Monster -> Activity
+activityForMonster monster =
+    case monster of
+        Monster1 ->
+            FightMonster1
+
+        Monster2 ->
+            FightMonster2
+
+
 allChores : List Activity
 allChores =
     allActivitiesBySkill Chores
@@ -37,11 +47,6 @@ allHexes =
     allActivitiesBySkill Hexes
 
 
-allAdventuring : List Activity
-allAdventuring =
-    allActivitiesBySkill Combat
-
-
 getActivities : Skill -> List Activity
 getActivities skill =
     case skill of
@@ -50,9 +55,6 @@ getActivities skill =
 
         Hexes ->
             allHexes
-
-        Combat ->
-            allAdventuring
 
 
 allActivities : List Activity
@@ -948,11 +950,11 @@ curse3Stats =
 exploreLocation1Stats : Stats
 exploreLocation1Stats =
     { belongsTo = BelongsToLocation Location1
-    , title = "Explore"
-    , image = ActivityLandscape "/chores/bubba4.png"
+    , title = "Explore: Location 1"
+    , image = ActivityLandscape "/chores/bubba3.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
-    , effects = []
+    , effects = [ Effect.explore Location1 ]
     , mastery = Nothing
     , hasSpellSelector = False
     , teachesSpell = Nothing
@@ -962,11 +964,11 @@ exploreLocation1Stats =
 exploreLocation2Stats : Stats
 exploreLocation2Stats =
     { belongsTo = BelongsToLocation Location2
-    , title = "Explore"
-    , image = ActivityLandscape "/chores/bubba4.png"
+    , title = "Explore: Location 2"
+    , image = ActivityLandscape "/chores/bubba3.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
-    , effects = []
+    , effects = [ Effect.explore Location2 ]
     , mastery = Nothing
     , hasSpellSelector = False
     , teachesSpell = Nothing
@@ -976,7 +978,7 @@ exploreLocation2Stats =
 monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
 monsterEffects { activity, rewards, power } =
     [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
-        |> Effect.withTags [ Effect.ActivityTag activity, Effect.SkillTag Combat ]
+        |> Effect.withTags [ Effect.ActivityTag activity ]
     ]
 
 
@@ -1014,7 +1016,7 @@ fightMonster2Stats =
             { activity = FightMonster2
             , rewards =
                 [ Effect.gainResource 1 Ectoplasm
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster2, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster2 ]
                 ]
             , power = 8
             }
@@ -1036,7 +1038,7 @@ fightMonster3Stats =
             { activity = FightMonster3
             , rewards =
                 [ Effect.gainCoin (Coin.int 5)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster3, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster3 ]
                 ]
             , power = 22
             }
@@ -1058,7 +1060,7 @@ fightMonster4Stats =
             { activity = FightMonster4
             , rewards =
                 [ Effect.gainResource 1 GreenhouseDirt
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster4, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster4 ]
                 ]
             , power = 45
             }
@@ -1080,7 +1082,7 @@ fightMonster5Stats =
             { activity = FightMonster5
             , rewards =
                 [ Effect.gainCoin (Coin.int 15)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster5, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster5 ]
                 ]
             , power = 75
             }
@@ -1102,11 +1104,11 @@ fightMonster6Stats =
             { activity = FightMonster6
             , rewards =
                 [ Effect.gainResource 2 Scrap
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
                 , Effect.gainResource 2 Soot
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
                 , Effect.gainCoin (Coin.int 20)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6, Effect.SkillTag Combat ]
+                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
                 ]
             , power = 110
             }

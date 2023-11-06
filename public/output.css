@@ -4148,6 +4148,10 @@ body[dir="rtl"] .checkbox:checked,
   grid-column: span 8 / span 8;
 }
 
+.col-span-2 {
+  grid-column: span 2 / span 2;
+}
+
 .ml-3 {
   margin-left: 0.75rem;
 }
@@ -4326,6 +4330,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .w-screen {
   width: 100vw;
+}
+
+.w-\[650px\] {
+  width: 650px;
 }
 
 .min-w-\[375px\] {

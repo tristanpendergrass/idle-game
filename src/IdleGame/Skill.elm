@@ -6,7 +6,6 @@ import IdleGame.Kinds exposing (..)
 type alias Record a =
     { chores : a
     , hexes : a
-    , adventuring : a
     }
 
 
@@ -19,9 +18,6 @@ getByKind kind data =
         Hexes ->
             data.hexes
 
-        Combat ->
-            data.adventuring
-
 
 setByKind : Skill -> a -> Record a -> Record a
 setByKind kind value data =
@@ -31,9 +27,6 @@ setByKind kind value data =
 
         Hexes ->
             { data | hexes = value }
-
-        Combat ->
-            { data | adventuring = value }
 
 
 updateByKind : Skill -> (a -> a) -> Record a -> Record a
@@ -49,6 +42,3 @@ getLabel kind =
 
         Hexes ->
             "Hexes"
-
-        Combat ->
-            "Adventuring"

@@ -11,6 +11,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
@@ -83,10 +84,10 @@ monsterImage kind =
         ]
 
 
-activityTitle : Activity -> Html FrontendMsg
-activityTitle kind =
+activityTitle : String -> Html FrontendMsg
+activityTitle title =
     h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
-        [ span [] [ text (Activity.getStats kind).title ]
+        [ span [] [ text title ]
         ]
 
 
@@ -222,7 +223,7 @@ renderActivityCard activity game screenWidth =
             , div [ class "relative card-body h-full" ]
                 [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
                     [ div [ class "t-column" ]
-                        [ activityTitle activity
+                        [ activityTitle (Activity.getStats activity).title
                         , activityDuration duration
                         ]
                     , div [ class "t-column" ]
@@ -338,6 +339,56 @@ renderBottomRight =
     div [] []
 
 
-renderExploreActivity : Game -> Location -> Html FrontendMsg
-renderExploreActivity game location =
-    Debug.todo ""
+renderExploreActivity : Location -> Game -> Html FrontendMsg
+renderExploreActivity location game =
+    div [ class "relative col-span-2" ]
+        [ Utils.withScreenWidth
+            (\screenWidth ->
+                let
+                    locationState : Location.State
+                    locationState =
+                        Location.getByKind location game.locations
+
+                    activity : Activity
+                    activity =
+                        (Location.getStats location).exploreActivity
+
+                    pointerDownState : PointerState
+                    pointerDownState =
+                        { click = HandleActivityClick { screenWidth = screenWidth } activity
+
+                        -- , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
+                        , longPress = Nothing
+                        }
+
+                    monstersAtLocation : List Monster
+                    monstersAtLocation =
+                        Location.monstersAtLocation location
+
+                    monstersCount : Int
+                    monstersCount =
+                        List.length monstersAtLocation
+
+                    foundMonsters : List Monster
+                    foundMonsters =
+                        Location.foundMonsters location locationState
+
+                    foundMonstersCount : Int
+                    foundMonstersCount =
+                        List.length foundMonsters
+                in
+                div
+                    [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none h-[340px]"
+                    , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
+                    , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
+                    , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
+                    ]
+                    [ div [ class "relative card-body h-full" ]
+                        [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
+                            [ activityTitle (Activity.getStats activity).title
+                            , div [] [ text <| "Monsters found: " ++ Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ]
+                            ]
+                        ]
+                    ]
+            )
+        ]
