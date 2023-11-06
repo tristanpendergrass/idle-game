@@ -65,6 +65,7 @@ updateByKind kind f record =
 type alias Stats =
     { title : String
     , monsters : Monster.Record Bool
+    , resources : Resource.Record Bool
     , exploreActivity : Activity
     }
 
@@ -84,15 +85,25 @@ allStats =
                     Monster.setByKind monster True accum
                 )
                 (Monster.createRecord False)
+
+        resourcesFromList : List Resource -> Resource.Record Bool
+        resourcesFromList =
+            List.foldl
+                (\resource accum ->
+                    Resource.setByKind resource True accum
+                )
+                (Resource.createRecord False)
     in
     { location1 =
         { title = "Location 1"
         , monsters = monstersFromList [ Monster1 ]
+        , resources = resourcesFromList [ Parchment ]
         , exploreActivity = ExploreLocation1
         }
     , location2 =
         { title = "Location 2"
         , monsters = monstersFromList [ Monster2 ]
+        , resources = resourcesFromList [ WashWater ]
         , exploreActivity = ExploreLocation2
         }
     }
@@ -104,12 +115,14 @@ allStats =
 
 type alias State =
     { foundMonsters : Monster.Record Bool
+    , foundResources : Resource.Record Bool
     }
 
 
 createState : State
 createState =
     { foundMonsters = Monster.createRecord False
+    , foundResources = Resource.createRecord False
     }
 
 
@@ -118,6 +131,14 @@ setMonsterToFound monster state =
     { state
         | foundMonsters =
             Monster.setByKind monster True state.foundMonsters
+    }
+
+
+setResourceToFound : Resource -> State -> State
+setResourceToFound resource state =
+    { state
+        | foundResources =
+            Resource.setByKind resource True state.foundResources
     }
 
 
@@ -183,3 +204,58 @@ monstersAtLocation : Location -> List Monster
 monstersAtLocation location =
     Monster.allMonsters
         |> List.filter (\monster -> Monster.getByKind monster (getStats location).monsters)
+
+
+findResourceGenerator : Location -> State -> Random.Generator State
+findResourceGenerator location state =
+    case findableResources location state of
+        -- If there's at least one resource to find, pick one at random and set it to found
+        first :: rest ->
+            Random.uniform first rest
+                |> Random.map (\resource -> setResourceToFound resource state)
+
+        -- Otherwise, return the state unchanged
+        [] ->
+            Random.constant state
+
+
+findableResources : Location -> State -> List Resource
+findableResources location state =
+    Resource.allResources
+        |> List.filter
+            (\resource ->
+                let
+                    isAtLocation : Bool
+                    isAtLocation =
+                        Resource.getByKind resource (getStats location).resources
+
+                    isFound : Bool
+                    isFound =
+                        Resource.getByKind resource state.foundResources
+                in
+                isAtLocation && not isFound
+            )
+
+
+foundResources : Location -> State -> List Resource
+foundResources location state =
+    Resource.allResources
+        |> List.filter
+            (\resource ->
+                let
+                    isAtLocation : Bool
+                    isAtLocation =
+                        Resource.getByKind resource (getStats location).resources
+
+                    isFound : Bool
+                    isFound =
+                        Resource.getByKind resource state.foundResources
+                in
+                isAtLocation && isFound
+            )
+
+
+resourcesAtLocation : Location -> List Resource
+resourcesAtLocation location =
+    Resource.allResources
+        |> List.filter (\resource -> Resource.getByKind resource (getStats location).resources)

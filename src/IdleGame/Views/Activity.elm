@@ -376,6 +376,22 @@ renderExploreActivity location game =
                     foundMonstersCount : Int
                     foundMonstersCount =
                         List.length foundMonsters
+
+                    resourcesAtLocation : List Resource
+                    resourcesAtLocation =
+                        Location.resourcesAtLocation location
+
+                    resourcesCount : Int
+                    resourcesCount =
+                        List.length resourcesAtLocation
+
+                    foundResources : List Resource
+                    foundResources =
+                        Location.foundResources location locationState
+
+                    foundResourcesCount : Int
+                    foundResourcesCount =
+                        List.length foundResources
                 in
                 div
                     [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none h-[340px]"
@@ -387,6 +403,7 @@ renderExploreActivity location game =
                         [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
                             [ activityTitle (Activity.getStats activity).title
                             , div [] [ text <| "Monsters found: " ++ Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ]
+                            , div [] [ text <| "Resources found: " ++ Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ]
                             ]
                         ]
                     ]

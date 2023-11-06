@@ -650,6 +650,7 @@ applyEffect effect game =
                     Location.getByKind location game.locations
             in
             Location.findMonsterGenerator location locationState
+                |> Random.andThen (Location.findResourceGenerator location)
                 |> Random.map
                     (\newLocationState ->
                         Ok

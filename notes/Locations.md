@@ -9,9 +9,9 @@ When you engage in adventuring you are always doing it in a specific location.
 * Evil fortress, outer
 * Evil fortress, inner
 
-# Exploration 
+# Locations
 
-## Completion
+# Completion
 A big simple number that goes from 0 to 100% as you do stuff in a location. All the stuff to do contributes and when it's all done you have 100% completion.
 * Discovering each resource
 * Discovering each monster
@@ -21,8 +21,15 @@ A big simple number that goes from 0 to 100% as you do stuff in a location. All 
 ### Calculating completion
 The contribution of each thing to the percent is pretty arbitrary. For instance, discovering of a resource might be 2.5%, while reaching 100 mastery against a monster might be 5%.
 
-## Unlocking locations
+# Unlocking locations
 For now we'll keep unlocking simple: locations unlock in a linear order, you must have 50% completion on the previous location.
+
+## Unlocking stuff in the location
+Exploring a location should be a different experience for the player depending on their previous progression
+* If they have not explored the location at all before, they should discover a resource within seconds of their first explore action
+* They should continue to gather resources while exploring in this early stage, gradually discovering an additional 2 or 3 types to be added to the pool of resources that might be gathered
+* Eventually (perhaps in a range of 30min - 4 hours) they should discover their first Monster.
+* 
 
 # Quests
 Similar to Melvor's Township quests. Discover these by exploring the location.

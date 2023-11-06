@@ -20,6 +20,10 @@ allResources =
     ]
 
 
+
+-- Record
+
+
 type alias Record a =
     { manure : a
     , soot : a
@@ -29,6 +33,19 @@ type alias Record a =
     , scrap : a
     , ectoplasm : a
     , parchment : a
+    }
+
+
+createRecord : a -> Record a
+createRecord a =
+    { manure = a
+    , soot = a
+    , greenhouseDirt = a
+    , washWater = a
+    , emptyBottles = a
+    , scrap = a
+    , ectoplasm = a
+    , parchment = a
     }
 
 
