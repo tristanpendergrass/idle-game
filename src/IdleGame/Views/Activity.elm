@@ -246,11 +246,11 @@ renderActivityCard activity game screenWidth =
                                 orderedAndFilteredEffects
                         )
                     , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
-                        [ Utils.xpBar
-                            { level = masteryLevel
+                        [ Utils.progressBar
+                            { progressText = Utils.intToString masteryLevel
                             , percent = masteryPercent
                             , primaryOrSecondary = Utils.Secondary
-                            , size = Utils.XpBarSmall
+                            , size = Utils.ProgressBarSmall
                             }
                         ]
                     ]
@@ -337,75 +337,3 @@ renderBottomRight =
     -- button [ class "btn btn-square btn-secondary uppercase", onClick OpenMasteryUnlocksModal ] [ text "m" ]
     -- This is used in Melvor to show e.g. item quick-equip and mastery panel, but we don't need yet as we'll show the mastery info in another place.
     div [] []
-
-
-renderExploreActivity : Location -> Game -> Html FrontendMsg
-renderExploreActivity location game =
-    div [ class "relative col-span-2" ]
-        [ Utils.withScreenWidth
-            (\screenWidth ->
-                let
-                    locationState : Location.State
-                    locationState =
-                        Location.getByKind location game.locations
-
-                    activity : Activity
-                    activity =
-                        (Location.getStats location).exploreActivity
-
-                    pointerDownState : PointerState
-                    pointerDownState =
-                        { click = HandleActivityClick { screenWidth = screenWidth } activity
-
-                        -- , longPress = Just ( Timer.create, 500, HandlePreviewClick activity )
-                        , longPress = Nothing
-                        }
-
-                    monstersAtLocation : List Monster
-                    monstersAtLocation =
-                        Location.monstersAtLocation location
-
-                    monstersCount : Int
-                    monstersCount =
-                        List.length monstersAtLocation
-
-                    foundMonsters : List Monster
-                    foundMonsters =
-                        Location.foundMonsters location locationState
-
-                    foundMonstersCount : Int
-                    foundMonstersCount =
-                        List.length foundMonsters
-
-                    resourcesAtLocation : List Resource
-                    resourcesAtLocation =
-                        Location.resourcesAtLocation location
-
-                    resourcesCount : Int
-                    resourcesCount =
-                        List.length resourcesAtLocation
-
-                    foundResources : List Resource
-                    foundResources =
-                        Location.foundResources location locationState
-
-                    foundResourcesCount : Int
-                    foundResourcesCount =
-                        List.length foundResources
-                in
-                div
-                    [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none h-[340px]"
-                    , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
-                    , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
-                    , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
-                    ]
-                    [ div [ class "relative card-body h-full" ]
-                        [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
-                            [ activityTitle (Activity.getStats activity).title
-                            , div [] [ text <| "Monsters found: " ++ Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ]
-                            , div [] [ text <| "Resources found: " ++ Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ]
-                            ]
-                        ]
-                    ]
-            )
-        ]

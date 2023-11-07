@@ -335,11 +335,11 @@ mxpSection mxp =
             [ div [ class "w-full flex items-center justify-between" ]
                 [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
                 ]
-            , Utils.xpBar
-                { level = skillLevel
+            , Utils.progressBar
+                { progressText = Utils.intToString skillLevel
                 , percent = skillPercent
                 , primaryOrSecondary = Utils.Secondary
-                , size = Utils.XpBarLarge
+                , size = Utils.ProgressBarLarge
                 }
             ]
         ]

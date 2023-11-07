@@ -38,6 +38,7 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
+- [ ] Fix status bar extending over the sidebar at medium screen widths
 - [ ] Skill: Enchantment
 - [ ] Support spell selector on Chores and Hex studying
   - [ ] Design system for what spells can be assigned on what activities
@@ -54,12 +55,12 @@ $ npm test -- --watch
 - [ ] Fix TimePasses to show xp gains in skills besides chores
 - [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 - [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
-- [ ] Add Exploration activity to locations
+- [x] Add Exploration activity to locations
   - [x] Design Location data shape
-  - [ ] Add ExploreLocation Effect variant
-  - [ ] Create Location type and add dict to model tracking state of them all
-  - [ ] Visuals of Explore activity
-  - [ ] Chance to unlock monster
+  - [x] Add ExploreLocation Effect variant
+  - [x] Create Location type and add dict to model tracking state of them all
+  - [x] Visuals of Explore activity
+  - [x] Chance to unlock monster
 
 ## Future
 ### Bugs

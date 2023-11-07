@@ -39,12 +39,117 @@ render game location =
                 |> List.map Game.ActivityListItem
     in
     div [ Utils.skills.wrapper ]
-        [ div [ Utils.skills.grid ]
+        [ renderLocationInfo game location
+        , div [ Utils.skills.grid ]
             (List.concat
-                [ [ ActivityView.renderExploreActivity location game ]
+                [ [ ActivityView.renderActivityListItem game (Game.ActivityListItem (Location.getStats location).exploreActivity) ]
                 , List.map
                     (ActivityView.renderActivityListItem game)
                     monsterListItems
                 ]
             )
+        ]
+
+
+locationGridItemClasses : Attribute FrontendMsg
+locationGridItemClasses =
+    class "h-48 rounded-xl bg-base-100"
+
+
+renderLocationInfo : Game -> Location -> Html FrontendMsg
+renderLocationInfo game location =
+    div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-primary" ]
+        [ div [ class "t-column" ]
+            [ div [ class "w-full flex items-center justify-between" ]
+                [ div [ class "text-2xs font-bold" ] [ text "Completion" ]
+                ]
+            , Utils.progressBar { progressText = "15%", percent = Percent.float 0.15, primaryOrSecondary = Utils.Primary, size = Utils.ProgressBarLarge }
+            , div [ class "w-full md:hidden grid grid-cols-4 gap-1" ]
+                -- TODO: mobile view
+                []
+            , div [ class "w-full hidden md:grid grid-cols-4 gap-1 lg:gap-2 xl:gap-4" ]
+                [ div [ locationGridItemClasses ] [ renderQuestsPane game location ]
+                , div [ locationGridItemClasses ] [ renderResourcesPane game location ]
+                , div [ locationGridItemClasses ] [ renderCharactersPane game location ]
+                , div [ locationGridItemClasses ] [ renderMonstersPane game location ]
+                ]
+            ]
+        ]
+
+
+paneClasses =
+    { pane = class "t-column w-full p-1 xl:p-2"
+    , title = class "text-sm"
+    }
+
+
+renderQuestsPane : Game -> Location -> Html FrontendMsg
+renderQuestsPane game location =
+    div [ paneClasses.pane ]
+        [ div [ paneClasses.title ] [ text "Quests" ]
+        ]
+
+
+renderResourcesPane : Game -> Location -> Html FrontendMsg
+renderResourcesPane game location =
+    let
+        locationState : Location.State
+        locationState =
+            Location.getByKind location game.locations
+
+        resourcesAtLocation : List Resource
+        resourcesAtLocation =
+            Location.resourcesAtLocation location
+
+        resourcesCount : Int
+        resourcesCount =
+            List.length resourcesAtLocation
+
+        foundResources : List Resource
+        foundResources =
+            Location.foundResources location locationState
+
+        foundResourcesCount : Int
+        foundResourcesCount =
+            List.length foundResources
+    in
+    div [ paneClasses.pane ]
+        [ div [ paneClasses.title ] [ text "Resources" ]
+        , div [] [ text <| "Discovered: " ++ Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ]
+        ]
+
+
+renderCharactersPane : Game -> Location -> Html FrontendMsg
+renderCharactersPane game location =
+    div [ paneClasses.pane ]
+        [ div [ paneClasses.title ] [ text "Characters" ]
+        ]
+
+
+renderMonstersPane : Game -> Location -> Html FrontendMsg
+renderMonstersPane game location =
+    let
+        locationState : Location.State
+        locationState =
+            Location.getByKind location game.locations
+
+        monstersAtLocation : List Monster
+        monstersAtLocation =
+            Location.monstersAtLocation location
+
+        monstersCount : Int
+        monstersCount =
+            List.length monstersAtLocation
+
+        foundMonsters : List Monster
+        foundMonsters =
+            Location.foundMonsters location locationState
+
+        foundMonstersCount : Int
+        foundMonstersCount =
+            List.length foundMonsters
+    in
+    div [ paneClasses.pane ]
+        [ div [ paneClasses.title ] [ text "Monsters" ]
+        , div [] [ text <| "Discovered: " ++ Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ]
         ]

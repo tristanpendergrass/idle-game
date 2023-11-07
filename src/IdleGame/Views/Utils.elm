@@ -191,7 +191,7 @@ xpSection xp =
                         |> text
                     ]
                 ]
-            , xpBar { level = skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = XpBarLarge }
+            , progressBar { progressText = intToString skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = ProgressBarLarge }
             ]
         ]
 
@@ -201,13 +201,13 @@ type PrimaryOrSecondary
     | Secondary
 
 
-type XpBarSize
-    = XpBarSmall
-    | XpBarLarge
+type ProgressBarSize
+    = ProgressBarSmall
+    | ProgressBarLarge
 
 
-xpBar : { level : Int, percent : Percent, primaryOrSecondary : PrimaryOrSecondary, size : XpBarSize } -> Html msg
-xpBar { level, percent, primaryOrSecondary, size } =
+progressBar : { progressText : String, percent : Percent, primaryOrSecondary : PrimaryOrSecondary, size : ProgressBarSize } -> Html msg
+progressBar { progressText, percent, primaryOrSecondary, size } =
     let
         ( backgroundClass, textColorClass ) =
             case primaryOrSecondary of
@@ -219,15 +219,15 @@ xpBar { level, percent, primaryOrSecondary, size } =
 
         ( textSizeClass, levelBoxWidthClass ) =
             case size of
-                XpBarSmall ->
-                    ( class "text-xs", class "w-8" )
+                ProgressBarSmall ->
+                    ( class "text-xs p-1", class "min-w-8" )
 
-                XpBarLarge ->
-                    ( class "text-lg", class "w-10" )
+                ProgressBarLarge ->
+                    ( class "text-lg px-2 py-1", class "min-w-10" )
     in
     div [ class "w-full flex items-center gap-2" ]
-        [ div [ class "font-bold p-1 rounded text-center", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]
-            [ text (intToString level) ]
+        [ div [ class "font-bold rounded text-center", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]
+            [ text progressText ]
         , progress
             [ class "progress w-full"
             , case primaryOrSecondary of
@@ -241,15 +241,6 @@ xpBar { level, percent, primaryOrSecondary, size } =
             , attribute "aria-label" "progress towards next experience level"
             ]
             []
-
-        -- , div [ class "flex-1 bg-base-300 rounded-full h-1.5" ]
-        --     [ div
-        --         [ class "h-2 rounded-full"
-        --         , backgroundClass
-        --         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percent) ++ "%")
-        --         ]
-        --         []
-        --     ]
         ]
 
 
