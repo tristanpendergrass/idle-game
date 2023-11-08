@@ -402,3 +402,13 @@ checkmark =
 insufficientFunds : Icon
 insufficientFunds =
     createIconFeather FeatherIcons.xCircle
+
+
+undiscoveredItem : Icon
+undiscoveredItem =
+    createIconFeather FeatherIcons.helpCircle
+
+
+undiscoveredMonster : Icon
+undiscoveredMonster =
+    createIconFeather FeatherIcons.helpCircle

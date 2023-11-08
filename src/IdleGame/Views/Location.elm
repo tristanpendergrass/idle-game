@@ -78,8 +78,10 @@ renderLocationInfo game location =
 
 
 paneClasses =
-    { pane = class "t-column w-full p-1 xl:p-2"
+    { pane = class "t-column h-full w-full p-1 xl:p-2 justify-between"
     , title = class "text-sm"
+    , body = class "flex-grow"
+    , footer = class "text-xs"
     }
 
 
@@ -115,7 +117,14 @@ renderResourcesPane game location =
     in
     div [ paneClasses.pane ]
         [ div [ paneClasses.title ] [ text "Resources" ]
-        , div [] [ text <| "Discovered: " ++ Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ]
+        , div [ paneClasses.body, class "grid max-w-full" ]
+            (List.concat
+                [ List.map (\resource -> (Resource.getStats resource).icon |> Icon.toHtml) foundResources
+                , List.repeat (resourcesCount - foundResourcesCount) (Icon.undiscoveredItem |> Icon.toHtml)
+                ]
+            )
+        , div [ paneClasses.footer ]
+            [ text <| Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ++ " discovered" ]
         ]
 
 
@@ -151,5 +160,11 @@ renderMonstersPane game location =
     in
     div [ paneClasses.pane ]
         [ div [ paneClasses.title ] [ text "Monsters" ]
-        , div [] [ text <| "Discovered: " ++ Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ]
+        , div [ paneClasses.body, class "grid max-w-full" ]
+            (List.concat
+                [ List.map (\monster -> (Monster.getStats monster).icon |> Icon.toHtml) foundMonsters
+                , List.repeat (monstersCount - foundMonstersCount) (Icon.undiscoveredMonster |> Icon.toHtml)
+                ]
+            )
+        , div [ paneClasses.footer ] [ text <| Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ++ " discovered" ]
         ]

@@ -78,7 +78,7 @@ monsterImage : Monster -> Html FrontendMsg
 monsterImage kind =
     div
         [ class "h-full w-full flex items-center justify-center bg-accent" ]
-        [ (Monster.getStats kind).image
+        [ (Monster.getStats kind).icon
             |> Icon.withSize Icon.Large
             |> Icon.toHtml
         ]
