@@ -986,7 +986,7 @@ fightMonster1Stats : Stats
 fightMonster1Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Furball"
-    , image = ActivityIcon (Icon.letter "F")
+    , image = ActivityIcon (Icon.fromString "F")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
@@ -1008,7 +1008,7 @@ fightMonster2Stats : Stats
 fightMonster2Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Ectoplo"
-    , image = ActivityIcon (Icon.letter "E")
+    , image = ActivityIcon (Icon.fromString "E")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
@@ -1030,7 +1030,7 @@ fightMonster3Stats : Stats
 fightMonster3Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Dreadkin"
-    , image = ActivityIcon (Icon.letter "D")
+    , image = ActivityIcon (Icon.fromString "D")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
@@ -1052,7 +1052,7 @@ fightMonster4Stats : Stats
 fightMonster4Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Creeping Vine"
-    , image = ActivityIcon (Icon.letter "C")
+    , image = ActivityIcon (Icon.fromString "C")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
@@ -1074,7 +1074,7 @@ fightMonster5Stats : Stats
 fightMonster5Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Banshee"
-    , image = ActivityIcon (Icon.letter "B")
+    , image = ActivityIcon (Icon.fromString "B")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
@@ -1096,7 +1096,7 @@ fightMonster6Stats : Stats
 fightMonster6Stats =
     { belongsTo = BelongsToLocation Location1
     , title = "Alucard"
-    , image = ActivityIcon (Icon.letter "A")
+    , image = ActivityIcon (Icon.fromString "A")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =

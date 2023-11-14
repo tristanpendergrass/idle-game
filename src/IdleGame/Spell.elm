@@ -121,47 +121,47 @@ allStats : Record Stats
 allStats =
     { hex1 =
         { title = "Hex I"
-        , icon = Icon.letter "Hx1"
+        , icon = Icon.fromString "Hx1"
         , mods = [ Event.powerBuff 5 ]
         }
     , jinx1 =
         { title = "Jinx I"
-        , icon = Icon.letter "Jx1"
+        , icon = Icon.fromString "Jx1"
         , mods = [ Event.powerBuff 10 ]
         }
     , curse1 =
         { title = "Curse I"
-        , icon = Icon.letter "Cs1"
+        , icon = Icon.fromString "Cs1"
         , mods = [ Event.powerBuff 15 ]
         }
     , hex2 =
         { title = "Hex II"
-        , icon = Icon.letter "Hx2"
+        , icon = Icon.fromString "Hx2"
         , mods = [ Event.powerBuff 20 ]
         }
     , jinx2 =
         { title = "Jinx II"
-        , icon = Icon.letter "Jx2"
+        , icon = Icon.fromString "Jx2"
         , mods = [ Event.powerBuff 25 ]
         }
     , curse2 =
         { title = "Curse II"
-        , icon = Icon.letter "Cs2"
+        , icon = Icon.fromString "Cs2"
         , mods = [ Event.powerBuff 30 ]
         }
     , hex3 =
         { title = "Hex III"
-        , icon = Icon.letter "Hx3"
+        , icon = Icon.fromString "Hx3"
         , mods = [ Event.powerBuff 35 ]
         }
     , jinx3 =
         { title = "Jinx III"
-        , icon = Icon.letter "Jx3"
+        , icon = Icon.fromString "Jx3"
         , mods = [ Event.powerBuff 40 ]
         }
     , curse3 =
         { title = "Curse III"
-        , icon = Icon.letter "Cs3"
+        , icon = Icon.fromString "Cs3"
         , mods = [ Event.powerBuff 45 ]
         }
     }

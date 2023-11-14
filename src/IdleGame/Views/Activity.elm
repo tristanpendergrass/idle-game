@@ -14,6 +14,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
@@ -41,11 +42,6 @@ renderActivityListItem game item =
             renderLockedActivity unlockSkill unlockLevel
 
 
-activityHeight : String
-activityHeight =
-    "h-[425px] xl:h-[405px]"
-
-
 probabilityToInt : Float -> Int
 probabilityToInt x =
     floor (x * 100)
@@ -59,19 +55,29 @@ activityImage : Activity -> Html FrontendMsg
 activityImage kind =
     case (Activity.getStats kind).image of
         Activity.ActivityLandscape imgSrc ->
-            img
-                [ src imgSrc
-                , class "h-full w-full object-cover"
-                ]
-                []
+            renderImage imgSrc
 
         Activity.ActivityIcon icon ->
-            div
-                [ class "h-full w-full flex items-center justify-center bg-accent" ]
-                [ icon
-                    |> Icon.withSize Icon.Large
-                    |> Icon.toHtml
-                ]
+            renderIcon icon
+
+
+renderImage : String -> Html FrontendMsg
+renderImage imgSrc =
+    img
+        [ src imgSrc
+        , class "h-full w-full object-cover"
+        ]
+        []
+
+
+renderIcon : Icon -> Html FrontendMsg
+renderIcon icon =
+    div
+        [ class "h-full w-full flex items-center justify-center bg-accent" ]
+        [ icon
+            |> Icon.withSize Icon.Large
+            |> Icon.toHtml
+        ]
 
 
 monsterImage : Monster -> Html FrontendMsg
@@ -81,20 +87,6 @@ monsterImage kind =
         [ (Monster.getStats kind).icon
             |> Icon.withSize Icon.Large
             |> Icon.toHtml
-        ]
-
-
-activityTitle : String -> Html FrontendMsg
-activityTitle title =
-    h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
-        [ span [] [ text title ]
-        ]
-
-
-monsterTitle : Monster -> Html FrontendMsg
-monsterTitle kind =
-    h2 [ class "text-sm  md:text-lg text-center flex items-center gap-2" ]
-        [ span [] [ text (Monster.getStats kind).title ]
         ]
 
 
@@ -209,7 +201,8 @@ renderActivityCard activity game screenWidth =
     in
     div [ class "relative" ]
         [ div
-            [ class "card card-compact bg-base-100 shadow-xl cursor-pointer bubble-pop select-none h-[340px]"
+            [ Utils.card.container
+            , Utils.card.containerClickable
 
             -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
             , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
@@ -217,76 +210,73 @@ renderActivityCard activity game screenWidth =
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             [ -- preview image
-              div [ class "h-24 relative" ]
+              div [ Utils.card.imageContainer ]
                 [ activityImage activity
                 ]
-            , div [ class "relative card-body h-full" ]
-                [ div [ class "t-column gap-2 h-full justify-between w-full", Utils.zIndexes.cardBody ]
-                    [ div [ class "t-column" ]
-                        [ activityTitle (Activity.getStats activity).title
-                        , activityDuration duration
-                        ]
-                    , div [ class "t-column" ]
-                        ((case stats.teachesSpell of
-                            Nothing ->
-                                []
-
-                            Just spell ->
-                                [ SpellView.renderSpellEffects spell ]
-                         )
-                            ++ List.map
-                                (\taggedEffect ->
-                                    EffectView.render
-                                        { game = game
-                                        , mods = mods
-                                        , effect = taggedEffect
-                                        , renderType = EffectView.Card
-                                        }
-                                )
-                                orderedAndFilteredEffects
-                        )
-                    , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
-                        [ Utils.progressBar
-                            { progressText = Utils.intToString masteryLevel
-                            , percent = masteryPercent
-                            , primaryOrSecondary = Utils.Secondary
-                            , size = Utils.ProgressBarSmall
-                            }
-                        ]
+            , div [ Utils.card.body, Utils.zIndexes.cardBody ]
+                [ div [ class "t-column" ]
+                    [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
+                    , activityDuration duration
                     ]
+                , div [ class "t-column" ]
+                    ((case stats.teachesSpell of
+                        Nothing ->
+                            []
 
-                -- Activity title
-                -- ([ activityTitle activity
-                --  , activityDuration duration
-                --  ]
-                --     ++ (case stats.teachesSpell of
-                --             Nothing ->
-                --                 []
-                --             Just spell ->
-                --                 [ SpellView.renderSpellEffects spell ]
-                --        )
-                --     ++ List.map
-                --         (\taggedEffect ->
-                --             EffectView.render
-                --                 { game = game
-                --                 , mods = mods
-                --                 , effect = taggedEffect
-                --                 , renderType = EffectView.Card
-                --                 }
-                --         )
-                --         orderedAndFilteredEffects
-                --     ++ [ div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
-                --             [ Utils.xpBar
-                --                 { level = masteryLevel
-                --                 , percent = masteryPercent
-                --                 , primaryOrSecondary = Utils.Secondary
-                --                 , size = Utils.XpBarSmall
-                --                 }
-                --             ]
-                --        ]
-                -- )
+                        Just spell ->
+                            [ SpellView.renderSpellEffects spell ]
+                     )
+                        ++ List.map
+                            (\taggedEffect ->
+                                EffectView.render
+                                    { game = game
+                                    , mods = mods
+                                    , effect = taggedEffect
+                                    , renderType = EffectView.Card
+                                    }
+                            )
+                            orderedAndFilteredEffects
+                    )
+                , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
+                    [ Utils.progressBar
+                        { progressText = Utils.intToString masteryLevel
+                        , percent = masteryPercent
+                        , primaryOrSecondary = Utils.Secondary
+                        , size = Utils.ProgressBarSmall
+                        }
+                    ]
                 ]
 
+            -- Activity title
+            -- ([ activityTitle activity
+            --  , activityDuration duration
+            --  ]
+            --     ++ (case stats.teachesSpell of
+            --             Nothing ->
+            --                 []
+            --             Just spell ->
+            --                 [ SpellView.renderSpellEffects spell ]
+            --        )
+            --     ++ List.map
+            --         (\taggedEffect ->
+            --             EffectView.render
+            --                 { game = game
+            --                 , mods = mods
+            --                 , effect = taggedEffect
+            --                 , renderType = EffectView.Card
+            --                 }
+            --         )
+            --         orderedAndFilteredEffects
+            --     ++ [ div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
+            --             [ Utils.xpBar
+            --                 { level = masteryLevel
+            --                 , percent = masteryPercent
+            --                 , primaryOrSecondary = Utils.Secondary
+            --                 , size = Utils.XpBarSmall
+            --                 }
+            --             ]
+            --        ]
+            -- )
             -- Progress bar
             , case Maybe.map Timer.percentComplete maybeTimer of
                 Nothing ->
@@ -306,11 +296,11 @@ renderActivityCard activity game screenWidth =
 renderLockedActivity : Skill -> Int -> Html FrontendMsg
 renderLockedActivity unlockSkill unlockLevel =
     div
-        [ class "card card-compact bg-base-100 shadow-xl relative text-error cursor-pointer"
+        [ Utils.card.container
+        , class "text-error"
 
         -- Bring this back when we figure out how to solve the problem where the shake happens on every page render?
         -- , class "bubble-shake"
-        , class activityHeight
         ]
         -- Activity image
         [ figure []

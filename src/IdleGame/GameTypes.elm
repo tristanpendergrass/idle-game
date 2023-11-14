@@ -12,6 +12,7 @@ type Toast
     | GainedResource Int Resource
     | LostCombat
     | NegativeAmountErr
+    | QuestAlreadyCompleteErr
 
 
 type IntervalModLabel

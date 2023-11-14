@@ -15,15 +15,6 @@ import Types exposing (..)
 renderDrawer : Bool -> Mode -> Tab -> Html FrontendMsg
 renderDrawer isDrawerOpen mode activeTab =
     let
-        setActiveTab : Tab -> FrontendMsg
-        setActiveTab tab =
-            case mode of
-                Skilling ->
-                    SetActiveSkillTab tab
-
-                Adventuring ->
-                    SetActiveAdventuringTab tab
-
         underConstructionIcon =
             Icon.underConstruction
                 |> Icon.withSize Icon.Small
@@ -52,7 +43,7 @@ renderDrawer isDrawerOpen mode activeTab =
         renderForbiddenTab =
             span
                 [ class "flex gap-4 items-center"
-                , onClick <| setActiveTab Tab.ForbiddenKnowledge
+                , onClick <| HandleTabClick Tab.ForbiddenKnowledge mode
                 ]
                 [ span [ class "flex-none" ]
                     [ Icon.forbiddenKnowledge
@@ -100,19 +91,19 @@ renderDrawer isDrawerOpen mode activeTab =
         skillTabs : List (Html FrontendMsg)
         skillTabs =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [ onClick (SetActiveSkillTab Tab.Bag) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
-                , li [ onClick (SetActiveSkillTab Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                [ li [ onClick (HandleTabClick Tab.Bag Skilling) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Shop Skilling) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
-                , li [ onClick (SetActiveSkillTab Tab.Chores) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
-                , li [ onClick (SetActiveSkillTab Tab.Explore) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
-                , li [ onClick (SetActiveSkillTab Tab.Mischief) ] [ renderTab { tab = Tab.Mischief, underConstruction = True } ]
+                , li [ onClick (HandleTabClick Tab.Chores Skilling) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Explore Skilling) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
+                , li [ onClick (HandleTabClick Tab.Mischief Skilling) ] [ renderTab { tab = Tab.Mischief, underConstruction = True } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
-                , li [ onClick (SetActiveSkillTab Tab.Hexes) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Hexes Skilling) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]
@@ -132,8 +123,12 @@ renderDrawer isDrawerOpen mode activeTab =
         adventuringTabs : List (Html FrontendMsg)
         adventuringTabs =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [ onClick (SetActiveAdventuringTab Tab.Location1) ] [ renderTab { tab = Tab.Location1, underConstruction = False } ]
-                , li [ onClick (SetActiveAdventuringTab Tab.Location2) ] [ renderTab { tab = Tab.Location2, underConstruction = False } ]
+                [ li [ onClick (HandleTabClick Tab.QuestLog Adventuring) ] [ renderTab { tab = Tab.QuestLog, underConstruction = True } ]
+                ]
+            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ onClick (HandleTabClick Tab.Location1 Adventuring) ] [ renderTab { tab = Tab.Location1, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Location2 Adventuring) ] [ renderTab { tab = Tab.Location2, underConstruction = False } ]
                 ]
             ]
     in

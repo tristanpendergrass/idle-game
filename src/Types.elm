@@ -112,6 +112,7 @@ type FrontendMsg
     | HandlePlayClick Activity
     | HandleStopClick Activity
     | HandleSpellSelect Activity String
+    | HandleQuestComplete Quest
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
@@ -134,8 +135,7 @@ type FrontendMsg
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
     | OpenMasteryUnlocksModal
-    | SetActiveSkillTab Tab
-    | SetActiveAdventuringTab Tab
+    | HandleTabClick Tab Mode
     | HandleShopUpgradeClick ShopUpgrade
     | HandlePointerDown PointerState
     | HandlePointerUp

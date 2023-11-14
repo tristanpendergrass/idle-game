@@ -12,6 +12,7 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
@@ -19,6 +20,7 @@ import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
+import IdleGame.Views.Quest as QuestView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
@@ -37,6 +39,10 @@ render game location =
             monsters
                 |> List.map Activity.activityForMonster
                 |> List.map Game.ActivityListItem
+
+        quests : List Quest
+        quests =
+            Location.foundQuests location (Location.getByKind location game.locations)
     in
     div [ Utils.skills.wrapper ]
         [ renderLocationInfo game location
@@ -46,6 +52,9 @@ render game location =
                 , List.map
                     (ActivityView.renderActivityListItem game)
                     monsterListItems
+                , List.map
+                    (QuestView.renderQuest game)
+                    quests
                 ]
             )
         ]
@@ -83,13 +92,6 @@ paneClasses =
     , body = class "flex-grow"
     , footer = class "text-xs"
     }
-
-
-renderQuestsPane : Game -> Location -> Html FrontendMsg
-renderQuestsPane game location =
-    div [ paneClasses.pane ]
-        [ div [ paneClasses.title ] [ text "Quests" ]
-        ]
 
 
 renderResourcesPane : Game -> Location -> Html FrontendMsg
@@ -167,4 +169,34 @@ renderMonstersPane game location =
                 ]
             )
         , div [ paneClasses.footer ] [ text <| Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ++ " discovered" ]
+        ]
+
+
+renderQuestsPane : Game -> Location -> Html FrontendMsg
+renderQuestsPane game location =
+    let
+        locationState : Location.State
+        locationState =
+            Location.getByKind location game.locations
+
+        questsAtLocation : List Quest
+        questsAtLocation =
+            Location.questsAtLocation location
+
+        questsCount : Int
+        questsCount =
+            List.length questsAtLocation
+
+        foundQuests : List Quest
+        foundQuests =
+            Location.foundQuests location locationState
+
+        foundQuestsCount : Int
+        foundQuestsCount =
+            List.length foundQuests
+    in
+    div [ paneClasses.pane ]
+        [ div [ paneClasses.title ] [ text "Quests" ]
+        , button [ class "btn btn-sm btn-primary" ] [ text "Open quest log" ]
+        , div [ paneClasses.footer ] [ text <| Utils.intToString foundQuestsCount ++ "/" ++ Utils.intToString questsCount ++ " discovered" ]
         ]

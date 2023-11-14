@@ -16,6 +16,7 @@ import IdleGame.Views.Chores
 import IdleGame.Views.Hexes
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Location
+import IdleGame.Views.QuestLog
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
 import IdleGame.Views.Utils
@@ -53,8 +54,6 @@ renderContent game activeTab =
                     ]
                 ]
             ]
-
-        -- Chore XP and MXP
         , case activeTab of
             Tab.Bag ->
                 IdleGame.Views.Bag.render game

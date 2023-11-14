@@ -61,12 +61,16 @@ $ npm test -- --watch
   - [x] Create Location type and add dict to model tracking state of them all
   - [x] Visuals of Explore activity
   - [x] Chance to unlock monster
+- [x] Support Quests
+  - [x] They can be discovered by exploring
+  - [x] They require resources to complete and give rewards
 
 ## Future
 ### Bugs
 - [ ] Fix Monster fighting card vertical spacing being off
 - [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.
+- [ ] Potential bug: the purchasing of shop upgrades isn't done with an effect. And the view isn't set up with one either, so any future buff that e.g. decreases shop prices won't be priced in or applied.
 
 ### Tech stuff
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
@@ -96,6 +100,10 @@ $ npm test -- --watch
 - [ ] Skill 4
 #### Combat
 - [ ] Regen period after loss
+#### Quests
+- [ ] Multi-stage quests
+- [ ] Quests that require you to do some more exploring (find something lost)
+- [ ] Quests that require you to defeat a certain monster
 
 ### Glitz
 - [ ] Show coin next to shop in left nav

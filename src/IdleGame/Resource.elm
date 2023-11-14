@@ -301,3 +301,8 @@ toList resources =
                 in
                 ( resource, amount )
             )
+
+
+getLabel : Resource -> String
+getLabel resource =
+    (getStats resource).title

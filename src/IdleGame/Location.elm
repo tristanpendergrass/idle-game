@@ -6,6 +6,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -66,6 +67,7 @@ type alias Stats =
     { title : String
     , monsters : Monster.Record Bool
     , resources : Resource.Record Bool
+    , quests : Quest.Record Bool
     , exploreActivity : Activity
     }
 
@@ -93,17 +95,27 @@ allStats =
                     Resource.setByKind resource True accum
                 )
                 (Resource.createRecord False)
+
+        questsFromList : List Quest -> Quest.Record Bool
+        questsFromList =
+            List.foldl
+                (\quest accum ->
+                    Quest.setByKind quest True accum
+                )
+                (Quest.createRecord False)
     in
     { location1 =
         { title = "Location 1"
         , monsters = monstersFromList [ Monster1 ]
         , resources = resourcesFromList [ Parchment ]
+        , quests = questsFromList [ Quest1, Quest2 ]
         , exploreActivity = ExploreLocation1
         }
     , location2 =
         { title = "Location 2"
         , monsters = monstersFromList [ Monster2 ]
         , resources = resourcesFromList [ WashWater ]
+        , quests = questsFromList []
         , exploreActivity = ExploreLocation2
         }
     }
@@ -116,6 +128,7 @@ allStats =
 type alias State =
     { foundMonsters : Monster.Record Bool
     , foundResources : Resource.Record Bool
+    , foundQuests : Quest.Record Bool
     }
 
 
@@ -123,6 +136,7 @@ createState : State
 createState =
     { foundMonsters = Monster.createRecord False
     , foundResources = Resource.createRecord False
+    , foundQuests = Quest.createRecord False
     }
 
 
@@ -139,6 +153,14 @@ setResourceToFound resource state =
     { state
         | foundResources =
             Resource.setByKind resource True state.foundResources
+    }
+
+
+setQuestToFound : Quest -> State -> State
+setQuestToFound quest state =
+    { state
+        | foundQuests =
+            Quest.setByKind quest True state.foundQuests
     }
 
 
@@ -259,3 +281,58 @@ resourcesAtLocation : Location -> List Resource
 resourcesAtLocation location =
     Resource.allResources
         |> List.filter (\resource -> Resource.getByKind resource (getStats location).resources)
+
+
+findQuestGenerator : Location -> State -> Random.Generator State
+findQuestGenerator location state =
+    case findableQuests location state of
+        -- If there's at least one quest to find, pick one at random and set it to found
+        first :: rest ->
+            Random.uniform first rest
+                |> Random.map (\quest -> setQuestToFound quest state)
+
+        -- Otherwise, return the state unchanged
+        [] ->
+            Random.constant state
+
+
+findableQuests : Location -> State -> List Quest
+findableQuests location state =
+    Quest.allQuests
+        |> List.filter
+            (\quest ->
+                let
+                    isAtLocation : Bool
+                    isAtLocation =
+                        Quest.getByKind quest (getStats location).quests
+
+                    isFound : Bool
+                    isFound =
+                        Quest.getByKind quest state.foundQuests
+                in
+                isAtLocation && not isFound
+            )
+
+
+foundQuests : Location -> State -> List Quest
+foundQuests location state =
+    Quest.allQuests
+        |> List.filter
+            (\quest ->
+                let
+                    isAtLocation : Bool
+                    isAtLocation =
+                        Quest.getByKind quest (getStats location).quests
+
+                    isFound : Bool
+                    isFound =
+                        Quest.getByKind quest state.foundQuests
+                in
+                isAtLocation && isFound
+            )
+
+
+questsAtLocation : Location -> List Quest
+questsAtLocation location =
+    Quest.allQuests
+        |> List.filter (\quest -> Quest.getByKind quest (getStats location).quests)

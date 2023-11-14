@@ -81,6 +81,6 @@ getStats kind =
 
 allStats : Record Stats
 allStats =
-    { monster1 = { title = "Monster 1", icon = Icon.letter "M1" }
-    , monster2 = { title = "Monster 2", icon = Icon.letter "M2" }
+    { monster1 = { title = "Monster 1", icon = Icon.fromString "M1" }
+    , monster2 = { title = "Monster 2", icon = Icon.fromString "M2" }
     }

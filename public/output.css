@@ -1683,6 +1683,40 @@ html {
   --tw-backdrop-sepia:  ;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
 .alert {
   display: flex;
   width: 100%;
@@ -4168,10 +4202,6 @@ body[dir="rtl"] .checkbox:checked,
   z-index: 50;
 }
 
-.col-span-2 {
-  grid-column: span 2 / span 2;
-}
-
 .col-span-4 {
   grid-column: span 4 / span 4;
 }
@@ -4256,10 +4286,6 @@ body[dir="rtl"] .checkbox:checked,
   height: 340px;
 }
 
-.h-\[425px\] {
-  height: 425px;
-}
-
 .h-\[4rem\] {
   height: 4rem;
 }
@@ -4274,6 +4300,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .min-h-\[12rem\] {
   min-height: 12rem;
+}
+
+.min-h-\[6rem\] {
+  min-height: 6rem;
 }
 
 .w-12 {
@@ -4516,10 +4546,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .rounded {
   border-radius: 0.25rem;
-}
-
-.rounded-3xl {
-  border-radius: 1.5rem;
 }
 
 .rounded-full {
@@ -4996,6 +5022,13 @@ body[dir="rtl"] .checkbox:checked,
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.t-divider-tight {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
 html {
   height: 100%;
   width: 100%;
@@ -5152,10 +5185,6 @@ body {
 }
 
 @media (min-width: 768px) {
-  .md\:visible {
-    visibility: visible;
-  }
-
   .md\:block {
     display: block;
   }
@@ -5200,12 +5229,12 @@ body {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .lg\:gap-4 {
-    gap: 1rem;
-  }
-
   .lg\:gap-2 {
     gap: 0.5rem;
+  }
+
+  .lg\:gap-4 {
+    gap: 1rem;
   }
 
   .lg\:transition-none {
@@ -5220,10 +5249,6 @@ body {
 
   .xl\:hidden {
     display: none;
-  }
-
-  .xl\:h-\[405px\] {
-    height: 405px;
   }
 
   .xl\:h-auto {

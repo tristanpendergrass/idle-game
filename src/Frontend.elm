@@ -13,11 +13,13 @@ import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
@@ -42,6 +44,7 @@ import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
 import Quantity exposing (Quantity)
+import Random
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -636,6 +639,79 @@ update msg model =
             , Cmd.none
             )
 
+        HandleQuestComplete quest ->
+            -- case model.gameState of
+            --     Playing snapshot ->
+            --         let
+            --             game : Game
+            --             game =
+            --                 Snapshot.getValue snapshot
+            --             purchaseResult : Result EffectErr Game.ApplyEffectsValue
+            --             purchaseResult =
+            --                 Game.attemptPurchaseResource quantity resource game
+            --         in
+            --         case purchaseResult of
+            --             Ok res ->
+            --                 let
+            --                     newGame : Game
+            --                     newGame =
+            --                         res.game
+            --                     toasts : List Toast
+            --                     toasts =
+            --                         res.toasts
+            --                     newModel : FrontendModel
+            --                     newModel =
+            --                         { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+            --                             |> setActiveModal Nothing
+            --                     notificationCmds : List (Cmd FrontendMsg)
+            --                     notificationCmds =
+            --                         List.map (AddToast >> delay 0) toasts
+            --                 in
+            --                 ( newModel, Cmd.batch notificationCmds )
+            --             Err _ ->
+            --                 -- We disable the buy button in this case so shouldn't normally reach this spot
+            --                 noOp
+            --     _ ->
+            --         noOp
+            case model.gameState of
+                Playing snapshot ->
+                    let
+                        game : Game
+                        game =
+                            Snapshot.getValue snapshot
+
+                        result : Result EffectErr Game.ApplyEffectsValue
+                        result =
+                            Game.attemptCompleteQuest quest game
+                    in
+                    case result of
+                        Ok res ->
+                            let
+                                newGame : Game
+                                newGame =
+                                    res.game
+
+                                toasts : List Toast
+                                toasts =
+                                    res.toasts
+
+                                newModel : FrontendModel
+                                newModel =
+                                    { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
+
+                                notificationCmds : List (Cmd FrontendMsg)
+                                notificationCmds =
+                                    List.map (AddToast >> delay 0) toasts
+                            in
+                            ( newModel, Cmd.batch notificationCmds )
+
+                        Err _ ->
+                            -- We disable the quest complete button in this case so shouldn't normally reach this spot
+                            noOp
+
+                _ ->
+                    noOp
+
         SetDrawerOpen newValue ->
             ( model
                 |> setIsDrawerOpen newValue
@@ -755,16 +831,18 @@ update msg model =
             , Cmd.none
             )
 
-        SetActiveSkillTab tab ->
-            ( model
-                |> setTabSkilling tab
-                |> setIsDrawerOpen False
-            , Cmd.none
-            )
+        HandleTabClick tab mode ->
+            let
+                setTab =
+                    case mode of
+                        Skilling ->
+                            setTabSkilling
 
-        SetActiveAdventuringTab tab ->
+                        Adventuring ->
+                            setTabAdventuring
+            in
             ( model
-                |> setTabAdventuring tab
+                |> setTab tab
                 |> setIsDrawerOpen False
             , Cmd.none
             )
@@ -1116,6 +1194,10 @@ toastToHtml notification =
         NegativeAmountErr ->
             div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
+
+        QuestAlreadyCompleteErr ->
+            div [ baseClass, warningClass ]
+                [ text "Quest already complete" ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg

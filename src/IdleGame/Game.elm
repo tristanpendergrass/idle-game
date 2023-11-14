@@ -13,6 +13,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
@@ -37,6 +38,7 @@ type alias Game =
     , xp : Skill.Record Xp
     , mxp : Activity.Record Xp
     , locations : Location.Record Location.State
+    , quests : Quest.Record Quest.State
     , choresMxp : Xp
     , activitySkilling : Maybe ( Activity, Timer )
     , activityAdventuring : Maybe ( Activity, Timer )
@@ -63,6 +65,7 @@ createProd seed =
     , xp = xp
     , mxp = Activity.createRecord (Xp.int 0)
     , locations = Location.createRecord Location.createState
+    , quests = Quest.createRecord Quest.Incomplete
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
@@ -89,6 +92,7 @@ createDev seed =
     , xp = xp
     , mxp = Activity.createRecord (Xp.int 0)
     , locations = Location.createRecord Location.createState
+    , quests = Quest.createRecord Quest.Incomplete
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
@@ -393,6 +397,56 @@ attemptPurchaseResource amount resource game =
         result
 
 
+setQuestToComplete : Quest -> Game -> Game
+setQuestToComplete quest game =
+    { game | quests = Quest.setByKind quest Quest.Complete game.quests }
+
+
+attemptCompleteQuest : Quest -> Game -> Result EffectErr ApplyEffectsValue
+attemptCompleteQuest quest game =
+    let
+        questStats : Quest.Stats
+        questStats =
+            Quest.getStats quest
+
+        questState : Quest.State
+        questState =
+            Quest.getByKind quest game.quests
+
+        effectsToComplete : List Effect.TaggedEffect
+        effectsToComplete =
+            Quest.getCompletionEffects quest
+
+        effects : List Effect.TaggedEffect
+        effects =
+            List.concat
+                [ effectsToComplete
+                , questStats.reward
+                ]
+
+        gen : ApplyEffectsResultGenerator
+        gen =
+            applyEffects effects game
+
+        ( result, newSeed ) =
+            Random.step gen game.seed
+    in
+    if questState == Quest.Complete then
+        Err EffectErr.QuestAlreadyComplete
+
+    else
+        Result.map
+            (\applyEffectsResult ->
+                { applyEffectsResult
+                    | game =
+                        applyEffectsResult.game
+                            |> setSeed newSeed
+                            |> setQuestToComplete quest
+                }
+            )
+            result
+
+
 setSeed : Random.Seed -> Game -> Game
 setSeed seed game =
     { game | seed = seed }
@@ -432,6 +486,9 @@ getToastForErr err =
     case err of
         EffectErr.NegativeAmount ->
             NegativeAmountErr
+
+        EffectErr.QuestAlreadyComplete ->
+            QuestAlreadyCompleteErr
 
 
 type alias ApplyEffectsValue =
@@ -651,6 +708,7 @@ applyEffect effect game =
             in
             Location.findMonsterGenerator location locationState
                 |> Random.andThen (Location.findResourceGenerator location)
+                |> Random.andThen (Location.findQuestGenerator location)
                 |> Random.map
                     (\newLocationState ->
                         Ok

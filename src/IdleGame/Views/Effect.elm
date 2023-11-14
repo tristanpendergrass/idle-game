@@ -39,7 +39,7 @@ renderModdedEffect renderType game effect =
             renderCoin coin
 
         Effect.GainResource params ->
-            renderResource params
+            renderResource game params
 
         Effect.GainXp params ->
             renderXp params
@@ -95,21 +95,27 @@ renderCoin { base, multiplier } =
         ]
 
 
-renderResource : Effect.GainResourceParams -> Html msg
-renderResource { base, resource } =
+renderResource : Game -> Effect.GainResourceParams -> Html msg
+renderResource game { base, resource } =
     let
-        isNegative : Bool
-        isNegative =
+        owned : Int
+        owned =
+            Resource.getByKind resource game.resources
+
+        isNegativeAmount : Bool
+        isNegativeAmount =
             base < 0
+
+        icon : Html msg
+        icon =
+            (Resource.getStats resource).icon
+                |> Icon.toHtml
     in
     div [ class "flex items-center gap-1" ]
-        [ span [ classList [ ( "text-error", isNegative ) ] ]
-            [ base
-                |> Utils.intToString
-                |> text
-            ]
-        , (Resource.getStats resource).icon
-            |> Icon.toHtml
+        [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (Utils.intToString base) ]
+        , icon
+        , div [ classList [ ( "hidden", not isNegativeAmount || owned >= abs base ) ] ]
+            [ text <| "(Owned: " ++ Utils.intToString owned ++ ")" ]
         ]
 
 

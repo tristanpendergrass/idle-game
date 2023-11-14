@@ -18,6 +18,8 @@ type Tab
     | Potionmaking
     | Conjuration
     | Transmogrification
+      -- Adventuring
+    | QuestLog
       -- Locations
     | Location1
     | Location2
@@ -95,6 +97,11 @@ getConfig tab =
         Transmogrification ->
             { title = "Transmogrification"
             , icon = Icon.transmogrification
+            }
+
+        QuestLog ->
+            { title = "Quest Log"
+            , icon = Icon.questLog
             }
 
         Location1 ->

@@ -144,8 +144,8 @@ toHtml icon =
 -- Icon creators
 
 
-letter : String -> Icon
-letter str =
+fromString : String -> Icon
+fromString str =
     IconString str defaultParams
 
 
@@ -412,3 +412,13 @@ undiscoveredItem =
 undiscoveredMonster : Icon
 undiscoveredMonster =
     createIconFeather FeatherIcons.helpCircle
+
+
+undiscoveredQuest : Icon
+undiscoveredQuest =
+    createIconFeather FeatherIcons.helpCircle
+
+
+questLog : Icon
+questLog =
+    createIconFeather FeatherIcons.trello

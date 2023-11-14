@@ -93,3 +93,10 @@ type
     | Keyring
     | ReadingGlasses
     | OversizedBag
+
+
+type
+    Quest
+    -- Don't forget to update IdleGame.Quest! Record + allQuests
+    = Quest1
+    | Quest2
