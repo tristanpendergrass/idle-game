@@ -23,8 +23,8 @@ import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-renderContent : Game -> Tab -> Html FrontendMsg
-renderContent game activeTab =
+renderContent : FrontendModel -> Game -> Tab -> Html FrontendMsg
+renderContent model game activeTab =
     let
         { title, icon } =
             Tab.getConfig activeTab
@@ -68,10 +68,10 @@ renderContent game activeTab =
                 IdleGame.Views.Shop.render game
 
             Tab.Location1 ->
-                IdleGame.Views.Location.render game Location1
+                IdleGame.Views.Location.render model game Location1
 
             Tab.Location2 ->
-                IdleGame.Views.Location.render game Location2
+                IdleGame.Views.Location.render model game Location2
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

@@ -27,8 +27,8 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-render : Game -> Location -> Html FrontendMsg
-render game location =
+render : FrontendModel -> Game -> Location -> Html FrontendMsg
+render model game location =
     let
         monsters : List Monster
         monsters =
@@ -43,19 +43,44 @@ render game location =
         quests : List Quest
         quests =
             Location.foundQuests location (Location.getByKind location game.locations)
+
+        locationFilter : LocationFilter
+        locationFilter =
+            Location.getByKind location model.locationFilters
+
+        exploreItem : Html FrontendMsg
+        exploreItem =
+            ActivityView.renderActivityListItem game (Game.ActivityListItem (Location.getStats location).exploreActivity)
+
+        monsterItems : List (Html FrontendMsg)
+        monsterItems =
+            List.map
+                (ActivityView.renderActivityListItem game)
+                monsterListItems
+
+        questItems : List (Html FrontendMsg)
+        questItems =
+            List.map
+                (QuestView.renderQuest game)
+                quests
     in
     div [ Utils.skills.wrapper ]
         [ renderLocationInfo game location
+        , renderLocationFilters locationFilter location
         , div [ Utils.skills.grid ]
-            (List.concat
-                [ [ ActivityView.renderActivityListItem game (Game.ActivityListItem (Location.getStats location).exploreActivity) ]
-                , List.map
-                    (ActivityView.renderActivityListItem game)
-                    monsterListItems
-                , List.map
-                    (QuestView.renderQuest game)
-                    quests
-                ]
+            (case locationFilter of
+                LocationAll ->
+                    List.concat
+                        [ [ exploreItem ]
+                        , monsterItems
+                        , questItems
+                        ]
+
+                LocationMonsters ->
+                    monsterItems
+
+                LocationQuests ->
+                    questItems
             )
         ]
 
@@ -199,4 +224,27 @@ renderQuestsPane game location =
         [ div [ paneClasses.title ] [ text "Quests" ]
         , button [ class "btn btn-sm btn-primary" ] [ text "Open quest log" ]
         , div [ paneClasses.footer ] [ text <| Utils.intToString foundQuestsCount ++ "/" ++ Utils.intToString questsCount ++ " discovered" ]
+        ]
+
+
+renderLocationFilters : LocationFilter -> Location -> Html FrontendMsg
+renderLocationFilters filterState location =
+    let
+        filterButtonClasses : Attribute FrontendMsg
+        filterButtonClasses =
+            class "btn btn-sm rounded-3xl"
+    in
+    div [ class "w-full flex items-center gap-1" ]
+        [ button
+            [ filterButtonClasses
+            , classList [ ( "btn-primary", filterState == LocationMonsters ) ]
+            , onClick (HandleLocationFilterClick location LocationMonsters)
+            ]
+            [ text "Monsters" ]
+        , button
+            [ filterButtonClasses
+            , classList [ ( "btn-primary", filterState == LocationQuests ) ]
+            , onClick (HandleLocationFilterClick location LocationQuests)
+            ]
+            [ text "Quests" ]
         ]

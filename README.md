@@ -38,8 +38,10 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
+- [ ] Come up with a formula for "Completion" of location and use it in Location panel
+- [x] Add filters for Location activities
 - [ ] Fix status bar extending over the sidebar at medium screen widths
-- [ ] Skill: Enchantment
+- [ ] Skill 3
 - [ ] Support spell selector on Chores and Hex studying
   - [ ] Design system for what spells can be assigned on what activities
   - [ ] Enable spell selector for Chores/Hexes/Exploring/Enchantment

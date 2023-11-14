@@ -18,6 +18,7 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
@@ -92,6 +93,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
+      , locationFilters = Location.createRecord LocationAll
       }
     , Cmd.none
     )
@@ -412,6 +414,11 @@ updatePointer delta model =
                           }
                         , Cmd.none
                         )
+
+
+updateLocationFilters : (Location.Record LocationFilter -> Location.Record LocationFilter) -> FrontendModel -> FrontendModel
+updateLocationFilters fn model =
+    { model | locationFilters = fn model.locationFilters }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -1055,6 +1062,21 @@ update msg model =
                 _ ->
                     noOp
 
+        HandleLocationFilterClick location filter ->
+            let
+                updateFilter : LocationFilter -> LocationFilter
+                updateFilter oldFilter =
+                    if oldFilter == filter then
+                        LocationAll
+
+                    else
+                        filter
+            in
+            ( model
+                |> updateLocationFilters (Location.updateByKind location updateFilter)
+            , Cmd.none
+            )
+
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
@@ -1359,7 +1381,7 @@ view model =
                             , onCheck SetDrawerOpen
                             ]
                             []
-                        , IdleGame.Views.Content.renderContent game activeTab
+                        , IdleGame.Views.Content.renderContent model game activeTab
                         , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.mode activeTab
                         ]
 

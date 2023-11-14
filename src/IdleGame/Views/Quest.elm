@@ -41,11 +41,12 @@ renderIcon icon =
         ]
 
 
-completeButton : Quest -> Html FrontendMsg
-completeButton quest =
+completeButton : Quest -> Bool -> Html FrontendMsg
+completeButton quest canComplete =
     button
         [ class "btn btn-sm btn-primary"
         , onClick (HandleQuestComplete quest)
+        , disabled (not canComplete)
         ]
         [ text "Complete" ]
 
@@ -56,6 +57,15 @@ renderQuest game quest =
         state : Quest.State
         state =
             Quest.getByKind quest game.quests
+
+        canComplete : Bool
+        canComplete =
+            case Game.attemptCompleteQuest quest game of
+                Err _ ->
+                    False
+
+                Ok _ ->
+                    True
     in
     div [ Utils.card.container ]
         [ div [ Utils.card.imageContainer ]
@@ -75,7 +85,7 @@ renderQuest game quest =
                     Quest.Complete ->
                         [ div [ class "text-sm text-success" ] [ text "Completed" ] ]
                 , [ div [ classList [ ( "hidden", state == Quest.Complete ) ] ]
-                        [ completeButton quest ]
+                        [ completeButton quest canComplete ]
                   ]
                 ]
             )

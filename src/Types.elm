@@ -9,6 +9,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Spell as Spell
@@ -69,6 +70,12 @@ type alias ModeState =
     }
 
 
+type LocationFilter
+    = LocationAll
+    | LocationMonsters
+    | LocationQuests
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
     , showDebugPanel : Bool
@@ -82,6 +89,7 @@ type alias FrontendModel =
     , saveGameTimer : Timer
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
+    , locationFilters : Location.Record LocationFilter
     }
 
 
@@ -140,6 +148,7 @@ type FrontendMsg
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel
+    | HandleLocationFilterClick Location LocationFilter
 
 
 type ToBackend
