@@ -38,7 +38,6 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
-- [ ] Come up with a formula for "Completion" of location and use it in Location panel
 - [ ] Skill 3
 - [ ] Support spell selector on Chores and Hex studying
   - [ ] Design system for what spells can be assigned on what activities
@@ -54,6 +53,7 @@ $ npm test -- --watch
 - [x] Add Quests to locations
 - [x] Add filters for Location activities
 - [x] Show discoveries of the four kinds of things (resources, monsters, quests, characters) in locations
+- [x] Calculate and display "completion" of locations
 ### Other
 - [x] Shop Improvements
 - [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.

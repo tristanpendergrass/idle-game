@@ -12,6 +12,7 @@ import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
 import Random
 
 
@@ -400,3 +401,21 @@ questsAtLocation : Location -> List Quest
 questsAtLocation location =
     Quest.allQuests
         |> List.filter (\quest -> Quest.getByKind quest (getStats location).quests)
+
+
+getCompletion : Location -> State -> Percent
+getCompletion location state =
+    let
+        numerator : Int
+        numerator =
+            List.length (foundMonsters location state)
+                + List.length (foundResources location state)
+                + List.length (foundQuests location state)
+
+        denominator : Int
+        denominator =
+            List.length (monstersAtLocation location)
+                + List.length (resourcesAtLocation location)
+                + List.length (questsAtLocation location)
+    in
+    Percent.float (toFloat numerator / toFloat denominator)

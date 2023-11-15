@@ -92,12 +92,22 @@ locationGridItemClasses =
 
 renderLocationInfo : Game -> Location -> Html FrontendMsg
 renderLocationInfo game location =
+    let
+        percent : Percent
+        percent =
+            Location.getCompletion location (Location.getByKind location game.locations)
+    in
     div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-primary" ]
         [ div [ class "t-column" ]
             [ div [ class "w-full flex items-center justify-between" ]
                 [ div [ class "text-2xs font-bold" ] [ text "Completion" ]
                 ]
-            , Utils.progressBar { progressText = "15%", percent = Percent.float 0.15, primaryOrSecondary = Utils.Primary, size = Utils.ProgressBarLarge }
+            , Utils.progressBar
+                { progressText = Utils.floatToString 0 (Percent.toPercentage percent) ++ "%"
+                , percent = percent
+                , primaryOrSecondary = Utils.Primary
+                , size = Utils.ProgressBarLarge
+                }
             , div [ class "w-full md:hidden grid grid-cols-4 gap-1" ]
                 -- TODO: mobile view
                 []
@@ -232,7 +242,7 @@ renderLocationFilters filterState location =
     let
         filterButtonClasses : Attribute FrontendMsg
         filterButtonClasses =
-            class "btn btn-sm rounded-3xl"
+            class "btn btn-sm rounded-3xl focus:bg-neutral"
     in
     div [ class "w-full flex items-center gap-1" ]
         [ button
