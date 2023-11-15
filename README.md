@@ -46,6 +46,7 @@ $ npm test -- --watch
 - [ ] Update TimePasses
   - [ ] Show XP from all skills not just chores
   - [ ] Show new discoveries in locations
+- [ ] Show the resources you'll gather on Explore action
 ### Locations
 - [x] Convert combat tabs to "Location" tabs
 - [x] Add Exploration activity to locations
