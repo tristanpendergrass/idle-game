@@ -39,36 +39,32 @@ $ npm test -- --watch
 
 ## Version 0.3
 - [ ] Come up with a formula for "Completion" of location and use it in Location panel
-- [x] Add filters for Location activities
-- [ ] Fix status bar extending over the sidebar at medium screen widths
 - [ ] Skill 3
 - [ ] Support spell selector on Chores and Hex studying
   - [ ] Design system for what spells can be assigned on what activities
   - [ ] Enable spell selector for Chores/Hexes/Exploring/Enchantment
-- [x] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
-- [x] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
-- [x] Shop Improvements
-  - [x] Show price on buy modal
-  - [x] Show cost on the Buy button
-  - [x] Add buttons to change quantity -- Min, Max, Half?
-  - [x] Close modal when item purchased
-  - [x] Show toast when item purchased
-  - [x] Handle case where not enough coin to purchase set quantity
-- [ ] Fix TimePasses to show xp gains in skills besides chores
-- [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
 - [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
+- [ ] Update TimePasses
+  - [ ] Show XP from all skills not just chores
+  - [ ] Show new discoveries in locations
+### Locations
+- [x] Convert combat tabs to "Location" tabs
 - [x] Add Exploration activity to locations
-  - [x] Design Location data shape
-  - [x] Add ExploreLocation Effect variant
-  - [x] Create Location type and add dict to model tracking state of them all
-  - [x] Visuals of Explore activity
-  - [x] Chance to unlock monster
-- [x] Support Quests
-  - [x] They can be discovered by exploring
-  - [x] They require resources to complete and give rewards
+- [x] Add Resources to locations
+- [x] Add Quests to locations
+- [x] Add filters for Location activities
+- [x] Show discoveries of the four kinds of things (resources, monsters, quests, characters) in locations
+### Other
+- [x] Shop Improvements
+- [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
+### Tech debt
+- [x] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
+- [x] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
+
 
 ## Future
 ### Bugs
+- [ ] Fix status bar extending over the sidebar at medium screen widths
 - [ ] Fix Monster fighting card vertical spacing being off
 - [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.

@@ -84,3 +84,12 @@ allStats =
     { monster1 = { title = "Monster 1", icon = Icon.fromString "M1" }
     , monster2 = { title = "Monster 2", icon = Icon.fromString "M2" }
     }
+
+
+
+-- Utils
+
+
+getLabel : Monster -> String
+getLabel monster =
+    (getStats monster).title

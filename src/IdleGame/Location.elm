@@ -3,6 +3,7 @@ module IdleGame.Location exposing (..)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
@@ -173,17 +174,46 @@ getLabel kind =
     (getStats kind).title
 
 
-findMonsterGenerator : Location -> State -> Random.Generator State
-findMonsterGenerator location state =
-    case findableMonsters location state of
+type alias ExploreResult =
+    { state : State
+    , effects : List Effect.TaggedEffect
+    , toasts : List Toast
+    }
+
+
+explorationGenerator : Location -> State -> Random.Generator ExploreResult
+explorationGenerator location state =
+    let
+        initialResult : ExploreResult
+        initialResult =
+            { state = state
+            , effects = []
+            , toasts = []
+            }
+    in
+    findMonsterGenerator location initialResult
+        |> Random.andThen (findResourceGenerator location)
+        |> Random.andThen (gatherResourceGenerator location)
+        |> Random.andThen (findQuestGenerator location)
+
+
+findMonsterGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
+findMonsterGenerator location result =
+    case findableMonsters location result.state of
         -- If there's at least one monster to find, pick one at random and set it to found
         first :: rest ->
             Random.uniform first rest
-                |> Random.map (\monster -> setMonsterToFound monster state)
+                |> Random.map
+                    (\monster ->
+                        { state = setMonsterToFound monster result.state
+                        , effects = List.concat [ result.effects, [] ]
+                        , toasts = List.concat [ result.toasts, [ DiscoveredMonster monster ] ]
+                        }
+                    )
 
         -- Otherwise, return the state unchanged
         [] ->
-            Random.constant state
+            Random.constant result
 
 
 findableMonsters : Location -> State -> List Monster
@@ -228,17 +258,45 @@ monstersAtLocation location =
         |> List.filter (\monster -> Monster.getByKind monster (getStats location).monsters)
 
 
-findResourceGenerator : Location -> State -> Random.Generator State
-findResourceGenerator location state =
-    case findableResources location state of
+findResourceGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
+findResourceGenerator location result =
+    case findableResources location result.state of
         -- If there's at least one resource to find, pick one at random and set it to found
         first :: rest ->
             Random.uniform first rest
-                |> Random.map (\resource -> setResourceToFound resource state)
+                |> Random.map
+                    (\resource ->
+                        { state = setResourceToFound resource result.state
+                        , effects = List.concat [ result.effects, [ Effect.gainResource 1 resource ] ]
+                        , toasts = List.concat [ result.toasts, [ DiscoveredResource resource ] ]
+                        }
+                    )
 
         -- Otherwise, return the state unchanged
         [] ->
-            Random.constant state
+            Random.constant result
+
+
+gatherResourceGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
+gatherResourceGenerator location result =
+    case foundResources location result.state of
+        first :: rest ->
+            Random.uniform first rest
+                |> Random.map
+                    (\resource ->
+                        let
+                            amount : Int
+                            amount =
+                                1
+                        in
+                        { state = result.state
+                        , effects = List.concat [ result.effects, [ Effect.gainResource amount resource ] ]
+                        , toasts = List.concat [ result.toasts, [] ]
+                        }
+                    )
+
+        [] ->
+            Random.constant result
 
 
 findableResources : Location -> State -> List Resource
@@ -283,17 +341,23 @@ resourcesAtLocation location =
         |> List.filter (\resource -> Resource.getByKind resource (getStats location).resources)
 
 
-findQuestGenerator : Location -> State -> Random.Generator State
-findQuestGenerator location state =
-    case findableQuests location state of
+findQuestGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
+findQuestGenerator location result =
+    case findableQuests location result.state of
         -- If there's at least one quest to find, pick one at random and set it to found
         first :: rest ->
             Random.uniform first rest
-                |> Random.map (\quest -> setQuestToFound quest state)
+                |> Random.map
+                    (\quest ->
+                        { state = setQuestToFound quest result.state
+                        , effects = List.concat [ result.effects, [] ]
+                        , toasts = List.concat [ result.toasts, [ DiscoveredQuest quest ] ]
+                        }
+                    )
 
         -- Otherwise, return the state unchanged
         [] ->
-            Random.constant state
+            Random.constant result
 
 
 findableQuests : Location -> State -> List Quest

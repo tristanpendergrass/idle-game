@@ -1221,6 +1221,21 @@ toastToHtml notification =
             div [ baseClass, warningClass ]
                 [ text "Quest already complete" ]
 
+        DiscoveredMonster monster ->
+            div [ baseClass, successClass ]
+                [ text <| "Discovered Monster: " ++ Monster.getLabel monster ]
+
+        DiscoveredResource resource ->
+            div [ baseClass, successClass, class "flex gap-1 items-center" ]
+                [ span [] [ text <| "Discovered Resource: " ++ (Resource.getStats resource).title ]
+                , (Resource.getStats resource).icon
+                    |> Icon.toHtml
+                ]
+
+        DiscoveredQuest quest ->
+            div [ baseClass, successClass ]
+                [ text <| "Discovered Quest: " ++ Quest.getLabel quest ]
+
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg
 renderModal activeModal game =

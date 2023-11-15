@@ -701,22 +701,38 @@ applyEffect effect game =
                 |> Random.map Ok
 
         Effect.Explore { location } ->
+            -- let
+            --     locationState : Location.State
+            --     locationState =
+            --         Location.getByKind location game.locations
+            -- in
+            -- Location.findMonsterGenerator location locationState
+            --     |> Random.andThen (Location.findResourceGenerator location)
+            --     |> Random.andThen (Location.findQuestGenerator location)
+            --     |> Random.map
+            --         (\newLocationState ->
+            --             Ok
+            --                 { game =
+            --                     game
+            --                         |> updateLocations (Location.setByKind location newLocationState)
+            --                 , toasts = []
+            --                 , additionalEffects = []
+            --                 }
+            -- )
             let
                 locationState : Location.State
                 locationState =
                     Location.getByKind location game.locations
             in
-            Location.findMonsterGenerator location locationState
-                |> Random.andThen (Location.findResourceGenerator location)
-                |> Random.andThen (Location.findQuestGenerator location)
+            Location.explorationGenerator location locationState
                 |> Random.map
-                    (\newLocationState ->
+                    (\{ state, effects, toasts } ->
                         Ok
                             { game =
                                 game
-                                    |> updateLocations (Location.setByKind location newLocationState)
-                            , toasts = []
-                            , additionalEffects = []
+                                    |> updateLocations (Location.setByKind location state)
+                            , toasts = toasts
+                            , additionalEffects = effects
                             }
                     )
 

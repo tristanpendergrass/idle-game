@@ -13,6 +13,9 @@ type Toast
     | LostCombat
     | NegativeAmountErr
     | QuestAlreadyCompleteErr
+    | DiscoveredMonster Monster
+    | DiscoveredQuest Quest
+    | DiscoveredResource Resource
 
 
 type IntervalModLabel
