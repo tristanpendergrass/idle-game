@@ -5,9 +5,12 @@ This module gets imported everywhere, so it's not allowed to import _anything_ t
 -}
 
 
-type Skill
+type
+    Skill
+    -- Don't forget to update IdleGame.Skill! Record
     = Chores
     | Hexes
+    | Weathermancing
 
 
 type
@@ -55,11 +58,14 @@ type
     | FightMonster4
     | FightMonster5
     | FightMonster6
+      -- Weathermancing
+    | StudyWeather1
 
 
 type
     Spell
     -- Don't forget to update IdleGame.Spell! Record + allSpells
+    -- Hexes
     = Hex1
     | Hex2
     | Hex3
@@ -69,6 +75,8 @@ type
     | Curse1
     | Curse2
     | Curse3
+      -- Weathermancing
+    | Weather1
 
 
 type

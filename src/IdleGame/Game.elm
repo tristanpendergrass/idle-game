@@ -59,6 +59,7 @@ createProd seed =
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
+            , weathermancing = Xp.int 0
             }
     in
     { seed = seed
@@ -86,6 +87,7 @@ createDev seed =
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
+            , weathermancing = Xp.int 0
             }
     in
     { seed = seed
@@ -745,6 +747,9 @@ addXp skill amount game =
 
         Hexes ->
             { game | xp = Skill.updateByKind Hexes (Quantity.plus amount) game.xp }
+
+        Weathermancing ->
+            { game | xp = Skill.updateByKind Weathermancing (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game

@@ -20,6 +20,7 @@ import IdleGame.Views.QuestLog
 import IdleGame.Views.Shop
 import IdleGame.Views.UnderConstruction
 import IdleGame.Views.Utils
+import IdleGame.Views.Weathermancing
 import Types exposing (..)
 
 
@@ -63,6 +64,9 @@ renderContent model game activeTab =
 
             Tab.Hexes ->
                 IdleGame.Views.Hexes.render game
+
+            Tab.Weathermancing ->
+                IdleGame.Views.Weathermancing.render game
 
             Tab.Shop ->
                 IdleGame.Views.Shop.render game

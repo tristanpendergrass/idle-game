@@ -1,7 +1,7 @@
 module IdleGame.Spell exposing (..)
 
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Event
+import IdleGame.Mod as Mod
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import List.Extra
 
@@ -17,6 +17,7 @@ allSpells =
     , Hex3
     , Jinx3
     , Curse3
+    , Weather1
     ]
 
 
@@ -30,6 +31,7 @@ type alias Record a =
     , curse1 : a
     , curse2 : a
     , curse3 : a
+    , weather1 : a
     }
 
 
@@ -63,6 +65,9 @@ getBySpell kind data =
         Curse3 ->
             data.curse3
 
+        Weather1 ->
+            data.weather1
+
 
 setBySpell : Spell -> a -> Record a -> Record a
 setBySpell kind value data =
@@ -94,6 +99,9 @@ setBySpell kind value data =
         Curse3 ->
             { data | curse3 = value }
 
+        Weather1 ->
+            { data | weather1 = value }
+
 
 updateBySpell : Spell -> (a -> a) -> Record a -> Record a
 updateBySpell kind update data =
@@ -110,11 +118,22 @@ getByTitle title =
     List.Extra.find (\kind -> (getStats kind).title == title) allSpells
 
 
+
+-- Stats
+
+
 type alias Stats =
     { title : String
     , icon : Icon
-    , mods : List Event.Mod -- When this spell is selected these mods are in effect
+    , mods : List Mod.Mod -- When this spell is selected these mods are in effect
+    , includedActivities : List InclusionCriteria -- Which activites this spell can be selected for
     }
+
+
+type InclusionCriteria
+    = IfActivity Activity
+    | IfSkill Skill
+    | IfCombat
 
 
 allStats : Record Stats
@@ -122,46 +141,61 @@ allStats =
     { hex1 =
         { title = "Hex I"
         , icon = Icon.fromString "Hx1"
-        , mods = [ Event.powerBuff 5 ]
+        , mods = [ Mod.powerBuff 5 ]
+        , includedActivities = [ IfCombat ]
         }
     , jinx1 =
         { title = "Jinx I"
         , icon = Icon.fromString "Jx1"
-        , mods = [ Event.powerBuff 10 ]
+        , mods = [ Mod.powerBuff 10 ]
+        , includedActivities = [ IfCombat ]
         }
     , curse1 =
         { title = "Curse I"
         , icon = Icon.fromString "Cs1"
-        , mods = [ Event.powerBuff 15 ]
+        , mods = [ Mod.powerBuff 15 ]
+        , includedActivities = [ IfCombat ]
         }
     , hex2 =
         { title = "Hex II"
         , icon = Icon.fromString "Hx2"
-        , mods = [ Event.powerBuff 20 ]
+        , mods = [ Mod.powerBuff 20 ]
+        , includedActivities = [ IfCombat ]
         }
     , jinx2 =
         { title = "Jinx II"
         , icon = Icon.fromString "Jx2"
-        , mods = [ Event.powerBuff 25 ]
+        , mods = [ Mod.powerBuff 25 ]
+        , includedActivities = [ IfCombat ]
         }
     , curse2 =
         { title = "Curse II"
         , icon = Icon.fromString "Cs2"
-        , mods = [ Event.powerBuff 30 ]
+        , mods = [ Mod.powerBuff 30 ]
+        , includedActivities = [ IfCombat ]
         }
     , hex3 =
         { title = "Hex III"
         , icon = Icon.fromString "Hx3"
-        , mods = [ Event.powerBuff 35 ]
+        , mods = [ Mod.powerBuff 35 ]
+        , includedActivities = [ IfCombat ]
         }
     , jinx3 =
         { title = "Jinx III"
         , icon = Icon.fromString "Jx3"
-        , mods = [ Event.powerBuff 40 ]
+        , mods = [ Mod.powerBuff 40 ]
+        , includedActivities = [ IfCombat ]
         }
     , curse3 =
         { title = "Curse III"
         , icon = Icon.fromString "Cs3"
-        , mods = [ Event.powerBuff 45 ]
+        , mods = [ Mod.powerBuff 45 ]
+        , includedActivities = [ IfCombat ]
+        }
+    , weather1 =
+        { title = "Weather I"
+        , icon = Icon.fromString "Wt1"
+        , mods = []
+        , includedActivities = [ IfSkill Chores ]
         }
     }

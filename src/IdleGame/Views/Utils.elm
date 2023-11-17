@@ -42,12 +42,17 @@ floatToString decimals =
 
 skillXpBadge : Skill -> Html msg
 skillXpBadge skill =
-    div [ class "badge badge-primary badge-xs col-span-8" ] [ text <| Skill.getLabel skill ++ " XP" ]
+    div [ class "badge badge-primary badge-sm col-span-8 flex items-center gap-2" ]
+        [ Skill.getIcon skill
+            |> Icon.withSize Icon.Small
+            |> Icon.toHtml
+        , text "Skill XP"
+        ]
 
 
 masteryXpBadge : Html msg
 masteryXpBadge =
-    div [ class "badge badge-secondary badge-xs col-span-8" ] [ text "Mastery XP" ]
+    div [ class "badge badge-secondary badge-sm col-span-8" ] [ text "Mastery XP" ]
 
 
 zIndexes =

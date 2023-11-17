@@ -78,6 +78,7 @@ $ npm test -- --watch
 - [ ] Find a way to unit test performance of tick
 - [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
 - [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
+- [ ] Refactor most things that configure Mod to instead configure Mod or IntervalMod. In fact make a union type called Mod that has both, only in a few places do we need to specify one or the other. Or just combine into one type and do nothing for Effects if its an interval mod?
 
 ### Fundamentals
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.

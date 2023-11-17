@@ -104,6 +104,7 @@ renderDrawer isDrawerOpen mode activeTab =
                 [ li [] []
                 , li [ class "menu-title" ] [ span [] [ text "Classes" ] ]
                 , li [ onClick (HandleTabClick Tab.Hexes Skilling) ] [ renderTab { tab = Tab.Hexes, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Weathermancing Skilling) ] [ renderTab { tab = Tab.Weathermancing, underConstruction = False } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Wards, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Enchantment, underConstruction = True } ]
                 , li [ class "disabled" ] [ renderTab { tab = Tab.Botany, underConstruction = True } ]

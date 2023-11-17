@@ -301,11 +301,18 @@ masterySection mxp mastery =
 
                     else
                         ""
+
+                checkIcon : Icon
+                checkIcon =
+                    if isAchieved then
+                        Icon.checkboxMarked
+
+                    else
+                        Icon.checkboxEmpty
             in
             div [ class "flex justify-between w-full" ]
                 [ span [ class "flex items-center gap-4" ]
-                    [ Icon.checkmark
-                        |> Icon.withVisibility isAchieved
+                    [ checkIcon
                         |> Icon.withSize Icon.Medium
                         |> Icon.toHtml
                     , span [] [ text (Utils.intToString level) ]

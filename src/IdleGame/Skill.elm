@@ -1,11 +1,13 @@
 module IdleGame.Skill exposing (..)
 
 import IdleGame.Kinds exposing (..)
+import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
 type alias Record a =
     { chores : a
     , hexes : a
+    , weathermancing : a
     }
 
 
@@ -18,6 +20,9 @@ getByKind kind data =
         Hexes ->
             data.hexes
 
+        Weathermancing ->
+            data.weathermancing
+
 
 setByKind : Skill -> a -> Record a -> Record a
 setByKind kind value data =
@@ -27,6 +32,9 @@ setByKind kind value data =
 
         Hexes ->
             { data | hexes = value }
+
+        Weathermancing ->
+            { data | weathermancing = value }
 
 
 updateByKind : Skill -> (a -> a) -> Record a -> Record a
@@ -42,3 +50,19 @@ getLabel kind =
 
         Hexes ->
             "Hexes"
+
+        Weathermancing ->
+            "Weathermancing"
+
+
+getIcon : Skill -> Icon
+getIcon kind =
+    case kind of
+        Chores ->
+            Icon.chores
+
+        Hexes ->
+            Icon.hexes
+
+        Weathermancing ->
+            Icon.weathermancing

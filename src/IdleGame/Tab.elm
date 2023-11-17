@@ -12,6 +12,7 @@ type Tab
     | Mischief
       -- Classes
     | Hexes
+    | Weathermancing
     | Wards
     | Enchantment
     | Botany
@@ -67,6 +68,11 @@ getConfig tab =
         Hexes ->
             { title = "Hexes"
             , icon = Icon.hexes
+            }
+
+        Weathermancing ->
+            { title = "Weathermancing"
+            , icon = Icon.weathermancing
             }
 
         Wards ->

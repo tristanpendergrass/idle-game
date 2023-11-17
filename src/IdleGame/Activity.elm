@@ -47,6 +47,11 @@ allHexes =
     allActivitiesBySkill Hexes
 
 
+allWeathermancing : List Activity
+allWeathermancing =
+    allActivitiesBySkill Weathermancing
+
+
 getActivities : Skill -> List Activity
 getActivities skill =
     case skill of
@@ -55,6 +60,9 @@ getActivities skill =
 
         Hexes ->
             allHexes
+
+        Weathermancing ->
+            allWeathermancing
 
 
 allActivities : List Activity
@@ -77,6 +85,7 @@ allActivities =
     , StudyHex3
     , StudyJinx3
     , StudyCurse3
+    , StudyWeather1
     , ExploreLocation1
     , ExploreLocation2
     , FightMonster1
@@ -107,6 +116,7 @@ type alias Record a =
     , hex3 : a
     , jinx3 : a
     , curse3 : a
+    , studyWeather1 : a
     , exploreLocation1 : a
     , exploreLocation2 : a
     , fightMonster1 : a
@@ -138,6 +148,7 @@ createRecord d =
     , hex3 = d
     , jinx3 = d
     , curse3 = d
+    , studyWeather1 = d
     , exploreLocation1 = d
     , exploreLocation2 = d
     , fightMonster1 = d
@@ -205,6 +216,9 @@ getByKind kind record =
 
         StudyCurse3 ->
             record.curse3
+
+        StudyWeather1 ->
+            record.studyWeather1
 
         ExploreLocation1 ->
             record.exploreLocation1
@@ -287,6 +301,9 @@ setByKind kind value record =
 
         StudyCurse3 ->
             { record | curse3 = value }
+
+        StudyWeather1 ->
+            { record | studyWeather1 = value }
 
         ExploreLocation1 ->
             { record | exploreLocation1 = value }
@@ -393,6 +410,7 @@ allStats =
     , hex3 = hex3Stats
     , jinx3 = jinx3Stats
     , curse3 = curse3Stats
+    , studyWeather1 = weather1Stats
     , exploreLocation1 = exploreLocation1Stats
     , exploreLocation2 = exploreLocation2Stats
     , fightMonster1 = fightMonster1Stats
@@ -940,6 +958,23 @@ curse3Stats =
     , mastery = Just defaultSpellMastery
     , hasSpellSelector = False
     , teachesSpell = Just Curse3
+    }
+
+
+weather1Stats : Stats
+weather1Stats =
+    { belongsTo = BelongsToSkill Weathermancing
+    , title = "Weather I"
+    , image = ActivityIcon (Icon.fromString "Wt1")
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 4
+    , effects =
+        [ Effect.gainXp (Xp.int 10) Weathermancing
+        , Effect.gainMxp StudyWeather1
+        ]
+    , mastery = Just defaultSpellMastery
+    , hasSpellSelector = False
+    , teachesSpell = Nothing
     }
 
 

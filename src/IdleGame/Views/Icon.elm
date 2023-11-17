@@ -234,6 +234,11 @@ hexes =
     createIconFeather FeatherIcons.zap
 
 
+weathermancing : Icon
+weathermancing =
+    createIconFeather FeatherIcons.cloudRain
+
+
 wards : Icon
 wards =
     createIconFeather FeatherIcons.shield
@@ -394,11 +399,6 @@ go =
     createIconFeather FeatherIcons.logIn
 
 
-checkmark : Icon
-checkmark =
-    createIconFeather FeatherIcons.check
-
-
 insufficientFunds : Icon
 insufficientFunds =
     createIconFeather FeatherIcons.xCircle
@@ -422,3 +422,13 @@ undiscoveredQuest =
 questLog : Icon
 questLog =
     createIconFeather FeatherIcons.trello
+
+
+checkboxMarked : Icon
+checkboxMarked =
+    createIconFeather FeatherIcons.checkSquare
+
+
+checkboxEmpty : Icon
+checkboxEmpty =
+    createIconFeather FeatherIcons.square
