@@ -247,36 +247,6 @@ renderActivityCard activity game screenWidth =
                     ]
                 ]
 
-            -- Activity title
-            -- ([ activityTitle activity
-            --  , activityDuration duration
-            --  ]
-            --     ++ (case stats.teachesSpell of
-            --             Nothing ->
-            --                 []
-            --             Just spell ->
-            --                 [ SpellView.renderSpellEffects spell ]
-            --        )
-            --     ++ List.map
-            --         (\taggedEffect ->
-            --             EffectView.render
-            --                 { game = game
-            --                 , mods = mods
-            --                 , effect = taggedEffect
-            --                 , renderType = EffectView.Card
-            --                 }
-            --         )
-            --         orderedAndFilteredEffects
-            --     ++ [ div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
-            --             [ Utils.xpBar
-            --                 { level = masteryLevel
-            --                 , percent = masteryPercent
-            --                 , primaryOrSecondary = Utils.Secondary
-            --                 , size = Utils.XpBarSmall
-            --                 }
-            --             ]
-            --        ]
-            -- )
             -- Progress bar
             , case Maybe.map Timer.percentComplete maybeTimer of
                 Nothing ->

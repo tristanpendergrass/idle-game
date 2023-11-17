@@ -32,7 +32,6 @@ import IdleGame.Views.Content
 import IdleGame.Views.DebugPanel as DebugPanel
 import IdleGame.Views.DetailViewContent
 import IdleGame.Views.DetailViewWrapper
-import IdleGame.Views.DetailViewWrapper2
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -103,21 +102,21 @@ init _ key =
 -- Update
 
 
-getDetailViewState : Maybe ( Activity, Timer ) -> Maybe Preview -> Bool -> IdleGame.Views.DetailViewWrapper2.State ( Activity, Timer ) Preview
+getDetailViewState : Maybe ( Activity, Timer ) -> Maybe Preview -> Bool -> IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
 getDetailViewState maybeActivity maybePreview activityExpanded =
     case ( maybeActivity, maybePreview ) of
         ( Nothing, Nothing ) ->
-            IdleGame.Views.DetailViewWrapper2.Blank
+            IdleGame.Views.DetailViewWrapper.Blank
 
         ( Just activity, Nothing ) ->
             if activityExpanded then
-                IdleGame.Views.DetailViewWrapper2.ActivityExpanded activity
+                IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
             else
-                IdleGame.Views.DetailViewWrapper2.ActivityCollapsed activity
+                IdleGame.Views.DetailViewWrapper.ActivityCollapsed activity
 
         ( Nothing, Just preview ) ->
-            IdleGame.Views.DetailViewWrapper2.Preview preview
+            IdleGame.Views.DetailViewWrapper.Preview preview
 
         ( Just activity, Just preview ) ->
             -- Slightly complicated by the fact that we might be trying to preview the same thing as the activity
@@ -130,16 +129,16 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
             in
             if Tuple.first activity == previewActivity then
                 if activityExpanded then
-                    IdleGame.Views.DetailViewWrapper2.ActivityExpanded activity
+                    IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
                 else
-                    IdleGame.Views.DetailViewWrapper2.ActivityCollapsed activity
+                    IdleGame.Views.DetailViewWrapper.ActivityCollapsed activity
 
             else if activityExpanded then
-                IdleGame.Views.DetailViewWrapper2.ActivityExpanded activity
+                IdleGame.Views.DetailViewWrapper.ActivityExpanded activity
 
             else
-                IdleGame.Views.DetailViewWrapper2.PreviewWithActivity preview activity
+                IdleGame.Views.DetailViewWrapper.PreviewWithActivity preview activity
 
 
 setIsVisible : Bool -> FrontendModel -> FrontendModel
@@ -1335,7 +1334,7 @@ view model =
                     game =
                         Snapshot.getValue snapshot
 
-                    detailViewState : IdleGame.Views.DetailViewWrapper2.State ( Activity, Timer ) Preview
+                    detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
                         case model.mode of
                             Skilling ->
@@ -1347,7 +1346,7 @@ view model =
                     extraBottomPadding : Bool
                     extraBottomPadding =
                         case detailViewState of
-                            IdleGame.Views.DetailViewWrapper2.PreviewWithActivity _ _ ->
+                            IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
                                 True
 
                             _ ->
@@ -1374,7 +1373,7 @@ view model =
                             Adventuring ->
                                 model.adventuringState.activeTab
 
-                    detailViewWrapperProps : IdleGame.Views.DetailViewWrapper2.Props ( Activity, Timer ) Preview FrontendMsg
+                    detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
                     detailViewWrapperProps =
                         { state = detailViewState
                         , renderActivity = renderActivity
@@ -1409,8 +1408,8 @@ view model =
                     --     , onExpandActivity = ExpandActivity
                     --     , onCollapseActivity = CollapseActivity
                     --     }
-                    , IdleGame.Views.DetailViewWrapper2.renderFullScreen detailViewWrapperProps
-                    , IdleGame.Views.DetailViewWrapper2.renderSidebar detailViewWrapperProps
+                    , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
+                    , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
 
                     -- , IdleGame.Views.DetailView.render game model.preview model.activityExpanded
                     -- , div [ class "w-[40rem] h-full border-l-8 border-base-200 overflow-y-auto overflow-x-hidden" ]
