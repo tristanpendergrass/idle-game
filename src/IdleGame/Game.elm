@@ -1117,3 +1117,30 @@ getMaxPurchase price game =
             game.coin
     in
     floor (Quantity.ratio playerCoin price)
+
+
+spellSelectorOptions : Activity -> List Spell
+spellSelectorOptions activity =
+    let
+        spellIsIncluded : Spell -> Bool
+        spellIsIncluded spell =
+            List.any
+                (\inclusionCriteria ->
+                    case inclusionCriteria of
+                        Spell.IfActivity includedActivity ->
+                            includedActivity == activity
+
+                        Spell.IfSkill includedSkill ->
+                            case (Activity.getStats activity).belongsTo of
+                                Activity.BelongsToSkill activitySkill ->
+                                    includedSkill == activitySkill
+
+                                _ ->
+                                    False
+
+                        Spell.IfCombat ->
+                            Activity.isCombatActivity activity
+                )
+                (Spell.getStats spell).inclusions
+    in
+    List.filter (\spell -> spellIsIncluded spell) Spell.allSpells

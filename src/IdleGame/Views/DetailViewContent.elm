@@ -152,6 +152,10 @@ renderContent obj extraBottomPadding game =
         selectedSpell : Maybe Spell
         selectedSpell =
             Activity.getByKind activity game.spellSelectors
+
+        spellSelectorOptions : List Spell
+        spellSelectorOptions =
+            Game.spellSelectorOptions activity
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
@@ -213,7 +217,7 @@ renderContent obj extraBottomPadding game =
             )
 
         -- Spell selector
-        , div [ class "flex flex-col items-start gap-1", classList [ ( "hidden", not stats.hasSpellSelector ) ] ]
+        , div [ class "flex flex-col items-start gap-1", classList [ ( "hidden", List.isEmpty spellSelectorOptions ) ] ]
             [ label [ for "selector" ] [ text "Spell selector" ]
             , select [ id "selector", class "select w-full", onInput (HandleSpellSelect activity) ]
                 ([ option [ selected (selectedSpell == Nothing), value "" ] [ text "None" ]
@@ -233,10 +237,13 @@ renderContent obj extraBottomPadding game =
                                 [ selected (selectedSpell == Just spell)
                                 , disabled (not spellUnlocked)
                                 , value title
+                                , class "flex items-center gap-1"
                                 ]
-                                [ text title ]
+                                [ span [] [ text title ]
+                                , span [ classList [ ( "hidden", spellUnlocked ) ] ] [ text " (unlearned)" ]
+                                ]
                         )
-                        Spell.allSpells
+                        spellSelectorOptions
                 )
             ]
         , div [ class "divider" ] []

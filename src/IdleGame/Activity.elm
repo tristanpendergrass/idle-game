@@ -380,7 +380,6 @@ type alias Stats =
     , duration : Duration
     , effects : List Effect.TaggedEffect
     , mastery : Maybe Mastery
-    , hasSpellSelector : Bool -- Does this activity support assigning a spell to empower it
     , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell
     }
 
@@ -514,7 +513,6 @@ cleanStablesStats =
             , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery CleanStables)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -554,7 +552,6 @@ cleanBigBubbaStats =
                     choresMastery
         in
         Just bigBubbaMastery
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -574,7 +571,6 @@ sweepChimneyStats =
             , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery SweepChimneys)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -594,7 +590,6 @@ waterGreenhousePlantsStats =
             , maybeResource = Just { resource = GreenhouseDirt, amount = 1, probability = 0.6 }
             }
     , mastery = Just (getChoresMastery WaterGreenhousePlants)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -614,7 +609,6 @@ washAndIronRobesStats =
             , maybeResource = Just { resource = WashWater, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery WashAndIronRobes)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -634,7 +628,6 @@ organizePotionIngredientsStats =
             , maybeResource = Nothing
             }
     , mastery = Just (getChoresMastery OrganizePotionIngredients)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -654,7 +647,6 @@ repairInstrumentsStats =
             , maybeResource = Just { resource = Scrap, amount = 1, probability = 0.25 }
             }
     , mastery = Just (getChoresMastery RepairInstruments)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -674,7 +666,6 @@ flushDrainDemonsStats =
             , maybeResource = Just { resource = Ectoplasm, amount = 1, probability = 0.1 }
             }
     , mastery = Just (getChoresMastery FlushDrainDemons)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -694,7 +685,6 @@ organizeSpellBooksStats =
             , maybeResource = Just { resource = Parchment, amount = 1, probability = 0.05 }
             }
     , mastery = Just (getChoresMastery OrganizeSpellBooks)
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -734,7 +724,6 @@ hex1Stats =
         , Effect.gainResource -1 Manure
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Hex1
     }
 
@@ -761,7 +750,6 @@ jinx1Stats =
         , Effect.gainResource -1 GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Jinx1
     }
 
@@ -789,7 +777,6 @@ curse1Stats =
         , Effect.gainResource -1 Soot
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Curse1
     }
 
@@ -816,7 +803,6 @@ hex2Stats =
         , Effect.gainResource -4 Manure
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Hex2
     }
 
@@ -843,7 +829,6 @@ jinx2Stats =
         , Effect.gainResource -5 GreenhouseDirt
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Jinx2
     }
 
@@ -871,7 +856,6 @@ curse2Stats =
         , Effect.gainResource -1 Scrap
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Curse2
     }
 
@@ -898,7 +882,6 @@ hex3Stats =
         , Effect.gainResource -10 Manure
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Hex3
     }
 
@@ -926,7 +909,6 @@ jinx3Stats =
         , Effect.gainResource -1 Ectoplasm
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Jinx3
     }
 
@@ -956,7 +938,6 @@ curse3Stats =
         , Effect.gainResource -2 Manure
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Just Curse3
     }
 
@@ -973,7 +954,6 @@ weather1Stats =
         , Effect.gainMxp StudyWeather1
         ]
     , mastery = Just defaultSpellMastery
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -991,7 +971,6 @@ exploreLocation1Stats =
     , duration = Duration.seconds 4
     , effects = [ Effect.explore Location1 ]
     , mastery = Nothing
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -1005,7 +984,6 @@ exploreLocation2Stats =
     , duration = Duration.seconds 4
     , effects = [ Effect.explore Location2 ]
     , mastery = Nothing
-    , hasSpellSelector = False
     , teachesSpell = Nothing
     }
 
@@ -1034,7 +1012,6 @@ fightMonster1Stats =
             , power = 1
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
 
@@ -1056,7 +1033,6 @@ fightMonster2Stats =
             , power = 8
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
 
@@ -1078,7 +1054,6 @@ fightMonster3Stats =
             , power = 22
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
 
@@ -1100,7 +1075,6 @@ fightMonster4Stats =
             , power = 45
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
 
@@ -1122,7 +1096,6 @@ fightMonster5Stats =
             , power = 75
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
 
@@ -1148,6 +1121,28 @@ fightMonster6Stats =
             , power = 110
             }
     , mastery = Nothing
-    , hasSpellSelector = True
     , teachesSpell = Nothing
     }
+
+
+
+-- Utils
+
+
+isCombatActivity : Activity -> Bool
+isCombatActivity activity =
+    let
+        effects : List Effect.TaggedEffect
+        effects =
+            (getStats activity).effects
+
+        effectIsCombat : Effect.TaggedEffect -> Bool
+        effectIsCombat effect =
+            case effect.effect of
+                Effect.ResolveCombat _ ->
+                    True
+
+                _ ->
+                    False
+    in
+    List.any effectIsCombat effects

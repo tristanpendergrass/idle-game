@@ -126,7 +126,7 @@ type alias Stats =
     { title : String
     , icon : Icon
     , mods : List Mod.Mod -- When this spell is selected these mods are in effect
-    , includedActivities : List InclusionCriteria -- Which activites this spell can be selected for
+    , inclusions : List InclusionCriteria -- Which activites this spell can be selected for
     }
 
 
@@ -142,60 +142,60 @@ allStats =
         { title = "Hex I"
         , icon = Icon.fromString "Hx1"
         , mods = [ Mod.powerBuff 5 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , jinx1 =
         { title = "Jinx I"
         , icon = Icon.fromString "Jx1"
         , mods = [ Mod.powerBuff 10 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , curse1 =
         { title = "Curse I"
         , icon = Icon.fromString "Cs1"
         , mods = [ Mod.powerBuff 15 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , hex2 =
         { title = "Hex II"
         , icon = Icon.fromString "Hx2"
         , mods = [ Mod.powerBuff 20 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , jinx2 =
         { title = "Jinx II"
         , icon = Icon.fromString "Jx2"
         , mods = [ Mod.powerBuff 25 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , curse2 =
         { title = "Curse II"
         , icon = Icon.fromString "Cs2"
         , mods = [ Mod.powerBuff 30 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , hex3 =
         { title = "Hex III"
         , icon = Icon.fromString "Hx3"
         , mods = [ Mod.powerBuff 35 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , jinx3 =
         { title = "Jinx III"
         , icon = Icon.fromString "Jx3"
         , mods = [ Mod.powerBuff 40 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , curse3 =
         { title = "Curse III"
         , icon = Icon.fromString "Cs3"
         , mods = [ Mod.powerBuff 45 ]
-        , includedActivities = [ IfCombat ]
+        , inclusions = [ IfCombat ]
         }
     , weather1 =
         { title = "Weather I"
         , icon = Icon.fromString "Wt1"
         , mods = []
-        , includedActivities = [ IfSkill Chores ]
+        , inclusions = [ IfSkill Chores ]
         }
     }
