@@ -38,15 +38,16 @@ $ npm test -- --watch
 # Todos
 
 ## Version 0.3
-- [ ] Skill 3
-- [ ] Support spell selector on Chores and Hex studying
-  - [ ] Design system for what spells can be assigned on what activities
-  - [ ] Enable spell selector for Chores/Hexes/Exploring/Enchantment
-- [ ] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
+- [x] Skill 3
+- [x] Support spell selector on Chores and Hex studying
+  - [x] Design system for what spells can be assigned on what activities
+  - [x] Enable spell selector for Chores/Hexes/Exploring/Enchantment
+- [x] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
 - [ ] Update TimePasses
   - [ ] Show XP from all skills not just chores
   - [ ] Show new discoveries in locations
 - [ ] Show the resources you'll gather on Explore action
+- [ ] Remove duration from Explore action
 ### Locations
 - [x] Convert combat tabs to "Location" tabs
 - [x] Add Exploration activity to locations

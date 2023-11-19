@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Browser exposing (UrlRequest)
+import Browser.Dom
 import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
@@ -149,6 +150,7 @@ type FrontendMsg
     | HandlePointerUp
     | HandlePointerCancel
     | HandleLocationFilterClick Location LocationFilter
+    | HandleGetViewportResult Browser.Dom.Viewport
 
 
 type ToBackend

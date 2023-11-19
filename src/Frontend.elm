@@ -94,7 +94,7 @@ init _ key =
       , pointerState = Nothing
       , locationFilters = Location.createRecord LocationAll
       }
-    , Cmd.none
+    , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
 
 
@@ -1073,6 +1073,31 @@ update msg model =
             in
             ( model
                 |> updateLocationFilters (Location.updateByKind location updateFilter)
+            , Cmd.none
+            )
+
+        HandleGetViewportResult viewport ->
+            let
+                screenWidth : Float
+                screenWidth =
+                    viewport.viewport.width
+
+                screenSupportsRightRail : Bool
+                screenSupportsRightRail =
+                    -- Hardcode the value that we use to determine if right rail is shown. -- It originates from Tailwind's breakpoints
+                    screenWidth >= 1280
+
+                expandedValue : Bool
+                expandedValue =
+                    if screenSupportsRightRail then
+                        True
+
+                    else
+                        False
+            in
+            ( model
+                |> setActivityExpanded Skilling expandedValue
+                |> setActivityExpanded Adventuring expandedValue
             , Cmd.none
             )
 
