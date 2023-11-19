@@ -72,6 +72,12 @@ delay ms msg =
 
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init _ key =
+    let
+        activityExpanded : Bool
+        activityExpanded =
+            -- Note: this value is overriden by HandleGetViewportResult immediately after the page loads to the value here doesn't matter so much
+            False
+    in
     ( { key = key
       , showDebugPanel = False
       , tray = Toast.tray
@@ -80,12 +86,12 @@ init _ key =
       , skillingState =
             { activeTab = Config.flags.defaultTabSkilling
             , preview = Nothing
-            , activityExpanded = Config.flags.defaultDetailViewExpanded
+            , activityExpanded = activityExpanded
             }
       , adventuringState =
             { activeTab = Config.flags.defaultTabAdventuring
             , preview = Nothing
-            , activityExpanded = Config.flags.defaultDetailViewExpanded
+            , activityExpanded = activityExpanded
             }
       , isVisible = True
       , activeModal = Nothing

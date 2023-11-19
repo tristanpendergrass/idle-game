@@ -20,7 +20,6 @@ type alias Flags =
     , defaultMode : Mode
     , defaultTabSkilling : Tab
     , defaultTabAdventuring : Tab
-    , defaultDetailViewExpanded : Bool
     }
 
 
@@ -47,7 +46,6 @@ devFlags =
     , defaultMode = Adventuring
     , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.Location1
-    , defaultDetailViewExpanded = False
     }
 
 
@@ -64,5 +62,4 @@ prodFlags =
     , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.Location1
-    , defaultDetailViewExpanded = False
     }
