@@ -381,6 +381,7 @@ type alias Stats =
     , effects : List Effect.TaggedEffect
     , mastery : Maybe Mastery
     , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell
+    , showDuration : Bool
     }
 
 
@@ -514,6 +515,7 @@ cleanStablesStats =
             }
     , mastery = Just (getChoresMastery CleanStables)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -553,6 +555,7 @@ cleanBigBubbaStats =
         in
         Just bigBubbaMastery
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -572,6 +575,7 @@ sweepChimneyStats =
             }
     , mastery = Just (getChoresMastery SweepChimneys)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -591,6 +595,7 @@ waterGreenhousePlantsStats =
             }
     , mastery = Just (getChoresMastery WaterGreenhousePlants)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -610,6 +615,7 @@ washAndIronRobesStats =
             }
     , mastery = Just (getChoresMastery WashAndIronRobes)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -629,6 +635,7 @@ organizePotionIngredientsStats =
             }
     , mastery = Just (getChoresMastery OrganizePotionIngredients)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -648,6 +655,7 @@ repairInstrumentsStats =
             }
     , mastery = Just (getChoresMastery RepairInstruments)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -667,6 +675,7 @@ flushDrainDemonsStats =
             }
     , mastery = Just (getChoresMastery FlushDrainDemons)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -686,6 +695,7 @@ organizeSpellBooksStats =
             }
     , mastery = Just (getChoresMastery OrganizeSpellBooks)
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -725,6 +735,7 @@ hex1Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Hex1
+    , showDuration = True
     }
 
 
@@ -751,6 +762,7 @@ jinx1Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Jinx1
+    , showDuration = True
     }
 
 
@@ -778,6 +790,7 @@ curse1Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Curse1
+    , showDuration = True
     }
 
 
@@ -804,6 +817,7 @@ hex2Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Hex2
+    , showDuration = True
     }
 
 
@@ -830,6 +844,7 @@ jinx2Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Jinx2
+    , showDuration = True
     }
 
 
@@ -857,6 +872,7 @@ curse2Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Curse2
+    , showDuration = True
     }
 
 
@@ -883,6 +899,7 @@ hex3Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Hex3
+    , showDuration = True
     }
 
 
@@ -910,6 +927,7 @@ jinx3Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Jinx3
+    , showDuration = True
     }
 
 
@@ -939,6 +957,7 @@ curse3Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Just Curse3
+    , showDuration = True
     }
 
 
@@ -955,6 +974,7 @@ weather1Stats =
         ]
     , mastery = Just defaultSpellMastery
     , teachesSpell = Nothing
+    , showDuration = True
     }
 
 
@@ -972,6 +992,7 @@ exploreLocation1Stats =
     , effects = [ Effect.explore Location1 ]
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -985,6 +1006,7 @@ exploreLocation2Stats =
     , effects = [ Effect.explore Location2 ]
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1013,6 +1035,7 @@ fightMonster1Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1034,6 +1057,7 @@ fightMonster2Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1055,6 +1079,7 @@ fightMonster3Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1076,6 +1101,7 @@ fightMonster4Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1097,6 +1123,7 @@ fightMonster5Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 
@@ -1122,6 +1149,7 @@ fightMonster6Stats =
             }
     , mastery = Nothing
     , teachesSpell = Nothing
+    , showDuration = False
     }
 
 

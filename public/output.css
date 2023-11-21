@@ -3777,12 +3777,12 @@ body[dir="rtl"] .checkbox:checked,
   font-size: 0.7rem;
 }
 
-.badge-xs {
-  height: 0.75rem;
+.badge-sm {
+  height: 1rem;
   font-size: 0.75rem;
-  line-height: .75rem;
-  padding-left: 0.313rem;
-  padding-right: 0.313rem;
+  line-height: 1rem;
+  padding-left: 0.438rem;
+  padding-right: 0.438rem;
 }
 
 .btm-nav-xs>*:where(.active) {
@@ -4134,20 +4134,12 @@ body[dir="rtl"] .checkbox:checked,
   bottom: 0px;
 }
 
-.bottom-\[-100\%\] {
-  bottom: -100%;
-}
-
 .bottom-\[2rem\] {
   bottom: 2rem;
 }
 
 .bottom-\[5rem\] {
   bottom: 5rem;
-}
-
-.bottom-\[calc\(-100\%\+4rem\)\] {
-  bottom: calc(-100% + 4rem);
 }
 
 .left-0 {
@@ -4548,6 +4540,10 @@ body[dir="rtl"] .checkbox:checked,
   border-radius: 0.25rem;
 }
 
+.rounded-3xl {
+  border-radius: 1.5rem;
+}
+
 .rounded-full {
   border-radius: 9999px;
 }
@@ -4558,10 +4554,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .rounded-xl {
   border-radius: 0.75rem;
-}
-
-.rounded-3xl {
-  border-radius: 1.5rem;
 }
 
 .rounded-t {
@@ -4833,6 +4825,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .font-bold {
   font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 800;
 }
 
 .font-semibold {
@@ -5172,6 +5168,11 @@ body {
   content: var(--tw-content);
 }
 
+.focus\:bg-neutral:focus {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--n) / var(--tw-bg-opacity));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion-reduce\:transition-none {
     transition-property: none;
@@ -5253,14 +5254,6 @@ body {
 
   .xl\:hidden {
     display: none;
-  }
-
-  .xl\:h-auto {
-    height: auto;
-  }
-
-  .xl\:w-auto {
-    width: auto;
   }
 
   .xl\:gap-4 {

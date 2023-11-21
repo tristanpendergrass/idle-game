@@ -10,6 +10,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Location as Location exposing (findableResources, foundResources)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -68,8 +69,8 @@ renderModdedEffect renderType game effect =
                 , game = game
                 }
 
-        Effect.Explore _ ->
-            div [] []
+        Effect.Explore { location } ->
+            renderExplore game location
 
 
 renderCoin : { base : Coin, multiplier : Float } -> Html msg
@@ -92,6 +93,31 @@ renderCoin { base, multiplier } =
             ]
         , Icon.coin
             |> Icon.toHtml
+        ]
+
+
+renderExplore : Game -> Location -> Html msg
+renderExplore game location =
+    let
+        locationState : Location.State
+        locationState =
+            Location.getByKind location game.locations
+
+        foundResources : List Resource
+        foundResources =
+            Location.foundResources location locationState
+
+        foundResourcesCount : Int
+        foundResourcesCount =
+            List.length foundResources
+    in
+    div [ class "t-column" ]
+        [ div [ class "italic text-sm" ] [ text "Gather" ]
+        , div [ class "grid max-w-full" ]
+            (List.map
+                (\resource -> (Resource.getStats resource).icon |> Icon.toHtml)
+                foundResources
+            )
         ]
 
 

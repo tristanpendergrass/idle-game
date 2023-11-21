@@ -216,7 +216,7 @@ renderActivityCard activity game screenWidth =
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 [ div [ class "t-column" ]
                     [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
-                    , activityDuration duration
+                    , div [ classList [ ( "hidden", not stats.showDuration ) ] ] [ activityDuration duration ]
                     ]
                 , div [ class "t-column" ]
                     ((case stats.teachesSpell of

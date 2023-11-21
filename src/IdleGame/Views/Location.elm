@@ -87,7 +87,7 @@ render model game location =
 
 locationGridItemClasses : Attribute FrontendMsg
 locationGridItemClasses =
-    class "h-48 rounded-xl bg-base-100"
+    class "rounded-xl bg-base-100"
 
 
 renderLocationInfo : Game -> Location -> Html FrontendMsg
@@ -123,8 +123,7 @@ renderLocationInfo game location =
 
 paneClasses =
     { pane = class "t-column h-full w-full p-1 xl:p-2 justify-between"
-    , title = class "text-sm"
-    , body = class "flex-grow"
+    , title = class "text-sm font-extrabold"
     , footer = class "text-xs"
     }
 
@@ -154,12 +153,6 @@ renderResourcesPane game location =
     in
     div [ paneClasses.pane ]
         [ div [ paneClasses.title ] [ text "Resources" ]
-        , div [ paneClasses.body, class "grid max-w-full" ]
-            (List.concat
-                [ List.map (\resource -> (Resource.getStats resource).icon |> Icon.toHtml) foundResources
-                , List.repeat (resourcesCount - foundResourcesCount) (Icon.undiscoveredItem |> Icon.toHtml)
-                ]
-            )
         , div [ paneClasses.footer ]
             [ text <| Utils.intToString foundResourcesCount ++ "/" ++ Utils.intToString resourcesCount ++ " discovered" ]
         ]
@@ -197,12 +190,6 @@ renderMonstersPane game location =
     in
     div [ paneClasses.pane ]
         [ div [ paneClasses.title ] [ text "Monsters" ]
-        , div [ paneClasses.body, class "grid max-w-full" ]
-            (List.concat
-                [ List.map (\monster -> (Monster.getStats monster).icon |> Icon.toHtml) foundMonsters
-                , List.repeat (monstersCount - foundMonstersCount) (Icon.undiscoveredMonster |> Icon.toHtml)
-                ]
-            )
         , div [ paneClasses.footer ] [ text <| Utils.intToString foundMonstersCount ++ "/" ++ Utils.intToString monstersCount ++ " discovered" ]
         ]
 
@@ -232,7 +219,6 @@ renderQuestsPane game location =
     in
     div [ paneClasses.pane ]
         [ div [ paneClasses.title ] [ text "Quests" ]
-        , button [ class "btn btn-sm btn-primary" ] [ text "Open quest log" ]
         , div [ paneClasses.footer ] [ text <| Utils.intToString foundQuestsCount ++ "/" ++ Utils.intToString questsCount ++ " discovered" ]
         ]
 

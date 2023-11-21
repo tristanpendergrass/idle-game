@@ -46,8 +46,8 @@ $ npm test -- --watch
 - [ ] Update TimePasses
   - [ ] Show XP from all skills not just chores
   - [ ] Show new discoveries in locations
-- [ ] Show the resources you'll gather on Explore action
-- [ ] Remove duration from Explore action
+- [x] Show the resources you'll gather on Explore action
+- [x] Remove duration from Explore action
 ### Locations
 - [x] Convert combat tabs to "Location" tabs
 - [x] Add Exploration activity to locations
@@ -82,6 +82,7 @@ $ npm test -- --watch
 - [ ] Refactor most things that configure Mod to instead configure Mod or IntervalMod. In fact make a union type called Mod that has both, only in a few places do we need to specify one or the other. Or just combine into one type and do nothing for Effects if its an interval mod?
 
 ### Fundamentals
+- [ ] Add correct source value for all Effects and use it to show source in Time Passes
 - [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
 - [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
