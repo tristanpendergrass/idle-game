@@ -6,7 +6,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Game exposing (TimePassesData)
+import IdleGame.Game as Game
+import IdleGame.Monster as Monster
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
@@ -41,7 +43,7 @@ renderCombatsLost num =
         ]
 
 
-hasGains : TimePassesData -> Bool
+hasGains : Game.TimePassesData -> Bool
 hasGains { xpGains, coinGains, resourcesDiff } =
     not <|
         (List.isEmpty xpGains
@@ -50,7 +52,28 @@ hasGains { xpGains, coinGains, resourcesDiff } =
         )
 
 
-render : Posix -> TimePassesData -> Html FrontendMsg
+renderTimePassesDiscovery : Game.TimePassesDiscovery -> Html FrontendMsg
+renderTimePassesDiscovery discovery =
+    let
+        ( kindOfDiscovery, title ) =
+            case discovery of
+                Game.DiscoveredMonster monster ->
+                    ( "Monster", (Monster.getStats monster).title )
+
+                Game.DiscoveredQuest quest ->
+                    ( "Quest", (Quest.getStats quest).title )
+
+                Game.DiscoveredResource resource ->
+                    ( "Resource", (Resource.getStats resource).title )
+    in
+    li [ class "flex items-center gap-2 text-success" ]
+        [ span [] [ text "Discovered" ]
+        , span [] [ text kindOfDiscovery ]
+        , span [] [ text title ]
+        ]
+
+
+render : Posix -> Game.TimePassesData -> Html FrontendMsg
 render timePassed timePassesData =
     let
         { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
@@ -59,6 +82,8 @@ render timePassed timePassesData =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , ul [ class "t-column font-semibold" ]
+            (List.map renderTimePassesDiscovery timePassesData.discoveries)
         , ul [ class "t-column font-semibold" ]
             (List.concat
                 [ if combatsWonDiff > 0 then

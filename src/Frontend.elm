@@ -19,6 +19,7 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
+import IdleGame.Mocks
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
@@ -77,6 +78,14 @@ init _ key =
         activityExpanded =
             -- Note: this value is overriden by HandleGetViewportResult immediately after the page loads to the value here doesn't matter so much
             False
+
+        defaultModal : Maybe Modal
+        defaultModal =
+            if Config.flags.debugTimePasses then
+                Just IdleGame.Mocks.timePassesModal
+
+            else
+                Nothing
     in
     ( { key = key
       , showDebugPanel = False
@@ -159,7 +168,9 @@ setActiveModal activeModal model =
         filteredActiveModal =
             case activeModal of
                 Just (TimePassesModal _ _) ->
-                    if Config.flags.showTimePasses then
+                    -- showTimePasses can be set to False for disabling this during development
+                    -- debugTimePasses forces it to be shown with debug values
+                    if Config.flags.showTimePasses || Config.flags.debugTimePasses then
                         activeModal
 
                     else
@@ -546,11 +557,18 @@ update msg model =
                         let
                             newSnap =
                                 Snapshot.tickUntil performantTick now current
+
+                            newModal =
+                                if Config.flags.debugTimePasses then
+                                    Just IdleGame.Mocks.timePassesModal
+
+                                else
+                                    createTimePassesModal original newSnap
                         in
                         ( model
                             |> setGameState
                                 (Playing newSnap)
-                            |> setActiveModal (createTimePassesModal original newSnap)
+                            |> setActiveModal newModal
                         , Cmd.none
                         )
 

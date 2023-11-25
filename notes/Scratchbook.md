@@ -1,0 +1,1 @@
+* For combat what if % chance to win came down to two numbers: strength and technique. 

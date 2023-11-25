@@ -828,8 +828,15 @@ type alias TimePassesXpGain =
     }
 
 
+type TimePassesDiscovery
+    = DiscoveredMonster Monster
+    | DiscoveredQuest Quest
+    | DiscoveredResource Resource
+
+
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
+    , discoveries : List TimePassesDiscovery
     , coinGains : Maybe Coin
     , resourcesDiff : Resource.Diff
     , combatsWonDiff : Int
@@ -837,15 +844,38 @@ type alias TimePassesData =
     }
 
 
+diff : List a -> List a -> List a
+diff list1 list2 =
+    List.concat
+        [ List.filter (\item -> not (List.member item list2)) list1
+        , List.filter (\item -> not (List.member item list1)) list2
+        ]
+
+
 getTimePassesData : Game -> Game -> Maybe TimePassesData
 getTimePassesData originalGame currentGame =
     let
-        xpGains =
-            if originalGame.xp.chores == currentGame.xp.chores then
-                []
+        xpGainOfSkill : Skill -> Maybe TimePassesXpGain
+        xpGainOfSkill skill =
+            let
+                originalXp : Xp
+                originalXp =
+                    Skill.getByKind skill originalGame.xp
+
+                currentXp : Xp
+                currentXp =
+                    Skill.getByKind skill currentGame.xp
+            in
+            if originalXp == currentXp then
+                Nothing
 
             else
-                [ { skill = Chores, originalXp = originalGame.xp.chores, currentXp = currentGame.xp.chores } ]
+                Just { skill = skill, originalXp = originalXp, currentXp = currentXp }
+
+        xpGains : List TimePassesXpGain
+        xpGains =
+            Skill.allSkills
+                |> List.filterMap xpGainOfSkill
 
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
@@ -872,10 +902,62 @@ getTimePassesData originalGame currentGame =
                     && (combatsWonDiff == 0)
                     && (combatsLostDiff == 0)
                 )
+
+        discoveredMonsters : Location -> List Monster
+        discoveredMonsters location =
+            let
+                originalMonsters : List Monster
+                originalMonsters =
+                    Location.foundMonsters location (Location.getByKind location originalGame.locations)
+
+                currentMonsters : List Monster
+                currentMonsters =
+                    Location.foundMonsters location (Location.getByKind location currentGame.locations)
+            in
+            diff originalMonsters currentMonsters
+
+        discoveredQuests : Location -> List Quest
+        discoveredQuests location =
+            let
+                originalQuests : List Quest
+                originalQuests =
+                    Location.foundQuests location (Location.getByKind location originalGame.locations)
+
+                currentQuests : List Quest
+                currentQuests =
+                    Location.foundQuests location (Location.getByKind location currentGame.locations)
+            in
+            diff originalQuests currentQuests
+
+        discoveredResources : Location -> List Resource
+        discoveredResources location =
+            let
+                originalResources : List Resource
+                originalResources =
+                    Location.foundResources location (Location.getByKind location originalGame.locations)
+
+                currentResources : List Resource
+                currentResources =
+                    Location.foundResources location (Location.getByKind location currentGame.locations)
+            in
+            diff originalResources currentResources
+
+        discoveriesAtLocation : Location -> List TimePassesDiscovery
+        discoveriesAtLocation location =
+            List.concat
+                [ List.map DiscoveredMonster (discoveredMonsters location)
+                , List.map DiscoveredQuest (discoveredQuests location)
+                , List.map DiscoveredResource (discoveredResources location)
+                ]
+
+        discoveries : List TimePassesDiscovery
+        discoveries =
+            List.concatMap discoveriesAtLocation Location.allLocations
     in
     if hasNewData then
         Just
             { xpGains = xpGains
+            , discoveries = discoveries
             , coinGains = coinGains
             , resourcesDiff = resourcesDiff
             , combatsWonDiff = combatsWonDiff
@@ -910,7 +992,6 @@ getShopItemMods game =
 getShopItemIntervalMods : Game -> List IntervalMod
 getShopItemIntervalMods game =
     game.ownedShopUpgrades
-        -- |> (\x -> Debug.log "foobar inside getShopItemIntervalMods" x)
         |> ShopUpgrade.toOwnedItems
         |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).reward)
         |> List.filterMap

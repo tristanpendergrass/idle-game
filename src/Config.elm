@@ -15,6 +15,7 @@ type alias Flags =
     { isDev : Bool -- Catchall boolean for anyting that needs to be different between dev and prod
     , showFastForwardSpeed : Bool -- Whether to show the "speed" of fast forward while it's active under the progress bar
     , extraFastForwardTime : Duration -- How much time to artificially add to the FastForward on init from backend
+    , debugTimePasses : Bool -- If True then Time Passes with mock values will appear when app starts
     , showTimePasses : Bool
     , showDebugPanel : Bool
     , defaultMode : Mode
@@ -41,6 +42,7 @@ devFlags =
     { isDev = True
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
+    , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True
     , defaultMode = Adventuring
@@ -62,4 +64,5 @@ prodFlags =
     , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.Location1
+    , debugTimePasses = False
     }

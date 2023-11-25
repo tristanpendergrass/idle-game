@@ -7,7 +7,7 @@ This module gets imported everywhere, so it's not allowed to import _anything_ t
 
 type
     Skill
-    -- Don't forget to update IdleGame.Skill! Record
+    -- Don't forget to update IdleGame.Skill! Record + allSkills
     = Chores
     | Hexes
     | Weathermancing

@@ -44,10 +44,14 @@ $ npm test -- --watch
   - [x] Enable spell selector for Chores/Hexes/Exploring/Enchantment
 - [x] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
 - [ ] Update TimePasses
-  - [ ] Show XP from all skills not just chores
+  - [x] Show XP from all skills not just chores
   - [ ] Show new discoveries in locations
+  - [ ] Add lines to Time Passes saying what you're studying and what you're exploring
 - [x] Show the resources you'll gather on Explore action
 - [x] Remove duration from Explore action
+- [ ] Figure out algorithm for how often to find resources, quests, monsters
+- [ ] Finalize location icon
+- [ ] Remove quest log
 ### Locations
 - [x] Convert combat tabs to "Location" tabs
 - [x] Add Exploration activity to locations

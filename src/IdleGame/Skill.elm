@@ -4,6 +4,11 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
+allSkills : List Skill
+allSkills =
+    [ Chores, Hexes, Weathermancing ]
+
+
 type alias Record a =
     { chores : a
     , hexes : a
