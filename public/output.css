@@ -4823,6 +4823,10 @@ body[dir="rtl"] .checkbox:checked,
   line-height: 1rem;
 }
 
+.text-\[8px\] {
+  font-size: 8px;
+}
+
 .font-bold {
   font-weight: 700;
 }

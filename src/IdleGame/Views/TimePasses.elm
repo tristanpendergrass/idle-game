@@ -55,20 +55,20 @@ hasGains { xpGains, coinGains, resourcesDiff } =
 renderTimePassesDiscovery : Game.TimePassesDiscovery -> Html FrontendMsg
 renderTimePassesDiscovery discovery =
     let
-        ( kindOfDiscovery, title ) =
+        ( icon, title ) =
             case discovery of
                 Game.DiscoveredMonster monster ->
-                    ( "Monster", (Monster.getStats monster).title )
+                    ( (Monster.getStats monster).icon, (Monster.getStats monster).title )
 
                 Game.DiscoveredQuest quest ->
-                    ( "Quest", (Quest.getStats quest).title )
+                    ( (Quest.getStats quest).icon, (Quest.getStats quest).title )
 
                 Game.DiscoveredResource resource ->
-                    ( "Resource", (Resource.getStats resource).title )
+                    ( (Resource.getStats resource).icon, (Resource.getStats resource).title )
     in
     li [ class "flex items-center gap-2 text-success" ]
-        [ span [] [ text "Discovered" ]
-        , span [] [ text kindOfDiscovery ]
+        [ span [] [ text <| "Discovered:" ]
+        , span [] [ icon |> Icon.toHtml ]
         , span [] [ text title ]
         ]
 

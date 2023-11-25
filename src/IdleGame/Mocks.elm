@@ -44,7 +44,7 @@ timePassesModal =
             { xpGains =
                 [ { originalXp = Xp.int 0, currentXp = Xp.int 100, skill = Hexes }
                 ]
-            , discoveries = [ Game.DiscoveredMonster Monster1 ]
+            , discoveries = [ Game.DiscoveredMonster Monster1, Game.DiscoveredQuest Quest1, Game.DiscoveredResource EmptyBottle ]
             , coinGains = Nothing
             , resourcesDiff = Resource.createRecord 0
             , combatsWonDiff = 0

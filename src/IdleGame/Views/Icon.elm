@@ -74,7 +74,7 @@ sizeToTailwindClass : Size -> String
 sizeToTailwindClass size =
     case size of
         Small ->
-            "w-3 h-3 text-xs"
+            "w-3 h-3 text-[8px]"
 
         Medium ->
             "w-6 h-6 text-sm font-semibold"
