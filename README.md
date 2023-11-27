@@ -48,8 +48,8 @@ $ npm test -- --watch
   - [x] Show new discoveries in locations
 - [x] Show the resources you'll gather on Explore action
 - [x] Remove duration from Explore action
-- [ ] Figure out algorithm for how often to find resources, quests, monsters
-- [ ] Remove quest log
+- [x] Remove quest log
+- [x] Move buttons for changing mode to under bag and shop
 - [ ] Finalize game config
   - [ ] Monsters
     - [ ] Names

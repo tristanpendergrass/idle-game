@@ -231,7 +231,7 @@ progressBar { progressText, percent, primaryOrSecondary, size } =
                     ( class "text-lg px-2 py-1", class "min-w-[2.5rem]" )
     in
     div [ class "w-full flex items-center gap-2" ]
-        [ div [ class "font-bold rounded text-center", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]
+        [ div [ class "font-bold rounded text-center box-content", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]
             [ text progressText ]
         , progress
             [ class "progress w-full"

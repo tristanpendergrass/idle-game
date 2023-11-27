@@ -43,11 +43,11 @@ devFlags =
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , debugTimePasses = False
-    , showTimePasses = True
+    , showTimePasses = False
     , showDebugPanel = True
-    , defaultMode = Skilling
+    , defaultMode = Adventuring
     , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.Location1
+    , defaultTabAdventuring = Tab.Location2
     }
 
 

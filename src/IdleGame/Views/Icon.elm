@@ -61,7 +61,7 @@ sizeToRem size =
             0.75
 
         Medium ->
-            1.5
+            1.2
 
         Large ->
             3.0
