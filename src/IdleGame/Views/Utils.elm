@@ -225,10 +225,10 @@ progressBar { progressText, percent, primaryOrSecondary, size } =
         ( textSizeClass, levelBoxWidthClass ) =
             case size of
                 ProgressBarSmall ->
-                    ( class "text-xs p-1", class "min-w-8" )
+                    ( class "text-xs p-1", class "min-w-[2rem]" )
 
                 ProgressBarLarge ->
-                    ( class "text-lg px-2 py-1", class "min-w-10" )
+                    ( class "text-lg px-2 py-1", class "min-w-[2.5rem]" )
     in
     div [ class "w-full flex items-center gap-2" ]
         [ div [ class "font-bold rounded text-center", backgroundClass, textColorClass, textSizeClass, levelBoxWidthClass ]

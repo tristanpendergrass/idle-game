@@ -4374,6 +4374,26 @@ body[dir="rtl"] .checkbox:checked,
   min-width: 3rem;
 }
 
+.min-w-\[2\.5rem\] {
+  min-width: 2.5rem;
+}
+
+.min-w-\[2rem\] {
+  min-width: 2rem;
+}
+
+.min-w-\[1rem\] {
+  min-width: 1rem;
+}
+
+.min-w-\[8rem\] {
+  min-width: 8rem;
+}
+
+.min-w-\[10rem\] {
+  min-width: 10rem;
+}
+
 .max-w-\[1920px\] {
   max-width: 1920px;
 }
