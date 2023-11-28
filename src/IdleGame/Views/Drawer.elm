@@ -76,10 +76,10 @@ renderDrawer isDrawerOpen mode activeTab =
                 btnClass =
                     case mode of
                         Skilling ->
-                            class "btn-info"
+                            class "btn-warning"
 
                         Adventuring ->
-                            class "btn-warning"
+                            class "btn-info"
             in
             button [ class "btn btn-sm btn-square flex items-center gap-2", btnClass, onClick (SwitchMode newMode) ]
                 [ Icon.go
