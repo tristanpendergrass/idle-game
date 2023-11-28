@@ -15,7 +15,7 @@ import IdleGame.Xp as Xp exposing (Xp)
 
 allQuests : List Quest
 allQuests =
-    [ Quest1, Quest2 ]
+    [ MendCrackedBell, ChopFirewood ]
 
 
 
@@ -23,8 +23,8 @@ allQuests =
 
 
 type alias Record a =
-    { quest1 : a
-    , quest2 : a
+    { mendCrackedBell : a
+    , chopFirewood : a
     }
 
 
@@ -36,21 +36,21 @@ createRecord d =
 getByKind : Quest -> Record a -> a
 getByKind kind record =
     case kind of
-        Quest1 ->
-            record.quest1
+        MendCrackedBell ->
+            record.mendCrackedBell
 
-        Quest2 ->
-            record.quest2
+        ChopFirewood ->
+            record.chopFirewood
 
 
 setByKind : Quest -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        Quest1 ->
-            { record | quest1 = value }
+        MendCrackedBell ->
+            { record | mendCrackedBell = value }
 
-        Quest2 ->
-            { record | quest2 = value }
+        ChopFirewood ->
+            { record | chopFirewood = value }
 
 
 updateByKind : Quest -> (a -> a) -> Record a -> Record a
@@ -70,7 +70,7 @@ type alias Stats =
     { title : String
     , criteria : List Criteria
     , reward : List Effect.TaggedEffect
-    , icon : Icon
+    , image : CardImage
     }
 
 
@@ -81,17 +81,17 @@ getStats kind =
 
 allStats : Record Stats
 allStats =
-    { quest1 =
-        { title = "Quest 1"
-        , criteria = [ CanApplyEffect (Effect.gainResource -10 Manure) ]
-        , reward = [ Effect.gainResource 20 Manure ]
-        , icon = Icon.fromString "Q1"
+    { mendCrackedBell =
+        { title = "Mend Cracked Bell"
+        , criteria = [ CanApplyEffect (Effect.gainResource -10 Scrap) ]
+        , reward = [ Effect.gainResource 20 Scrap ]
+        , image = CardLandscape "/aiart/mend_cracked_bell.webp"
         }
-    , quest2 =
-        { title = "Quest 2"
-        , criteria = [ CanApplyEffect (Effect.gainResource -20 EmptyBottle) ]
-        , reward = [ Effect.gainResource 25 EmptyBottle ]
-        , icon = Icon.fromString "Q2"
+    , chopFirewood =
+        { title = "Chop Firewood"
+        , criteria = [ CanApplyEffect (Effect.gainResource -10 Scrap) ]
+        , reward = [ Effect.gainResource 20 Scrap ]
+        , image = CardLandscape "/aiart/chop_firewood.webp"
         }
     }
 

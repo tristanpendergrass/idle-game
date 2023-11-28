@@ -419,8 +419,8 @@ undiscoveredQuest =
     createIconFeather FeatherIcons.helpCircle
 
 
-questLog : Icon
-questLog =
+quest : Icon
+quest =
     createIconFeather FeatherIcons.trello
 
 

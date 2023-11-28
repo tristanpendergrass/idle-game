@@ -47,7 +47,7 @@ devFlags =
     , showDebugPanel = True
     , defaultMode = Adventuring
     , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.Location2
+    , defaultTabAdventuring = Tab.SchoolGrounds
     }
 
 
@@ -63,6 +63,6 @@ prodFlags =
     , showDebugPanel = True -- Setting to True for now so play testers can enjoy
     , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.Location1
+    , defaultTabAdventuring = Tab.SchoolGrounds
     , debugTimePasses = False
     }

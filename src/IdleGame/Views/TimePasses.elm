@@ -61,7 +61,7 @@ renderTimePassesDiscovery discovery =
                     ( (Monster.getStats monster).icon, (Monster.getStats monster).title )
 
                 Game.DiscoveredQuest quest ->
-                    ( (Quest.getStats quest).icon, (Quest.getStats quest).title )
+                    ( Icon.quest, (Quest.getStats quest).title )
 
                 Game.DiscoveredResource resource ->
                     ( (Resource.getStats resource).icon, (Resource.getStats resource).title )

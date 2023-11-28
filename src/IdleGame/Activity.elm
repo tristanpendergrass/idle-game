@@ -30,11 +30,14 @@ allActivitiesBySkill skill =
 activityForMonster : Monster -> Activity
 activityForMonster monster =
     case monster of
-        Monster1 ->
-            FightMonster1
+        Prefect ->
+            FightPrefect
 
-        Monster2 ->
-            FightMonster2
+        BookWyrm ->
+            FightBookWyrm
+
+        WhisperingWind ->
+            FightWhisperingWind
 
 
 allChores : List Activity
@@ -86,14 +89,11 @@ allActivities =
     , StudyJinx3
     , StudyCurse3
     , StudyWeather1
-    , ExploreLocation1
-    , ExploreLocation2
-    , FightMonster1
-    , FightMonster2
-    , FightMonster3
-    , FightMonster4
-    , FightMonster5
-    , FightMonster6
+    , ExploreSchoolGrounds
+    , ExploreSecretGarden
+    , FightPrefect
+    , FightBookWyrm
+    , FightWhisperingWind
     ]
 
 
@@ -117,14 +117,11 @@ type alias Record a =
     , jinx3 : a
     , curse3 : a
     , studyWeather1 : a
-    , exploreLocation1 : a
-    , exploreLocation2 : a
-    , fightMonster1 : a
-    , fightMonster2 : a
-    , fightMonster3 : a
-    , fightMonster4 : a
-    , fightMonster5 : a
-    , fightMonster6 : a
+    , exploreSchoolGrounds : a
+    , exploreSecretGarden : a
+    , fightPrefect : a
+    , fightBookWyrm : a
+    , fightWhisperingWind : a
     }
 
 
@@ -149,14 +146,11 @@ createRecord d =
     , jinx3 = d
     , curse3 = d
     , studyWeather1 = d
-    , exploreLocation1 = d
-    , exploreLocation2 = d
-    , fightMonster1 = d
-    , fightMonster2 = d
-    , fightMonster3 = d
-    , fightMonster4 = d
-    , fightMonster5 = d
-    , fightMonster6 = d
+    , exploreSchoolGrounds = d
+    , exploreSecretGarden = d
+    , fightPrefect = d
+    , fightBookWyrm = d
+    , fightWhisperingWind = d
     }
 
 
@@ -220,29 +214,20 @@ getByKind kind record =
         StudyWeather1 ->
             record.studyWeather1
 
-        ExploreLocation1 ->
-            record.exploreLocation1
+        ExploreSchoolGrounds ->
+            record.exploreSchoolGrounds
 
-        ExploreLocation2 ->
-            record.exploreLocation2
+        ExploreSecretGarden ->
+            record.exploreSecretGarden
 
-        FightMonster1 ->
-            record.fightMonster1
+        FightPrefect ->
+            record.fightPrefect
 
-        FightMonster2 ->
-            record.fightMonster2
+        FightBookWyrm ->
+            record.fightBookWyrm
 
-        FightMonster3 ->
-            record.fightMonster3
-
-        FightMonster4 ->
-            record.fightMonster4
-
-        FightMonster5 ->
-            record.fightMonster5
-
-        FightMonster6 ->
-            record.fightMonster6
+        FightWhisperingWind ->
+            record.fightWhisperingWind
 
 
 setByKind : Activity -> a -> Record a -> Record a
@@ -305,29 +290,20 @@ setByKind kind value record =
         StudyWeather1 ->
             { record | studyWeather1 = value }
 
-        ExploreLocation1 ->
-            { record | exploreLocation1 = value }
+        ExploreSchoolGrounds ->
+            { record | exploreSchoolGrounds = value }
 
-        ExploreLocation2 ->
-            { record | exploreLocation2 = value }
+        ExploreSecretGarden ->
+            { record | exploreSecretGarden = value }
 
-        FightMonster1 ->
-            { record | fightMonster1 = value }
+        FightPrefect ->
+            { record | fightPrefect = value }
 
-        FightMonster2 ->
-            { record | fightMonster2 = value }
+        FightBookWyrm ->
+            { record | fightBookWyrm = value }
 
-        FightMonster3 ->
-            { record | fightMonster3 = value }
-
-        FightMonster4 ->
-            { record | fightMonster4 = value }
-
-        FightMonster5 ->
-            { record | fightMonster5 = value }
-
-        FightMonster6 ->
-            { record | fightMonster6 = value }
+        FightWhisperingWind ->
+            { record | fightWhisperingWind = value }
 
 
 updateByKind : Activity -> (a -> a) -> Record a -> Record a
@@ -338,11 +314,6 @@ updateByKind kind f record =
 getBySpell : Spell -> Maybe Activity
 getBySpell spell =
     List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities
-
-
-type ActivityImage
-    = ActivityLandscape String
-    | ActivityIcon Icon
 
 
 type MasteryReward
@@ -375,7 +346,7 @@ belongsToLabel belongsTo =
 type alias Stats =
     { belongsTo : BelongsTo
     , title : String
-    , image : ActivityImage
+    , image : CardImage
     , unlockRequirements : Maybe ( Skill, Int )
     , duration : Duration
     , effects : List Effect.TaggedEffect
@@ -411,14 +382,11 @@ allStats =
     , jinx3 = jinx3Stats
     , curse3 = curse3Stats
     , studyWeather1 = weather1Stats
-    , exploreLocation1 = exploreLocation1Stats
-    , exploreLocation2 = exploreLocation2Stats
-    , fightMonster1 = fightMonster1Stats
-    , fightMonster2 = fightMonster2Stats
-    , fightMonster3 = fightMonster3Stats
-    , fightMonster4 = fightMonster4Stats
-    , fightMonster5 = fightMonster5Stats
-    , fightMonster6 = fightMonster6Stats
+    , exploreSchoolGrounds = exploreSchoolGroundsStats
+    , exploreSecretGarden = exploreSecretGardenStats
+    , fightPrefect = fightPrefectStats
+    , fightBookWyrm = fightBookWyrmStats
+    , fightWhisperingWind = fightWhisperingWind
     }
 
 
@@ -503,7 +471,7 @@ cleanStablesStats : Stats
 cleanStablesStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Clean Stables"
-    , image = ActivityLandscape "/chores/stable.png"
+    , image = CardLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3
     , effects =
@@ -523,7 +491,7 @@ cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Clean Big Bubba's Stall"
-    , image = ActivityLandscape "/chores/bubba4.png"
+    , image = CardLandscape "/chores/bubba4.png"
     , unlockRequirements = Just ( Chores, 10 )
     , duration = Duration.seconds 6
     , effects =
@@ -563,7 +531,7 @@ sweepChimneyStats : Stats
 sweepChimneyStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Sweep Chimneys"
-    , image = ActivityLandscape "/chores/chimney.png"
+    , image = CardLandscape "/chores/chimney.png"
     , unlockRequirements = Just ( Chores, 25 )
     , duration = Duration.seconds 8
     , effects =
@@ -583,7 +551,7 @@ waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Water Greenhouse Plants"
-    , image = ActivityLandscape "/chores/greenhouse_3.png"
+    , image = CardLandscape "/chores/greenhouse_3.png"
     , unlockRequirements = Just ( Chores, 35 )
     , duration = Duration.seconds 2
     , effects =
@@ -603,7 +571,7 @@ washAndIronRobesStats : Stats
 washAndIronRobesStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Wash and Iron Robes"
-    , image = ActivityLandscape "/chores/washRobes.png"
+    , image = CardLandscape "/chores/washRobes.png"
     , unlockRequirements = Just ( Chores, 45 )
     , duration = Duration.seconds 8
     , effects =
@@ -623,7 +591,7 @@ organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Organize Potion Ingredients"
-    , image = ActivityLandscape "/chores/potionIngredients_2.png"
+    , image = CardLandscape "/chores/potionIngredients_2.png"
     , unlockRequirements = Just ( Chores, 55 )
     , duration = Duration.seconds 20
     , effects =
@@ -643,7 +611,7 @@ repairInstrumentsStats : Stats
 repairInstrumentsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Repair Instruments"
-    , image = ActivityLandscape "/chores/repairInstruments.png"
+    , image = CardLandscape "/chores/repairInstruments.png"
     , unlockRequirements = Just ( Chores, 65 )
     , duration = Duration.seconds 12
     , effects =
@@ -663,7 +631,7 @@ flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Flush the Drain Demons"
-    , image = ActivityLandscape "/chores/drainDemons.png"
+    , image = CardLandscape "/chores/drainDemons.png"
     , unlockRequirements = Just ( Chores, 75 )
     , duration = Duration.seconds 10
     , effects =
@@ -683,7 +651,7 @@ organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Organize Spell Books"
-    , image = ActivityLandscape "/chores/spellBooks.png"
+    , image = CardLandscape "/chores/spellBooks.png"
     , unlockRequirements = Just ( Chores, 90 )
     , duration = Duration.seconds 20
     , effects =
@@ -725,7 +693,7 @@ hex1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3.5
     , effects =
@@ -752,7 +720,7 @@ jinx1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 10 )
     , duration = Duration.seconds 4.5
     , effects =
@@ -779,7 +747,7 @@ curse1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 25 )
     , duration = Duration.seconds 5
     , effects =
@@ -807,7 +775,7 @@ hex2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 35 )
     , duration = Duration.seconds 9
     , effects =
@@ -834,7 +802,7 @@ jinx2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 45 )
     , duration = Duration.seconds 10.5
     , effects =
@@ -861,7 +829,7 @@ curse2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 55 )
     , duration = Duration.seconds 12
     , effects =
@@ -889,7 +857,7 @@ hex3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 65 )
     , duration = Duration.seconds 15
     , effects =
@@ -916,7 +884,7 @@ jinx3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 75 )
     , duration = Duration.seconds 16
     , effects =
@@ -944,7 +912,7 @@ curse3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
-    , image = ActivityIcon spellStats.icon
+    , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 90 )
     , duration = Duration.seconds 19
     , effects =
@@ -965,7 +933,7 @@ weather1Stats : Stats
 weather1Stats =
     { belongsTo = BelongsToSkill Weathermancing
     , title = "Weather I"
-    , image = ActivityIcon (Icon.fromString "Wt1")
+    , image = CardIcon (Icon.fromString "Wt1")
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
     , effects =
@@ -982,28 +950,28 @@ weather1Stats =
 -- Adventuring
 
 
-exploreLocation1Stats : Stats
-exploreLocation1Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Explore: Location 1"
-    , image = ActivityLandscape "/chores/bubba3.png"
+exploreSchoolGroundsStats : Stats
+exploreSchoolGroundsStats =
+    { belongsTo = BelongsToLocation SchoolGrounds
+    , title = "Explore: School Grounds"
+    , image = CardLandscape "/aiart/school_grounds.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
-    , effects = [ Effect.explore Location1 ]
+    , effects = [ Effect.explore SchoolGrounds ]
     , mastery = Nothing
     , teachesSpell = Nothing
     , showDuration = False
     }
 
 
-exploreLocation2Stats : Stats
-exploreLocation2Stats =
-    { belongsTo = BelongsToLocation Location2
-    , title = "Explore: Location 2"
-    , image = ActivityLandscape "/chores/bubba3.png"
+exploreSecretGardenStats : Stats
+exploreSecretGardenStats =
+    { belongsTo = BelongsToLocation SecretGarden
+    , title = "Explore: Secret Garden"
+    , image = CardLandscape "/aiart/secret_garden.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
-    , effects = [ Effect.explore Location2 ]
+    , effects = [ Effect.explore SecretGarden ]
     , mastery = Nothing
     , teachesSpell = Nothing
     , showDuration = False
@@ -1017,19 +985,19 @@ monsterEffects { activity, rewards, power } =
     ]
 
 
-fightMonster1Stats : Stats
-fightMonster1Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Furball"
-    , image = ActivityIcon (Icon.fromString "F")
+fightPrefectStats : Stats
+fightPrefectStats =
+    { belongsTo = BelongsToLocation SchoolGrounds
+    , title = "Prefect"
+    , image = CardLandscape "/aiart/prefect.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightMonster1
+            { activity = FightPrefect
             , rewards =
                 [ Effect.gainCoin (Coin.int 1)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster1 ]
+                    |> Effect.withTags [ Effect.ActivityTag FightPrefect ]
                 ]
             , power = 1
             }
@@ -1039,19 +1007,19 @@ fightMonster1Stats =
     }
 
 
-fightMonster2Stats : Stats
-fightMonster2Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Ectoplo"
-    , image = ActivityIcon (Icon.fromString "E")
+fightBookWyrmStats : Stats
+fightBookWyrmStats =
+    { belongsTo = BelongsToLocation SchoolGrounds
+    , title = "Book Wyrm"
+    , image = CardLandscape "/aiart/book_wyrm.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightMonster2
+            { activity = FightBookWyrm
             , rewards =
                 [ Effect.gainResource 1 Ectoplasm
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster2 ]
+                    |> Effect.withTags [ Effect.ActivityTag FightBookWyrm ]
                 ]
             , power = 8
             }
@@ -1061,91 +1029,21 @@ fightMonster2Stats =
     }
 
 
-fightMonster3Stats : Stats
-fightMonster3Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Dreadkin"
-    , image = ActivityIcon (Icon.fromString "D")
+fightWhisperingWind : Stats
+fightWhisperingWind =
+    { belongsTo = BelongsToLocation SecretGarden
+    , title = "Whispering Wind"
+    , image = CardLandscape "/aiart/whispering_wind.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightMonster3
+            { activity = FightWhisperingWind
             , rewards =
                 [ Effect.gainCoin (Coin.int 5)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster3 ]
+                    |> Effect.withTags [ Effect.ActivityTag FightWhisperingWind ]
                 ]
             , power = 22
-            }
-    , mastery = Nothing
-    , teachesSpell = Nothing
-    , showDuration = False
-    }
-
-
-fightMonster4Stats : Stats
-fightMonster4Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Creeping Vine"
-    , image = ActivityIcon (Icon.fromString "C")
-    , unlockRequirements = Nothing
-    , duration = Duration.seconds 8
-    , effects =
-        monsterEffects
-            { activity = FightMonster4
-            , rewards =
-                [ Effect.gainResource 1 GreenhouseDirt
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster4 ]
-                ]
-            , power = 45
-            }
-    , mastery = Nothing
-    , teachesSpell = Nothing
-    , showDuration = False
-    }
-
-
-fightMonster5Stats : Stats
-fightMonster5Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Banshee"
-    , image = ActivityIcon (Icon.fromString "B")
-    , unlockRequirements = Nothing
-    , duration = Duration.seconds 8
-    , effects =
-        monsterEffects
-            { activity = FightMonster5
-            , rewards =
-                [ Effect.gainCoin (Coin.int 15)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster5 ]
-                ]
-            , power = 75
-            }
-    , mastery = Nothing
-    , teachesSpell = Nothing
-    , showDuration = False
-    }
-
-
-fightMonster6Stats : Stats
-fightMonster6Stats =
-    { belongsTo = BelongsToLocation Location1
-    , title = "Alucard"
-    , image = ActivityIcon (Icon.fromString "A")
-    , unlockRequirements = Nothing
-    , duration = Duration.seconds 8
-    , effects =
-        monsterEffects
-            { activity = FightMonster6
-            , rewards =
-                [ Effect.gainResource 2 Scrap
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
-                , Effect.gainResource 2 Soot
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
-                , Effect.gainCoin (Coin.int 20)
-                    |> Effect.withTags [ Effect.ActivityTag FightMonster6 ]
-                ]
-            , power = 110
             }
     , mastery = Nothing
     , teachesSpell = Nothing

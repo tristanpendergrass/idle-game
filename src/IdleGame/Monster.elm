@@ -14,53 +14,63 @@ import IdleGame.Xp as Xp exposing (Xp)
 allMonstersByLocation : Location -> List Monster
 allMonstersByLocation location =
     case location of
-        Location1 ->
-            [ Monster1
-            , Monster2
+        SchoolGrounds ->
+            [ Prefect
+            , BookWyrm
             ]
 
-        _ ->
-            []
+        SecretGarden ->
+            [ WhisperingWind
+            ]
 
 
 allMonsters : List Monster
 allMonsters =
-    [ Monster1
-    , Monster2
+    [ Prefect
+    , BookWyrm
+    , WhisperingWind
     ]
 
 
 type alias Record a =
-    { monster1 : a
-    , monster2 : a
+    { prefect : a
+    , bookWyrm : a
+    , whisperingWind : a
     }
 
 
 createRecord : a -> Record a
 createRecord d =
-    { monster1 = d
-    , monster2 = d
+    { prefect = d
+    , bookWyrm = d
+    , whisperingWind = d
     }
 
 
 getByKind : Monster -> Record a -> a
 getByKind kind record =
     case kind of
-        Monster1 ->
-            record.monster1
+        Prefect ->
+            record.prefect
 
-        Monster2 ->
-            record.monster2
+        BookWyrm ->
+            record.bookWyrm
+
+        WhisperingWind ->
+            record.whisperingWind
 
 
 setByKind : Monster -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        Monster1 ->
-            { record | monster1 = value }
+        Prefect ->
+            { record | prefect = value }
 
-        Monster2 ->
-            { record | monster2 = value }
+        BookWyrm ->
+            { record | bookWyrm = value }
+
+        WhisperingWind ->
+            { record | whisperingWind = value }
 
 
 updateByKind : Monster -> (a -> a) -> Record a -> Record a
@@ -81,8 +91,9 @@ getStats kind =
 
 allStats : Record Stats
 allStats =
-    { monster1 = { title = "Monster 1", icon = Icon.fromString "M1" }
-    , monster2 = { title = "Monster 2", icon = Icon.fromString "M2" }
+    { prefect = Stats "Prefect" Icon.underConstruction
+    , bookWyrm = Stats "Book Wyrm" Icon.underConstruction
+    , whisperingWind = Stats "Whispering Wind" Icon.underConstruction
     }
 
 

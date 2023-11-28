@@ -2,7 +2,7 @@ module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
 import Html.Attributes exposing (download)
-import IdleGame.Activity as Activity exposing (ActivityImage)
+import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)

@@ -18,7 +18,7 @@ import Random
 
 allLocations : List Location
 allLocations =
-    [ Location1, Location2 ]
+    [ SchoolGrounds, SecretGarden ]
 
 
 
@@ -26,8 +26,8 @@ allLocations =
 
 
 type alias Record a =
-    { location1 : a
-    , location2 : a
+    { schoolGrounds : a
+    , secretGarden : a
     }
 
 
@@ -39,21 +39,21 @@ createRecord d =
 getByKind : Location -> Record a -> a
 getByKind kind record =
     case kind of
-        Location1 ->
-            record.location1
+        SchoolGrounds ->
+            record.schoolGrounds
 
-        Location2 ->
-            record.location2
+        SecretGarden ->
+            record.secretGarden
 
 
 setByKind : Location -> a -> Record a -> Record a
 setByKind kind value record =
     case kind of
-        Location1 ->
-            { record | location1 = value }
+        SchoolGrounds ->
+            { record | schoolGrounds = value }
 
-        Location2 ->
-            { record | location2 = value }
+        SecretGarden ->
+            { record | secretGarden = value }
 
 
 updateByKind : Location -> (a -> a) -> Record a -> Record a
@@ -106,19 +106,19 @@ allStats =
                 )
                 (Quest.createRecord False)
     in
-    { location1 =
-        { title = "Location 1"
-        , monsters = monstersFromList [ Monster1 ]
+    { schoolGrounds =
+        { title = "School Grounds"
+        , monsters = monstersFromList [ Prefect, BookWyrm ]
         , resources = resourcesFromList [ Parchment ]
-        , quests = questsFromList [ Quest1, Quest2 ]
-        , exploreActivity = ExploreLocation1
+        , quests = questsFromList [ MendCrackedBell, ChopFirewood ]
+        , exploreActivity = ExploreSchoolGrounds
         }
-    , location2 =
-        { title = "Location 2"
-        , monsters = monstersFromList [ Monster2 ]
+    , secretGarden =
+        { title = "Secret Garden"
+        , monsters = monstersFromList [ WhisperingWind ]
         , resources = resourcesFromList [ WashWater ]
         , quests = questsFromList []
-        , exploreActivity = ExploreLocation2
+        , exploreActivity = ExploreSecretGarden
         }
     }
 

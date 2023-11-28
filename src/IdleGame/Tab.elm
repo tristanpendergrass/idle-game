@@ -20,8 +20,8 @@ type Tab
     | Conjuration
     | Transmogrification
       -- Locations
-    | Location1
-    | Location2
+    | SchoolGrounds
+    | SecretGarden
 
 
 type alias TabConfig =
@@ -103,12 +103,12 @@ getConfig tab =
             , icon = Icon.transmogrification
             }
 
-        Location1 ->
-            { title = "Location 1"
+        SchoolGrounds ->
+            { title = "School Grounds"
             , icon = Icon.enchantment
             }
 
-        Location2 ->
-            { title = "Location 2"
+        SecretGarden ->
+            { title = "Secret Garden"
             , icon = Icon.enchantment
             }

@@ -50,14 +50,11 @@ type
     | StudyJinx3
     | StudyCurse3
       -- Adventuring
-    | ExploreLocation1
-    | ExploreLocation2
-    | FightMonster1
-    | FightMonster2
-    | FightMonster3
-    | FightMonster4
-    | FightMonster5
-    | FightMonster6
+    | ExploreSchoolGrounds
+    | ExploreSecretGarden
+    | FightPrefect
+    | FightBookWyrm
+    | FightWhisperingWind
       -- Weathermancing
     | StudyWeather1
 
@@ -82,15 +79,16 @@ type
 type
     Location
     -- Don't forget to update IdleGame.Location! Record + allLocations
-    = Location1
-    | Location2
+    = SchoolGrounds
+    | SecretGarden
 
 
 type
     Monster
     -- Don't forget to update IdleGame.Monster! Record + allMonsters
-    = Monster1
-    | Monster2
+    = Prefect
+    | BookWyrm
+    | WhisperingWind
 
 
 type
@@ -106,5 +104,5 @@ type
 type
     Quest
     -- Don't forget to update IdleGame.Quest! Record + allQuests
-    = Quest1
-    | Quest2
+    = MendCrackedBell
+    | ChopFirewood

@@ -4,6 +4,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import Percent exposing (Percent)
 
 
@@ -27,3 +28,8 @@ type alias IntervalMod =
     , percentChange : Percent -- e.g. 0.25 -> 25% faster
     , label : IntervalModLabel
     }
+
+
+type CardImage
+    = CardLandscape String
+    | CardIcon Icon

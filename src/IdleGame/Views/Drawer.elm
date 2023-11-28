@@ -148,8 +148,8 @@ renderDrawer isDrawerOpen mode activeTab =
                         , switchModeButton
                         ]
                     ]
-                , li [ onClick (HandleTabClick Tab.Location1 Adventuring) ] [ renderTab { tab = Tab.Location1, underConstruction = False } ]
-                , li [ onClick (HandleTabClick Tab.Location2 Adventuring) ] [ renderTab { tab = Tab.Location2, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.SchoolGrounds Adventuring) ] [ renderTab { tab = Tab.SchoolGrounds, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.SecretGarden Adventuring) ] [ renderTab { tab = Tab.SecretGarden, underConstruction = False } ]
                 ]
             ]
     in

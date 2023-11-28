@@ -51,35 +51,6 @@ probabilityToInt x =
 -- Activity title
 
 
-activityImage : Activity -> Html FrontendMsg
-activityImage kind =
-    case (Activity.getStats kind).image of
-        Activity.ActivityLandscape imgSrc ->
-            renderImage imgSrc
-
-        Activity.ActivityIcon icon ->
-            renderIcon icon
-
-
-renderImage : String -> Html FrontendMsg
-renderImage imgSrc =
-    img
-        [ src imgSrc
-        , class "h-full w-full object-cover"
-        ]
-        []
-
-
-renderIcon : Icon -> Html FrontendMsg
-renderIcon icon =
-    div
-        [ class "h-full w-full flex items-center justify-center bg-accent" ]
-        [ icon
-            |> Icon.withSize Icon.Large
-            |> Icon.toHtml
-        ]
-
-
 monsterImage : Monster -> Html FrontendMsg
 monsterImage kind =
     div
@@ -211,7 +182,7 @@ renderActivityCard activity game screenWidth =
             ]
             [ -- preview image
               div [ Utils.card.imageContainer ]
-                [ activityImage activity
+                [ Utils.cardImage (Activity.getStats activity).image
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 [ div [ class "t-column" ]

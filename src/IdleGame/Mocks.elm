@@ -2,7 +2,7 @@ module IdleGame.Mocks exposing (..)
 
 import Duration exposing (Duration)
 import Html.Attributes exposing (download)
-import IdleGame.Activity as Activity exposing (ActivityImage)
+import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
@@ -44,7 +44,7 @@ timePassesModal =
             { xpGains =
                 [ { originalXp = Xp.int 0, currentXp = Xp.int 100, skill = Hexes }
                 ]
-            , discoveries = [ Game.DiscoveredMonster Monster1, Game.DiscoveredQuest Quest1, Game.DiscoveredResource EmptyBottle ]
+            , discoveries = [ Game.DiscoveredMonster Prefect, Game.DiscoveredQuest MendCrackedBell, Game.DiscoveredResource EmptyBottle ]
             , coinGains = Nothing
             , resourcesDiff = Resource.createRecord 0
             , combatsWonDiff = 0

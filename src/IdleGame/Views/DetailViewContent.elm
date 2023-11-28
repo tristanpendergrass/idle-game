@@ -57,10 +57,10 @@ renderStatusBar ( activity, timer ) =
         image : Html FrontendMsg
         image =
             case stats.image of
-                Activity.ActivityLandscape imgSrc ->
+                CardLandscape imgSrc ->
                     img [ src imgSrc, class "object-cover h-full w-full object-center" ] []
 
-                Activity.ActivityIcon icon ->
+                CardIcon icon ->
                     div [ class "h-full w-full flex items-center justify-center bg-accent" ] [ Icon.toHtml icon ]
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
@@ -168,7 +168,7 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ ActivityView.activityImage activity
+            [ Utils.cardImage (Activity.getStats activity).image
             , fade isPreview
             ]
 

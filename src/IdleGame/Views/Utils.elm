@@ -5,6 +5,7 @@ import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -387,3 +388,22 @@ card =
     , body = class "relative h-full card-body t-column gap-2 justify-between w-full"
     , title = class "text-sm  md:text-lg text-center flex items-center gap-2"
     }
+
+
+cardImage : CardImage -> Html msg
+cardImage image =
+    case image of
+        CardLandscape imgSrc ->
+            img
+                [ src imgSrc
+                , class "h-full w-full object-cover"
+                ]
+                []
+
+        CardIcon icon ->
+            div
+                [ class "h-full w-full flex items-center justify-center bg-accent" ]
+                [ icon
+                    |> Icon.withSize Icon.Large
+                    |> Icon.toHtml
+                ]

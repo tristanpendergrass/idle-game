@@ -71,11 +71,11 @@ renderContent model game activeTab =
             Tab.Shop ->
                 IdleGame.Views.Shop.render game
 
-            Tab.Location1 ->
-                IdleGame.Views.Location.render model game Location1
+            Tab.SchoolGrounds ->
+                IdleGame.Views.Location.render model game SchoolGrounds
 
-            Tab.Location2 ->
-                IdleGame.Views.Location.render model game Location2
+            Tab.SecretGarden ->
+                IdleGame.Views.Location.render model game SecretGarden
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

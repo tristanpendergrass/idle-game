@@ -31,16 +31,6 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-renderIcon : Icon -> Html FrontendMsg
-renderIcon icon =
-    div
-        [ class "h-full w-full flex items-center justify-center bg-accent" ]
-        [ icon
-            |> Icon.withSize Icon.Large
-            |> Icon.toHtml
-        ]
-
-
 completeButton : Quest -> Bool -> Html FrontendMsg
 completeButton quest canComplete =
     button
@@ -69,7 +59,7 @@ renderQuest game quest =
     in
     div [ Utils.card.container ]
         [ div [ Utils.card.imageContainer ]
-            [ renderIcon (Quest.getStats quest).icon ]
+            [ Utils.cardImage (Quest.getStats quest).image ]
         , div [ Utils.card.body ]
             (List.concat
                 [ [ h2 [ Utils.card.title ] [ text (Quest.getLabel quest) ] ]
