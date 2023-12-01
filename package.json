@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build:css": "npx tailwindcss -i ./src/index.css -o ./public/output.css",
-    "test": "npx elm-test \"src/**/*test.elm\""
+    "test": "npx elm-test \"src/**/*test.elm\"",
+    "generate-elm": "npx elm-codegen run && npx shx cp -r generated/IdleGame.Kinds2.elm src/IdleGame/Kinds2.elm"
   }
 }

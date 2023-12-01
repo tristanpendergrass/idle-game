@@ -2,6 +2,7 @@ module IdleGame.Views.Hexes exposing (..)
 
 import Duration exposing (Duration)
 import FeatherIcons
+import HelloWorld
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
