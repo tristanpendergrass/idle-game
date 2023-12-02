@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill

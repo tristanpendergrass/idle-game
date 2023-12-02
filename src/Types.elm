@@ -10,6 +10,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)

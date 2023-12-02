@@ -2,7 +2,6 @@ module IdleGame.Views.Hexes exposing (..)
 
 import Duration exposing (Duration)
 import FeatherIcons
-import HelloWorld
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -11,7 +10,6 @@ import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
-import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity

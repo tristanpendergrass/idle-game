@@ -10,6 +10,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest

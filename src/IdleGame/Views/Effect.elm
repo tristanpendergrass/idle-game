@@ -10,6 +10,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location exposing (findableResources, foundResources)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -126,7 +127,7 @@ renderResource game { base, resource } =
     let
         owned : Int
         owned =
-            Resource.getByKind resource game.resources
+            getByKindResource resource game.resources
 
         isNegativeAmount : Bool
         isNegativeAmount =

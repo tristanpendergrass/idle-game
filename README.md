@@ -24,6 +24,11 @@ or
 $ npm test -- --watch
 ```
 
+# Codegen
+
+We use [elm-codegen](https://github.com/mdgriffith/elm-codegen) to generate some boilerplate for the game.
+To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. This will run elm-codegen and copy the results from `generated/` to `src/`.
+
 # Deployment
 [ ] Run unit tests (see above)
 [ ] Run `$ npx elm-review --fix`
@@ -122,6 +127,7 @@ $ npm test -- --watch
 - [ ] Skill 4
 #### Combat
 - [ ] Regen period after loss
+- [ ] Redesign "danger meter" for combat. Visual inspiration: the power zone interface on peloton. Also wildfire danger signs you see on the road
 #### Quests
 - [ ] Multi-stage quests
 - [ ] Quests that require you to do some more exploring (find something lost)

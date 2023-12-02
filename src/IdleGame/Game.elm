@@ -10,6 +10,7 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
@@ -44,7 +45,7 @@ type alias Game =
     , activityAdventuring : Maybe ( Activity, Timer )
     , monster : Maybe Monster
     , coin : Coin
-    , resources : Resource.Record Int
+    , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgrade.Record Bool
     , combatsWon : Int
     , combatsLost : Int
@@ -72,7 +73,7 @@ createProd seed =
     , activityAdventuring = Nothing
     , monster = Nothing
     , coin = Coin.int 0
-    , resources = Resource.emptyResourceRecord
+    , resources = resourceRecord 0
     , ownedShopUpgrades = ShopUpgrade.createRecord False
     , combatsWon = 0
     , combatsLost = 0
@@ -100,7 +101,7 @@ createDev seed =
     , activityAdventuring = Nothing
     , monster = Nothing
     , coin = Coin.int 100000
-    , resources = Resource.emptyResourceRecord
+    , resources = resourceRecord 0
     , ownedShopUpgrades = ShopUpgrade.createRecord False
     , combatsWon = 0
     , combatsLost = 0
@@ -773,7 +774,7 @@ addMasteryPoolXp amount game =
 addResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
 addResource resource amount game =
     let
-        newResources : Result EffectErr (Resource.Record Int)
+        newResources : Result EffectErr (ResourceRecord Int)
         newResources =
             Resource.add resource amount game.resources
     in

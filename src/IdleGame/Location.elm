@@ -6,6 +6,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
@@ -68,7 +69,7 @@ updateByKind kind f record =
 type alias Stats =
     { title : String
     , monsters : Monster.Record Bool
-    , resources : Resource.Record Bool
+    , resources : ResourceRecord Bool
     , quests : Quest.Record Bool
     , exploreActivity : Activity
     }
@@ -90,13 +91,13 @@ allStats =
                 )
                 (Monster.createRecord False)
 
-        resourcesFromList : List Resource -> Resource.Record Bool
+        resourcesFromList : List Resource -> ResourceRecord Bool
         resourcesFromList =
             List.foldl
                 (\resource accum ->
-                    Resource.setByKind resource True accum
+                    setByKindResource resource True accum
                 )
-                (Resource.createRecord False)
+                (resourceRecord False)
 
         questsFromList : List Quest -> Quest.Record Bool
         questsFromList =
@@ -129,7 +130,7 @@ allStats =
 
 type alias State =
     { foundMonsters : Monster.Record Bool
-    , foundResources : Resource.Record Bool
+    , foundResources : ResourceRecord Bool
     , foundQuests : Quest.Record Bool
     }
 
@@ -137,7 +138,7 @@ type alias State =
 createState : State
 createState =
     { foundMonsters = Monster.createRecord False
-    , foundResources = Resource.createRecord False
+    , foundResources = resourceRecord False
     , foundQuests = Quest.createRecord False
     }
 
@@ -154,7 +155,7 @@ setResourceToFound : Resource -> State -> State
 setResourceToFound resource state =
     { state
         | foundResources =
-            Resource.setByKind resource True state.foundResources
+            setByKindResource resource True state.foundResources
     }
 
 
@@ -302,17 +303,17 @@ gatherResourceGenerator location result =
 
 findableResources : Location -> State -> List Resource
 findableResources location state =
-    Resource.allResources
+    allResources
         |> List.filter
             (\resource ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Resource.getByKind resource (getStats location).resources
+                        getByKindResource resource (getStats location).resources
 
                     isFound : Bool
                     isFound =
-                        Resource.getByKind resource state.foundResources
+                        getByKindResource resource state.foundResources
                 in
                 isAtLocation && not isFound
             )
@@ -320,17 +321,17 @@ findableResources location state =
 
 foundResources : Location -> State -> List Resource
 foundResources location state =
-    Resource.allResources
+    allResources
         |> List.filter
             (\resource ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Resource.getByKind resource (getStats location).resources
+                        getByKindResource resource (getStats location).resources
 
                     isFound : Bool
                     isFound =
-                        Resource.getByKind resource state.foundResources
+                        getByKindResource resource state.foundResources
                 in
                 isAtLocation && isFound
             )
@@ -338,8 +339,8 @@ foundResources location state =
 
 resourcesAtLocation : Location -> List Resource
 resourcesAtLocation location =
-    Resource.allResources
-        |> List.filter (\resource -> Resource.getByKind resource (getStats location).resources)
+    allResources
+        |> List.filter (\resource -> getByKindResource resource (getStats location).resources)
 
 
 findQuestGenerator : Location -> ExploreResult -> Random.Generator ExploreResult

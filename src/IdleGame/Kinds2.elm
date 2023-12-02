@@ -18,7 +18,7 @@ type Resource
     | Parchment
 
 
-allResources : List manure
+allResources : List Resource
 allResources =
     [ Manure
     , Soot
@@ -34,9 +34,9 @@ allResources =
 type alias ResourceRecord a =
     { manure : a
     , soot : a
-    , greenhousedirt : a
-    , washwater : a
-    , emptybottle : a
+    , greenhouseDirt : a
+    , washWater : a
+    , emptyBottle : a
     , scrap : a
     , ectoplasm : a
     , parchment : a
@@ -47,9 +47,9 @@ resourceRecord : a -> ResourceRecord a
 resourceRecord a =
     { manure = a
     , soot = a
-    , greenhousedirt = a
-    , washwater = a
-    , emptybottle = a
+    , greenhouseDirt = a
+    , washWater = a
+    , emptyBottle = a
     , scrap = a
     , ectoplasm = a
     , parchment = a
@@ -66,13 +66,13 @@ getByKindResource kind data =
             data.soot
 
         GreenhouseDirt ->
-            data.greenhousedirt
+            data.greenhouseDirt
 
         WashWater ->
-            data.washwater
+            data.washWater
 
         EmptyBottle ->
-            data.emptybottle
+            data.emptyBottle
 
         Scrap ->
             data.scrap
@@ -82,3 +82,32 @@ getByKindResource kind data =
 
         Parchment ->
             data.parchment
+
+
+setByKindResource :
+    Resource -> value -> ResourceRecord value -> ResourceRecord value
+setByKindResource kind value data =
+    case kind of
+        Manure ->
+            { data | manure = value }
+
+        Soot ->
+            { data | soot = value }
+
+        GreenhouseDirt ->
+            { data | greenhouseDirt = value }
+
+        WashWater ->
+            { data | washWater = value }
+
+        EmptyBottle ->
+            { data | emptyBottle = value }
+
+        Scrap ->
+            { data | scrap = value }
+
+        Ectoplasm ->
+            { data | ectoplasm = value }
+
+        Parchment ->
+            { data | parchment = value }

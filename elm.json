@@ -1,9 +1,7 @@
 {
     "type": "application",
     "source-directories": [
-        "src",
-        "generated",
-        "codegen"
+        "src"
     ],
     "elm-version": "0.19.1",
     "dependencies": {

@@ -7,6 +7,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
@@ -23,7 +24,7 @@ render game quantity ( resource, price ) =
 
         owned : Int
         owned =
-            Resource.getByKind resource game.resources
+            getByKindResource resource game.resources
 
         minMaxButtonWidth : Attribute msg
         minMaxButtonWidth =

@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game, attemptPurchaseResource)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Kinds2 exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
@@ -113,7 +114,7 @@ render game =
 
         purchasableResources : List ( Resource, Coin )
         purchasableResources =
-            Resource.allResources
+            allResources
                 |> List.filterMap
                     (\kind ->
                         case (Resource.getStats kind).purchasing of

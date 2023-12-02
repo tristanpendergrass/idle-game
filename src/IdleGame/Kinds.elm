@@ -13,17 +13,18 @@ type
     | Weathermancing
 
 
-type
-    Resource
-    -- Don't forget to update IdleGame.Resource! Record + allResources
-    = Manure
-    | Soot
-    | GreenhouseDirt
-    | WashWater
-    | EmptyBottle
-    | Scrap
-    | Ectoplasm
-    | Parchment
+
+-- type
+--     Resource
+--     -- Don't forget to update IdleGame.Resource! Record + allResources
+--     = Manure
+--     | Soot
+--     | GreenhouseDirt
+--     | WashWater
+--     | EmptyBottle
+--     | Scrap
+--     | Ectoplasm
+--     | Parchment
 
 
 type
