@@ -10,7 +10,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
@@ -33,7 +32,7 @@ render model game location =
     let
         monsters : List Monster
         monsters =
-            Location.foundMonsters location (Location.getByKind location game.locations)
+            Location.foundMonsters location (getByKindLocation location game.locations)
 
         monsterListItems : List Game.ActivityListItem
         monsterListItems =
@@ -43,11 +42,11 @@ render model game location =
 
         quests : List Quest
         quests =
-            Location.foundQuests location (Location.getByKind location game.locations)
+            Location.foundQuests location (getByKindLocation location game.locations)
 
         locationFilter : LocationFilter
         locationFilter =
-            Location.getByKind location model.locationFilters
+            getByKindLocation location model.locationFilters
 
         exploreItem : Html FrontendMsg
         exploreItem =
@@ -96,7 +95,7 @@ renderLocationInfo game location =
     let
         percent : Percent
         percent =
-            Location.getCompletion location (Location.getByKind location game.locations)
+            Location.getCompletion location (getByKindLocation location game.locations)
     in
     div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-primary" ]
         [ div [ class "t-column" ]
@@ -134,7 +133,7 @@ renderResourcesPane game location =
     let
         locationState : Location.State
         locationState =
-            Location.getByKind location game.locations
+            getByKindLocation location game.locations
 
         resourcesAtLocation : List Resource
         resourcesAtLocation =
@@ -171,7 +170,7 @@ renderMonstersPane game location =
     let
         locationState : Location.State
         locationState =
-            Location.getByKind location game.locations
+            getByKindLocation location game.locations
 
         monstersAtLocation : List Monster
         monstersAtLocation =
@@ -200,7 +199,7 @@ renderQuestsPane game location =
     let
         locationState : Location.State
         locationState =
-            Location.getByKind location game.locations
+            getByKindLocation location game.locations
 
         questsAtLocation : List Quest
         questsAtLocation =

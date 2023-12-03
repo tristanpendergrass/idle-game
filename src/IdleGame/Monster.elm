@@ -24,60 +24,6 @@ allMonstersByLocation location =
             ]
 
 
-allMonsters : List Monster
-allMonsters =
-    [ Prefect
-    , BookWyrm
-    , WhisperingWind
-    ]
-
-
-type alias Record a =
-    { prefect : a
-    , bookWyrm : a
-    , whisperingWind : a
-    }
-
-
-createRecord : a -> Record a
-createRecord d =
-    { prefect = d
-    , bookWyrm = d
-    , whisperingWind = d
-    }
-
-
-getByKind : Monster -> Record a -> a
-getByKind kind record =
-    case kind of
-        Prefect ->
-            record.prefect
-
-        BookWyrm ->
-            record.bookWyrm
-
-        WhisperingWind ->
-            record.whisperingWind
-
-
-setByKind : Monster -> a -> Record a -> Record a
-setByKind kind value record =
-    case kind of
-        Prefect ->
-            { record | prefect = value }
-
-        BookWyrm ->
-            { record | bookWyrm = value }
-
-        WhisperingWind ->
-            { record | whisperingWind = value }
-
-
-updateByKind : Monster -> (a -> a) -> Record a -> Record a
-updateByKind kind f record =
-    setByKind kind (f (getByKind kind record)) record
-
-
 type alias Stats =
     { title : String
     , icon : Icon
@@ -86,10 +32,10 @@ type alias Stats =
 
 getStats : Monster -> Stats
 getStats kind =
-    getByKind kind allStats
+    getByKindMonster kind allStats
 
 
-allStats : Record Stats
+allStats : MonsterRecord Stats
 allStats =
     { prefect = Stats "Prefect" Icon.underConstruction
     , bookWyrm = Stats "Book Wyrm" Icon.underConstruction

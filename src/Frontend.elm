@@ -107,7 +107,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
-      , locationFilters = Location.createRecord LocationAll
+      , locationFilters = locationRecord LocationAll
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -432,7 +432,7 @@ updatePointer delta model =
                         )
 
 
-updateLocationFilters : (Location.Record LocationFilter -> Location.Record LocationFilter) -> FrontendModel -> FrontendModel
+updateLocationFilters : (LocationRecord LocationFilter -> LocationRecord LocationFilter) -> FrontendModel -> FrontendModel
 updateLocationFilters fn model =
     { model | locationFilters = fn model.locationFilters }
 
@@ -891,7 +891,7 @@ update msg model =
                                 Coin.toInt stats.price <= Coin.toInt game.coin
 
                             dontOwnItemYet =
-                                not <| ShopUpgrade.getByKind kind game.ownedShopUpgrades
+                                not <| getByKindShopUpgrade kind game.ownedShopUpgrades
                         in
                         if canAfford && dontOwnItemYet then
                             let
@@ -899,7 +899,7 @@ update msg model =
                                 newGame =
                                     { game
                                         | coin = Quantity.difference game.coin stats.price
-                                        , ownedShopUpgrades = ShopUpgrade.setByKind kind True game.ownedShopUpgrades
+                                        , ownedShopUpgrades = setByKindShopUpgrade kind True game.ownedShopUpgrades
                                     }
                             in
                             newGame
@@ -1096,7 +1096,7 @@ update msg model =
                         filter
             in
             ( model
-                |> updateLocationFilters (Location.updateByKind location updateFilter)
+                |> updateLocationFilters (Location.updateByKindLocation location updateFilter)
             , Cmd.none
             )
 

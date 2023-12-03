@@ -11,7 +11,6 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster

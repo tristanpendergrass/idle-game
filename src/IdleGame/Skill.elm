@@ -4,49 +4,6 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
-allSkills : List Skill
-allSkills =
-    [ Chores, Hexes, Weathermancing ]
-
-
-type alias Record a =
-    { chores : a
-    , hexes : a
-    , weathermancing : a
-    }
-
-
-getByKind : Skill -> Record a -> a
-getByKind kind data =
-    case kind of
-        Chores ->
-            data.chores
-
-        Hexes ->
-            data.hexes
-
-        Weathermancing ->
-            data.weathermancing
-
-
-setByKind : Skill -> a -> Record a -> Record a
-setByKind kind value data =
-    case kind of
-        Chores ->
-            { data | chores = value }
-
-        Hexes ->
-            { data | hexes = value }
-
-        Weathermancing ->
-            { data | weathermancing = value }
-
-
-updateByKind : Skill -> (a -> a) -> Record a -> Record a
-updateByKind kind update data =
-    setByKind kind (update (getByKind kind data)) data
-
-
 getLabel : Skill -> String
 getLabel kind =
     case kind of
@@ -71,3 +28,8 @@ getIcon kind =
 
         Weathermancing ->
             Icon.weathermancing
+
+
+updateByKindSkill : Skill -> (a -> a) -> SkillRecord a -> SkillRecord a
+updateByKindSkill skill fn record =
+    setByKindSkill skill (fn (getByKindSkill skill record)) record

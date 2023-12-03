@@ -10,7 +10,6 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Monster as Monster
@@ -36,27 +35,27 @@ import Tuple
 
 type alias Game =
     { seed : Random.Seed
-    , xp : Skill.Record Xp
-    , mxp : Activity.Record Xp
-    , locations : Location.Record Location.State
-    , quests : Quest.Record Quest.State
+    , xp : SkillRecord Xp
+    , mxp : ActivityRecord Xp
+    , locations : LocationRecord Location.State
+    , quests : QuestRecord Quest.State
     , choresMxp : Xp
     , activitySkilling : Maybe ( Activity, Timer )
     , activityAdventuring : Maybe ( Activity, Timer )
     , monster : Maybe Monster
     , coin : Coin
     , resources : ResourceRecord Int
-    , ownedShopUpgrades : ShopUpgrade.Record Bool
+    , ownedShopUpgrades : ShopUpgradeRecord Bool
     , combatsWon : Int
     , combatsLost : Int
-    , spellSelectors : Activity.Record (Maybe Spell)
+    , spellSelectors : ActivityRecord (Maybe Spell)
     }
 
 
 createProd : Random.Seed -> Game
 createProd seed =
     let
-        xp : Skill.Record Xp
+        xp : SkillRecord Xp
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
@@ -65,26 +64,26 @@ createProd seed =
     in
     { seed = seed
     , xp = xp
-    , mxp = Activity.createRecord (Xp.int 0)
-    , locations = Location.createRecord Location.createState
-    , quests = Quest.createRecord Quest.Incomplete
+    , mxp = activityRecord (Xp.int 0)
+    , locations = locationRecord Location.createState
+    , quests = questRecord Quest.Incomplete
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
     , monster = Nothing
     , coin = Coin.int 0
     , resources = resourceRecord 0
-    , ownedShopUpgrades = ShopUpgrade.createRecord False
+    , ownedShopUpgrades = shopUpgradeRecord False
     , combatsWon = 0
     , combatsLost = 0
-    , spellSelectors = Activity.createRecord Nothing
+    , spellSelectors = activityRecord Nothing
     }
 
 
 createDev : Random.Seed -> Game
 createDev seed =
     let
-        xp : Skill.Record Xp
+        xp : SkillRecord Xp
         xp =
             { chores = Xp.int 0
             , hexes = Xp.int 0
@@ -93,25 +92,25 @@ createDev seed =
     in
     { seed = seed
     , xp = xp
-    , mxp = Activity.createRecord (Xp.int 0)
-    , locations = Location.createRecord Location.createState
-    , quests = Quest.createRecord Quest.Incomplete
+    , mxp = activityRecord (Xp.int 0)
+    , locations = locationRecord Location.createState
+    , quests = questRecord Quest.Incomplete
     , choresMxp = Xp.int 0
     , activitySkilling = Nothing
     , activityAdventuring = Nothing
     , monster = Nothing
     , coin = Coin.int 100000
     , resources = resourceRecord 0
-    , ownedShopUpgrades = ShopUpgrade.createRecord False
+    , ownedShopUpgrades = shopUpgradeRecord False
     , combatsWon = 0
     , combatsLost = 0
-    , spellSelectors = Activity.createRecord Nothing
+    , spellSelectors = activityRecord Nothing
     }
 
 
 selectSpell : { activity : Activity, maybeSpell : Maybe Spell } -> Game -> Game
 selectSpell { activity, maybeSpell } game =
-    { game | spellSelectors = Activity.updateByKind activity (\_ -> maybeSpell) game.spellSelectors }
+    { game | spellSelectors = Activity.updateByKindActivity activity (\_ -> maybeSpell) game.spellSelectors }
 
 
 type ActivityListItem
@@ -124,7 +123,7 @@ getActivityListItems skill game =
     let
         xp : Xp
         xp =
-            Skill.getByKind skill game.xp
+            getByKindSkill skill game.xp
 
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
@@ -133,7 +132,7 @@ getActivityListItems skill game =
                     let
                         currentLevel : Int
                         currentLevel =
-                            Skill.getByKind unlockSkill game.xp
+                            getByKindSkill unlockSkill game.xp
                                 |> Xp.level Xp.defaultSchedule
                     in
                     if currentLevel >= unlockLevel then
@@ -200,7 +199,7 @@ toggleActivity kind game =
                     let
                         currentLevel : Int
                         currentLevel =
-                            Skill.getByKind unlockSkill game.xp
+                            getByKindSkill unlockSkill game.xp
                                 |> Xp.level Xp.defaultSchedule
                     in
                     currentLevel >= unlockLevel
@@ -239,7 +238,7 @@ activityIsActive kind game =
             False
 
 
-updateLocations : (Location.Record Location.State -> Location.Record Location.State) -> Game -> Game
+updateLocations : (LocationRecord Location.State -> LocationRecord Location.State) -> Game -> Game
 updateLocations fn game =
     { game | locations = fn game.locations }
 
@@ -402,7 +401,7 @@ attemptPurchaseResource amount resource game =
 
 setQuestToComplete : Quest -> Game -> Game
 setQuestToComplete quest game =
-    { game | quests = Quest.setByKind quest Quest.Complete game.quests }
+    { game | quests = setByKindQuest quest Quest.Complete game.quests }
 
 
 attemptCompleteQuest : Quest -> Game -> Result EffectErr ApplyEffectsValue
@@ -414,7 +413,7 @@ attemptCompleteQuest quest game =
 
         questState : Quest.State
         questState =
-            Quest.getByKind quest game.quests
+            getByKindQuest quest game.quests
 
         effectsToComplete : List Effect.TaggedEffect
         effectsToComplete =
@@ -607,7 +606,7 @@ calculateActivityMxp kind game =
         mxp : Xp
         mxp =
             game.mxp
-                |> Activity.getByKind kind
+                |> getByKindActivity kind
 
         currentMasteryLevel : Int
         currentMasteryLevel =
@@ -707,7 +706,7 @@ applyEffect effect game =
             -- let
             --     locationState : Location.State
             --     locationState =
-            --         Location.getByKind location game.locations
+            --         getByKindLocation location game.locations
             -- in
             -- Location.findMonsterGenerator location locationState
             --     |> Random.andThen (Location.findResourceGenerator location)
@@ -717,7 +716,7 @@ applyEffect effect game =
             --             Ok
             --                 { game =
             --                     game
-            --                         |> updateLocations (Location.setByKind location newLocationState)
+            --                         |> updateLocations (setByKindLocation location newLocationState)
             --                 , toasts = []
             --                 , additionalEffects = []
             --                 }
@@ -725,7 +724,7 @@ applyEffect effect game =
             let
                 locationState : Location.State
                 locationState =
-                    Location.getByKind location game.locations
+                    getByKindLocation location game.locations
             in
             Location.explorationGenerator location locationState
                 |> Random.map
@@ -733,7 +732,7 @@ applyEffect effect game =
                         Ok
                             { game =
                                 game
-                                    |> updateLocations (Location.setByKind location state)
+                                    |> updateLocations (setByKindLocation location state)
                             , toasts = toasts
                             , additionalEffects = effects
                             }
@@ -744,13 +743,13 @@ addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
     case skill of
         Chores ->
-            { game | xp = Skill.updateByKind Chores (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateByKindSkill Chores (Quantity.plus amount) game.xp }
 
         Hexes ->
-            { game | xp = Skill.updateByKind Hexes (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateByKindSkill Hexes (Quantity.plus amount) game.xp }
 
         Weathermancing ->
-            { game | xp = Skill.updateByKind Weathermancing (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateByKindSkill Weathermancing (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game
@@ -762,7 +761,7 @@ addMxp kind amount game =
     { game
         | mxp =
             game.mxp
-                |> Activity.updateByKind kind fn
+                |> Activity.updateByKindActivity kind fn
     }
 
 
@@ -861,11 +860,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalXp : Xp
                 originalXp =
-                    Skill.getByKind skill originalGame.xp
+                    getByKindSkill skill originalGame.xp
 
                 currentXp : Xp
                 currentXp =
-                    Skill.getByKind skill currentGame.xp
+                    getByKindSkill skill currentGame.xp
             in
             if originalXp == currentXp then
                 Nothing
@@ -875,7 +874,7 @@ getTimePassesData originalGame currentGame =
 
         xpGains : List TimePassesXpGain
         xpGains =
-            Skill.allSkills
+            allSkills
                 |> List.filterMap xpGainOfSkill
 
         resourcesDiff =
@@ -909,11 +908,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalMonsters : List Monster
                 originalMonsters =
-                    Location.foundMonsters location (Location.getByKind location originalGame.locations)
+                    Location.foundMonsters location (getByKindLocation location originalGame.locations)
 
                 currentMonsters : List Monster
                 currentMonsters =
-                    Location.foundMonsters location (Location.getByKind location currentGame.locations)
+                    Location.foundMonsters location (getByKindLocation location currentGame.locations)
             in
             diff originalMonsters currentMonsters
 
@@ -922,11 +921,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalQuests : List Quest
                 originalQuests =
-                    Location.foundQuests location (Location.getByKind location originalGame.locations)
+                    Location.foundQuests location (getByKindLocation location originalGame.locations)
 
                 currentQuests : List Quest
                 currentQuests =
-                    Location.foundQuests location (Location.getByKind location currentGame.locations)
+                    Location.foundQuests location (getByKindLocation location currentGame.locations)
             in
             diff originalQuests currentQuests
 
@@ -935,11 +934,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalResources : List Resource
                 originalResources =
-                    Location.foundResources location (Location.getByKind location originalGame.locations)
+                    Location.foundResources location (getByKindLocation location originalGame.locations)
 
                 currentResources : List Resource
                 currentResources =
-                    Location.foundResources location (Location.getByKind location currentGame.locations)
+                    Location.foundResources location (getByKindLocation location currentGame.locations)
             in
             diff originalResources currentResources
 
@@ -953,7 +952,7 @@ getTimePassesData originalGame currentGame =
 
         discoveries : List TimePassesDiscovery
         discoveries =
-            List.concatMap discoveriesAtLocation Location.allLocations
+            List.concatMap discoveriesAtLocation allLocations
     in
     if hasNewData then
         Just
@@ -1010,10 +1009,6 @@ getShopItemIntervalMods game =
 getMasteryIntervalMods : Game -> List IntervalMod
 getMasteryIntervalMods game =
     let
-        allActivities : List Activity
-        allActivities =
-            Activity.allActivities
-
         masteryRewards : List Activity.MasteryReward
         masteryRewards =
             allActivities
@@ -1026,7 +1021,7 @@ getMasteryIntervalMods game =
 
                             mxp : Xp
                             mxp =
-                                Activity.getByKind activity game.mxp
+                                getByKindActivity activity game.mxp
 
                             masteryLevel : Int
                             masteryLevel =
@@ -1073,7 +1068,7 @@ getMasteryRewards game activity =
 
         mxp : Xp
         mxp =
-            Activity.getByKind activity game.mxp
+            getByKindActivity activity game.mxp
 
         masteryLevel : Int
         masteryLevel =
@@ -1107,7 +1102,7 @@ getActivityMods game =
                 _ ->
                     Nothing
     in
-    Activity.allActivities
+    allActivities
         |> List.concatMap (getMasteryRewards game)
         |> List.filterMap getGameMod
 
@@ -1115,15 +1110,10 @@ getActivityMods game =
 getSpellMods : Game -> List Mod
 getSpellMods game =
     -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
-    let
-        allActivities : List Activity
-        allActivities =
-            Activity.allActivities
-    in
     allActivities
         |> List.filterMap
             (\activity ->
-                case Activity.getByKind activity game.spellSelectors of
+                case getByKindActivity activity game.spellSelectors of
                     Just spell ->
                         Just (addActivityTagToMods activity (Spell.getStats spell).mods)
 
@@ -1225,4 +1215,4 @@ spellSelectorOptions activity =
                 )
                 (Spell.getStats spell).inclusions
     in
-    List.filter (\spell -> spellIsIncluded spell) Spell.allSpells
+    List.filter (\spell -> spellIsIncluded spell) allSpells

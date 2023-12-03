@@ -10,7 +10,6 @@ import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location exposing (findableResources, foundResources)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -102,7 +101,7 @@ renderExplore game location =
     let
         locationState : Location.State
         locationState =
-            Location.getByKind location game.locations
+            getByKindLocation location game.locations
 
         foundResources : List Resource
         foundResources =

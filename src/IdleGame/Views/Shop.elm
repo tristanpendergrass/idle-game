@@ -6,7 +6,6 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game exposing (Game, attemptPurchaseResource)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
@@ -44,14 +43,14 @@ render game =
         --                 |> text
         --             ]
         --         ]
-        renderShopItem : ShopUpgrade.Record Bool -> ShopUpgrade -> Html FrontendMsg
-        renderShopItem ownedItems kind =
+        renderShopUpgrade : ShopUpgradeRecord Bool -> ShopUpgrade -> Html FrontendMsg
+        renderShopUpgrade ownedItems kind =
             let
                 stats =
                     ShopUpgrade.getStats kind
 
                 owned =
-                    ShopUpgrade.getByKind kind ownedItems
+                    getByKindShopUpgrade kind ownedItems
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
@@ -150,7 +149,7 @@ render game =
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map
                 (\kind ->
-                    renderShopItem game.ownedShopUpgrades kind
+                    renderShopUpgrade game.ownedShopUpgrades kind
                 )
                 ShopUpgrade.allShopUpgrades
             )

@@ -6,57 +6,11 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
-
-
-allQuests : List Quest
-allQuests =
-    [ MendCrackedBell, ChopFirewood ]
-
-
-
--- Record
-
-
-type alias Record a =
-    { mendCrackedBell : a
-    , chopFirewood : a
-    }
-
-
-createRecord : a -> Record a
-createRecord d =
-    Record d d
-
-
-getByKind : Quest -> Record a -> a
-getByKind kind record =
-    case kind of
-        MendCrackedBell ->
-            record.mendCrackedBell
-
-        ChopFirewood ->
-            record.chopFirewood
-
-
-setByKind : Quest -> a -> Record a -> Record a
-setByKind kind value record =
-    case kind of
-        MendCrackedBell ->
-            { record | mendCrackedBell = value }
-
-        ChopFirewood ->
-            { record | chopFirewood = value }
-
-
-updateByKind : Quest -> (a -> a) -> Record a -> Record a
-updateByKind kind f record =
-    setByKind kind (f (getByKind kind record)) record
 
 
 
@@ -77,10 +31,10 @@ type alias Stats =
 
 getStats : Quest -> Stats
 getStats kind =
-    getByKind kind allStats
+    getByKindQuest kind allStats
 
 
-allStats : Record Stats
+allStats : QuestRecord Stats
 allStats =
     { mendCrackedBell =
         { title = "Mend Cracked Bell"

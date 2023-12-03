@@ -100,12 +100,12 @@ hasResource amount kind =
 
 expectXp : Xp -> Skill.Kind -> (Game -> Expectation)
 expectXp amount skill =
-    .xp >> Skill.getByKind skill >> Expect.equal amount
+    .xp >> getByKindSkillSkill skill >> Expect.equal amount
 
 
 hasXp : Xp -> Skill.Kind -> (Game -> Bool)
 hasXp amount skill =
-    .xp >> Skill.getByKind skill >> (==) amount
+    .xp >> getByKindSkillSkill skill >> (==) amount
 
 
 initialGame : Game

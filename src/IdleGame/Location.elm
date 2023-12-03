@@ -6,7 +6,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
@@ -17,79 +16,34 @@ import Percent exposing (Percent)
 import Random
 
 
-allLocations : List Location
-allLocations =
-    [ SchoolGrounds, SecretGarden ]
-
-
-
--- Record
-
-
-type alias Record a =
-    { schoolGrounds : a
-    , secretGarden : a
-    }
-
-
-createRecord : a -> Record a
-createRecord d =
-    Record d d
-
-
-getByKind : Location -> Record a -> a
-getByKind kind record =
-    case kind of
-        SchoolGrounds ->
-            record.schoolGrounds
-
-        SecretGarden ->
-            record.secretGarden
-
-
-setByKind : Location -> a -> Record a -> Record a
-setByKind kind value record =
-    case kind of
-        SchoolGrounds ->
-            { record | schoolGrounds = value }
-
-        SecretGarden ->
-            { record | secretGarden = value }
-
-
-updateByKind : Location -> (a -> a) -> Record a -> Record a
-updateByKind kind f record =
-    setByKind kind (f (getByKind kind record)) record
-
-
 
 -- Stats
 
 
 type alias Stats =
     { title : String
-    , monsters : Monster.Record Bool
+    , monsters : MonsterRecord Bool
     , resources : ResourceRecord Bool
-    , quests : Quest.Record Bool
+    , quests : QuestRecord Bool
     , exploreActivity : Activity
     }
 
 
 getStats : Location -> Stats
 getStats kind =
-    getByKind kind allStats
+    getByKindLocation kind allStats
 
 
-allStats : Record Stats
+allStats : LocationRecord Stats
 allStats =
     let
-        monstersFromList : List Monster -> Monster.Record Bool
+        monstersFromList : List Monster -> MonsterRecord Bool
         monstersFromList =
             List.foldl
                 (\monster accum ->
-                    Monster.setByKind monster True accum
+                    setByKindMonster monster True accum
                 )
-                (Monster.createRecord False)
+                (monsterRecord False)
 
         resourcesFromList : List Resource -> ResourceRecord Bool
         resourcesFromList =
@@ -99,13 +53,13 @@ allStats =
                 )
                 (resourceRecord False)
 
-        questsFromList : List Quest -> Quest.Record Bool
+        questsFromList : List Quest -> QuestRecord Bool
         questsFromList =
             List.foldl
                 (\quest accum ->
-                    Quest.setByKind quest True accum
+                    setByKindQuest quest True accum
                 )
-                (Quest.createRecord False)
+                (questRecord False)
     in
     { schoolGrounds =
         { title = "School Grounds"
@@ -129,17 +83,17 @@ allStats =
 
 
 type alias State =
-    { foundMonsters : Monster.Record Bool
+    { foundMonsters : MonsterRecord Bool
     , foundResources : ResourceRecord Bool
-    , foundQuests : Quest.Record Bool
+    , foundQuests : QuestRecord Bool
     }
 
 
 createState : State
 createState =
-    { foundMonsters = Monster.createRecord False
+    { foundMonsters = monsterRecord False
     , foundResources = resourceRecord False
-    , foundQuests = Quest.createRecord False
+    , foundQuests = questRecord False
     }
 
 
@@ -147,7 +101,7 @@ setMonsterToFound : Monster -> State -> State
 setMonsterToFound monster state =
     { state
         | foundMonsters =
-            Monster.setByKind monster True state.foundMonsters
+            setByKindMonster monster True state.foundMonsters
     }
 
 
@@ -163,7 +117,7 @@ setQuestToFound : Quest -> State -> State
 setQuestToFound quest state =
     { state
         | foundQuests =
-            Quest.setByKind quest True state.foundQuests
+            setByKindQuest quest True state.foundQuests
     }
 
 
@@ -220,17 +174,17 @@ findMonsterGenerator location result =
 
 findableMonsters : Location -> State -> List Monster
 findableMonsters location state =
-    Monster.allMonsters
+    allMonsters
         |> List.filter
             (\monster ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Monster.getByKind monster (getStats location).monsters
+                        getByKindMonster monster (getStats location).monsters
 
                     isFound : Bool
                     isFound =
-                        Monster.getByKind monster state.foundMonsters
+                        getByKindMonster monster state.foundMonsters
                 in
                 isAtLocation && not isFound
             )
@@ -238,17 +192,17 @@ findableMonsters location state =
 
 foundMonsters : Location -> State -> List Monster
 foundMonsters location state =
-    Monster.allMonsters
+    allMonsters
         |> List.filter
             (\monster ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Monster.getByKind monster (getStats location).monsters
+                        getByKindMonster monster (getStats location).monsters
 
                     isFound : Bool
                     isFound =
-                        Monster.getByKind monster state.foundMonsters
+                        getByKindMonster monster state.foundMonsters
                 in
                 isAtLocation && isFound
             )
@@ -256,8 +210,8 @@ foundMonsters location state =
 
 monstersAtLocation : Location -> List Monster
 monstersAtLocation location =
-    Monster.allMonsters
-        |> List.filter (\monster -> Monster.getByKind monster (getStats location).monsters)
+    allMonsters
+        |> List.filter (\monster -> getByKindMonster monster (getStats location).monsters)
 
 
 findResourceGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
@@ -364,17 +318,17 @@ findQuestGenerator location result =
 
 findableQuests : Location -> State -> List Quest
 findableQuests location state =
-    Quest.allQuests
+    allQuests
         |> List.filter
             (\quest ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Quest.getByKind quest (getStats location).quests
+                        getByKindQuest quest (getStats location).quests
 
                     isFound : Bool
                     isFound =
-                        Quest.getByKind quest state.foundQuests
+                        getByKindQuest quest state.foundQuests
                 in
                 isAtLocation && not isFound
             )
@@ -382,17 +336,17 @@ findableQuests location state =
 
 foundQuests : Location -> State -> List Quest
 foundQuests location state =
-    Quest.allQuests
+    allQuests
         |> List.filter
             (\quest ->
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        Quest.getByKind quest (getStats location).quests
+                        getByKindQuest quest (getStats location).quests
 
                     isFound : Bool
                     isFound =
-                        Quest.getByKind quest state.foundQuests
+                        getByKindQuest quest state.foundQuests
                 in
                 isAtLocation && isFound
             )
@@ -400,8 +354,8 @@ foundQuests location state =
 
 questsAtLocation : Location -> List Quest
 questsAtLocation location =
-    Quest.allQuests
-        |> List.filter (\quest -> Quest.getByKind quest (getStats location).quests)
+    allQuests
+        |> List.filter (\quest -> getByKindQuest quest (getStats location).quests)
 
 
 getCompletion : Location -> State -> Percent
@@ -420,3 +374,8 @@ getCompletion location state =
                 + List.length (questsAtLocation location)
     in
     Percent.float (toFloat numerator / toFloat denominator)
+
+
+updateByKindLocation : Location -> (a -> a) -> LocationRecord a -> LocationRecord a
+updateByKindLocation location fn record =
+    setByKindLocation location (fn (getByKindLocation location record)) record

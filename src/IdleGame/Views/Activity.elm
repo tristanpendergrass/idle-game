@@ -156,7 +156,7 @@ renderActivityCard activity game screenWidth =
 
         mxp : Xp
         mxp =
-            Activity.getByKind activity game.mxp
+            getByKindActivity activity game.mxp
 
         masteryLevel : Int
         masteryLevel =

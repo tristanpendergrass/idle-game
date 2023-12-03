@@ -7,7 +7,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Kinds2 exposing (..)
 import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
@@ -69,249 +68,6 @@ getActivities skill =
             allWeathermancing
 
 
-allActivities : List Activity
-allActivities =
-    [ CleanStables
-    , CleanBigBubba
-    , SweepChimneys
-    , WaterGreenhousePlants
-    , WashAndIronRobes
-    , OrganizePotionIngredients
-    , RepairInstruments
-    , FlushDrainDemons
-    , OrganizeSpellBooks
-    , StudyHex1
-    , StudyJinx1
-    , StudyCurse1
-    , StudyHex2
-    , StudyJinx2
-    , StudyCurse2
-    , StudyHex3
-    , StudyJinx3
-    , StudyCurse3
-    , StudyWeather1
-    , ExploreSchoolGrounds
-    , ExploreSecretGarden
-    , FightPrefect
-    , FightBookWyrm
-    , FightWhisperingWind
-    ]
-
-
-type alias Record a =
-    { cleanStables : a
-    , cleanBigBubba : a
-    , sweepChimneys : a
-    , waterGreenhousePlants : a
-    , washAndIronRobes : a
-    , organizePotionIngredients : a
-    , repairInstruments : a
-    , flushDrainDemons : a
-    , organizeSpellBooks : a
-    , hex1 : a
-    , jinx1 : a
-    , curse1 : a
-    , hex2 : a
-    , jinx2 : a
-    , curse2 : a
-    , hex3 : a
-    , jinx3 : a
-    , curse3 : a
-    , studyWeather1 : a
-    , exploreSchoolGrounds : a
-    , exploreSecretGarden : a
-    , fightPrefect : a
-    , fightBookWyrm : a
-    , fightWhisperingWind : a
-    }
-
-
-createRecord : a -> Record a
-createRecord d =
-    { cleanStables = d
-    , cleanBigBubba = d
-    , sweepChimneys = d
-    , waterGreenhousePlants = d
-    , washAndIronRobes = d
-    , organizePotionIngredients = d
-    , repairInstruments = d
-    , flushDrainDemons = d
-    , organizeSpellBooks = d
-    , hex1 = d
-    , jinx1 = d
-    , curse1 = d
-    , hex2 = d
-    , jinx2 = d
-    , curse2 = d
-    , hex3 = d
-    , jinx3 = d
-    , curse3 = d
-    , studyWeather1 = d
-    , exploreSchoolGrounds = d
-    , exploreSecretGarden = d
-    , fightPrefect = d
-    , fightBookWyrm = d
-    , fightWhisperingWind = d
-    }
-
-
-getByKind : Activity -> Record a -> a
-getByKind kind record =
-    case kind of
-        CleanStables ->
-            record.cleanStables
-
-        CleanBigBubba ->
-            record.cleanBigBubba
-
-        SweepChimneys ->
-            record.sweepChimneys
-
-        WaterGreenhousePlants ->
-            record.waterGreenhousePlants
-
-        WashAndIronRobes ->
-            record.washAndIronRobes
-
-        OrganizePotionIngredients ->
-            record.organizePotionIngredients
-
-        RepairInstruments ->
-            record.repairInstruments
-
-        FlushDrainDemons ->
-            record.flushDrainDemons
-
-        OrganizeSpellBooks ->
-            record.organizeSpellBooks
-
-        StudyHex1 ->
-            record.hex1
-
-        StudyJinx1 ->
-            record.jinx1
-
-        StudyCurse1 ->
-            record.curse1
-
-        StudyHex2 ->
-            record.hex2
-
-        StudyJinx2 ->
-            record.jinx2
-
-        StudyCurse2 ->
-            record.curse2
-
-        StudyHex3 ->
-            record.hex3
-
-        StudyJinx3 ->
-            record.jinx3
-
-        StudyCurse3 ->
-            record.curse3
-
-        StudyWeather1 ->
-            record.studyWeather1
-
-        ExploreSchoolGrounds ->
-            record.exploreSchoolGrounds
-
-        ExploreSecretGarden ->
-            record.exploreSecretGarden
-
-        FightPrefect ->
-            record.fightPrefect
-
-        FightBookWyrm ->
-            record.fightBookWyrm
-
-        FightWhisperingWind ->
-            record.fightWhisperingWind
-
-
-setByKind : Activity -> a -> Record a -> Record a
-setByKind kind value record =
-    case kind of
-        CleanStables ->
-            { record | cleanStables = value }
-
-        CleanBigBubba ->
-            { record | cleanBigBubba = value }
-
-        SweepChimneys ->
-            { record | sweepChimneys = value }
-
-        WaterGreenhousePlants ->
-            { record | waterGreenhousePlants = value }
-
-        WashAndIronRobes ->
-            { record | washAndIronRobes = value }
-
-        OrganizePotionIngredients ->
-            { record | organizePotionIngredients = value }
-
-        RepairInstruments ->
-            { record | repairInstruments = value }
-
-        FlushDrainDemons ->
-            { record | flushDrainDemons = value }
-
-        OrganizeSpellBooks ->
-            { record | organizeSpellBooks = value }
-
-        StudyHex1 ->
-            { record | hex1 = value }
-
-        StudyJinx1 ->
-            { record | jinx1 = value }
-
-        StudyCurse1 ->
-            { record | curse1 = value }
-
-        StudyHex2 ->
-            { record | hex2 = value }
-
-        StudyJinx2 ->
-            { record | jinx2 = value }
-
-        StudyCurse2 ->
-            { record | curse2 = value }
-
-        StudyHex3 ->
-            { record | hex3 = value }
-
-        StudyJinx3 ->
-            { record | jinx3 = value }
-
-        StudyCurse3 ->
-            { record | curse3 = value }
-
-        StudyWeather1 ->
-            { record | studyWeather1 = value }
-
-        ExploreSchoolGrounds ->
-            { record | exploreSchoolGrounds = value }
-
-        ExploreSecretGarden ->
-            { record | exploreSecretGarden = value }
-
-        FightPrefect ->
-            { record | fightPrefect = value }
-
-        FightBookWyrm ->
-            { record | fightBookWyrm = value }
-
-        FightWhisperingWind ->
-            { record | fightWhisperingWind = value }
-
-
-updateByKind : Activity -> (a -> a) -> Record a -> Record a
-updateByKind kind f record =
-    setByKind kind (f (getByKind kind record)) record
-
-
 getBySpell : Spell -> Maybe Activity
 getBySpell spell =
     List.Extra.find (\activity -> (getStats activity).teachesSpell == Just spell) allActivities
@@ -359,10 +115,10 @@ type alias Stats =
 
 getStats : Activity -> Stats
 getStats kind =
-    getByKind kind allStats
+    getByKindActivity kind allStats
 
 
-allStats : Record Stats
+allStats : ActivityRecord Stats
 allStats =
     { cleanStables = cleanStablesStats
     , cleanBigBubba = cleanBigBubbaStats
@@ -373,15 +129,15 @@ allStats =
     , repairInstruments = repairInstrumentsStats
     , flushDrainDemons = flushDrainDemonsStats
     , organizeSpellBooks = organizeSpellBooksStats
-    , hex1 = hex1Stats
-    , jinx1 = jinx1Stats
-    , curse1 = curse1Stats
-    , hex2 = hex2Stats
-    , jinx2 = jinx2Stats
-    , curse2 = curse2Stats
-    , hex3 = hex3Stats
-    , jinx3 = jinx3Stats
-    , curse3 = curse3Stats
+    , studyHex1 = studyHex1Stats
+    , studyJinx1 = studyJinx1Stats
+    , studyCurse1 = studyCurse1Stats
+    , studyHex2 = studyHex2Stats
+    , studyJinx2 = studyJinx2Stats
+    , studyCurse2 = studyCurse2Stats
+    , studyHex3 = studyHex3Stats
+    , studyJinx3 = studyJinx3Stats
+    , studyCurse3 = studyCurse3Stats
     , studyWeather1 = weather1Stats
     , exploreSchoolGrounds = exploreSchoolGroundsStats
     , exploreSecretGarden = exploreSecretGardenStats
@@ -681,8 +437,8 @@ defaultSpellMastery =
     ]
 
 
-hex1Stats : Stats
-hex1Stats =
+studyHex1Stats : Stats
+studyHex1Stats =
     let
         spell : Spell
         spell =
@@ -708,8 +464,8 @@ hex1Stats =
     }
 
 
-jinx1Stats : Stats
-jinx1Stats =
+studyJinx1Stats : Stats
+studyJinx1Stats =
     let
         spell : Spell
         spell =
@@ -735,8 +491,8 @@ jinx1Stats =
     }
 
 
-curse1Stats : Stats
-curse1Stats =
+studyCurse1Stats : Stats
+studyCurse1Stats =
     let
         spell : Spell
         spell =
@@ -763,8 +519,8 @@ curse1Stats =
     }
 
 
-hex2Stats : Stats
-hex2Stats =
+studyHex2Stats : Stats
+studyHex2Stats =
     let
         spell : Spell
         spell =
@@ -790,8 +546,8 @@ hex2Stats =
     }
 
 
-jinx2Stats : Stats
-jinx2Stats =
+studyJinx2Stats : Stats
+studyJinx2Stats =
     let
         spell : Spell
         spell =
@@ -817,8 +573,8 @@ jinx2Stats =
     }
 
 
-curse2Stats : Stats
-curse2Stats =
+studyCurse2Stats : Stats
+studyCurse2Stats =
     let
         spell : Spell
         spell =
@@ -845,8 +601,8 @@ curse2Stats =
     }
 
 
-hex3Stats : Stats
-hex3Stats =
+studyHex3Stats : Stats
+studyHex3Stats =
     let
         spell : Spell
         spell =
@@ -872,8 +628,8 @@ hex3Stats =
     }
 
 
-jinx3Stats : Stats
-jinx3Stats =
+studyJinx3Stats : Stats
+studyJinx3Stats =
     let
         spell : Spell
         spell =
@@ -900,8 +656,8 @@ jinx3Stats =
     }
 
 
-curse3Stats : Stats
-curse3Stats =
+studyCurse3Stats : Stats
+studyCurse3Stats =
     let
         spell : Spell
         spell =
@@ -1073,3 +829,8 @@ isCombatActivity activity =
                     False
     in
     List.any effectIsCombat effects
+
+
+updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a
+updateByKindActivity activity fn record =
+    setByKindActivity activity (fn (getByKindActivity activity record)) record

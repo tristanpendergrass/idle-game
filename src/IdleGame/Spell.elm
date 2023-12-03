@@ -6,111 +6,9 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import List.Extra
 
 
-allSpells : List Spell
-allSpells =
-    [ Hex1
-    , Jinx1
-    , Curse1
-    , Hex2
-    , Jinx2
-    , Curse2
-    , Hex3
-    , Jinx3
-    , Curse3
-    , Weather1
-    ]
-
-
-type alias Record a =
-    { hex1 : a
-    , hex2 : a
-    , hex3 : a
-    , jinx1 : a
-    , jinx2 : a
-    , jinx3 : a
-    , curse1 : a
-    , curse2 : a
-    , curse3 : a
-    , weather1 : a
-    }
-
-
-getBySpell : Spell -> Record a -> a
-getBySpell kind data =
-    case kind of
-        Hex1 ->
-            data.hex1
-
-        Hex2 ->
-            data.hex2
-
-        Hex3 ->
-            data.hex3
-
-        Jinx1 ->
-            data.jinx1
-
-        Jinx2 ->
-            data.jinx2
-
-        Jinx3 ->
-            data.jinx3
-
-        Curse1 ->
-            data.curse1
-
-        Curse2 ->
-            data.curse2
-
-        Curse3 ->
-            data.curse3
-
-        Weather1 ->
-            data.weather1
-
-
-setBySpell : Spell -> a -> Record a -> Record a
-setBySpell kind value data =
-    case kind of
-        Hex1 ->
-            { data | hex1 = value }
-
-        Hex2 ->
-            { data | hex2 = value }
-
-        Hex3 ->
-            { data | hex3 = value }
-
-        Jinx1 ->
-            { data | jinx1 = value }
-
-        Jinx2 ->
-            { data | jinx2 = value }
-
-        Jinx3 ->
-            { data | jinx3 = value }
-
-        Curse1 ->
-            { data | curse1 = value }
-
-        Curse2 ->
-            { data | curse2 = value }
-
-        Curse3 ->
-            { data | curse3 = value }
-
-        Weather1 ->
-            { data | weather1 = value }
-
-
-updateBySpell : Spell -> (a -> a) -> Record a -> Record a
-updateBySpell kind update data =
-    setBySpell kind (update (getBySpell kind data)) data
-
-
 getStats : Spell -> Stats
 getStats kind =
-    getBySpell kind allStats
+    getByKindSpell kind allStats
 
 
 getByTitle : String -> Maybe Spell
@@ -136,7 +34,7 @@ type InclusionCriteria
     | IfCombat
 
 
-allStats : Record Stats
+allStats : SpellRecord Stats
 allStats =
     { hex1 =
         { title = "Hex I"

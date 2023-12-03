@@ -14,104 +14,6 @@ import List.Extra
 import Percent exposing (Percent)
 
 
-type alias Record a =
-    { shovel : a
-    , keyring : a
-    , book : a
-    , readingGlasses : a
-    , oversizedBag : a
-    }
-
-
-createRecord : a -> Record a
-createRecord a =
-    { shovel = a
-    , keyring = a
-    , book = a
-    , readingGlasses = a
-    , oversizedBag = a
-    }
-
-
-
--- getByKind : Resource -> Record a -> a
--- getByKind kind data =
---     case kind of
---         Manure ->
---             data.manure
---         Soot ->
---             data.soot
---         GreenhouseDirt ->
---             data.greenhouseDirt
---         WashWater ->
---             data.washWater
---         EmptyBottle ->
---             data.emptyBottles
---         Scrap ->
---             data.scrap
---         Ectoplasm ->
---             data.ectoplasm
---         Parchment ->
---             data.parchment
--- setByKind : Resource -> a -> Record a -> Record a
--- setByKind kind value data =
---     case kind of
---         Manure ->
---             { data | manure = value }
---         Soot ->
---             { data | soot = value }
---         GreenhouseDirt ->
---             { data | greenhouseDirt = value }
---         WashWater ->
---             { data | washWater = value }
---         EmptyBottle ->
---             { data | emptyBottles = value }
---         Scrap ->
---             { data | scrap = value }
---         Ectoplasm ->
---             { data | ectoplasm = value }
---         Parchment ->
---             { data | parchment = value }
-
-
-getByKind : ShopUpgrade -> Record a -> a
-getByKind kind data =
-    case kind of
-        Shovel ->
-            data.shovel
-
-        Keyring ->
-            data.keyring
-
-        Book ->
-            data.book
-
-        ReadingGlasses ->
-            data.readingGlasses
-
-        OversizedBag ->
-            data.oversizedBag
-
-
-setByKind : ShopUpgrade -> a -> Record a -> Record a
-setByKind kind value data =
-    case kind of
-        Shovel ->
-            { data | shovel = value }
-
-        Keyring ->
-            { data | keyring = value }
-
-        Book ->
-            { data | book = value }
-
-        ReadingGlasses ->
-            { data | readingGlasses = value }
-
-        OversizedBag ->
-            { data | oversizedBag = value }
-
-
 allShopUpgrades : List ShopUpgrade
 allShopUpgrades =
     [ Shovel, Keyring, Book, ReadingGlasses, OversizedBag ]
@@ -218,7 +120,7 @@ getStats kind =
 
 
 type alias OwnedItems =
-    Record Bool
+    ShopUpgradeRecord Bool
 
 
 type Reward
@@ -226,7 +128,7 @@ type Reward
     | ShopItemIntervalMod (List IntervalMod)
 
 
-toOwnedItems : Record Bool -> List ShopUpgrade
+toOwnedItems : ShopUpgradeRecord Bool -> List ShopUpgrade
 toOwnedItems shopItems =
     allShopUpgrades
-        |> List.filter (\kind -> getByKind kind shopItems)
+        |> List.filter (\kind -> getByKindShopUpgrade kind shopItems)
