@@ -716,7 +716,7 @@ applyEffect effect game =
             --             Ok
             --                 { game =
             --                     game
-            --                         |> updateLocations (setByKindLocation location newLocationState)
+            --                         |> updateLocations (setByLocation location newLocationState)
             --                 , toasts = []
             --                 , additionalEffects = []
             --                 }

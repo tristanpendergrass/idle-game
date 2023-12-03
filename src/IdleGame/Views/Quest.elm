@@ -46,7 +46,7 @@ renderQuest game quest =
     let
         state : Quest.State
         state =
-            getByKindQuest quest game.quests
+            getByQuest quest game.quests
 
         canComplete : Bool
         canComplete =

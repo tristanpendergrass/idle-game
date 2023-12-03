@@ -130,7 +130,7 @@ add resource amount resources =
             oldAmount + amount
     in
     if newAmount >= 0 then
-        Ok (setByKindResource resource newAmount resources)
+        Ok (setByResource resource newAmount resources)
 
     else
         Err EffectErr.NegativeAmount
