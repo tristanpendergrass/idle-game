@@ -113,7 +113,7 @@ renderContent obj extraBottomPadding game =
 
         mxp : Xp
         mxp =
-            getByKindActivity activity game.mxp
+            getByActivity activity game.mxp
 
         effects : List Effect.TaggedEffect
         effects =
@@ -151,7 +151,7 @@ renderContent obj extraBottomPadding game =
 
         selectedSpell : Maybe Spell
         selectedSpell =
-            getByKindActivity activity game.spellSelectors
+            getByActivity activity game.spellSelectors
 
         spellSelectorOptions : List Spell
         spellSelectorOptions =

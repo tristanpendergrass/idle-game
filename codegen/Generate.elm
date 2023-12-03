@@ -113,11 +113,11 @@ getDeclarations category categoryPlural names =
             (Elm.fn ( "a", Nothing )
                 (\a -> Elm.record (List.map (\n -> ( n, a )) namesUncapitalized))
             )
-    , Elm.declaration ("getByKind" ++ category) getByKind
-    , Elm.declaration ("setByKind" ++ category) setByKind
+    , Elm.declaration ("getBy" ++ category) getByKind
+    , Elm.declaration ("setBy" ++ category) setByKind
 
     -- Commented out "updateByKind" since getting weird error that seems like it may be an elm-codegen bug?
-    -- , Elm.declaration ("updateByKind" ++ category) <|
+    -- , Elm.declaration ("updateBy" ++ category) <|
     --     Elm.withType
     --         (Type.function
     --             [ Type.named [] category

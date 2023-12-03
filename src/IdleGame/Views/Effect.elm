@@ -101,7 +101,7 @@ renderExplore game location =
     let
         locationState : Location.State
         locationState =
-            getByKindLocation location game.locations
+            getByLocation location game.locations
 
         foundResources : List Resource
         foundResources =
@@ -126,7 +126,7 @@ renderResource game { base, resource } =
     let
         owned : Int
         owned =
-            getByKindResource resource game.resources
+            getByResource resource game.resources
 
         isNegativeAmount : Bool
         isNegativeAmount =

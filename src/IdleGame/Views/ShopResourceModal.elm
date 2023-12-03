@@ -23,7 +23,7 @@ render game quantity ( resource, price ) =
 
         owned : Int
         owned =
-            getByKindResource resource game.resources
+            getByResource resource game.resources
 
         minMaxButtonWidth : Attribute msg
         minMaxButtonWidth =

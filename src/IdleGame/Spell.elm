@@ -8,7 +8,7 @@ import List.Extra
 
 getStats : Spell -> Stats
 getStats kind =
-    getByKindSpell kind allStats
+    getBySpell kind allStats
 
 
 getByTitle : String -> Maybe Spell

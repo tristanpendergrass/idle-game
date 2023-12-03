@@ -115,7 +115,7 @@ type alias Stats =
 
 getStats : Activity -> Stats
 getStats kind =
-    getByKindActivity kind allStats
+    getByActivity kind allStats
 
 
 allStats : ActivityRecord Stats
@@ -833,4 +833,4 @@ isCombatActivity activity =
 
 updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a
 updateByKindActivity activity fn record =
-    setByKindActivity activity (fn (getByKindActivity activity record)) record
+    setByActivity activity (fn (getByActivity activity record)) record

@@ -32,4 +32,4 @@ getIcon kind =
 
 updateByKindSkill : Skill -> (a -> a) -> SkillRecord a -> SkillRecord a
 updateByKindSkill skill fn record =
-    setByKindSkill skill (fn (getByKindSkill skill record)) record
+    setBySkill skill (fn (getBySkill skill record)) record

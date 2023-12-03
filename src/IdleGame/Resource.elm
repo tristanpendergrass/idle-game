@@ -97,7 +97,7 @@ parchmentStats =
 
 getStats : Resource -> Stats
 getStats kind =
-    getByKindResource kind allStats
+    getByResource kind allStats
 
 
 type alias Diff =
@@ -123,7 +123,7 @@ add resource amount resources =
     let
         oldAmount : Int
         oldAmount =
-            getByKindResource resource resources
+            getByResource resource resources
 
         newAmount : Int
         newAmount =
@@ -158,7 +158,7 @@ mapDiff fn diff =
                 let
                     amount : Int
                     amount =
-                        getByKindResource resource diff
+                        getByResource resource diff
                 in
                 fn amount resource
             )
@@ -167,7 +167,7 @@ mapDiff fn diff =
 isEmptyDiff : Diff -> Bool
 isEmptyDiff resourcesDiff =
     allResources
-        |> List.map (\resource -> getByKindResource resource resourcesDiff)
+        |> List.map (\resource -> getByResource resource resourcesDiff)
         |> List.all ((==) 0)
 
 
@@ -179,7 +179,7 @@ mapResources fn resources =
                 let
                     amount : Int
                     amount =
-                        getByKindResource resource resources
+                        getByResource resource resources
                 in
                 fn amount resource
             )
@@ -193,7 +193,7 @@ toList resources =
                 let
                     amount : Int
                     amount =
-                        getByKindResource resource resources
+                        getByResource resource resources
                 in
                 ( resource, amount )
             )

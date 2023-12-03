@@ -31,7 +31,7 @@ type alias Stats =
 
 getStats : Quest -> Stats
 getStats kind =
-    getByKindQuest kind allStats
+    getByQuest kind allStats
 
 
 allStats : QuestRecord Stats

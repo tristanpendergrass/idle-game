@@ -32,7 +32,7 @@ render model game location =
     let
         monsters : List Monster
         monsters =
-            Location.foundMonsters location (getByKindLocation location game.locations)
+            Location.foundMonsters location (getByLocation location game.locations)
 
         monsterListItems : List Game.ActivityListItem
         monsterListItems =
@@ -42,11 +42,11 @@ render model game location =
 
         quests : List Quest
         quests =
-            Location.foundQuests location (getByKindLocation location game.locations)
+            Location.foundQuests location (getByLocation location game.locations)
 
         locationFilter : LocationFilter
         locationFilter =
-            getByKindLocation location model.locationFilters
+            getByLocation location model.locationFilters
 
         exploreItem : Html FrontendMsg
         exploreItem =
@@ -95,7 +95,7 @@ renderLocationInfo game location =
     let
         percent : Percent
         percent =
-            Location.getCompletion location (getByKindLocation location game.locations)
+            Location.getCompletion location (getByLocation location game.locations)
     in
     div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-primary" ]
         [ div [ class "t-column" ]
@@ -133,7 +133,7 @@ renderResourcesPane game location =
     let
         locationState : Location.State
         locationState =
-            getByKindLocation location game.locations
+            getByLocation location game.locations
 
         resourcesAtLocation : List Resource
         resourcesAtLocation =
@@ -170,7 +170,7 @@ renderMonstersPane game location =
     let
         locationState : Location.State
         locationState =
-            getByKindLocation location game.locations
+            getByLocation location game.locations
 
         monstersAtLocation : List Monster
         monstersAtLocation =
@@ -199,7 +199,7 @@ renderQuestsPane game location =
     let
         locationState : Location.State
         locationState =
-            getByKindLocation location game.locations
+            getByLocation location game.locations
 
         questsAtLocation : List Quest
         questsAtLocation =

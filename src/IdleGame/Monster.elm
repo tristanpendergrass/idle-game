@@ -32,7 +32,7 @@ type alias Stats =
 
 getStats : Monster -> Stats
 getStats kind =
-    getByKindMonster kind allStats
+    getByMonster kind allStats
 
 
 allStats : MonsterRecord Stats

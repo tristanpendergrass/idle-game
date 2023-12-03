@@ -123,7 +123,7 @@ getActivityListItems skill game =
     let
         xp : Xp
         xp =
-            getByKindSkill skill game.xp
+            getBySkill skill game.xp
 
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
@@ -132,7 +132,7 @@ getActivityListItems skill game =
                     let
                         currentLevel : Int
                         currentLevel =
-                            getByKindSkill unlockSkill game.xp
+                            getBySkill unlockSkill game.xp
                                 |> Xp.level Xp.defaultSchedule
                     in
                     if currentLevel >= unlockLevel then
@@ -199,7 +199,7 @@ toggleActivity kind game =
                     let
                         currentLevel : Int
                         currentLevel =
-                            getByKindSkill unlockSkill game.xp
+                            getBySkill unlockSkill game.xp
                                 |> Xp.level Xp.defaultSchedule
                     in
                     currentLevel >= unlockLevel
@@ -401,7 +401,7 @@ attemptPurchaseResource amount resource game =
 
 setQuestToComplete : Quest -> Game -> Game
 setQuestToComplete quest game =
-    { game | quests = setByKindQuest quest Quest.Complete game.quests }
+    { game | quests = setByQuest quest Quest.Complete game.quests }
 
 
 attemptCompleteQuest : Quest -> Game -> Result EffectErr ApplyEffectsValue
@@ -413,7 +413,7 @@ attemptCompleteQuest quest game =
 
         questState : Quest.State
         questState =
-            getByKindQuest quest game.quests
+            getByQuest quest game.quests
 
         effectsToComplete : List Effect.TaggedEffect
         effectsToComplete =
@@ -606,7 +606,7 @@ calculateActivityMxp kind game =
         mxp : Xp
         mxp =
             game.mxp
-                |> getByKindActivity kind
+                |> getByActivity kind
 
         currentMasteryLevel : Int
         currentMasteryLevel =
@@ -724,7 +724,7 @@ applyEffect effect game =
             let
                 locationState : Location.State
                 locationState =
-                    getByKindLocation location game.locations
+                    getByLocation location game.locations
             in
             Location.explorationGenerator location locationState
                 |> Random.map
@@ -732,7 +732,7 @@ applyEffect effect game =
                         Ok
                             { game =
                                 game
-                                    |> updateLocations (setByKindLocation location state)
+                                    |> updateLocations (setByLocation location state)
                             , toasts = toasts
                             , additionalEffects = effects
                             }
@@ -860,11 +860,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalXp : Xp
                 originalXp =
-                    getByKindSkill skill originalGame.xp
+                    getBySkill skill originalGame.xp
 
                 currentXp : Xp
                 currentXp =
-                    getByKindSkill skill currentGame.xp
+                    getBySkill skill currentGame.xp
             in
             if originalXp == currentXp then
                 Nothing
@@ -908,11 +908,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalMonsters : List Monster
                 originalMonsters =
-                    Location.foundMonsters location (getByKindLocation location originalGame.locations)
+                    Location.foundMonsters location (getByLocation location originalGame.locations)
 
                 currentMonsters : List Monster
                 currentMonsters =
-                    Location.foundMonsters location (getByKindLocation location currentGame.locations)
+                    Location.foundMonsters location (getByLocation location currentGame.locations)
             in
             diff originalMonsters currentMonsters
 
@@ -921,11 +921,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalQuests : List Quest
                 originalQuests =
-                    Location.foundQuests location (getByKindLocation location originalGame.locations)
+                    Location.foundQuests location (getByLocation location originalGame.locations)
 
                 currentQuests : List Quest
                 currentQuests =
-                    Location.foundQuests location (getByKindLocation location currentGame.locations)
+                    Location.foundQuests location (getByLocation location currentGame.locations)
             in
             diff originalQuests currentQuests
 
@@ -934,11 +934,11 @@ getTimePassesData originalGame currentGame =
             let
                 originalResources : List Resource
                 originalResources =
-                    Location.foundResources location (getByKindLocation location originalGame.locations)
+                    Location.foundResources location (getByLocation location originalGame.locations)
 
                 currentResources : List Resource
                 currentResources =
-                    Location.foundResources location (getByKindLocation location currentGame.locations)
+                    Location.foundResources location (getByLocation location currentGame.locations)
             in
             diff originalResources currentResources
 
@@ -1021,7 +1021,7 @@ getMasteryIntervalMods game =
 
                             mxp : Xp
                             mxp =
-                                getByKindActivity activity game.mxp
+                                getByActivity activity game.mxp
 
                             masteryLevel : Int
                             masteryLevel =
@@ -1068,7 +1068,7 @@ getMasteryRewards game activity =
 
         mxp : Xp
         mxp =
-            getByKindActivity activity game.mxp
+            getByActivity activity game.mxp
 
         masteryLevel : Int
         masteryLevel =
@@ -1113,7 +1113,7 @@ getSpellMods game =
     allActivities
         |> List.filterMap
             (\activity ->
-                case getByKindActivity activity game.spellSelectors of
+                case getByActivity activity game.spellSelectors of
                     Just spell ->
                         Just (addActivityTagToMods activity (Spell.getStats spell).mods)
 

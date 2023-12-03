@@ -31,7 +31,7 @@ type alias Stats =
 
 getStats : Location -> Stats
 getStats kind =
-    getByKindLocation kind allStats
+    getByLocation kind allStats
 
 
 allStats : LocationRecord Stats
@@ -49,7 +49,7 @@ allStats =
         resourcesFromList =
             List.foldl
                 (\resource accum ->
-                    setByKindResource resource True accum
+                    setByResource resource True accum
                 )
                 (resourceRecord False)
 
@@ -109,7 +109,7 @@ setResourceToFound : Resource -> State -> State
 setResourceToFound resource state =
     { state
         | foundResources =
-            setByKindResource resource True state.foundResources
+            setByResource resource True state.foundResources
     }
 
 
@@ -263,11 +263,11 @@ findableResources location state =
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        getByKindResource resource (getStats location).resources
+                        getByResource resource (getStats location).resources
 
                     isFound : Bool
                     isFound =
-                        getByKindResource resource state.foundResources
+                        getByResource resource state.foundResources
                 in
                 isAtLocation && not isFound
             )
@@ -281,11 +281,11 @@ foundResources location state =
                 let
                     isAtLocation : Bool
                     isAtLocation =
-                        getByKindResource resource (getStats location).resources
+                        getByResource resource (getStats location).resources
 
                     isFound : Bool
                     isFound =
-                        getByKindResource resource state.foundResources
+                        getByResource resource state.foundResources
                 in
                 isAtLocation && isFound
             )
@@ -294,7 +294,7 @@ foundResources location state =
 resourcesAtLocation : Location -> List Resource
 resourcesAtLocation location =
     allResources
-        |> List.filter (\resource -> getByKindResource resource (getStats location).resources)
+        |> List.filter (\resource -> getByResource resource (getStats location).resources)
 
 
 findQuestGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
@@ -378,4 +378,4 @@ getCompletion location state =
 
 updateByKindLocation : Location -> (a -> a) -> LocationRecord a -> LocationRecord a
 updateByKindLocation location fn record =
-    setByKindLocation location (fn (getByKindLocation location record)) record
+    setByKindLocation location (fn (getByLocation location record)) record

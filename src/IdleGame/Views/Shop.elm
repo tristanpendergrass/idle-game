@@ -50,7 +50,7 @@ render game =
                     ShopUpgrade.getStats kind
 
                 owned =
-                    getByKindShopUpgrade kind ownedItems
+                    getByShopUpgrade kind ownedItems
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"

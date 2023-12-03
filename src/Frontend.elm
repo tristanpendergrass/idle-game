@@ -891,7 +891,7 @@ update msg model =
                                 Coin.toInt stats.price <= Coin.toInt game.coin
 
                             dontOwnItemYet =
-                                not <| getByKindShopUpgrade kind game.ownedShopUpgrades
+                                not <| getByShopUpgrade kind game.ownedShopUpgrades
                         in
                         if canAfford && dontOwnItemYet then
                             let
@@ -899,7 +899,7 @@ update msg model =
                                 newGame =
                                     { game
                                         | coin = Quantity.difference game.coin stats.price
-                                        , ownedShopUpgrades = setByKindShopUpgrade kind True game.ownedShopUpgrades
+                                        , ownedShopUpgrades = setByShopUpgrade kind True game.ownedShopUpgrades
                                     }
                             in
                             newGame

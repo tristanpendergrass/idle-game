@@ -131,4 +131,4 @@ type Reward
 toOwnedItems : ShopUpgradeRecord Bool -> List ShopUpgrade
 toOwnedItems shopItems =
     allShopUpgrades
-        |> List.filter (\kind -> getByKindShopUpgrade kind shopItems)
+        |> List.filter (\kind -> getByShopUpgrade kind shopItems)

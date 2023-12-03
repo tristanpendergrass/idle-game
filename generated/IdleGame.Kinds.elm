@@ -1,6 +1,10 @@
 module IdleGame.Kinds exposing (..)
 
-{- !! Generated code, do not edit by hand !! -} {- Resources -}
+
+{- !! Generated code, do not edit by hand !! -}
+
+
+{- Resources -}
 
 
 type Resource
@@ -80,7 +84,8 @@ getByResource kind data =
             data.parchment
 
 
-setByResource : Resource -> value -> ResourceRecord value -> ResourceRecord value
+setByResource :
+    Resource -> value -> ResourceRecord value -> ResourceRecord value
 setByResource kind value data =
     case kind of
         Manure ->
@@ -106,7 +111,6 @@ setByResource kind value data =
 
         Parchment ->
             { data | parchment = value }
-
 
 
 {- Skills -}
@@ -156,7 +160,6 @@ setBySkill kind value data =
 
         Weathermancing ->
             { data | weathermancing = value }
-
 
 
 {- Activities -}
@@ -351,7 +354,8 @@ getByActivity kind data =
             data.studyWeather1
 
 
-setByActivity : Activity -> value -> ActivityRecord value -> ActivityRecord value
+setByActivity :
+    Activity -> value -> ActivityRecord value -> ActivityRecord value
 setByActivity kind value data =
     case kind of
         CleanStables ->
@@ -425,7 +429,6 @@ setByActivity kind value data =
 
         StudyWeather1 ->
             { data | studyWeather1 = value }
-
 
 
 {- Spells -}
@@ -546,7 +549,6 @@ setBySpell kind value data =
             { data | weather1 = value }
 
 
-
 {- Locations -}
 
 
@@ -579,7 +581,8 @@ getByLocation kind data =
             data.secretGarden
 
 
-setByLocation : Location -> value -> LocationRecord value -> LocationRecord value
+setByLocation :
+    Location -> value -> LocationRecord value -> LocationRecord value
 setByLocation kind value data =
     case kind of
         SchoolGrounds ->
@@ -587,7 +590,6 @@ setByLocation kind value data =
 
         SecretGarden ->
             { data | secretGarden = value }
-
 
 
 {- Monsters -}
@@ -639,7 +641,6 @@ setByMonster kind value data =
             { data | whisperingWind = value }
 
 
-
 {- Shop Upgrades -}
 
 
@@ -684,7 +685,8 @@ getByShopUpgrade kind data =
             data.oversizedBag
 
 
-setByShopUpgrade : ShopUpgrade -> value -> ShopUpgradeRecord value -> ShopUpgradeRecord value
+setByShopUpgrade :
+    ShopUpgrade -> value -> ShopUpgradeRecord value -> ShopUpgradeRecord value
 setByShopUpgrade kind value data =
     case kind of
         Shovel ->
@@ -701,7 +703,6 @@ setByShopUpgrade kind value data =
 
         OversizedBag ->
             { data | oversizedBag = value }
-
 
 
 {- Quests -}
