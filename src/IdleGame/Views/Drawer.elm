@@ -39,6 +39,51 @@ renderDrawer isDrawerOpen mode activeTab =
                     [ underConstructionIcon ]
                 ]
 
+        renderModeSwitch : Mode -> Html FrontendMsg
+        renderModeSwitch newMode =
+            let
+                icon : Icon
+                icon =
+                    case newMode of
+                        Skilling ->
+                            Icon.studying
+
+                        Adventuring ->
+                            Icon.adventuring
+
+                modeLabel : String
+                modeLabel =
+                    case newMode of
+                        Skilling ->
+                            "Studying"
+
+                        Adventuring ->
+                            "Adventuring"
+
+                textColor : Attribute FrontendMsg
+                textColor =
+                    case newMode of
+                        Skilling ->
+                            class "text-info"
+
+                        Adventuring ->
+                            class "text-warning"
+            in
+            span
+                [ class "flex gap-4 items-center"
+                , textColor
+                ]
+                [ span [ class "flex-none" ]
+                    [ icon
+                        |> Icon.toHtml
+                    ]
+                , span [ class "flex-1 flex items-center gap-1" ]
+                    [ span [] [ text modeLabel ]
+                    , Icon.goToMode
+                        |> Icon.toHtml
+                    ]
+                ]
+
         renderForbiddenTab : Html FrontendMsg
         renderForbiddenTab =
             span
@@ -61,32 +106,6 @@ renderDrawer isDrawerOpen mode activeTab =
             else
                 []
 
-        switchModeButton =
-            let
-                newMode : Mode
-                newMode =
-                    case mode of
-                        Skilling ->
-                            Adventuring
-
-                        Adventuring ->
-                            Skilling
-
-                btnClass : Attribute FrontendMsg
-                btnClass =
-                    case mode of
-                        Skilling ->
-                            class "btn-warning"
-
-                        Adventuring ->
-                            class "btn-info"
-            in
-            button [ class "btn btn-sm btn-square flex items-center gap-2", btnClass, onClick (SwitchMode newMode) ]
-                [ Icon.go
-                    |> Icon.withSize Icon.Medium
-                    |> Icon.toHtml
-                ]
-
         modeHeader =
             case mode of
                 Skilling ->
@@ -100,14 +119,12 @@ renderDrawer isDrawerOpen mode activeTab =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [ onClick (HandleTabClick Tab.Bag Skilling) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Shop Skilling) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                , li [ onClick (SwitchMode Adventuring) ] [ renderModeSwitch Adventuring ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , div [ class "py-2" ]
-                    [ div [ class "flex items-center justify-between" ]
-                        [ modeHeader
-                        , switchModeButton
-                        ]
+                    [ modeHeader
                     ]
                 , li [ onClick (HandleTabClick Tab.Chores Skilling) ] [ renderTab { tab = Tab.Chores, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Explore Skilling) ] [ renderTab { tab = Tab.Explore, underConstruction = True } ]
@@ -139,14 +156,12 @@ renderDrawer isDrawerOpen mode activeTab =
             [ ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [ onClick (HandleTabClick Tab.Bag Adventuring) ] [ renderTab { tab = Tab.Bag, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Shop Adventuring) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                , li [ onClick (SwitchMode Skilling) ] [ renderModeSwitch Skilling ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 [ li [] []
                 , div [ class "py-2" ]
-                    [ div [ class "flex items-center justify-between" ]
-                        [ modeHeader
-                        , switchModeButton
-                        ]
+                    [ modeHeader
                     ]
                 , li [ onClick (HandleTabClick Tab.SchoolGrounds Adventuring) ] [ renderTab { tab = Tab.SchoolGrounds, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.SecretGarden Adventuring) ] [ renderTab { tab = Tab.SecretGarden, underConstruction = False } ]

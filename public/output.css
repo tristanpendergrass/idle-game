@@ -4412,14 +4412,6 @@ body[dir="rtl"] .checkbox:checked,
   width: 100vw;
 }
 
-.min-w-\[375px\] {
-  min-width: 375px;
-}
-
-.min-w-\[3rem\] {
-  min-width: 3rem;
-}
-
 .min-w-\[2\.5rem\] {
   min-width: 2.5rem;
 }
@@ -4428,16 +4420,12 @@ body[dir="rtl"] .checkbox:checked,
   min-width: 2rem;
 }
 
-.min-w-\[1rem\] {
-  min-width: 1rem;
+.min-w-\[375px\] {
+  min-width: 375px;
 }
 
-.min-w-\[8rem\] {
-  min-width: 8rem;
-}
-
-.min-w-\[10rem\] {
-  min-width: 10rem;
+.min-w-\[3rem\] {
+  min-width: 3rem;
 }
 
 .max-w-\[1920px\] {
@@ -4820,14 +4808,14 @@ body[dir="rtl"] .checkbox:checked,
   padding-bottom: 0.25rem;
 }
 
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .pb-16 {
@@ -4836,10 +4824,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .pb-20 {
   padding-bottom: 5rem;
-}
-
-.pl-4 {
-  padding-left: 1rem;
 }
 
 .pl-\[0\.3rem\] {
@@ -4874,6 +4858,10 @@ body[dir="rtl"] .checkbox:checked,
   line-height: 1;
 }
 
+.text-\[8px\] {
+  font-size: 8px;
+}
+
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -4892,10 +4880,6 @@ body[dir="rtl"] .checkbox:checked,
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.text-\[8px\] {
-  font-size: 8px;
 }
 
 .font-bold {
@@ -5036,6 +5020,11 @@ body[dir="rtl"] .checkbox:checked,
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.saturate-50 {
+  --tw-saturate: saturate(.5);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .filter {

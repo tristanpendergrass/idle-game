@@ -199,9 +199,19 @@ shop =
     createIconFeather FeatherIcons.dollarSign
 
 
+studying : Icon
+studying =
+    createIconFeather FeatherIcons.book
+
+
 adventuring : Icon
 adventuring =
-    createIconFeather FeatherIcons.gitlab
+    createIconFeather FeatherIcons.compass
+
+
+goToMode : Icon
+goToMode =
+    createIconFeather FeatherIcons.arrowRight
 
 
 chores : Icon
