@@ -98,6 +98,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Potential bug: the purchasing of shop upgrades isn't done with an effect. And the view isn't set up with one either, so any future buff that e.g. decreases shop prices won't be priced in or applied.
 
 ### Tech stuff
+- [ ] Refactor Effects to be opaque types. I just debugged an issue which came down to forgetting to add the Xp tag to GainXp. It's because the constructor for GainXp is being used directly by Activity.elm and that shouldnt' be allowed, it should have to use a helper method that makes sure to get it right.
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%

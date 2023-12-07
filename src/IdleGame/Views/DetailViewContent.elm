@@ -232,6 +232,14 @@ renderContent obj extraBottomPadding game =
                                 spellUnlocked : Bool
                                 spellUnlocked =
                                     Game.isSpellLearned game spell
+
+                                unlearnedString : String
+                                unlearnedString =
+                                    if spellUnlocked then
+                                        ""
+
+                                    else
+                                        " (unlearned)"
                             in
                             option
                                 [ selected (selectedSpell == Just spell)
@@ -239,8 +247,7 @@ renderContent obj extraBottomPadding game =
                                 , value title
                                 , class "flex items-center gap-1"
                                 ]
-                                [ span [] [ text title ]
-                                , span [ classList [ ( "hidden", spellUnlocked ) ] ] [ text " (unlearned)" ]
+                                [ span [] [ text (title ++ unlearnedString) ]
                                 ]
                         )
                         spellSelectorOptions

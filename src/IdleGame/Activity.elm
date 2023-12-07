@@ -167,9 +167,9 @@ choreEffects { activity, xp, coin, maybeResource } =
         choreTags =
             [ Effect.ActivityTag activity, Effect.SkillTag Chores ]
     in
-    [ { effect = Effect.GainXp { base = xp, percentIncrease = Percent.zero, skill = Chores }, tags = choreTags }
+    [ { effect = Effect.GainXp { base = xp, percentIncrease = Percent.zero, skill = Chores }, tags = Effect.XpTag :: choreTags }
     , { effect = Effect.GainCoin { base = coin, percentIncrease = Percent.zero }, tags = choreTags }
-    , { effect = Effect.GainMxp { activity = activity, percentIncrease = Percent.zero }, tags = choreTags }
+    , { effect = Effect.GainMxp { activity = activity, percentIncrease = Percent.zero }, tags = Effect.MxpTag :: choreTags }
     ]
         ++ (case maybeResource of
                 Nothing ->

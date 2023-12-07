@@ -510,9 +510,9 @@ applyEffects effects game =
         effect :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
-                    Mod.applyModsToEffect (getAllMods game) effect
+                    Mod.applyModsToEffect (Debug.log "foobar allMods" (getAllMods game)) (Debug.log "foobar effect" effect)
             in
-            applyEffect moddedEffect game
+            applyEffect (Debug.log "foobar moddedEffect" moddedEffect) game
                 |> Random.andThen
                     (\applyEffectResult ->
                         case applyEffectResult of
