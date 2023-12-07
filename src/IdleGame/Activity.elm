@@ -101,9 +101,29 @@ belongsToLabel belongsTo =
             Location.getLabel location
 
 
+type Type_
+    = Study
+    | Combat
+    | ExploreAndGather
+
+
+typeToString : Type_ -> String
+typeToString type_ =
+    case type_ of
+        Study ->
+            "Study"
+
+        Combat ->
+            "Combat"
+
+        ExploreAndGather ->
+            "Explore & Gather"
+
+
 type alias Stats =
     { belongsTo : BelongsTo
     , title : String
+    , type_ : Maybe Type_
     , image : CardImage
     , unlockRequirements : Maybe ( Skill, Int )
     , duration : Duration
@@ -231,6 +251,7 @@ cleanStablesStats : Stats
 cleanStablesStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Clean Stables"
+    , type_ = Nothing
     , image = CardLandscape "/chores/stable.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3
@@ -251,6 +272,7 @@ cleanBigBubbaStats : Stats
 cleanBigBubbaStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Clean Big Bubba's Stall"
+    , type_ = Nothing
     , image = CardLandscape "/chores/bubba4.png"
     , unlockRequirements = Just ( Chores, 10 )
     , duration = Duration.seconds 6
@@ -291,6 +313,7 @@ sweepChimneyStats : Stats
 sweepChimneyStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Sweep Chimneys"
+    , type_ = Nothing
     , image = CardLandscape "/chores/chimney.png"
     , unlockRequirements = Just ( Chores, 25 )
     , duration = Duration.seconds 8
@@ -311,6 +334,7 @@ waterGreenhousePlantsStats : Stats
 waterGreenhousePlantsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Water Greenhouse Plants"
+    , type_ = Nothing
     , image = CardLandscape "/chores/greenhouse_3.png"
     , unlockRequirements = Just ( Chores, 35 )
     , duration = Duration.seconds 2
@@ -331,6 +355,7 @@ washAndIronRobesStats : Stats
 washAndIronRobesStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Wash and Iron Robes"
+    , type_ = Nothing
     , image = CardLandscape "/chores/washRobes.png"
     , unlockRequirements = Just ( Chores, 45 )
     , duration = Duration.seconds 8
@@ -351,6 +376,7 @@ organizePotionIngredientsStats : Stats
 organizePotionIngredientsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Organize Potion Ingredients"
+    , type_ = Nothing
     , image = CardLandscape "/chores/potionIngredients_2.png"
     , unlockRequirements = Just ( Chores, 55 )
     , duration = Duration.seconds 20
@@ -371,6 +397,7 @@ repairInstrumentsStats : Stats
 repairInstrumentsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Repair Instruments"
+    , type_ = Nothing
     , image = CardLandscape "/chores/repairInstruments.png"
     , unlockRequirements = Just ( Chores, 65 )
     , duration = Duration.seconds 12
@@ -391,6 +418,7 @@ flushDrainDemonsStats : Stats
 flushDrainDemonsStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Flush the Drain Demons"
+    , type_ = Nothing
     , image = CardLandscape "/chores/drainDemons.png"
     , unlockRequirements = Just ( Chores, 75 )
     , duration = Duration.seconds 10
@@ -411,6 +439,7 @@ organizeSpellBooksStats : Stats
 organizeSpellBooksStats =
     { belongsTo = BelongsToSkill Chores
     , title = "Organize Spell Books"
+    , type_ = Nothing
     , image = CardLandscape "/chores/spellBooks.png"
     , unlockRequirements = Just ( Chores, 90 )
     , duration = Duration.seconds 20
@@ -462,6 +491,7 @@ studyHex1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3.5
@@ -489,6 +519,7 @@ studyJinx1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 10 )
     , duration = Duration.seconds 4.5
@@ -516,6 +547,7 @@ studyCurse1Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 25 )
     , duration = Duration.seconds 5
@@ -544,6 +576,7 @@ studyHex2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 35 )
     , duration = Duration.seconds 9
@@ -571,6 +604,7 @@ studyJinx2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 45 )
     , duration = Duration.seconds 10.5
@@ -598,6 +632,7 @@ studyCurse2Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 55 )
     , duration = Duration.seconds 12
@@ -626,6 +661,7 @@ studyHex3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 65 )
     , duration = Duration.seconds 15
@@ -653,6 +689,7 @@ studyJinx3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 75 )
     , duration = Duration.seconds 16
@@ -681,6 +718,7 @@ studyCurse3Stats =
     in
     { belongsTo = BelongsToSkill Hexes
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardIcon spellStats.icon
     , unlockRequirements = Just ( Hexes, 90 )
     , duration = Duration.seconds 19
@@ -711,6 +749,7 @@ studyWindStats =
     in
     { belongsTo = BelongsToSkill Weathermancing
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardLandscape "/weathermancing/wind.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
@@ -737,6 +776,7 @@ studyWaterStats =
     in
     { belongsTo = BelongsToSkill Weathermancing
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardLandscape "/weathermancing/water.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
@@ -763,6 +803,7 @@ studySunStats =
     in
     { belongsTo = BelongsToSkill Weathermancing
     , title = spellStats.title
+    , type_ = Just Study
     , image = CardLandscape "/weathermancing/sun.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
@@ -783,7 +824,8 @@ studySunStats =
 exploreSchoolGroundsStats : Stats
 exploreSchoolGroundsStats =
     { belongsTo = BelongsToLocation SchoolGrounds
-    , title = "Explore: School Grounds"
+    , title = "School Grounds"
+    , type_ = Just ExploreAndGather
     , image = CardLandscape "/aiart/school_grounds.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
@@ -797,7 +839,8 @@ exploreSchoolGroundsStats =
 exploreSecretGardenStats : Stats
 exploreSecretGardenStats =
     { belongsTo = BelongsToLocation SecretGarden
-    , title = "Explore: Secret Garden"
+    , title = "Secret Garden"
+    , type_ = Just ExploreAndGather
     , image = CardLandscape "/aiart/secret_garden.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
@@ -819,6 +862,7 @@ fightPrefectStats : Stats
 fightPrefectStats =
     { belongsTo = BelongsToLocation SchoolGrounds
     , title = "Prefect"
+    , type_ = Just Combat
     , image = CardLandscape "/aiart/prefect.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
@@ -841,6 +885,7 @@ fightBookWyrmStats : Stats
 fightBookWyrmStats =
     { belongsTo = BelongsToLocation SchoolGrounds
     , title = "Book Wyrm"
+    , type_ = Just Combat
     , image = CardLandscape "/aiart/book_wyrm.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8
@@ -863,6 +908,7 @@ fightWhisperingWind : Stats
 fightWhisperingWind =
     { belongsTo = BelongsToLocation SecretGarden
     , title = "Whispering Wind"
+    , type_ = Just Combat
     , image = CardLandscape "/aiart/whispering_wind.webp"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 8

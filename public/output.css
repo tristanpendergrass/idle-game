@@ -2624,6 +2624,15 @@ html {
   color: hsl(var(--sc) / var(--tw-text-opacity));
 }
 
+.badge-ghost {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--b2, var(--b1)) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--b2, var(--b1)) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--bc) / var(--tw-text-opacity));
+}
+
 .badge-outline.badge-primary {
   --tw-text-opacity: 1;
   color: hsl(var(--p) / var(--tw-text-opacity));
@@ -3777,6 +3786,14 @@ body[dir="rtl"] .checkbox:checked,
   font-size: 0.7rem;
 }
 
+.badge-xs {
+  height: 0.75rem;
+  font-size: 0.75rem;
+  line-height: .75rem;
+  padding-left: 0.313rem;
+  padding-right: 0.313rem;
+}
+
 .badge-sm {
   height: 1rem;
   font-size: 0.75rem;
@@ -4290,6 +4307,14 @@ body[dir="rtl"] .checkbox:checked,
   height: 100%;
 }
 
+.h-\[400px\] {
+  height: 400px;
+}
+
+.h-\[420px\] {
+  height: 420px;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
@@ -4785,6 +4810,16 @@ body[dir="rtl"] .checkbox:checked,
   padding-right: 0.75rem;
 }
 
+.px-1 {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.py-\[0\.125rem\] {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+
 .pb-16 {
   padding-bottom: 4rem;
 }
@@ -4859,6 +4894,14 @@ body[dir="rtl"] .checkbox:checked,
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-thin {
+  font-weight: 100;
+}
+
+.font-light {
+  font-weight: 300;
 }
 
 .uppercase {

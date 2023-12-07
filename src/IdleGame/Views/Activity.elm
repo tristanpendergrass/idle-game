@@ -185,7 +185,14 @@ renderActivityCard activity game screenWidth =
                 [ Utils.cardImage (Activity.getStats activity).image
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
-                [ div [ class "t-column" ]
+                -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
+                [ case stats.type_ of
+                    Nothing ->
+                        div [ class "hidden" ] []
+
+                    Just type_ ->
+                        div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString type_) ]
+                , div [ class "t-column" ]
                     [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
                     , div [ classList [ ( "hidden", not stats.showDuration ) ] ] [ activityDuration duration ]
                     ]
