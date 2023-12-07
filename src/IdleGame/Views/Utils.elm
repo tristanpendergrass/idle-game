@@ -364,7 +364,7 @@ modToString mod =
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Coin"
 
         Mod.PowerLabel buff ->
-            "+" ++ intToString buff ++ " Power"
+            "+" ++ intToString buff ++ " Combat Power"
 
 
 priceLabel : { price : Coin, isError : Bool } -> Html msg
