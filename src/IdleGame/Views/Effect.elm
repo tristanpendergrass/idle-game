@@ -17,7 +17,9 @@ import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
+import Percent exposing (Percent)
 import Quantity exposing (Quantity)
+import Svg.Attributes exposing (lengthAdjust)
 import Types exposing (..)
 
 
@@ -73,12 +75,12 @@ renderModdedEffect renderType game effect =
             renderExplore game location
 
 
-renderCoin : { base : Coin, multiplier : Float } -> Html msg
-renderCoin { base, multiplier } =
+renderCoin : { base : Coin, percentIncrease : Percent } -> Html msg
+renderCoin { base, percentIncrease } =
     let
         coin : Coin
         coin =
-            Quantity.multiplyBy multiplier base
+            Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base
 
         isNegative : Bool
         isNegative =
@@ -150,7 +152,7 @@ renderXp params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.skillXpBadge params.skill
         , span [ class "font-bold col-span-4" ]
-            [ Quantity.multiplyBy params.multiplier params.base
+            [ Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) params.base
                 |> Xp.toInt
                 |> Utils.intToString
                 |> text
@@ -168,7 +170,7 @@ renderMxp game params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
-            [ Quantity.multiplyBy params.multiplier base
+            [ Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) base
                 |> Xp.toInt
                 |> Utils.intToString
                 |> text
@@ -181,12 +183,16 @@ probabilityToInt x =
     floor (x * 100)
 
 
-renderVariableResource : Float -> Resource -> Html msg
+renderVariableResource : Percent -> Resource -> Html msg
 renderVariableResource probability kind =
     let
+        cappedProbability : Percent
+        cappedProbability =
+            Percent.capAtHundred probability
+
         probabilityStr : String
         probabilityStr =
-            Utils.intToString (floor (probability * 100)) ++ "%"
+            Utils.intToString (floor (Percent.toPercentage cappedProbability)) ++ "%"
     in
     div [ class "flex items-center gap-2" ]
         [ div [ class "border border-info text-info px-2 rounded-full" ] [ text probabilityStr ]
@@ -199,7 +205,7 @@ renderVariableResource probability kind =
 renderMonsterPower : Int -> Html msg
 renderMonsterPower strength =
     div [ class "flex items-center gap-4" ]
-        [ Icon.adventuring
+        [ Icon.monsterPower
             |> Icon.withSize Icon.Large
             |> Icon.toHtml
         , span [ class "text-5xl font-bold leading-none" ]

@@ -1,0 +1,8 @@
+{
+	"nodes":[
+		{"id":"2824efdd03e7d35c","x":-780,"y":-400,"width":250,"height":60,"type":"text","text":"Weathermancing"},
+		{"id":"43874f7fa05aa43e","x":-460,"y":180,"width":460,"height":200,"type":"text","text":"Firestorm\n\nA spell to rain down embers like daggers on your enemy.\n\nLooking up at a night sky aswarm with countless embers, seeming to rain down like daggers."},
+		{"id":"c494924bccc8a228","x":-460,"y":-543,"width":439,"height":203,"type":"text","text":"Palm drizzle\n\nA spell to create droplets of water in your palm.\n\nA hand outstretched with raindrops forming on its downward facing palm and dripping upon the floor."}
+	],
+	"edges":[]
+}

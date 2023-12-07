@@ -209,6 +209,11 @@ adventuring =
     createIconFeather FeatherIcons.compass
 
 
+monsterPower : Icon
+monsterPower =
+    createIconFeather FeatherIcons.gitlab
+
+
 goToMode : Icon
 goToMode =
     createIconFeather FeatherIcons.arrowRight

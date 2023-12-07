@@ -7,6 +7,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import Percent exposing (Percent)
+import Quantity
 
 
 type ModSource
@@ -274,18 +275,23 @@ withTags tags mod =
     { mod | tags = mod.tags ++ tags }
 
 
-xpTransformer : Float -> Transformer
+withLabel : Label -> Mod -> Mod
+withLabel label mod =
+    { mod | label = label }
+
+
+xpTransformer : Percent -> Transformer
 xpTransformer buff repetitions effect =
     case Effect.getEffect effect of
         Effect.GainXp params ->
             let
-                adjustedBuff : Float
+                adjustedBuff : Percent
                 adjustedBuff =
-                    buff * toFloat repetitions
+                    Quantity.multiplyBy (toFloat repetitions) buff
 
                 newParams : Effect.GainXpParams
                 newParams =
-                    { params | multiplier = params.multiplier * adjustedBuff }
+                    { params | percentIncrease = Quantity.plus params.percentIncrease adjustedBuff }
             in
             effect
                 |> Effect.setEffect (Effect.GainXp newParams)
@@ -295,13 +301,14 @@ xpTransformer buff repetitions effect =
             NoChange
 
 
-coinTransformer : Float -> Transformer
+coinTransformer : Percent -> Transformer
 coinTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainCoin quantity ->
             let
+                adjustedMultiplicable : Effect.GainCoinParams
                 adjustedMultiplicable =
-                    { quantity | multiplier = quantity.multiplier + (buff * toFloat repetitions) }
+                    { quantity | percentIncrease = Quantity.plus quantity.percentIncrease (Quantity.multiplyBy (toFloat repetitions) buff) }
             in
             taggedEffect
                 |> Effect.setEffect (Effect.GainCoin adjustedMultiplicable)
@@ -311,18 +318,18 @@ coinTransformer buff repetitions taggedEffect =
             NoChange
 
 
-mxpTransformer : Float -> Transformer
+mxpTransformer : Percent -> Transformer
 mxpTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainMxp params ->
             let
-                adjustedBuff : Float
+                adjustedBuff : Percent
                 adjustedBuff =
-                    buff * toFloat repetitions
+                    Quantity.multiplyBy (toFloat repetitions) buff
 
                 newParams : Effect.GainMxpParams
                 newParams =
-                    { params | multiplier = params.multiplier * adjustedBuff }
+                    { params | percentIncrease = Quantity.plus params.percentIncrease adjustedBuff }
             in
             taggedEffect
                 |> Effect.setEffect (Effect.GainMxp newParams)
@@ -332,7 +339,7 @@ mxpTransformer buff repetitions taggedEffect =
             NoChange
 
 
-resourceDoublingTransformer : Float -> Transformer
+resourceDoublingTransformer : Percent -> Transformer
 resourceDoublingTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
@@ -340,7 +347,7 @@ resourceDoublingTransformer buff repetitions taggedEffect =
                 |> Effect.setEffect
                     (Effect.GainResource
                         { base = base
-                        , doublingChance = doublingChance + (buff * toFloat repetitions)
+                        , doublingChance = Quantity.plus doublingChance (Quantity.multiplyBy (toFloat repetitions) buff)
                         , resource = resource
                         }
                     )
@@ -368,14 +375,14 @@ resourceBaseTransformer buff repetitions taggedEffect =
             NoChange
 
 
-increaseSuccessTransformer : Float -> Transformer
+increaseSuccessTransformer : Percent -> Transformer
 increaseSuccessTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.VariableSuccess params ->
             let
                 newSuccessProbability =
-                    (params.successProbability + buff * toFloat repetitions)
-                        |> min 1.0
+                    Quantity.plus params.successProbability (Quantity.multiplyBy (toFloat repetitions) buff)
+                        |> Quantity.min (Percent.float 1.0)
 
                 newEffect =
                     Effect.VariableSuccess { params | successProbability = newSuccessProbability }
@@ -407,7 +414,7 @@ powerTransformer buff repetitions taggedEffect =
             NoChange
 
 
-activityXpBuff : Activity -> Float -> Mod
+activityXpBuff : Activity -> Percent -> Mod
 activityXpBuff activity amount =
     { tags = [ Effect.XpTag, Effect.ActivityTag activity ]
     , label = XpActivityLabel amount
@@ -417,17 +424,24 @@ activityXpBuff activity amount =
     }
 
 
-skillXpBuff : Skill -> Float -> Mod
-skillXpBuff skill amount =
-    { tags = [ Effect.XpTag, Effect.SkillTag skill ]
-    , label = XpSkillLabel amount skill
+xpBuff : Percent -> Mod
+xpBuff amount =
+    { tags = [ Effect.XpTag ]
+    , label = XpActivityLabel amount
     , transformer = xpTransformer amount
     , source = AdminCrimes
     , repetitions = 1
     }
 
 
-choresXpBuff : Float -> Mod
+skillXpBuff : Skill -> Percent -> Mod
+skillXpBuff skill amount =
+    xpBuff amount
+        |> withTags [ Effect.SkillTag skill ]
+        |> withLabel (XpSkillLabel amount skill)
+
+
+choresXpBuff : Percent -> Mod
 choresXpBuff buff =
     { tags = [ Effect.SkillTag Chores, Effect.XpTag ]
     , label = XpActivityLabel buff
@@ -437,7 +451,7 @@ choresXpBuff buff =
     }
 
 
-coinBuff : Float -> Mod
+coinBuff : Percent -> Mod
 coinBuff buff =
     { tags = []
     , label = CoinLabel buff
@@ -447,7 +461,7 @@ coinBuff buff =
     }
 
 
-mxpBuff : Float -> Mod
+mxpBuff : Percent -> Mod
 mxpBuff buff =
     { tags = [ Effect.MxpTag ]
     , label = MxpModLabel buff
@@ -457,7 +471,7 @@ mxpBuff buff =
     }
 
 
-resourceBuff : Float -> Mod
+resourceBuff : Percent -> Mod
 resourceBuff buff =
     { tags = []
     , label = ResourceDoublingLabel buff
@@ -477,7 +491,7 @@ resourceBaseBuff buff =
     }
 
 
-successBuff : Float -> Mod
+successBuff : Percent -> Mod
 successBuff buff =
     { tags = []
     , label = SuccessLabel buff
@@ -498,12 +512,12 @@ powerBuff buff =
 
 
 type Label
-    = XpActivityLabel Float
-    | XpSkillLabel Float Skill
-    | MxpModLabel Float
-    | ResourceDoublingLabel Float
+    = XpActivityLabel Percent
+    | XpSkillLabel Percent Skill
+    | MxpModLabel Percent
+    | ResourceDoublingLabel Percent
     | ResourceBaseLabel Int
     | MoreManure
-    | SuccessLabel Float
-    | CoinLabel Float
+    | SuccessLabel Percent
+    | CoinLabel Percent
     | PowerLabel Int

@@ -340,16 +340,16 @@ modToString : Mod -> String
 modToString mod =
     case mod.label of
         Mod.XpActivityLabel buff ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% XP"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% XP"
 
         Mod.XpSkillLabel buff skill ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% " ++ Skill.getLabel skill ++ " XP"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% " ++ Skill.getLabel skill ++ " XP"
 
         Mod.MxpModLabel buff ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% Mastery XP"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Mastery XP"
 
         Mod.ResourceDoublingLabel buff ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% chance to double items"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to double items"
 
         Mod.ResourceBaseLabel buff ->
             "+" ++ intToString buff ++ " item"
@@ -358,10 +358,10 @@ modToString mod =
             "More manure"
 
         Mod.SuccessLabel buff ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% chance to gain an item"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to gain an item"
 
         Mod.CoinLabel buff ->
-            "+" ++ intToString (floor (buff * 100)) ++ "% Coin"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Coin"
 
         Mod.PowerLabel buff ->
             "+" ++ intToString buff ++ " Power"

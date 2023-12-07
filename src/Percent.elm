@@ -16,6 +16,11 @@ float p =
     Quantity p
 
 
+zero : Percent
+zero =
+    float 0
+
+
 toFloat : Percent -> Float
 toFloat (Quantity p) =
     p
@@ -26,6 +31,16 @@ toPercentage (Quantity p) =
     p * 100
 
 
+toMultiplier : Percent -> Float
+toMultiplier (Quantity p) =
+    1 + p
+
+
 capAtHundred : Percent -> Percent
 capAtHundred (Quantity p) =
     Quantity (min 100 p)
+
+
+increaseByPercent : Percent -> Float -> Float
+increaseByPercent (Quantity p) value =
+    value + (value * (p / 100))

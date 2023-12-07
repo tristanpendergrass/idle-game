@@ -123,7 +123,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 
 ### Features
 #### Skills
-- [ ] Skill 3
+- [ ] Skill: Wild Magic
 - [ ] Skill 4
 #### Combat
 - [ ] Regen period after loss

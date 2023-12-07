@@ -189,7 +189,9 @@ type Activity
     | FightPrefect
     | FightBookWyrm
     | FightWhisperingWind
-    | StudyWeather1
+    | StudyWind
+    | StudyWater
+    | StudySun
 
 
 allActivities : List Activity
@@ -217,7 +219,9 @@ allActivities =
     , FightPrefect
     , FightBookWyrm
     , FightWhisperingWind
-    , StudyWeather1
+    , StudyWind
+    , StudyWater
+    , StudySun
     ]
 
 
@@ -245,7 +249,9 @@ type alias ActivityRecord a =
     , fightPrefect : a
     , fightBookWyrm : a
     , fightWhisperingWind : a
-    , studyWeather1 : a
+    , studyWind : a
+    , studyWater : a
+    , studySun : a
     }
 
 
@@ -274,11 +280,13 @@ activityRecord a =
     , fightPrefect = a
     , fightBookWyrm = a
     , fightWhisperingWind = a
-    , studyWeather1 = a
+    , studyWind = a
+    , studyWater = a
+    , studySun = a
     }
 
 
-getByActivity : Activity -> ActivityRecord studyWeather1 -> studyWeather1
+getByActivity : Activity -> ActivityRecord studySun -> studySun
 getByActivity kind data =
     case kind of
         CleanStables ->
@@ -350,8 +358,14 @@ getByActivity kind data =
         FightWhisperingWind ->
             data.fightWhisperingWind
 
-        StudyWeather1 ->
-            data.studyWeather1
+        StudyWind ->
+            data.studyWind
+
+        StudyWater ->
+            data.studyWater
+
+        StudySun ->
+            data.studySun
 
 
 setByActivity :
@@ -427,8 +441,14 @@ setByActivity kind value data =
         FightWhisperingWind ->
             { data | fightWhisperingWind = value }
 
-        StudyWeather1 ->
-            { data | studyWeather1 = value }
+        StudyWind ->
+            { data | studyWind = value }
+
+        StudyWater ->
+            { data | studyWater = value }
+
+        StudySun ->
+            { data | studySun = value }
 
 
 {- Spells -}
@@ -444,12 +464,26 @@ type Spell
     | Curse1
     | Curse2
     | Curse3
-    | Weather1
+    | Wind
+    | Water
+    | Sun
 
 
 allSpells : List Spell
 allSpells =
-    [ Hex1, Hex2, Hex3, Jinx1, Jinx2, Jinx3, Curse1, Curse2, Curse3, Weather1 ]
+    [ Hex1
+    , Hex2
+    , Hex3
+    , Jinx1
+    , Jinx2
+    , Jinx3
+    , Curse1
+    , Curse2
+    , Curse3
+    , Wind
+    , Water
+    , Sun
+    ]
 
 
 type alias SpellRecord a =
@@ -462,7 +496,9 @@ type alias SpellRecord a =
     , curse1 : a
     , curse2 : a
     , curse3 : a
-    , weather1 : a
+    , wind : a
+    , water : a
+    , sun : a
     }
 
 
@@ -477,11 +513,13 @@ spellRecord a =
     , curse1 = a
     , curse2 = a
     , curse3 = a
-    , weather1 = a
+    , wind = a
+    , water = a
+    , sun = a
     }
 
 
-getBySpell : Spell -> SpellRecord weather1 -> weather1
+getBySpell : Spell -> SpellRecord sun -> sun
 getBySpell kind data =
     case kind of
         Hex1 ->
@@ -511,8 +549,14 @@ getBySpell kind data =
         Curse3 ->
             data.curse3
 
-        Weather1 ->
-            data.weather1
+        Wind ->
+            data.wind
+
+        Water ->
+            data.water
+
+        Sun ->
+            data.sun
 
 
 setBySpell : Spell -> value -> SpellRecord value -> SpellRecord value
@@ -545,8 +589,14 @@ setBySpell kind value data =
         Curse3 ->
             { data | curse3 = value }
 
-        Weather1 ->
-            { data | weather1 = value }
+        Wind ->
+            { data | wind = value }
+
+        Water ->
+            { data | water = value }
+
+        Sun ->
+            { data | sun = value }
 
 
 {- Locations -}

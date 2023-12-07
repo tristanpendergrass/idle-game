@@ -19,7 +19,7 @@ type Timer
 
 create : Timer
 create =
-    Timer { current = Percent.float 0 }
+    Timer { current = Percent.zero }
 
 
 percentComplete : Timer -> Percent

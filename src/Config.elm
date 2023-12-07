@@ -45,8 +45,8 @@ devFlags =
     , debugTimePasses = False
     , showTimePasses = False
     , showDebugPanel = True
-    , defaultMode = Adventuring
-    , defaultTabSkilling = Tab.Chores
+    , defaultMode = Skilling
+    , defaultTabSkilling = Tab.Weathermancing
     , defaultTabAdventuring = Tab.SchoolGrounds
     }
 

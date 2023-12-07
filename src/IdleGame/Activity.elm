@@ -13,6 +13,7 @@ import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Spell as Spell
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Utils exposing (cardImage)
 import IdleGame.Xp as Xp exposing (Xp)
 import List.Extra
 import Percent exposing (Percent)
@@ -138,7 +139,9 @@ allStats =
     , studyHex3 = studyHex3Stats
     , studyJinx3 = studyJinx3Stats
     , studyCurse3 = studyCurse3Stats
-    , studyWeather1 = weather1Stats
+    , studyWind = studyWindStats
+    , studyWater = studyWaterStats
+    , studySun = studySunStats
     , exploreSchoolGrounds = exploreSchoolGroundsStats
     , exploreSecretGarden = exploreSecretGardenStats
     , fightPrefect = fightPrefectStats
@@ -155,7 +158,7 @@ choreEffects :
     { activity : Activity
     , xp : Xp
     , coin : Coin
-    , maybeResource : Maybe { resource : Resource, amount : Int, probability : Float }
+    , maybeResource : Maybe { resource : Resource, amount : Int, probability : Percent }
     }
     -> List Effect.TaggedEffect
 choreEffects { activity, xp, coin, maybeResource } =
@@ -164,9 +167,9 @@ choreEffects { activity, xp, coin, maybeResource } =
         choreTags =
             [ Effect.ActivityTag activity, Effect.SkillTag Chores ]
     in
-    [ { effect = Effect.GainXp { base = xp, multiplier = 1, skill = Chores }, tags = choreTags }
-    , { effect = Effect.GainCoin { base = coin, multiplier = 1 }, tags = choreTags }
-    , { effect = Effect.GainMxp { activity = activity, multiplier = 1 }, tags = choreTags }
+    [ { effect = Effect.GainXp { base = xp, percentIncrease = Percent.zero, skill = Chores }, tags = choreTags }
+    , { effect = Effect.GainCoin { base = coin, percentIncrease = Percent.zero }, tags = choreTags }
+    , { effect = Effect.GainMxp { activity = activity, percentIncrease = Percent.zero }, tags = choreTags }
     ]
         ++ (case maybeResource of
                 Nothing ->
@@ -180,7 +183,7 @@ choreEffects { activity, xp, coin, maybeResource } =
                                     [ { effect =
                                             Effect.GainResource
                                                 { base = amount
-                                                , doublingChance = 0
+                                                , doublingChance = Percent.zero
                                                 , resource = resource
                                                 }
                                       , tags = choreTags
@@ -198,13 +201,13 @@ getChoresMastery : Activity -> Mastery
 getChoresMastery chore =
     [ ( 25
       , GameMod
-            (Mod.coinBuff 0.1
+            (Mod.coinBuff (Percent.float 0.1)
                 |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
     , ( 50
       , GameMod
-            (Mod.activityXpBuff chore 0.25
+            (Mod.activityXpBuff chore (Percent.float 0.25)
                 |> Mod.withTags [ Effect.ActivityTag chore ]
             )
       )
@@ -217,7 +220,7 @@ getChoresMastery chore =
       )
     , ( 100
       , GameMod
-            (Mod.skillXpBuff Chores 0.05
+            (Mod.skillXpBuff Chores (Percent.float 0.05)
                 |> Mod.withTags [ Effect.SkillTag Chores ]
             )
       )
@@ -256,7 +259,7 @@ cleanBigBubbaStats =
             { activity = CleanBigBubba
             , xp = Xp.int 25
             , coin = Coin.int 3
-            , maybeResource = Just { resource = Manure, amount = 1, probability = 0.75 }
+            , maybeResource = Just { resource = Manure, amount = 1, probability = Percent.float 0.75 }
             }
     , mastery =
         let
@@ -316,7 +319,7 @@ waterGreenhousePlantsStats =
             { activity = WaterGreenhousePlants
             , xp = Xp.int 12
             , coin = Coin.int 2
-            , maybeResource = Just { resource = GreenhouseDirt, amount = 1, probability = 0.6 }
+            , maybeResource = Just { resource = GreenhouseDirt, amount = 1, probability = Percent.float 0.6 }
             }
     , mastery = Just (getChoresMastery WaterGreenhousePlants)
     , teachesSpell = Nothing
@@ -336,7 +339,7 @@ washAndIronRobesStats =
             { activity = WashAndIronRobes
             , xp = Xp.int 50
             , coin = Coin.int 9
-            , maybeResource = Just { resource = WashWater, amount = 1, probability = 0.1 }
+            , maybeResource = Just { resource = WashWater, amount = 1, probability = Percent.float 0.1 }
             }
     , mastery = Just (getChoresMastery WashAndIronRobes)
     , teachesSpell = Nothing
@@ -376,7 +379,7 @@ repairInstrumentsStats =
             { activity = RepairInstruments
             , xp = Xp.int 75
             , coin = Coin.int 20
-            , maybeResource = Just { resource = Scrap, amount = 1, probability = 0.25 }
+            , maybeResource = Just { resource = Scrap, amount = 1, probability = Percent.float 0.25 }
             }
     , mastery = Just (getChoresMastery RepairInstruments)
     , teachesSpell = Nothing
@@ -396,7 +399,7 @@ flushDrainDemonsStats =
             { activity = FlushDrainDemons
             , xp = Xp.int 90
             , coin = Coin.int 14
-            , maybeResource = Just { resource = Ectoplasm, amount = 1, probability = 0.1 }
+            , maybeResource = Just { resource = Ectoplasm, amount = 1, probability = Percent.float 0.1 }
             }
     , mastery = Just (getChoresMastery FlushDrainDemons)
     , teachesSpell = Nothing
@@ -416,7 +419,7 @@ organizeSpellBooksStats =
             { activity = OrganizeSpellBooks
             , xp = Xp.int 210
             , coin = Coin.int 30
-            , maybeResource = Just { resource = Parchment, amount = 1, probability = 0.05 }
+            , maybeResource = Just { resource = Parchment, amount = 1, probability = Percent.float 0.05 }
             }
     , mastery = Just (getChoresMastery OrganizeSpellBooks)
     , teachesSpell = Nothing
@@ -428,12 +431,21 @@ organizeSpellBooksStats =
 -- Hexes
 
 
-defaultSpellMastery : Mastery
-defaultSpellMastery =
+studyHexesMastery : Mastery
+studyHexesMastery =
     [ ( 25, SpellAvailable )
     , ( 50, SecondaryEnabled )
     , ( 75, ImbueEnabled )
     , ( 100, GameMod (Mod.powerBuff 1) )
+    ]
+
+
+studyWeathermancingMastery : Mastery
+studyWeathermancingMastery =
+    [ ( 25, SpellAvailable )
+    , ( 50, SecondaryEnabled )
+    , ( 75, ImbueEnabled )
+    , ( 100, GameMod (Mod.skillXpBuff Chores (Percent.float 0.05)) )
     ]
 
 
@@ -458,7 +470,7 @@ studyHex1Stats =
         , Effect.gainMxp StudyHex1
         , Effect.gainResource -1 Manure
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex1
     , showDuration = True
     }
@@ -485,7 +497,7 @@ studyJinx1Stats =
         , Effect.gainMxp StudyJinx1
         , Effect.gainResource -1 GreenhouseDirt
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx1
     , showDuration = True
     }
@@ -513,7 +525,7 @@ studyCurse1Stats =
         , Effect.gainResource -1 WashWater
         , Effect.gainResource -1 Soot
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse1
     , showDuration = True
     }
@@ -540,7 +552,7 @@ studyHex2Stats =
         , Effect.gainMxp StudyHex2
         , Effect.gainResource -4 Manure
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex2
     , showDuration = True
     }
@@ -567,7 +579,7 @@ studyJinx2Stats =
         , Effect.gainMxp StudyJinx2
         , Effect.gainResource -5 GreenhouseDirt
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx2
     , showDuration = True
     }
@@ -595,7 +607,7 @@ studyCurse2Stats =
         , Effect.gainResource -2 WashWater
         , Effect.gainResource -1 Scrap
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse2
     , showDuration = True
     }
@@ -622,7 +634,7 @@ studyHex3Stats =
         , Effect.gainMxp StudyHex3
         , Effect.gainResource -10 Manure
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex3
     , showDuration = True
     }
@@ -650,7 +662,7 @@ studyJinx3Stats =
         , Effect.gainResource -6 GreenhouseDirt
         , Effect.gainResource -1 Ectoplasm
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx3
     , showDuration = True
     }
@@ -680,25 +692,86 @@ studyCurse3Stats =
         , Effect.gainResource -2 Scrap
         , Effect.gainResource -2 Manure
         ]
-    , mastery = Just defaultSpellMastery
+    , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse3
     , showDuration = True
     }
 
 
-weather1Stats : Stats
-weather1Stats =
+studyWindStats : Stats
+studyWindStats =
+    let
+        spell : Spell
+        spell =
+            Wind
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
     { belongsTo = BelongsToSkill Weathermancing
-    , title = "Weather I"
-    , image = CardIcon (Icon.fromString "Wt1")
+    , title = spellStats.title
+    , image = CardLandscape "/weathermancing/wind.png"
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
     , effects =
         [ Effect.gainXp (Xp.int 10) Weathermancing
-        , Effect.gainMxp StudyWeather1
+        , Effect.gainMxp StudyWind
         ]
-    , mastery = Just defaultSpellMastery
-    , teachesSpell = Nothing
+    , mastery = Just studyWeathermancingMastery
+    , teachesSpell = Just Wind
+    , showDuration = True
+    }
+
+
+studyWaterStats : Stats
+studyWaterStats =
+    let
+        spell : Spell
+        spell =
+            Water
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { belongsTo = BelongsToSkill Weathermancing
+    , title = spellStats.title
+    , image = CardLandscape "/weathermancing/water.png"
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 4
+    , effects =
+        [ Effect.gainXp (Xp.int 10) Weathermancing
+        , Effect.gainMxp StudyWater
+        ]
+    , mastery = Just studyWeathermancingMastery
+    , teachesSpell = Just Water
+    , showDuration = True
+    }
+
+
+studySunStats : Stats
+studySunStats =
+    let
+        spell : Spell
+        spell =
+            Sun
+
+        spellStats : Spell.Stats
+        spellStats =
+            Spell.getStats spell
+    in
+    { belongsTo = BelongsToSkill Weathermancing
+    , title = spellStats.title
+    , image = CardLandscape "/weathermancing/sun.png"
+    , unlockRequirements = Nothing
+    , duration = Duration.seconds 4
+    , effects =
+        [ Effect.gainXp (Xp.int 10) Weathermancing
+        , Effect.gainMxp StudySun
+        ]
+    , mastery = Just studyWeathermancingMastery
+    , teachesSpell = Just Sun
     , showDuration = True
     }
 

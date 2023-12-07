@@ -194,7 +194,9 @@ activities =
     , "FightPrefect"
     , "FightBookWyrm"
     , "FightWhisperingWind"
-    , "StudyWeather1"
+    , "StudyWind"
+    , "StudyWater"
+    , "StudySun"
     ]
 
 
@@ -209,7 +211,9 @@ spells =
     , "Curse1"
     , "Curse2"
     , "Curse3"
-    , "Weather1"
+    , "Wind"
+    , "Water"
+    , "Sun"
     ]
 
 

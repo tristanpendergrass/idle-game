@@ -27,29 +27,29 @@ type alias TaggedEffect =
 
 type alias GainXpParams =
     { base : Xp
-    , multiplier : Float
+    , percentIncrease : Percent
     , skill : Skill
     }
 
 
 type alias GainMxpParams =
-    { multiplier : Float
+    { percentIncrease : Percent
     , activity : Activity
     }
 
 
 type alias GainCoinParams =
     { base : Coin
-    , multiplier : Float
+    , percentIncrease : Percent
     }
 
 
 type alias GainResourceParams =
-    { base : Int, doublingChance : Float, resource : Resource }
+    { base : Int, doublingChance : Percent, resource : Resource }
 
 
 type Effect
-    = VariableSuccess { successProbability : Float, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
+    = VariableSuccess { successProbability : Percent, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
     | GainResource GainResourceParams
     | GainXp GainXpParams
     | GainMxp GainMxpParams
@@ -70,40 +70,40 @@ setEffect newEffect taggedEffect =
 
 gainXp : Xp -> Skill -> TaggedEffect
 gainXp quantity skill =
-    { effect = GainXp { base = quantity, multiplier = 1, skill = skill }
+    { effect = GainXp { base = quantity, percentIncrease = Percent.zero, skill = skill }
     , tags = []
     }
 
 
 gainCoin : Coin -> TaggedEffect
 gainCoin quantity =
-    { effect = GainCoin { base = quantity, multiplier = 1 }
+    { effect = GainCoin { base = quantity, percentIncrease = Percent.zero }
     , tags = []
     }
 
 
 gainMxp : Activity -> TaggedEffect
 gainMxp activity =
-    { effect = GainMxp { multiplier = 1, activity = activity }
+    { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
     , tags = []
     }
 
 
 gainResource : Int -> Resource -> TaggedEffect
 gainResource quantity kind =
-    { effect = GainResource { base = quantity, doublingChance = 0, resource = kind }
+    { effect = GainResource { base = quantity, doublingChance = Percent.zero, resource = kind }
     , tags = []
     }
 
 
-gainResourceWithDoubling : Int -> Resource -> Float -> TaggedEffect
+gainResourceWithDoubling : Int -> Resource -> Percent -> TaggedEffect
 gainResourceWithDoubling quantity kind doubling =
     { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
     , tags = []
     }
 
 
-gainWithProbability : Float -> List TaggedEffect -> TaggedEffect
+gainWithProbability : Percent -> List TaggedEffect -> TaggedEffect
 gainWithProbability probability successEffects =
     { effect = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }
     , tags = []

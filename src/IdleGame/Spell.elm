@@ -4,6 +4,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import List.Extra
+import Percent exposing (Percent)
 
 
 getStats : Spell -> Stats
@@ -90,10 +91,22 @@ allStats =
         , mods = [ Mod.powerBuff 45 ]
         , inclusions = [ IfCombat ]
         }
-    , weather1 =
-        { title = "Weather I"
+    , wind =
+        { title = "Envigorating Breeze"
+        , icon = Icon.fromString "Wd1"
+        , mods = [ Mod.xpBuff (Percent.float 0.1) ]
+        , inclusions = [ IfSkill Chores ]
+        }
+    , water =
+        { title = "Refreshing Mizzle"
         , icon = Icon.fromString "Wt1"
-        , mods = []
+        , mods = [ Mod.successBuff (Percent.float 0.1) ]
+        , inclusions = [ IfSkill Chores ]
+        }
+    , sun =
+        { title = "Warming Sunrays"
+        , icon = Icon.fromString "Sn1"
+        , mods = [ Mod.mxpBuff (Percent.float 0.15) ]
         , inclusions = [ IfSkill Chores ]
         }
     }

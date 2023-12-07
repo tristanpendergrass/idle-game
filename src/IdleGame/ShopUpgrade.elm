@@ -93,7 +93,7 @@ oversizedBagStats =
     , price = Coin.int 5000
     , reward =
         ShopItemMod
-            [ Mod.coinBuff 1
+            [ Mod.coinBuff (Percent.float 1)
                 |> Mod.withTags [ Effect.SkillTag Chores ]
             ]
     , description = "Earn double coin from chores"

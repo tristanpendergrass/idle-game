@@ -575,16 +575,16 @@ mapGeneratorResult fn =
 --     mapGeneratorResult fn
 
 
-successGenerator : Float -> Generator Bool
+successGenerator : Percent -> Generator Bool
 successGenerator probability =
     Random.float 0 1
         |> Random.map
             (\num ->
-                num < probability
+                num < Percent.toFloat probability
             )
 
 
-intGenerator : { base : Int, doublingChance : Float } -> Generator Int
+intGenerator : { base : Int, doublingChance : Percent } -> Generator Int
 intGenerator { base, doublingChance } =
     successGenerator doublingChance
         |> Random.map
@@ -660,11 +660,11 @@ applyEffect effect game =
                         Random.constant (Ok (ApplyEffectValue game toasts chosenEffects))
                     )
 
-        Effect.GainCoin { base, multiplier } ->
+        Effect.GainCoin { base, percentIncrease } ->
             let
                 product : Coin
                 product =
-                    Quantity.multiplyBy multiplier base
+                    Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base
             in
             addCoin product game
                 |> Random.constant
@@ -673,8 +673,8 @@ applyEffect effect game =
             intGenerator { base = params.base, doublingChance = params.doublingChance }
                 |> Random.map (\amount -> addResource params.resource amount game)
 
-        Effect.GainXp { base, multiplier, skill } ->
-            { game = addXp skill (Quantity.multiplyBy multiplier base) game
+        Effect.GainXp { base, percentIncrease, skill } ->
+            { game = addXp skill (Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base) game
             , toasts = []
             , additionalEffects = []
             }
@@ -689,16 +689,10 @@ applyEffect effect game =
 
                 mxp : Xp
                 mxp =
-                    Quantity.multiplyBy params.multiplier base
-
-                masteryPoolXp : Xp
-                masteryPoolXp =
-                    Quantity.multiplyBy params.multiplier base
-                        |> Quantity.multiplyBy 0.5
+                    Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) base
             in
             game
                 |> addMxp params.activity mxp
-                |> addMasteryPoolXp masteryPoolXp
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
                 |> Random.map Ok
 
@@ -1107,8 +1101,8 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-getSpellMods : Game -> List Mod
-getSpellMods game =
+getSelectedSpellMods : Game -> List Mod
+getSelectedSpellMods game =
     -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
     allActivities
         |> List.filterMap
@@ -1131,7 +1125,7 @@ addActivityTagToMods activity =
 getAllMods : Game -> List Mod
 getAllMods game =
     []
-        ++ getSpellMods game
+        ++ getSelectedSpellMods game
         ++ getActivityMods game
         ++ getShopItemMods game
 
