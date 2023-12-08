@@ -10,9 +10,11 @@ import IdleGame.Monster as Monster
 import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
+import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
+import Quantity
 import Random
 
 
@@ -86,14 +88,31 @@ type alias State =
     { foundMonsters : MonsterRecord Bool
     , foundResources : ResourceRecord Bool
     , foundQuests : QuestRecord Bool
+    , interval : Timer
     }
 
 
-createState : State
-createState =
+durationOfExploration : Duration
+durationOfExploration =
+    Duration.days 2
+
+
+getInterval : Location -> Duration
+getInterval location =
+    let
+        totalThingsToDiscover : Int
+        totalThingsToDiscover =
+            List.length (monstersAtLocation location) + List.length (resourcesAtLocation location) + List.length (questsAtLocation location)
+    in
+    Quantity.divideBy (toFloat totalThingsToDiscover) durationOfExploration
+
+
+createState : Location -> State
+createState location =
     { foundMonsters = monsterRecord False
     , foundResources = resourceRecord False
     , foundQuests = questRecord False
+    , interval = Timer.create
     }
 
 
