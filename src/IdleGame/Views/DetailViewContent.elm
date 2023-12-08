@@ -190,7 +190,7 @@ renderContent obj extraBottomPadding game =
                 activityProgress timer
 
             _ ->
-                div [ class "h-1" ] []
+                div [ class "invisible" ] [ activityProgress Timer.create ]
 
         -- Play/pause button
         , playPauseButton playButtonState activity

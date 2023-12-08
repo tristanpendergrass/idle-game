@@ -85,9 +85,9 @@ createDev seed =
     let
         xp : SkillRecord Xp
         xp =
-            { chores = Xp.int 0
-            , hexes = Xp.int 0
-            , weathermancing = Xp.int 0
+            { chores = Xp.int 9000000
+            , hexes = Xp.int 9000000
+            , weathermancing = Xp.int 9000000
             }
     in
     { seed = seed
@@ -510,9 +510,9 @@ applyEffects effects game =
         effect :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
-                    Mod.applyModsToEffect (Debug.log "foobar allMods" (getAllMods game)) (Debug.log "foobar effect" effect)
+                    Mod.applyModsToEffect (getAllMods game) effect
             in
-            applyEffect (Debug.log "foobar moddedEffect" moddedEffect) game
+            applyEffect moddedEffect game
                 |> Random.andThen
                     (\applyEffectResult ->
                         case applyEffectResult of

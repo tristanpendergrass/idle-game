@@ -21,6 +21,7 @@ type alias Flags =
     , defaultMode : Mode
     , defaultTabSkilling : Tab
     , defaultTabAdventuring : Tab
+    , maxOutSkillXp : Bool
     }
 
 
@@ -46,8 +47,9 @@ devFlags =
     , showTimePasses = False
     , showDebugPanel = True
     , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Weathermancing
+    , defaultTabSkilling = Tab.Hexes
     , defaultTabAdventuring = Tab.SchoolGrounds
+    , maxOutSkillXp = True
     }
 
 
@@ -65,4 +67,5 @@ prodFlags =
     , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.SchoolGrounds
     , debugTimePasses = False
+    , maxOutSkillXp = False
     }

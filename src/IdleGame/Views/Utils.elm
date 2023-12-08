@@ -382,7 +382,7 @@ priceLabel { price, isError } =
 
 card =
     -- Classes to ease the creation of cards such as the activity and quest cards
-    { container = class "card card-compact bg-base-100 shadow-xl h-[400px]"
+    { container = class "card card-compact bg-base-100 shadow-xl"
     , containerClickable = class "cursor-pointer bubble-pop select-none"
     , activityTypeBadge = class "badge badge-neutral badge-xs"
     , imageContainer = class "min-h-[6rem] h-24 relative"

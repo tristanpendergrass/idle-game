@@ -4327,6 +4327,10 @@ body[dir="rtl"] .checkbox:checked,
   min-height: 6rem;
 }
 
+.min-h-\[0\.25rem\] {
+  min-height: 0.25rem;
+}
+
 .w-12 {
   width: 3rem;
 }
