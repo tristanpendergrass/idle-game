@@ -1,6 +1,7 @@
 module IdleGame.Location exposing (..)
 
 import Duration exposing (Duration)
+import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
@@ -16,6 +17,12 @@ import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Quantity
 import Random
+
+
+exploreActivityDuration : Duration
+exploreActivityDuration =
+    -- How often an exploration effect happens when exploring
+    Duration.seconds 4
 
 
 
@@ -159,17 +166,23 @@ type alias ExploreResult =
 explorationGenerator : Location -> State -> Random.Generator ExploreResult
 explorationGenerator location state =
     let
-        initialResult : ExploreResult
-        initialResult =
+        ( newInterval, discoveryCount ) =
+            Timer.increment (getInterval location) exploreActivityDuration state.interval
+    in
+    discoverThings discoveryCount location { state | interval = newInterval }
+
+
+discoverThings : Int -> Location -> State -> Random.Generator ExploreResult
+discoverThings count location state =
+    if count < 1 then
+        Random.constant
             { state = state
             , effects = []
             , toasts = []
             }
-    in
-    findMonsterGenerator location initialResult
-        |> Random.andThen (findResourceGenerator location)
-        |> Random.andThen (gatherResourceGenerator location)
-        |> Random.andThen (findQuestGenerator location)
+
+    else
+        Debug.todo ""
 
 
 findMonsterGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
