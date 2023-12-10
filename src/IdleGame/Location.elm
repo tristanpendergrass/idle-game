@@ -7,16 +7,19 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Monster as Monster
-import IdleGame.Quest as Quest
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
+import Json.Decode exposing (maybe)
 import Percent exposing (Percent)
 import Quantity
 import Random
+
+
+durationOfExploration : Duration
+durationOfExploration =
+    -- How long it should take of exploring a location to find all the stuff
+    Duration.days 2
 
 
 exploreActivityDuration : Duration
@@ -99,11 +102,6 @@ type alias State =
     }
 
 
-durationOfExploration : Duration
-durationOfExploration =
-    Duration.days 2
-
-
 getInterval : Location -> Duration
 getInterval location =
     let
@@ -114,8 +112,8 @@ getInterval location =
     Quantity.divideBy (toFloat totalThingsToDiscover) durationOfExploration
 
 
-createState : Location -> State
-createState location =
+createState : State
+createState =
     { foundMonsters = monsterRecord False
     , foundResources = resourceRecord False
     , foundQuests = questRecord False
@@ -163,26 +161,85 @@ type alias ExploreResult =
     }
 
 
+type Discoverable
+    = DiscoverMonster Monster
+    | DiscoverQuest Quest
+    | DiscoverResource Resource
+
+
 explorationGenerator : Location -> State -> Random.Generator ExploreResult
 explorationGenerator location state =
     let
         ( newInterval, discoveryCount ) =
             Timer.increment (getInterval location) exploreActivityDuration state.interval
     in
-    discoverThings discoveryCount location { state | interval = newInterval }
+    explorationGeneratorHelper discoveryCount location { state = { state | interval = newInterval }, effects = [], toasts = [] }
 
 
-discoverThings : Int -> Location -> State -> Random.Generator ExploreResult
-discoverThings count location state =
-    if count < 1 then
-        Random.constant
-            { state = state
-            , effects = []
-            , toasts = []
+applyDiscovery : Discoverable -> ExploreResult -> ExploreResult
+applyDiscovery discovery result =
+    case discovery of
+        DiscoverMonster monster ->
+            { result
+                | state = setMonsterToFound monster result.state
+                , toasts = DiscoveredMonster monster :: result.toasts
             }
 
+        DiscoverQuest quest ->
+            { result
+                | state = setQuestToFound quest result.state
+                , toasts = DiscoveredQuest quest :: result.toasts
+            }
+
+        DiscoverResource resource ->
+            { result
+                | state = setResourceToFound resource result.state
+                , effects = List.concat [ result.effects, [ Effect.gainResource 1 resource ] ]
+                , toasts = List.concat [ result.toasts, [ DiscoveredResource resource ] ]
+            }
+
+
+explorationGeneratorHelper : Int -> Location -> ExploreResult -> Random.Generator ExploreResult
+explorationGeneratorHelper count location result =
+    if count < 1 then
+        Random.constant result
+
     else
-        Debug.todo ""
+        discoverGenerator location result.state
+            |> Random.andThen
+                (\maybeDiscovery ->
+                    let
+                        newCount : Int
+                        newCount =
+                            count - 1
+                    in
+                    case maybeDiscovery of
+                        Nothing ->
+                            explorationGeneratorHelper newCount location result
+
+                        Just discovery ->
+                            explorationGeneratorHelper newCount location (applyDiscovery discovery result)
+                )
+
+
+discoverGenerator : Location -> State -> Random.Generator (Maybe Discoverable)
+discoverGenerator location state =
+    let
+        discoverables : List Discoverable
+        discoverables =
+            List.concat
+                [ List.map DiscoverMonster (monstersAtLocation location)
+                , List.map DiscoverQuest (questsAtLocation location)
+                , List.map DiscoverResource (resourcesAtLocation location)
+                ]
+    in
+    case discoverables of
+        [] ->
+            Random.constant Nothing
+
+        first :: rest ->
+            Random.uniform first rest
+                |> Random.map Just
 
 
 findMonsterGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
