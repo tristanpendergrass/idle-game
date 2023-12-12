@@ -8,7 +8,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -17,7 +16,6 @@ import Maybe.Extra
 import Percent exposing (Percent)
 import Quantity exposing (Quantity(..))
 import Random
-import Random.Extra
 
 
 totalExplorationDuration : Duration
@@ -205,97 +203,92 @@ type Discoverable
 
 explorationGenerator : Location -> State -> Random.Generator ExploreResult
 explorationGenerator location state =
-    gatherGenerator location state
-        |> Random.andThen
-            (\gatherResult ->
-                discoveryGenerator location gatherResult.state
-                    |> Random.map
-                        (\discoveryResult ->
-                            { state = discoveryResult.state
-                            , effects = List.concat [ gatherResult.effects, discoveryResult.effects ]
-                            , toasts = List.concat [ gatherResult.toasts, discoveryResult.toasts ]
-                            }
-                        )
+    let
+        gatherResult : ExploreResult
+        gatherResult =
+            getGatherResult location state
+    in
+    discoveryGenerator location gatherResult.state
+        |> Random.map
+            (\discoveryResult ->
+                { state = discoveryResult.state
+                , effects = List.concat [ gatherResult.effects, discoveryResult.effects ]
+                , toasts = List.concat [ gatherResult.toasts, discoveryResult.toasts ]
+                }
             )
 
 
-gatherResource : Resource -> ExploreResult -> ExploreResult
-gatherResource resource result =
+gatherResource : Resource -> Percent -> ExploreResult -> ExploreResult
+gatherResource resource chanceToGather result =
+    let
+        gainResourceEffect : Effect.TaggedEffect
+        gainResourceEffect =
+            Effect.gainResource 1 resource
+
+        variableGainResourceEffect : Effect.TaggedEffect
+        variableGainResourceEffect =
+            Effect.gainWithProbability chanceToGather [ gainResourceEffect ]
+
+        gainedResourceToast : Toast
+        gainedResourceToast =
+            GainedResource 1 resource
+    in
     { result
-        | effects = Effect.gainResource 1 resource :: result.effects
-        , toasts = GainedResource 1 resource :: result.toasts
+        | effects = variableGainResourceEffect :: result.effects
+        , toasts = gainedResourceToast :: result.toasts
     }
 
 
-probability : Random.Generator Float
-probability =
-    Random.float 0 1
+
+-- didGatherGenerator : Resource -> Location -> State -> Random.Generator (Maybe Resource)
+-- didGatherGenerator resource location state =
+--     let
+--         isFound : Bool
+--         isFound =
+--             getByResource resource state.foundResources
+--         locationStats : Stats
+--         locationStats =
+--             getStats location
+--         maybeFrequency : Maybe ResourceFrequency
+--         maybeFrequency =
+--             getByResource resource locationStats.resources
+--     in
+--     if isFound then
+--         case maybeFrequency of
+--             Nothing ->
+--                 Random.constant Nothing
+--             Just resourceFrequency ->
+--                 frequencyGenerator resourceFrequency
+--                     |> Random.map
+--                         (\didGather ->
+--                             if didGather then
+--                                 Just resource
+--                             else
+--                                 Nothing
+--                         )
+--     else
+--         Random.constant Nothing
 
 
-frequencyGenerator : ResourceFrequency -> Random.Generator Bool
-frequencyGenerator resourceFrequency =
+getGatherResult : Location -> State -> ExploreResult
+getGatherResult location state =
+    -- TODO: rename from generator
     let
-        resourcesPerActivityDuration : Float
-        resourcesPerActivityDuration =
-            inResourcesPerActivityDuration resourceFrequency
+        initialResult : ExploreResult
+        initialResult =
+            { state = state, effects = [], toasts = [] }
     in
-    Random.map (\p -> Debug.log "foobar p" p < Debug.log "foobar other p" resourcesPerActivityDuration) probability
-
-
-didGatherGenerator : Resource -> Location -> State -> Random.Generator (Maybe Resource)
-didGatherGenerator resource location state =
-    let
-        isFound : Bool
-        isFound =
-            getByResource resource state.foundResources
-
-        locationStats : Stats
-        locationStats =
-            getStats location
-
-        maybeFrequency : Maybe ResourceFrequency
-        maybeFrequency =
-            getByResource resource locationStats.resources
-    in
-    if isFound then
-        case maybeFrequency of
-            Nothing ->
-                Random.constant Nothing
-
-            Just resourceFrequency ->
-                frequencyGenerator resourceFrequency
-                    |> Random.map
-                        (\didGather ->
-                            if didGather then
-                                Just resource
-
-                            else
-                                Nothing
-                        )
-
-    else
-        Random.constant Nothing
-
-
-gatherGenerator : Location -> State -> Random.Generator ExploreResult
-gatherGenerator location state =
-    let
-        candidates : List Resource
-        candidates =
-            foundResources location state
-    in
-    Debug.log "foobar candidates" candidates
-        |> List.map (\resource -> didGatherGenerator resource location state)
-        |> Random.Extra.sequence
-        |> Random.map
-            (\didGatherResults ->
+    foundResourcesAndFrequency location state
+        |> List.foldl
+            (\( resource, resourceFrequency ) result ->
                 let
-                    gatheredResources : List Resource
-                    gatheredResources =
-                        List.filterMap identity didGatherResults
+                    chanceToGather : Percent
+                    chanceToGather =
+                        Percent.float (inResourcesPerActivityDuration resourceFrequency)
                 in
-                List.foldl gatherResource { state = state, effects = [], toasts = [] } gatheredResources
+                gatherResource resource chanceToGather result
             )
+            initialResult
 
 
 discoveryGenerator : Location -> State -> Random.Generator ExploreResult
@@ -359,9 +352,9 @@ discoverGenerator location state =
         discoverables : List Discoverable
         discoverables =
             List.concat
-                [ List.map DiscoverMonster (monstersAtLocation location)
-                , List.map DiscoverQuest (questsAtLocation location)
-                , List.map DiscoverResource (resourcesAtLocation location)
+                [ List.map DiscoverMonster (findableMonsters location state)
+                , List.map DiscoverQuest (findableQuests location state)
+                , List.map DiscoverResource (findableResources location state)
                 ]
     in
     case discoverables of
@@ -371,25 +364,6 @@ discoverGenerator location state =
         first :: rest ->
             Random.uniform first rest
                 |> Random.map Just
-
-
-findMonsterGenerator : Location -> ExploreResult -> Random.Generator ExploreResult
-findMonsterGenerator location result =
-    case findableMonsters location result.state of
-        -- If there's at least one monster to find, pick one at random and set it to found
-        first :: rest ->
-            Random.uniform first rest
-                |> Random.map
-                    (\monster ->
-                        { state = setMonsterToFound monster result.state
-                        , effects = List.concat [ result.effects, [] ]
-                        , toasts = List.concat [ result.toasts, [ DiscoveredMonster monster ] ]
-                        }
-                    )
-
-        -- Otherwise, return the state unchanged
-        [] ->
-            Random.constant result
 
 
 findableMonsters : Location -> State -> List Monster
@@ -494,23 +468,25 @@ findableResources location state =
             )
 
 
+foundResourcesAndFrequency : Location -> State -> List ( Resource, ResourceFrequency )
+foundResourcesAndFrequency location state =
+    allResources
+        |> List.filterMap
+            (\resource ->
+                if not (getByResource resource state.foundResources) then
+                    -- If resource is not found, it won't be returned
+                    Nothing
+
+                else
+                    getByResource resource (getStats location).resources
+                        |> Maybe.map (\resourceFrequency -> ( resource, resourceFrequency ))
+            )
+
+
 foundResources : Location -> State -> List Resource
 foundResources location state =
-    allResources
-        |> List.filter
-            (\resource ->
-                let
-                    isAtLocation : Bool
-                    isAtLocation =
-                        getByResource resource (getStats location).resources
-                            |> Maybe.Extra.isJust
-
-                    isFound : Bool
-                    isFound =
-                        getByResource resource state.foundResources
-                in
-                isAtLocation && isFound
-            )
+    foundResourcesAndFrequency location state
+        |> List.map Tuple.first
 
 
 resourcesAtLocation : Location -> List Resource
