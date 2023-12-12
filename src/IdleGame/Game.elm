@@ -697,24 +697,6 @@ applyEffect effect game =
                 |> Random.map Ok
 
         Effect.Explore { location } ->
-            -- let
-            --     locationState : Location.State
-            --     locationState =
-            --         getByKindLocation location game.locations
-            -- in
-            -- Location.findMonsterGenerator location locationState
-            --     |> Random.andThen (Location.findResourceGenerator location)
-            --     |> Random.andThen (Location.findQuestGenerator location)
-            --     |> Random.map
-            --         (\newLocationState ->
-            --             Ok
-            --                 { game =
-            --                     game
-            --                         |> updateLocations (setByLocation location newLocationState)
-            --                 , toasts = []
-            --                 , additionalEffects = []
-            --                 }
-            -- )
             let
                 locationState : Location.State
                 locationState =

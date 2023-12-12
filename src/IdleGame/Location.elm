@@ -1,23 +1,27 @@
 module IdleGame.Location exposing (..)
 
 import Duration exposing (Duration)
+import Fuzz exposing (frequency)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.Resource as Resource
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Json.Decode exposing (maybe)
+import Maybe.Extra
 import Percent exposing (Percent)
-import Quantity
+import Quantity exposing (Quantity(..))
 import Random
+import Random.Extra
 
 
-durationOfExploration : Duration
-durationOfExploration =
+totalExplorationDuration : Duration
+totalExplorationDuration =
     -- How long it should take of exploring a location to find all the stuff
     Duration.days 2
 
@@ -32,10 +36,42 @@ exploreActivityDuration =
 -- Stats
 
 
+type SingleResource
+    = SingleResource
+
+
+type alias ResourcesPerSecond =
+    Quantity.Rate SingleResource Duration.Seconds
+
+
+type alias ResourceFrequency =
+    Quantity Float ResourcesPerSecond
+
+
+resourcesPerSecond : Float -> ResourceFrequency
+resourcesPerSecond =
+    Quantity
+
+
+resourcesPerHour : Float -> ResourceFrequency
+resourcesPerHour numResourcesPerHour =
+    resourcesPerSecond (numResourcesPerHour / 3600)
+
+
+inResourcesPerSecond : ResourceFrequency -> Float
+inResourcesPerSecond (Quantity freq) =
+    freq
+
+
+inResourcesPerActivityDuration : ResourceFrequency -> Float
+inResourcesPerActivityDuration (Quantity freq) =
+    freq * Duration.inSeconds exploreActivityDuration
+
+
 type alias Stats =
     { title : String
     , monsters : MonsterRecord Bool
-    , resources : ResourceRecord Bool
+    , resources : ResourceRecord (Maybe ResourceFrequency)
     , quests : QuestRecord Bool
     , exploreActivity : Activity
     }
@@ -57,13 +93,13 @@ allStats =
                 )
                 (monsterRecord False)
 
-        resourcesFromList : List Resource -> ResourceRecord Bool
+        resourcesFromList : List ( Resource, ResourceFrequency ) -> ResourceRecord (Maybe ResourceFrequency)
         resourcesFromList =
             List.foldl
-                (\resource accum ->
-                    setByResource resource True accum
+                (\( resource, frequency ) accum ->
+                    setByResource resource (Just frequency) accum
                 )
-                (resourceRecord False)
+                (resourceRecord Nothing)
 
         questsFromList : List Quest -> QuestRecord Bool
         questsFromList =
@@ -76,14 +112,14 @@ allStats =
     { schoolGrounds =
         { title = "School Grounds"
         , monsters = monstersFromList [ Prefect, BookWyrm ]
-        , resources = resourcesFromList [ Parchment ]
+        , resources = resourcesFromList [ ( Parchment, resourcesPerHour 1 ) ]
         , quests = questsFromList [ MendCrackedBell, ChopFirewood ]
         , exploreActivity = ExploreSchoolGrounds
         }
     , secretGarden =
         { title = "Secret Garden"
         , monsters = monstersFromList [ WhisperingWind ]
-        , resources = resourcesFromList [ WashWater ]
+        , resources = resourcesFromList [ ( WashWater, resourcesPerHour 1 ) ]
         , quests = questsFromList []
         , exploreActivity = ExploreSecretGarden
         }
@@ -98,7 +134,7 @@ type alias State =
     { foundMonsters : MonsterRecord Bool
     , foundResources : ResourceRecord Bool
     , foundQuests : QuestRecord Bool
-    , interval : Timer
+    , discoveryTimer : Timer -- When this ticks over, you discover something
     }
 
 
@@ -109,7 +145,7 @@ getInterval location =
         totalThingsToDiscover =
             List.length (monstersAtLocation location) + List.length (resourcesAtLocation location) + List.length (questsAtLocation location)
     in
-    Quantity.divideBy (toFloat totalThingsToDiscover) durationOfExploration
+    Quantity.divideBy (toFloat totalThingsToDiscover) totalExplorationDuration
 
 
 createState : State
@@ -117,7 +153,7 @@ createState =
     { foundMonsters = monsterRecord False
     , foundResources = resourceRecord False
     , foundQuests = questRecord False
-    , interval = Timer.create
+    , discoveryTimer = Timer.create
     }
 
 
@@ -169,11 +205,106 @@ type Discoverable
 
 explorationGenerator : Location -> State -> Random.Generator ExploreResult
 explorationGenerator location state =
+    gatherGenerator location state
+        |> Random.andThen
+            (\gatherResult ->
+                discoveryGenerator location gatherResult.state
+                    |> Random.map
+                        (\discoveryResult ->
+                            { state = discoveryResult.state
+                            , effects = List.concat [ gatherResult.effects, discoveryResult.effects ]
+                            , toasts = List.concat [ gatherResult.toasts, discoveryResult.toasts ]
+                            }
+                        )
+            )
+
+
+gatherResource : Resource -> ExploreResult -> ExploreResult
+gatherResource resource result =
+    { result
+        | effects = Effect.gainResource 1 resource :: result.effects
+        , toasts = GainedResource 1 resource :: result.toasts
+    }
+
+
+probability : Random.Generator Float
+probability =
+    Random.float 0 1
+
+
+frequencyGenerator : ResourceFrequency -> Random.Generator Bool
+frequencyGenerator resourceFrequency =
     let
-        ( newInterval, discoveryCount ) =
-            Timer.increment (getInterval location) exploreActivityDuration state.interval
+        resourcesPerActivityDuration : Float
+        resourcesPerActivityDuration =
+            inResourcesPerActivityDuration resourceFrequency
     in
-    explorationGeneratorHelper discoveryCount location { state = { state | interval = newInterval }, effects = [], toasts = [] }
+    Random.map (\p -> Debug.log "foobar p" p < Debug.log "foobar other p" resourcesPerActivityDuration) probability
+
+
+didGatherGenerator : Resource -> Location -> State -> Random.Generator (Maybe Resource)
+didGatherGenerator resource location state =
+    let
+        isFound : Bool
+        isFound =
+            getByResource resource state.foundResources
+
+        locationStats : Stats
+        locationStats =
+            getStats location
+
+        maybeFrequency : Maybe ResourceFrequency
+        maybeFrequency =
+            getByResource resource locationStats.resources
+    in
+    if isFound then
+        case maybeFrequency of
+            Nothing ->
+                Random.constant Nothing
+
+            Just resourceFrequency ->
+                frequencyGenerator resourceFrequency
+                    |> Random.map
+                        (\didGather ->
+                            if didGather then
+                                Just resource
+
+                            else
+                                Nothing
+                        )
+
+    else
+        Random.constant Nothing
+
+
+gatherGenerator : Location -> State -> Random.Generator ExploreResult
+gatherGenerator location state =
+    let
+        candidates : List Resource
+        candidates =
+            foundResources location state
+    in
+    Debug.log "foobar candidates" candidates
+        |> List.map (\resource -> didGatherGenerator resource location state)
+        |> Random.Extra.sequence
+        |> Random.map
+            (\didGatherResults ->
+                let
+                    gatheredResources : List Resource
+                    gatheredResources =
+                        List.filterMap identity didGatherResults
+                in
+                List.foldl gatherResource { state = state, effects = [], toasts = [] } gatheredResources
+            )
+
+
+discoveryGenerator : Location -> State -> Random.Generator ExploreResult
+discoveryGenerator location state =
+    let
+        ( newDiscoveryTimer, discoveryCount ) =
+            Timer.increment (getInterval location) exploreActivityDuration state.discoveryTimer
+    in
+    explorationGeneratorHelper discoveryCount location { state = { state | discoveryTimer = newDiscoveryTimer }, effects = [], toasts = [] }
 
 
 applyDiscovery : Discoverable -> ExploreResult -> ExploreResult
@@ -353,6 +484,7 @@ findableResources location state =
                     isAtLocation : Bool
                     isAtLocation =
                         getByResource resource (getStats location).resources
+                            |> Maybe.Extra.isJust
 
                     isFound : Bool
                     isFound =
@@ -371,6 +503,7 @@ foundResources location state =
                     isAtLocation : Bool
                     isAtLocation =
                         getByResource resource (getStats location).resources
+                            |> Maybe.Extra.isJust
 
                     isFound : Bool
                     isFound =
@@ -383,7 +516,7 @@ foundResources location state =
 resourcesAtLocation : Location -> List Resource
 resourcesAtLocation location =
     allResources
-        |> List.filter (\resource -> getByResource resource (getStats location).resources)
+        |> List.filter (\resource -> Maybe.Extra.isJust (getByResource resource (getStats location).resources))
 
 
 findQuestGenerator : Location -> ExploreResult -> Random.Generator ExploreResult

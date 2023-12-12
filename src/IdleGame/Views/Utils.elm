@@ -18,12 +18,13 @@ import Percent exposing (Percent)
 intToString : Int -> String
 intToString num =
     let
+        usLocale : FormatNumber.Locales.Locale
+        usLocale =
+            FormatNumber.Locales.usLocale
+
         localeForInts : FormatNumber.Locales.Locale
         localeForInts =
-            FormatNumber.Locales.usLocale
-                |> (\usLocale ->
-                        { usLocale | decimals = FormatNumber.Locales.Exact 0 }
-                   )
+            { usLocale | decimals = FormatNumber.Locales.Exact 0 }
     in
     FormatNumber.format localeForInts (toFloat num)
 
