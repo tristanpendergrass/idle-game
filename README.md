@@ -38,6 +38,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 [ ] Update current version in `Config.elm`
 [ ] Commit changes in git
 [ ] Run `$ lamdera check` and `$ lamdera deploy`
+  [ ] Optional: Run `$ lamdera check --destructive-migration` instead if willing to destroy all prod data
 [ ] Run `$ git tag {version}` and `$ git push --tags`
 
 # Todos
