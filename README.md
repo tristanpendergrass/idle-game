@@ -42,51 +42,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 
 # Todos
 
-## Version 0.3
-- [x] Skill 3
-- [x] Support spell selector on Chores and Hex studying
-  - [x] Design system for what spells can be assigned on what activities
-  - [x] Enable spell selector for Chores/Hexes/Exploring/Enchantment
-- [x] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
-- [x] Update TimePasses
-  - [x] Show XP from all skills not just chores
-  - [x] Show new discoveries in locations
-- [x] Show the resources you'll gather on Explore action
-- [x] Remove duration from Explore action
-- [x] Remove quest log
-- [x] Move buttons for changing mode to under bag and shop
-- [ ] Finalize game config
-  - [ ] Monsters
-    - [ ] Names
-    - [ ] Art
-    - [ ] Dropped resources
-    - [ ] Strength
-  - [ ] Locations
-    - [ ] Names
-    - [ ] Discovery algorithms
-    - [ ] Gathering algorithms
-    - [ ] Explore action art
-    - [ ] Icon in drawer
-  - [ ] Weathermancing
-    - [ ] Names
-    - [ ] Effects
-    - [ ] Art
-    - [ ] Mastery thresholds
-  - [ ] Final pass
-### Locations
-- [x] Convert combat tabs to "Location" tabs
-- [x] Add Exploration activity to locations
-- [x] Add Resources to locations
-- [x] Add Quests to locations
-- [x] Add filters for Location activities
-- [x] Show discoveries of the four kinds of things (resources, monsters, quests, characters) in locations
-- [x] Calculate and display "completion" of locations
-### Other
-- [x] Shop Improvements
-- [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
-### Tech debt
-- [x] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
-- [x] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
+## Version 0.4
 
 
 ## Future
@@ -149,6 +105,35 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Add a way of giving hints to the player. Old wise man?
 
 # Changelog
+
+## Version 0.3
+- [x] Skill 3
+- [x] Support spell selector on Chores and Hex studying
+  - [x] Design system for what spells can be assigned on what activities
+  - [x] Enable spell selector for Chores/Hexes/Exploring/Enchantment
+- [x] Fix it so details view is expanded when page loads in browser width but not expanded when loaded in mobile
+- [x] Update TimePasses
+  - [x] Show XP from all skills not just chores
+  - [x] Show new discoveries in locations
+- [x] Show the resources you'll gather on Explore action
+- [x] Remove duration from Explore action
+- [x] Remove quest log
+- [x] Move buttons for changing mode to under bag and shop
+- [x] Finalize game config
+### Locations
+- [x] Convert combat tabs to "Location" tabs
+- [x] Add Exploration activity to locations
+- [x] Add Resources to locations
+- [x] Add Quests to locations
+- [x] Add filters for Location activities
+- [x] Show discoveries of the four kinds of things (resources, monsters, quests, characters) in locations
+- [x] Calculate and display "completion" of locations
+### Other
+- [x] Shop Improvements
+- [x] Change mastery display on activities so it doesn't show mastery xp but rather a mastery progress bar and level. Maybe show which mastery thresholds achieved with dots or something.
+### Tech debt
+- [x] Refactor for consistent treatment of Kind amongst modules. All into one big module called Kind which can't import from anything and can be imported everywhere.
+- [x] Refactor Activity stats so skill is a Maybe Skill. Remove skill from combat and exploring activities
 
 ## Version 0.2
 - [x] Add second "mode": Adventuring
