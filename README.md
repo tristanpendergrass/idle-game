@@ -36,9 +36,10 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
   [ ] Move current version from Todos to Changelog
   [ ] Create new section header for next version
 [ ] Update current version in `Config.elm`
-[ ] Commit changes in git
-[ ] Run `$ lamdera check` and `$ lamdera deploy`
+[ ] Run `$ lamdera check`
   [ ] Optional: Run `$ lamdera check --destructive-migration` instead if willing to destroy all prod data
+[ ] Commit changes in git. Don't forget to use `$ git add .` instead of `$ git commit -am`! There's new migration files at this point.
+[ ] Run `$ lamdera deploy`
 [ ] Run `$ git tag {version}` and `$ git push --tags`
 
 # Todos
