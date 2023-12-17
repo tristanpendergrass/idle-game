@@ -61,6 +61,7 @@ Each denizen has a bespoke upgrade system. In general, you need to provide somet
 * Collect charms which drop only as a resource when exploring the location they're at
 * Collect charms which drop only when defeating monsters in the location. Or from a specific monster.
 * Gives you special seeds that need to be planted and then the fruits given to them.
+* Gives you equipment that you have to equip then defeat certain monsters
 
 #### Reward ideas:
 I think a nice balance would be four rewards per denizen, each a permanent buff:

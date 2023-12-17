@@ -45,30 +45,41 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-
+- [ ] Refactor Effect to come from module similar to Icon. All creator functions in this file, no file should create its own Effects
+- [ ] Use Resource.Amount in place of Int in all the places
+  - [ ] Or not, if this doesn't make sense
+- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
+- [ ] Refactor most things that configure Mod to instead configure Mod or IntervalMod. In fact make a union type called Mod that has both, only in a few places do we need to specify one or the other. Or just combine into one type and do nothing for Effects if its an interval mod?
+- [ ] Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
+  - [ ] Modify definition of gain resource to have preservation chance
+  - [ ] Add shop upgrade for this or mastery or something
+- [ ] Skill: Wild Magic
+- [ ] Feature: Tuition to unlock classes
+- [ ] Feature: Regenerate after losing combat
+- [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
+- [ ] Feature: Syllabus for each class
+- [ ] Feature: Changelog
+- [ ] Feature: Tutorial?
+- [ ] Feature: get mail?
 
 ## Future
 ### Bugs
 - [ ] Fix status bar extending over the sidebar at medium screen widths
-- [ ] Fix Monster fighting card vertical spacing being off
 - [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.
 - [ ] Potential bug: the purchasing of shop upgrades isn't done with an effect. And the view isn't set up with one either, so any future buff that e.g. decreases shop prices won't be priced in or applied.
 
 ### Tech stuff
-- [ ] Use Resource.Amount in place of Int in all the places
 - [ ] Refactor Effects to be opaque types. I just debugged an issue which came down to forgetting to add the Xp tag to GainXp. It's because the constructor for GainXp is being used directly by Activity.elm and that shouldnt' be allowed, it should have to use a helper method that makes sure to get it right.
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
-- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick
 - [ ] When tab is viewed again the focus is on the Adventuring/Skilling button instead of the Time passes modal's button
 - [ ] Refactor ShopItems. Why are there getters and setters on Stats there? Also the descriptions are hardcoded instead of derived from their effects
-- [ ] Refactor most things that configure Mod to instead configure Mod or IntervalMod. In fact make a union type called Mod that has both, only in a few places do we need to specify one or the other. Or just combine into one type and do nothing for Effects if its an interval mod?
 
 ### Fundamentals
 - [ ] Add correct source value for all Effects and use it to show source in Time Passes
-- [ ] Make resource preservation mod work. How to transform an effect from costing to maybe costing? Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
+- [ ] Also can effects be tagged with "show me"? With most effects created by mods having showMe = False, but this one = True? Actually maybe resource preservation should just be built into the GainResource effect.
 - [ ] Allow mods to affect other mods. E.g. I want a spell mastery that boosts the effects of that spell. This should simply be a new type of transformer that gets run from getAllMods
 - [ ] Allow shop items to have requirements besides coin. Resources and level requirements
 - [ ] Show what mods there are on an effect/interval and where they came from
