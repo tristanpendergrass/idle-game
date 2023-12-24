@@ -95,7 +95,7 @@ belongsToLabel : BelongsTo -> String
 belongsToLabel belongsTo =
     case belongsTo of
         BelongsToSkill skill ->
-            Skill.getLabel skill
+            (Skill.getStats skill).title
 
         BelongsToLocation location ->
             Location.getLabel location
@@ -170,6 +170,16 @@ allStats =
     }
 
 
+activityEffects : { belongsTo : BelongsTo, activity : Activity, effects : List Effect.TaggedEffect } -> List Effect.TaggedEffect
+activityEffects { belongsTo, activity, effects } =
+    case belongsTo of
+        BelongsToSkill skill ->
+            List.map (Effect.withTags [ Effect.SkillTag skill, Effect.ActivityTag activity ]) effects
+
+        BelongsToLocation location ->
+            List.map (Effect.withTags [ Effect.LocationTag location, Effect.ActivityTag activity ]) effects
+
+
 
 -- Chores
 
@@ -182,39 +192,39 @@ choreEffects :
     }
     -> List Effect.TaggedEffect
 choreEffects { activity, xp, coin, maybeResource } =
-    let
-        choreTags : List Effect.Tag
-        choreTags =
-            [ Effect.ActivityTag activity, Effect.SkillTag Chores ]
-    in
-    [ { effect = Effect.GainXp { base = xp, percentIncrease = Percent.zero, skill = Chores }, tags = Effect.XpTag :: choreTags }
-    , { effect = Effect.GainCoin { base = coin, percentIncrease = Percent.zero }, tags = choreTags }
-    , { effect = Effect.GainMxp { activity = activity, percentIncrease = Percent.zero }, tags = Effect.MxpTag :: choreTags }
-    ]
-        ++ (case maybeResource of
-                Nothing ->
-                    []
+    activityEffects
+        { belongsTo = BelongsToSkill Chores
+        , activity = activity
+        , effects =
+            [ { effect = Effect.GainXp { base = xp, percentIncrease = Percent.zero, skill = Chores }, tags = [ Effect.XpTag ] }
+            , { effect = Effect.GainCoin { base = coin, percentIncrease = Percent.zero }, tags = [] }
+            , { effect = Effect.GainMxp { activity = activity, percentIncrease = Percent.zero }, tags = [ Effect.MxpTag ] }
+            ]
+                ++ (case maybeResource of
+                        Nothing ->
+                            []
 
-                Just { resource, amount, probability } ->
-                    [ { effect =
-                            Effect.VariableSuccess
-                                { successProbability = probability
-                                , successEffects =
-                                    [ { effect =
-                                            Effect.GainResource
-                                                { base = amount
-                                                , doublingChance = Percent.zero
-                                                , resource = resource
-                                                }
-                                      , tags = choreTags
-                                      }
-                                    ]
-                                , failureEffects = []
-                                }
-                      , tags = choreTags
-                      }
-                    ]
-           )
+                        Just { resource, amount, probability } ->
+                            [ { effect =
+                                    Effect.VariableSuccess
+                                        { successProbability = probability
+                                        , successEffects =
+                                            [ { effect =
+                                                    Effect.GainResource
+                                                        { base = amount
+                                                        , doublingChance = Percent.zero
+                                                        , resource = resource
+                                                        }
+                                              , tags = []
+                                              }
+                                            ]
+                                        , failureEffects = []
+                                        }
+                              , tags = []
+                              }
+                            ]
+                   )
+        }
 
 
 getChoresMastery : Activity -> Mastery
@@ -496,10 +506,15 @@ studyHex1Stats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 3.5
     , effects =
-        [ Effect.gainXp (Xp.int 12) Hexes
-        , Effect.gainMxp StudyHex1
-        , Effect.gainResource -1 Manure
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyHex1
+            , effects =
+                [ Effect.gainXp (Xp.int 12) Hexes
+                , Effect.gainMxp StudyHex1
+                , Effect.spendResource 1 Manure (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex1
     , showDuration = True
@@ -524,10 +539,15 @@ studyJinx1Stats =
     , unlockRequirements = Just ( Hexes, 10 )
     , duration = Duration.seconds 4.5
     , effects =
-        [ Effect.gainXp (Xp.int 18) Hexes
-        , Effect.gainMxp StudyJinx1
-        , Effect.gainResource -1 GreenhouseDirt
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyJinx1
+            , effects =
+                [ Effect.gainXp (Xp.int 18) Hexes
+                , Effect.gainMxp StudyJinx1
+                , Effect.spendResource 1 GreenhouseDirt (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx1
     , showDuration = True
@@ -552,11 +572,16 @@ studyCurse1Stats =
     , unlockRequirements = Just ( Hexes, 25 )
     , duration = Duration.seconds 5
     , effects =
-        [ Effect.gainXp (Xp.int 24) Hexes
-        , Effect.gainMxp StudyCurse1
-        , Effect.gainResource -1 WashWater
-        , Effect.gainResource -1 Soot
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyCurse1
+            , effects =
+                [ Effect.gainXp (Xp.int 24) Hexes
+                , Effect.gainMxp StudyCurse1
+                , Effect.spendResource 1 WashWater (Just Percent.zero)
+                , Effect.spendResource 1 Soot (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse1
     , showDuration = True
@@ -581,10 +606,15 @@ studyHex2Stats =
     , unlockRequirements = Just ( Hexes, 35 )
     , duration = Duration.seconds 9
     , effects =
-        [ Effect.gainXp (Xp.int 54) Hexes
-        , Effect.gainMxp StudyHex2
-        , Effect.gainResource -4 Manure
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyHex2
+            , effects =
+                [ Effect.gainXp (Xp.int 54) Hexes
+                , Effect.gainMxp StudyHex2
+                , Effect.spendResource 4 Manure (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex2
     , showDuration = True
@@ -609,10 +639,15 @@ studyJinx2Stats =
     , unlockRequirements = Just ( Hexes, 45 )
     , duration = Duration.seconds 10.5
     , effects =
-        [ Effect.gainXp (Xp.int 65) Hexes
-        , Effect.gainMxp StudyJinx2
-        , Effect.gainResource -5 GreenhouseDirt
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyJinx2
+            , effects =
+                [ Effect.gainXp (Xp.int 65) Hexes
+                , Effect.gainMxp StudyJinx2
+                , Effect.spendResource 5 GreenhouseDirt (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx2
     , showDuration = True
@@ -637,11 +672,16 @@ studyCurse2Stats =
     , unlockRequirements = Just ( Hexes, 55 )
     , duration = Duration.seconds 12
     , effects =
-        [ Effect.gainXp (Xp.int 99) Hexes
-        , Effect.gainMxp StudyCurse2
-        , Effect.gainResource -2 WashWater
-        , Effect.gainResource -1 Scrap
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyCurse2
+            , effects =
+                [ Effect.gainXp (Xp.int 99) Hexes
+                , Effect.gainMxp StudyCurse2
+                , Effect.spendResource 2 WashWater (Just Percent.zero)
+                , Effect.spendResource 1 Scrap (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse2
     , showDuration = True
@@ -666,10 +706,15 @@ studyHex3Stats =
     , unlockRequirements = Just ( Hexes, 65 )
     , duration = Duration.seconds 15
     , effects =
-        [ Effect.gainXp (Xp.int 94) Hexes
-        , Effect.gainMxp StudyHex3
-        , Effect.gainResource -10 Manure
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyHex3
+            , effects =
+                [ Effect.gainXp (Xp.int 94) Hexes
+                , Effect.gainMxp StudyHex3
+                , Effect.spendResource 10 Manure (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Hex3
     , showDuration = True
@@ -694,11 +739,16 @@ studyJinx3Stats =
     , unlockRequirements = Just ( Hexes, 75 )
     , duration = Duration.seconds 16
     , effects =
-        [ Effect.gainXp (Xp.int 144) Hexes
-        , Effect.gainMxp StudyJinx3
-        , Effect.gainResource -6 GreenhouseDirt
-        , Effect.gainResource -1 Ectoplasm
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyJinx3
+            , effects =
+                [ Effect.gainXp (Xp.int 144) Hexes
+                , Effect.gainMxp StudyJinx3
+                , Effect.spendResource 6 GreenhouseDirt (Just Percent.zero)
+                , Effect.spendResource 1 Ectoplasm (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Jinx3
     , showDuration = True
@@ -723,13 +773,18 @@ studyCurse3Stats =
     , unlockRequirements = Just ( Hexes, 90 )
     , duration = Duration.seconds 19
     , effects =
-        [ Effect.gainXp (Xp.int 200) Hexes
-        , Effect.gainMxp StudyCurse3
-        , Effect.gainResource -2 WashWater
-        , Effect.gainResource -2 Soot
-        , Effect.gainResource -2 Scrap
-        , Effect.gainResource -2 Manure
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Hexes
+            , activity = StudyCurse3
+            , effects =
+                [ Effect.gainXp (Xp.int 200) Hexes
+                , Effect.gainMxp StudyCurse3
+                , Effect.spendResource 2 WashWater (Just Percent.zero)
+                , Effect.spendResource 2 Soot (Just Percent.zero)
+                , Effect.spendResource 2 Scrap (Just Percent.zero)
+                , Effect.spendResource 2 Manure (Just Percent.zero)
+                ]
+            }
     , mastery = Just studyHexesMastery
     , teachesSpell = Just Curse3
     , showDuration = True
@@ -754,9 +809,14 @@ studyWindStats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
     , effects =
-        [ Effect.gainXp (Xp.int 10) Weathermancing
-        , Effect.gainMxp StudyWind
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Weathermancing
+            , activity = StudyWind
+            , effects =
+                [ Effect.gainXp (Xp.int 10) Weathermancing
+                , Effect.gainMxp StudyWind
+                ]
+            }
     , mastery = Just studyWeathermancingMastery
     , teachesSpell = Just Wind
     , showDuration = True
@@ -781,9 +841,14 @@ studyWaterStats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
     , effects =
-        [ Effect.gainXp (Xp.int 10) Weathermancing
-        , Effect.gainMxp StudyWater
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Weathermancing
+            , activity = StudyWater
+            , effects =
+                [ Effect.gainXp (Xp.int 10) Weathermancing
+                , Effect.gainMxp StudyWater
+                ]
+            }
     , mastery = Just studyWeathermancingMastery
     , teachesSpell = Just Water
     , showDuration = True
@@ -808,9 +873,14 @@ studySunStats =
     , unlockRequirements = Nothing
     , duration = Duration.seconds 4
     , effects =
-        [ Effect.gainXp (Xp.int 10) Weathermancing
-        , Effect.gainMxp StudySun
-        ]
+        activityEffects
+            { belongsTo = BelongsToSkill Weathermancing
+            , activity = StudySun
+            , effects =
+                [ Effect.gainXp (Xp.int 10) Weathermancing
+                , Effect.gainMxp StudySun
+                ]
+            }
     , mastery = Just studyWeathermancingMastery
     , teachesSpell = Just Sun
     , showDuration = True
@@ -829,7 +899,12 @@ exploreSchoolGroundsStats =
     , image = CardLandscape "/aiart/school_grounds.webp"
     , unlockRequirements = Nothing
     , duration = Location.exploreActivityDuration
-    , effects = [ Effect.explore SchoolGrounds ]
+    , effects =
+        activityEffects
+            { belongsTo = BelongsToLocation SchoolGrounds
+            , activity = ExploreSchoolGrounds
+            , effects = [ Effect.explore SchoolGrounds ]
+            }
     , mastery = Nothing
     , teachesSpell = Nothing
     , showDuration = False
@@ -844,18 +919,25 @@ exploreSecretGardenStats =
     , image = CardLandscape "/aiart/secret_garden.png"
     , unlockRequirements = Nothing
     , duration = Location.exploreActivityDuration
-    , effects = [ Effect.explore SecretGarden ]
+    , effects =
+        activityEffects
+            { belongsTo = BelongsToLocation SecretGarden
+            , activity = ExploreSecretGarden
+            , effects = [ Effect.explore SecretGarden ]
+            }
     , mastery = Nothing
     , teachesSpell = Nothing
     , showDuration = False
     }
 
 
-monsterEffects : { activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
-monsterEffects { activity, rewards, power } =
-    [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards
-        |> Effect.withTags [ Effect.ActivityTag activity ]
-    ]
+monsterEffects : { location : Location, activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
+monsterEffects { location, activity, rewards, power } =
+    activityEffects
+        { belongsTo = BelongsToLocation location
+        , activity = activity
+        , effects = [ Effect.resolveCombat (Combat.create { monsterPower = power, playerPower = 1 }) rewards ]
+        }
 
 
 fightPrefectStats : Stats
@@ -868,7 +950,8 @@ fightPrefectStats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightPrefect
+            { location = SchoolGrounds
+            , activity = FightPrefect
             , rewards =
                 [ Effect.gainCoin (Coin.int 1)
                     |> Effect.withTags [ Effect.ActivityTag FightPrefect ]
@@ -891,7 +974,8 @@ fightBookWyrmStats =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightBookWyrm
+            { location = SchoolGrounds
+            , activity = FightBookWyrm
             , rewards =
                 [ Effect.gainResource 1 Ectoplasm
                     |> Effect.withTags [ Effect.ActivityTag FightBookWyrm ]
@@ -914,7 +998,8 @@ fightWhisperingWind =
     , duration = Duration.seconds 8
     , effects =
         monsterEffects
-            { activity = FightWhisperingWind
+            { location = SecretGarden
+            , activity = FightWhisperingWind
             , rewards =
                 [ Effect.gainCoin (Coin.int 5)
                     |> Effect.withTags [ Effect.ActivityTag FightWhisperingWind ]

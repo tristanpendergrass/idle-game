@@ -17,6 +17,7 @@ type Tag
     | XpTag
     | MxpTag
     | ActivityTag Activity
+    | LocationTag Location
 
 
 type alias TaggedEffect =
@@ -48,9 +49,14 @@ type alias GainResourceParams =
     { base : Int, doublingChance : Percent, resource : Resource }
 
 
+type alias SpendResourceParams =
+    { base : Int, resource : Resource, preservationChance : Maybe Percent }
+
+
 type Effect
     = VariableSuccess { successProbability : Percent, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
     | GainResource GainResourceParams
+    | SpendResource SpendResourceParams
     | GainXp GainXpParams
     | GainMxp GainMxpParams
     | GainCoin GainCoinParams
@@ -92,6 +98,13 @@ gainMxp activity =
 gainResource : Int -> Resource -> TaggedEffect
 gainResource quantity kind =
     { effect = GainResource { base = quantity, doublingChance = Percent.zero, resource = kind }
+    , tags = []
+    }
+
+
+spendResource : Int -> Resource -> Maybe Percent -> TaggedEffect
+spendResource quantity kind preservationChance =
+    { effect = SpendResource { base = quantity, preservationChance = preservationChance, resource = kind }
     , tags = []
     }
 

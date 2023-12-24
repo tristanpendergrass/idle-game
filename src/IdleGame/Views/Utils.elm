@@ -45,7 +45,7 @@ floatToString decimals =
 skillXpBadge : Skill -> Html msg
 skillXpBadge skill =
     div [ class "badge badge-primary badge-sm col-span-8 flex items-center gap-2" ]
-        [ Skill.getIcon skill
+        [ (Skill.getStats skill).icon
             |> Icon.withSize Icon.Small
             |> Icon.toHtml
         , text "Skill XP"
@@ -344,7 +344,7 @@ modToString mod =
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% XP"
 
         Mod.XpSkillLabel buff skill ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% " ++ Skill.getLabel skill ++ " XP"
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% " ++ (Skill.getStats skill).title ++ " XP"
 
         Mod.MxpModLabel buff ->
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Mastery XP"
@@ -354,6 +354,9 @@ modToString mod =
 
         Mod.ResourceBaseLabel buff ->
             "+" ++ intToString buff ++ " item"
+
+        Mod.ResourcePreservationLabel buff ->
+            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to preserve items"
 
         Mod.MoreManure ->
             "More manure"

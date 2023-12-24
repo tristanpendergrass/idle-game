@@ -42,7 +42,10 @@ renderModdedEffect renderType game effect =
             renderCoin coin
 
         Effect.GainResource params ->
-            renderResource game params
+            renderResource game params.resource params.base
+
+        Effect.SpendResource params ->
+            renderResource game params.resource params.base
 
         Effect.GainXp params ->
             renderXp params
@@ -123,8 +126,8 @@ renderExplore game location =
         ]
 
 
-renderResource : Game -> Effect.GainResourceParams -> Html msg
-renderResource game { base, resource } =
+renderResource : Game -> Resource -> Int -> Html msg
+renderResource game resource base =
     let
         owned : Int
         owned =

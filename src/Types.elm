@@ -28,6 +28,7 @@ type Modal
     = TimePassesModal Posix IdleGame.Game.TimePassesData
     | ChoreItemUnlocksModal
     | ShopResourceModal Int Resource Coin
+    | SyllabusModal Skill
 
 
 type PreviousIntervalTimer

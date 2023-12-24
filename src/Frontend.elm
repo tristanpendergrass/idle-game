@@ -39,6 +39,7 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.ShopResourceModal
+import IdleGame.Views.SyllabusModal
 import IdleGame.Views.TimePasses
 import IdleGame.Views.Utils as ViewUtils
 import Json.Decode.Pipeline exposing (..)
@@ -103,7 +104,7 @@ init _ key =
             , activityExpanded = activityExpanded
             }
       , isVisible = True
-      , activeModal = Nothing
+      , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
@@ -1287,7 +1288,7 @@ toastToHtml notification =
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg
 renderModal activeModal game =
-    case activeModal of
+    case Debug.log "activeModal" activeModal of
         Nothing ->
             nothing
 
@@ -1313,6 +1314,15 @@ renderModal activeModal game =
             let
                 children =
                     IdleGame.Views.ShopResourceModal.render game amount ( resource, price )
+            in
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
+                |> IdleGame.Views.ModalWrapper.render
+
+        Just (SyllabusModal skill) ->
+            let
+                children =
+                    IdleGame.Views.SyllabusModal.render game skill
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"

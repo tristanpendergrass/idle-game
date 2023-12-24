@@ -38,13 +38,13 @@ allStats : QuestRecord Stats
 allStats =
     { mendCrackedBell =
         { title = "Mend Cracked Bell"
-        , criteria = [ CanApplyEffect (Effect.gainResource -10 Scrap) ]
+        , criteria = [ CanApplyEffect (Effect.spendResource 10 Scrap Nothing) ]
         , reward = [ Effect.gainResource 20 Scrap ]
         , image = CardLandscape "/aiart/mend_cracked_bell.webp"
         }
     , chopFirewood =
         { title = "Chop Firewood"
-        , criteria = [ CanApplyEffect (Effect.gainResource -10 Scrap) ]
+        , criteria = [ CanApplyEffect (Effect.spendResource 10 Scrap Nothing) ]
         , reward = [ Effect.gainResource 20 Scrap ]
         , image = CardLandscape "/aiart/chop_firewood.webp"
         }

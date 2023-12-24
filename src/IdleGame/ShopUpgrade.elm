@@ -58,9 +58,11 @@ bookStats =
     , icon = Icon.book
     , price = Coin.int 6000
     , reward =
-        ShopItemIntervalMod
-            (List.map (\activity -> intervalMod activity (Percent.float 0.1)) Activity.allHexes)
-    , description = "+10% faster at studying Hexes"
+        ShopItemMod
+            [ Mod.resourcePreservationBuff (Percent.float 1)
+                |> Mod.withTags [ Effect.SkillTag Hexes ]
+            ]
+    , description = "+100% resource preservation chance in Hexes"
     }
 
 

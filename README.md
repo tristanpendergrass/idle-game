@@ -45,22 +45,17 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [ ] Refactor Effect to come from module similar to Icon. All creator functions in this file, no file should create its own Effects
-- [ ] Use Resource.Amount in place of Int in all the places
-  - [ ] Or not, if this doesn't make sense
-- [ ] Refactor getAllMods and getAllIntervalMods so they're not two separate functions. Also it should not be possible that the mods for e.g. chore thresholds are commented out but still appear in UI, UI and effect should be drawn from same place
-- [ ] Refactor most things that configure Mod to instead configure Mod or IntervalMod. In fact make a union type called Mod that has both, only in a few places do we need to specify one or the other. Or just combine into one type and do nothing for Effects if its an interval mod?
-- [ ] Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
-  - [ ] Modify definition of gain resource to have preservation chance
-  - [ ] Add shop upgrade for this or mastery or something
-- [ ] Skill: Wild Magic
+- [ ] Feature: Syllabus for each class
 - [ ] Feature: Tuition to unlock classes
 - [ ] Feature: Regenerate after losing combat
 - [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
-- [ ] Feature: Syllabus for each class
 - [ ] Feature: Changelog
 - [ ] Feature: Tutorial?
 - [ ] Feature: get mail?
+- [ ] Skill: Wild Magic
+- [x] Tech stuff: Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
+  - [x] Modify definition of gain resource to have preservation chance
+  - [x] Add shop upgrade for this or mastery or something
 
 ## Future
 ### Bugs
@@ -70,7 +65,6 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Potential bug: the purchasing of shop upgrades isn't done with an effect. And the view isn't set up with one either, so any future buff that e.g. decreases shop prices won't be priced in or applied.
 
 ### Tech stuff
-- [ ] Refactor Effects to be opaque types. I just debugged an issue which came down to forgetting to add the Xp tag to GainXp. It's because the constructor for GainXp is being used directly by Activity.elm and that shouldnt' be allowed, it should have to use a helper method that makes sure to get it right.
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded
 - [ ] Refactor success probability so mods can make it go over 100% but only displays capped at 100%
 - [ ] Find a way to unit test performance of tick

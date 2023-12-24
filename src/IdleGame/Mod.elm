@@ -375,6 +375,38 @@ resourceBaseTransformer buff repetitions taggedEffect =
             NoChange
 
 
+resourcePreservationTransformer : Percent -> Transformer
+resourcePreservationTransformer buff repetitions taggedEffect =
+    case Effect.getEffect taggedEffect of
+        Effect.SpendResource { base, preservationChance, resource } ->
+            case preservationChance of
+                Nothing ->
+                    NoChange
+
+                Just percent ->
+                    let
+                        adjustedBuff : Percent
+                        adjustedBuff =
+                            Quantity.multiplyBy (toFloat repetitions) buff
+
+                        buffedChance : Percent
+                        buffedChance =
+                            Quantity.plus percent adjustedBuff
+                    in
+                    taggedEffect
+                        |> Effect.setEffect
+                            (Effect.SpendResource
+                                { base = base
+                                , preservationChance = Just buffedChance
+                                , resource = resource
+                                }
+                            )
+                        |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
 increaseSuccessTransformer : Percent -> Transformer
 increaseSuccessTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
@@ -491,6 +523,16 @@ resourceBaseBuff buff =
     }
 
 
+resourcePreservationBuff : Percent -> Mod
+resourcePreservationBuff buff =
+    { tags = []
+    , label = ResourcePreservationLabel buff
+    , transformer = resourcePreservationTransformer buff
+    , source = AdminCrimes
+    , repetitions = 1
+    }
+
+
 successBuff : Percent -> Mod
 successBuff buff =
     { tags = []
@@ -516,6 +558,7 @@ type Label
     | XpSkillLabel Percent Skill
     | MxpModLabel Percent
     | ResourceDoublingLabel Percent
+    | ResourcePreservationLabel Percent
     | ResourceBaseLabel Int
     | MoreManure
     | SuccessLabel Percent

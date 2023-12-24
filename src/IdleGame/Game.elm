@@ -26,6 +26,7 @@ import Maybe.Extra
 import Percent exposing (Percent)
 import Quantity
 import Random exposing (Generator)
+import Svg.Attributes exposing (preserveAlpha)
 import Tuple
 
 
@@ -559,41 +560,12 @@ mapGeneratorResult fn =
         )
 
 
-
--- effectReducer : Effect -> GameUpdateGen -> GameUpdateGen
--- effectReducer effect =
---     let
---         fn : ( Game, List Toast ) -> GameUpdateGen
---         fn ( game, notifications ) =
---             applyEffect effect game
---                 |> Random.map
---                     (\res ->
---                         res
---                             |> Result.map (\( newGame, newToasts, newEffects ) -> ( newGame, notifications ++ newToasts, newEffects ))
---                     )
---     in
---     mapGeneratorResult fn
-
-
-successGenerator : Percent -> Generator Bool
-successGenerator probability =
+probabilityGenerator : Percent -> Generator Bool
+probabilityGenerator probability =
     Random.float 0 1
         |> Random.map
             (\num ->
                 num < Percent.toFloat probability
-            )
-
-
-intGenerator : { base : Int, doublingChance : Percent } -> Generator Int
-intGenerator { base, doublingChance } =
-    successGenerator doublingChance
-        |> Random.map
-            (\doubled ->
-                if doubled then
-                    base * 2
-
-                else
-                    base
             )
 
 
@@ -631,7 +603,7 @@ applyEffect : Effect.TaggedEffect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
     case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
-            successGenerator successProbability
+            probabilityGenerator successProbability
                 |> Random.andThen
                     (\succeeded ->
                         let
@@ -669,9 +641,32 @@ applyEffect effect game =
             addCoin product game
                 |> Random.constant
 
-        Effect.GainResource params ->
-            intGenerator { base = params.base, doublingChance = params.doublingChance }
-                |> Random.map (\amount -> addResource params.resource amount game)
+        Effect.GainResource { base, resource, doublingChance } ->
+            probabilityGenerator doublingChance
+                |> Random.map
+                    (\doubled ->
+                        if doubled then
+                            adjustResource resource (base * 2) game
+
+                        else
+                            adjustResource resource base game
+                    )
+
+        Effect.SpendResource { base, resource, preservationChance } ->
+            case preservationChance of
+                Nothing ->
+                    Random.constant (adjustResource resource base game)
+
+                Just percent ->
+                    probabilityGenerator percent
+                        |> Random.map
+                            (\preserved ->
+                                if preserved then
+                                    adjustResource resource 0 game
+
+                                else
+                                    adjustResource resource (-1 * base) game
+                            )
 
         Effect.GainXp { base, percentIncrease, skill } ->
             { game = addXp skill (Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base) game
@@ -719,13 +714,13 @@ addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
     case skill of
         Chores ->
-            { game | xp = Skill.updateByKindSkill Chores (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateBySkill Chores (Quantity.plus amount) game.xp }
 
         Hexes ->
-            { game | xp = Skill.updateByKindSkill Hexes (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateBySkill Hexes (Quantity.plus amount) game.xp }
 
         Weathermancing ->
-            { game | xp = Skill.updateByKindSkill Weathermancing (Quantity.plus amount) game.xp }
+            { game | xp = Skill.updateBySkill Weathermancing (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game
@@ -746,8 +741,8 @@ addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
 
 
-addResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
-addResource resource amount game =
+adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
+adjustResource resource amount game =
     let
         newResources : Result EffectErr (ResourceRecord Int)
         newResources =

@@ -261,7 +261,7 @@ renderLockedActivity unlockSkill unlockLevel =
                     |> FeatherIcons.toHtml []
                 , div [ class "text-lg font-semibold" ]
                     [ text <|
-                        Skill.getLabel unlockSkill
+                        (Skill.getStats unlockSkill).title
                             ++ " level "
                             ++ Utils.intToString unlockLevel
                     ]
