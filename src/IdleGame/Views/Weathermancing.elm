@@ -28,7 +28,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.xp.weathermancing
+        [ Utils.classTopNav game.xp.weathermancing
         , div [ Utils.skills.grid ]
             (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Weathermancing game))
         ]

@@ -176,8 +176,8 @@ getDurationStringParts millis =
                     []
 
 
-xpSection : Xp -> Html msg
-xpSection xp =
+classTopNav : { xp : Xp } -> Html msg
+classTopNav { xp } =
     let
         skillLevel : Int
         skillLevel =
@@ -254,7 +254,7 @@ progressBar { progressText, percent, primaryOrSecondary, size } =
 skills =
     { wrapper = class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]"
     , grid = class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-2 2xl:gap-4"
-    , xpSection = xpSection
+    , xpSection = classTopNav
     }
 
 
