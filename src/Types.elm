@@ -7,16 +7,16 @@ import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Game exposing (Game)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
-import IdleGame.Views.Utils as ViewUtils
+import IdleGame.Xp as Xp exposing (Xp)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Time exposing (Posix)
@@ -24,8 +24,62 @@ import Toast
 import Url exposing (Url)
 
 
+type alias TimePassesResourceGain =
+    { amount : Int
+    , title : String
+    }
+
+
+type alias TimePassesResourceLoss =
+    { amount : Int
+    , title : String
+    }
+
+
+type alias TimePassesXpGain =
+    { originalXp : Xp
+    , currentXp : Xp
+    , skill : Skill
+    }
+
+
+type TimePassesDiscovery
+    = MonsterDiscovery Monster
+    | QuestDiscovery Quest
+    | ResourceDiscovery Resource
+
+
+type alias TimePassesData =
+    { xpGains : List TimePassesXpGain
+    , discoveries : List TimePassesDiscovery
+    , coinGains : Maybe Coin
+    , resourcesDiff : Resource.Diff
+    , combatsWonDiff : Int
+    , combatsLostDiff : Int
+    }
+
+
+type alias Game =
+    { seed : Random.Seed
+    , xp : SkillRecord Xp
+    , mxp : ActivityRecord Xp
+    , locations : LocationRecord Location.State
+    , quests : QuestRecord Quest.State
+    , choresMxp : Xp
+    , activitySkilling : Maybe ( Activity, Timer )
+    , activityAdventuring : Maybe ( Activity, Timer )
+    , monster : Maybe Monster
+    , coin : Coin
+    , resources : ResourceRecord Int
+    , ownedShopUpgrades : ShopUpgradeRecord Bool
+    , combatsWon : Int
+    , combatsLost : Int
+    , spellSelectors : ActivityRecord (Maybe Spell)
+    }
+
+
 type Modal
-    = TimePassesModal Posix IdleGame.Game.TimePassesData
+    = TimePassesModal Posix TimePassesData
     | ChoreItemUnlocksModal
     | ShopResourceModal Int Resource Coin
     | SyllabusModal Skill
@@ -105,6 +159,17 @@ type alias BackendModel =
     }
 
 
+type
+    ScreenWidth
+    -- Represents the width of a screen in which the game is displayed
+    = ScreenXs -- Screen width < 640px
+    | ScreenSm
+    | ScreenMd
+    | ScreenLg
+    | ScreenXl
+    | Screen2xl -- Screen width >= 1536px
+
+
 type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
@@ -117,7 +182,8 @@ type FrontendMsg
     | CollapseDetailView
     | ExpandDetailView
       -- Activities
-    | HandleActivityClick { screenWidth : ViewUtils.ScreenWidth } Activity
+    | HandleSyllabusClick Skill
+    | HandleActivityClick { screenWidth : ScreenWidth } Activity
     | HandlePreviewClick Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity

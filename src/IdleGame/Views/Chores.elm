@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Game as Game exposing (Game)
+import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
@@ -26,7 +26,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.xp.chores
+        [ Utils.xpSection Chores game.xp.chores
         , div [ Utils.skills.grid ]
             (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Chores game))
         ]

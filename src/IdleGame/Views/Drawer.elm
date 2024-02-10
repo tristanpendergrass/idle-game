@@ -5,7 +5,6 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game exposing (Game)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils

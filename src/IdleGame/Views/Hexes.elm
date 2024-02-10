@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Game as Game exposing (Game)
+import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
@@ -27,7 +27,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection game.xp.hexes
+        [ Utils.xpSection Hexes game.xp.hexes
         , div [ Utils.skills.grid ]
             (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Hexes game))
         ]

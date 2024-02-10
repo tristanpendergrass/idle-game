@@ -43,7 +43,7 @@ renderCombatsLost num =
         ]
 
 
-hasGains : Game.TimePassesData -> Bool
+hasGains : TimePassesData -> Bool
 hasGains { xpGains, coinGains, resourcesDiff } =
     not <|
         (List.isEmpty xpGains
@@ -52,18 +52,18 @@ hasGains { xpGains, coinGains, resourcesDiff } =
         )
 
 
-renderTimePassesDiscovery : Game.TimePassesDiscovery -> Html FrontendMsg
+renderTimePassesDiscovery : TimePassesDiscovery -> Html FrontendMsg
 renderTimePassesDiscovery discovery =
     let
         ( icon, title ) =
             case discovery of
-                Game.DiscoveredMonster monster ->
+                MonsterDiscovery monster ->
                     ( (Monster.getStats monster).icon, (Monster.getStats monster).title )
 
-                Game.DiscoveredQuest quest ->
+                QuestDiscovery quest ->
                     ( Icon.quest, (Quest.getStats quest).title )
 
-                Game.DiscoveredResource resource ->
+                ResourceDiscovery resource ->
                     ( (Resource.getStats resource).icon, (Resource.getStats resource).title )
     in
     li [ class "flex items-center gap-2 text-success" ]
@@ -73,7 +73,7 @@ renderTimePassesDiscovery discovery =
         ]
 
 
-render : Posix -> Game.TimePassesData -> Html FrontendMsg
+render : Posix -> TimePassesData -> Html FrontendMsg
 render timePassed timePassesData =
     let
         { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =

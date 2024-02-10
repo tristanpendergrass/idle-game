@@ -4,6 +4,7 @@ import FormatNumber
 import FormatNumber.Locales
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -13,6 +14,7 @@ import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
+import Types exposing (..)
 
 
 intToString : Int -> String
@@ -176,8 +178,8 @@ getDurationStringParts millis =
                     []
 
 
-xpSection : Xp -> Html msg
-xpSection xp =
+xpSection : Skill -> Xp -> Html FrontendMsg
+xpSection skill xp =
     let
         skillLevel : Int
         skillLevel =
@@ -199,6 +201,7 @@ xpSection xp =
                     ]
                 ]
             , progressBar { progressText = intToString skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = ProgressBarLarge }
+            , button [ onClick (HandleSyllabusClick skill) ] [ text "Syllabus" ]
             ]
         ]
 
@@ -256,17 +259,6 @@ skills =
     , grid = class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-2 2xl:gap-4"
     , xpSection = xpSection
     }
-
-
-type
-    ScreenWidth
-    -- Represents the width of a screen in which the game is displayed
-    = ScreenXs -- Screen width < 640px
-    | ScreenSm
-    | ScreenMd
-    | ScreenLg
-    | ScreenXl
-    | Screen2xl -- Screen width >= 1536px
 
 
 withScreenWidth : (ScreenWidth -> Html msg) -> Html msg

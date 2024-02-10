@@ -15,7 +15,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.Game as Game exposing (Game)
+import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
@@ -576,6 +576,12 @@ update msg model =
                 _ ->
                     -- Shouldn't normally happen
                     noOp
+
+        HandleSyllabusClick skill ->
+            ( model
+                |> setActiveModal (Just (SyllabusModal skill))
+            , Cmd.none
+            )
 
         HandleActivityClick { screenWidth } kind ->
             let

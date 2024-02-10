@@ -3,7 +3,7 @@ module IdleGame.Views.UnderConstruction exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Game exposing (Game)
+import IdleGame.Game
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)

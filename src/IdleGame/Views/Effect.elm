@@ -7,7 +7,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect)
-import IdleGame.Game as Game exposing (Game)
+import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location exposing (findableResources, foundResources)

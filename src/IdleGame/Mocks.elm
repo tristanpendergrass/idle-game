@@ -39,12 +39,12 @@ timePassesModal =
         time =
             Time.millisToPosix (1000 * 60 * 10)
 
-        data : Game.TimePassesData
+        data : TimePassesData
         data =
             { xpGains =
                 [ { originalXp = Xp.int 0, currentXp = Xp.int 100, skill = Hexes }
                 ]
-            , discoveries = [ Game.DiscoveredMonster Prefect, Game.DiscoveredQuest MendCrackedBell, Game.DiscoveredResource EmptyBottle ]
+            , discoveries = [ MonsterDiscovery Prefect, QuestDiscovery MendCrackedBell, ResourceDiscovery EmptyBottle ]
             , coinGains = Nothing
             , resourcesDiff = resourceRecord 0
             , combatsWonDiff = 0

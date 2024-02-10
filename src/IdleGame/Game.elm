@@ -28,29 +28,11 @@ import Quantity
 import Random exposing (Generator)
 import Svg.Attributes exposing (preserveAlpha)
 import Tuple
+import Types exposing (..)
 
 
 
 -- Public
-
-
-type alias Game =
-    { seed : Random.Seed
-    , xp : SkillRecord Xp
-    , mxp : ActivityRecord Xp
-    , locations : LocationRecord Location.State
-    , quests : QuestRecord Quest.State
-    , choresMxp : Xp
-    , activitySkilling : Maybe ( Activity, Timer )
-    , activityAdventuring : Maybe ( Activity, Timer )
-    , monster : Maybe Monster
-    , coin : Coin
-    , resources : ResourceRecord Int
-    , ownedShopUpgrades : ShopUpgradeRecord Bool
-    , combatsWon : Int
-    , combatsLost : Int
-    , spellSelectors : ActivityRecord (Maybe Spell)
-    }
 
 
 createProd : Random.Seed -> Game
@@ -780,41 +762,6 @@ addCoin amount game =
             }
 
 
-type alias TimePassesResourceGain =
-    { amount : Int
-    , title : String
-    }
-
-
-type alias TimePassesResourceLoss =
-    { amount : Int
-    , title : String
-    }
-
-
-type alias TimePassesXpGain =
-    { originalXp : Xp
-    , currentXp : Xp
-    , skill : Skill
-    }
-
-
-type TimePassesDiscovery
-    = DiscoveredMonster Monster
-    | DiscoveredQuest Quest
-    | DiscoveredResource Resource
-
-
-type alias TimePassesData =
-    { xpGains : List TimePassesXpGain
-    , discoveries : List TimePassesDiscovery
-    , coinGains : Maybe Coin
-    , resourcesDiff : Resource.Diff
-    , combatsWonDiff : Int
-    , combatsLostDiff : Int
-    }
-
-
 diff : List a -> List a -> List a
 diff list1 list2 =
     List.concat
@@ -916,9 +863,9 @@ getTimePassesData originalGame currentGame =
         discoveriesAtLocation : Location -> List TimePassesDiscovery
         discoveriesAtLocation location =
             List.concat
-                [ List.map DiscoveredMonster (discoveredMonsters location)
-                , List.map DiscoveredQuest (discoveredQuests location)
-                , List.map DiscoveredResource (discoveredResources location)
+                [ List.map MonsterDiscovery (discoveredMonsters location)
+                , List.map QuestDiscovery (discoveredQuests location)
+                , List.map ResourceDiscovery (discoveredResources location)
                 ]
 
         discoveries : List TimePassesDiscovery
