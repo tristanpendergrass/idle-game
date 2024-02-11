@@ -56,8 +56,8 @@ allWeathermancing =
     allActivitiesBySkill Weathermancing
 
 
-getActivities : Skill -> List Activity
-getActivities skill =
+getBySkill : Skill -> List Activity
+getBySkill skill =
     case skill of
         Chores ->
             allChores

@@ -155,7 +155,7 @@ getActivityListItems skill game =
                 { items = newItems, lockedItem = newItemIsLocked }
 
         result =
-            List.foldl reducer { items = [], lockedItem = False } (Activity.getActivities skill)
+            List.foldl reducer { items = [], lockedItem = False } (Activity.getBySkill skill)
     in
     result.items
 
