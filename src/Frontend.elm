@@ -1451,7 +1451,7 @@ view model =
                 in
                 div [ class "flex h-full w-full relative overflow-hidden" ]
                     [ Toast.render viewToast model.tray toastConfig
-                    , div [ class "bg-base-100 drawer drawer-mobile" ]
+                    , div [ class "bg-base-100 drawer lg:drawer-open" ]
                         [ input
                             [ id "drawer"
                             , type_ "checkbox"
