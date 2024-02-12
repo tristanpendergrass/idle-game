@@ -45,7 +45,6 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [ ] Feature: Syllabus for each class
 - [ ] Feature: Tuition to unlock classes
 - [ ] Feature: Regenerate after losing combat
 - [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
@@ -53,6 +52,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Feature: Tutorial?
 - [ ] Feature: get mail?
 - [ ] Skill: Wild Magic
+- [x] Feature: Syllabus for each class
 - [x] Tech stuff: Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
   - [x] Modify definition of gain resource to have preservation chance
   - [x] Add shop upgrade for this or mastery or something

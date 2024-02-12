@@ -44,8 +44,14 @@ render game skill =
     in
     div [ class "t-column gap-6" ]
         [ h3 [ class "font-bold text-lg" ] [ text ("Syllabus: " ++ skillStats.title) ]
-        , table [ class "table table-xs" ]
-            [ tbody []
+        , table [ class "table table-sm w-80" ]
+            [ thead []
+                [ tr []
+                    [ th [] [ text "Unlock Level" ]
+                    , th [] [ text "Activity" ]
+                    ]
+                ]
+            , tbody []
                 (activities
                     |> List.map
                         (\activity ->
@@ -68,8 +74,8 @@ render game skill =
                                             td [] []
                             in
                             tr []
-                                [ td [] [ text activityStats.title ]
-                                , levelCell
+                                [ levelCell
+                                , td [] [ text activityStats.title ]
                                 ]
                         )
                 )
