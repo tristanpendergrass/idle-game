@@ -201,7 +201,7 @@ xpSection skill xp =
                     ]
                 ]
             , progressBar { progressText = intToString skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = ProgressBarLarge }
-            , button [ onClick (HandleSyllabusClick skill) ] [ text "Syllabus" ]
+            , button [ class "btn btn-neutral btn-outline", onClick (HandleSyllabusClick skill) ] [ text "Syllabus" ]
             ]
         ]
 
