@@ -45,12 +45,11 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [ ] Feature: Tuition to unlock classes
-- [ ] Feature: Regenerate after losing combat
-- [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
+- [ ] Attempt to address perf
+- [ ] Limit to 48 hours
+- [ ] Award spell resource on activity completion
+- [ ] Consume spell resource when assigned on slot
 - [ ] Feature: Changelog
-- [ ] Feature: Tutorial?
-- [ ] Feature: get mail?
 - [ ] Skill: Wild Magic
 - [x] Feature: Syllabus for each class
 - [x] Tech stuff: Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
@@ -97,6 +96,9 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Multi-stage quests
 - [ ] Quests that require you to do some more exploring (find something lost)
 - [ ] Quests that require you to defeat a certain monster
+#### Other
+- [ ] Feature: Tutorial?
+- [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
 
 ### Glitz
 - [ ] Show coin next to shop in left nav
