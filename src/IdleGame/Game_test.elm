@@ -10,6 +10,7 @@ import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Event exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -21,6 +22,7 @@ import Random
 import Test exposing (..)
 import Test.Distribution
 import Test.Random
+import Types exposing (..)
 
 
 hasNoneOf : List (Game -> Bool) -> Game -> Bool
@@ -90,30 +92,30 @@ hasCoin amount =
 
 expectResource : Int -> Resource -> (Game -> Expectation)
 expectResource amount kind =
-    .resources >> Resource.getByKind kind >> Expect.equal amount
+    .resources >> getByResource kind >> Expect.equal amount
 
 
 hasResource : Int -> Resource -> (Game -> Bool)
 hasResource amount kind =
-    .resources >> Resource.getByKind kind >> (==) amount
+    .resources >> getByResource kind >> (==) amount
 
 
-expectXp : Xp -> Skill.Kind -> (Game -> Expectation)
+expectXp : Xp -> Skill -> (Game -> Expectation)
 expectXp amount skill =
-    .xp >> getByKindSkillSkill skill >> Expect.equal amount
+    .xp >> getBySkill skill >> Expect.equal amount
 
 
-hasXp : Xp -> Skill.Kind -> (Game -> Bool)
+hasXp : Xp -> Skill -> (Game -> Bool)
 hasXp amount skill =
-    .xp >> getByKindSkillSkill skill >> (==) amount
+    .xp >> getBySkill skill >> (==) amount
 
 
 initialGame : Game
 initialGame =
-    Game.create (Random.initialSeed 0)
+    Game.createProd (Random.initialSeed 0)
 
 
-testEffects : String -> { effects : List Effect.Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects : String -> { effects : List Effect.TaggedEffect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
 testEffects name { effects, check } =
     Test.Random.check
         name
@@ -124,7 +126,7 @@ testEffects name { effects, check } =
 testEffectsDistribution :
     String
     ->
-        { effects : List Effect.Effect
+        { effects : List Effect.TaggedEffect
         , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
         }
     -> Test
@@ -169,41 +171,41 @@ applyEffectsTest =
             ]
         , describe "GainXp"
             [ testEffects "can get Xp for Chores"
-                { effects = [ Effect.gainXp (Xp.int 5) Skill.Chores ]
-                , check = expectOk (expectXp (Xp.int 5) Skill.Chores)
+                { effects = [ Effect.gainXp (Xp.int 5) Chores ]
+                , check = expectOk (expectXp (Xp.int 5) Chores)
                 }
             , testEffects "can get Xp for Hexes"
-                { effects = [ Effect.gainXp (Xp.int 5) Skill.Hexes ]
-                , check = expectOk (expectXp (Xp.int 5) Skill.Hexes)
+                { effects = [ Effect.gainXp (Xp.int 5) Hexes ]
+                , check = expectOk (expectXp (Xp.int 5) Hexes)
                 }
             ]
         , describe "GainResource"
             [ testEffects "can get resources"
-                { effects = [ Effect.gainResource 1 Resource.EmptyBottle ]
-                , check = expectOk (expectResource 1 Resource.EmptyBottle)
+                { effects = [ Effect.gainResource 1 EmptyBottle ]
+                , check = expectOk (expectResource 1 EmptyBottle)
                 }
             , testEffects "cannot go below 0 of a resource"
-                { effects = [ Effect.spendResource 1 Resource.EmptyBottle ]
+                { effects = [ Effect.spendResource 1 EmptyBottle (Just (Percent.float 1)) ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffectsDistribution "doubling chance of 50% works"
-                { effects = [ Effect.gainResourceWithDoubling 1 Resource.EmptyBottle 0.5 ]
+                { effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
                 , distribution =
                     Test.expectDistribution
                         [ ( Test.Distribution.atLeast 45
                           , "has 1 of resource"
-                          , hasOk (hasResource 1 Resource.EmptyBottle)
+                          , hasOk (hasResource 1 EmptyBottle)
                           )
                         , ( Test.Distribution.atLeast 45
                           , "has 2 of resource"
-                          , hasOk (hasResource 2 Resource.EmptyBottle)
+                          , hasOk (hasResource 2 EmptyBottle)
                           )
                         , ( Test.Distribution.zero
                           , "has something else"
                           , hasOk
                                 (hasNoneOf
-                                    [ hasResource 1 Resource.EmptyBottle
-                                    , hasResource 2 Resource.EmptyBottle
+                                    [ hasResource 1 EmptyBottle
+                                    , hasResource 2 EmptyBottle
                                     ]
                                 )
                           )
@@ -213,25 +215,25 @@ applyEffectsTest =
         , describe "variable effects"
             [ testEffectsDistribution "can have a 50% chance to gain a resource"
                 { effects =
-                    [ Effect.gainWithProbability 0.5
-                        [ Effect.gainResource 1 Resource.EmptyBottle ]
+                    [ Effect.gainWithProbability (Percent.float 0.5)
+                        [ Effect.gainResource 1 EmptyBottle ]
                     ]
                 , distribution =
                     Test.expectDistribution
                         [ ( Test.Distribution.atLeast 45
                           , "has 0 of resource"
-                          , hasOk (hasResource 0 Resource.EmptyBottle)
+                          , hasOk (hasResource 0 EmptyBottle)
                           )
                         , ( Test.Distribution.atLeast 45
                           , "has 1 of resource"
-                          , hasOk (hasResource 1 Resource.EmptyBottle)
+                          , hasOk (hasResource 1 EmptyBottle)
                           )
                         , ( Test.Distribution.zero
                           , "has more than 1 reasource"
                           , hasOk
                                 (hasNoneOf
-                                    [ hasResource 0 Resource.EmptyBottle
-                                    , hasResource 1 Resource.EmptyBottle
+                                    [ hasResource 0 EmptyBottle
+                                    , hasResource 1 EmptyBottle
                                     ]
                                 )
                           )
