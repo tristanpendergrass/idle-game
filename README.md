@@ -14,14 +14,20 @@ $ lamdera live
 
 # Testing
 
-```
-$ npm test
-```
-
-or
+Using [node-test-runner](https://github.com/rtfeldman/node-test-runner)
 
 ```
-$ npm test -- --watch
+$ npm test // runs all tests
+# npm test -- --watch // runs all tests in watch mode
+$ npx elm-test path/to/my/test.elm // runs one test
+$ npx elm-test "src/**/*Tests.elm" // runs all tests in glob
+```
+
+## Perf testing
+I created some quick performance tests in IdleGame/PerfTesting/. They were created to demonstrate how long calculating Time Passes would take after the player returned after various lengths of time. Each test varies the length of time and the "tick duration" to see what can be satisfactory. The tests all pass autoamtically, the true test is how long the test takes to run. Of course, this isn't necessarily reproducible across different machines, or representative of user hardware and results, but it's close enough to make some rough comparisons.
+
+```
+npx elm-test src/IdleGame/PerfTesting/Test60Days.elm
 ```
 
 # Codegen
@@ -45,8 +51,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [ ] Attempt to address perf
-- [ ] Limit to 48 hours
+- [x] Attempt to address perf
 - [ ] Award spell resource on activity completion
 - [ ] Consume spell resource when assigned on slot
 - [ ] Feature: Changelog

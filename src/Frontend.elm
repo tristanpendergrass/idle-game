@@ -296,7 +296,7 @@ This tick also discards the notifications of Game.tick.
 -}
 performantTick : Snapshot.Tick Game
 performantTick =
-    Snapshot.createTick (Duration.seconds 2)
+    Snapshot.createTick (Duration.minutes 1)
         (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
 
 
