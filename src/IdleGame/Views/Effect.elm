@@ -45,7 +45,7 @@ renderModdedEffect renderType game effect =
             renderResource game params.resource params.base
 
         Effect.SpendResource params ->
-            renderResource game params.resource params.base
+            renderResource game params.resource (-1 * params.base)
 
         Effect.GainXp params ->
             renderXp params

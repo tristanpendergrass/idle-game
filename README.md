@@ -52,6 +52,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 
 ## Version 0.4
 - [x] Attempt to address perf
+- [ ] Redesign activity quick view with a focus on clarity over form
 - [ ] Award spell resource on activity completion
 - [ ] Consume spell resource when assigned on slot
 - [ ] Feature: Changelog

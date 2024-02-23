@@ -447,3 +447,8 @@ checkboxMarked =
 checkboxEmpty : Icon
 checkboxEmpty =
     createIconFeather FeatherIcons.square
+
+
+scroll : Icon
+scroll =
+    createIconFeather FeatherIcons.mail
