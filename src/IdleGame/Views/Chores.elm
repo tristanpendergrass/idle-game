@@ -26,7 +26,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection Chores game.xp.chores
+        [ Utils.classTopNav { xp = game.xp.chores, skill = Chores }
         , div [ Utils.skills.grid ]
             (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Chores game))
         ]

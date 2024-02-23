@@ -27,7 +27,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.xpSection Hexes game.xp.hexes
+        [ Utils.classTopNav { skill = Hexes, xp = game.xp.hexes }
         , div [ Utils.skills.grid ]
             (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Hexes game))
         ]

@@ -1,4 +1,4 @@
-module IdleGame.Views.Weathermancing exposing (..)
+module IdleGame.Views.SchoolGrounds exposing (..)
 
 import Duration exposing (Duration)
 import FeatherIcons
@@ -28,7 +28,7 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     div [ Utils.skills.wrapper ]
-        [ Utils.classTopNav { skill = Weathermancing, xp = game.xp.weathermancing }
+        [ Utils.classTopNav { skill = Hexes, xp = game.xp.hexes }
         , div [ Utils.skills.grid ]
-            (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Weathermancing game))
+            (List.map (IdleGame.Views.Activity.renderActivityListItem game) (Game.getActivityListItems Hexes game))
         ]
