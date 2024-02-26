@@ -379,29 +379,24 @@ resourcePreservationTransformer : Percent -> Transformer
 resourcePreservationTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.SpendResource { base, preservationChance, resource } ->
-            case preservationChance of
-                Nothing ->
-                    NoChange
+            let
+                adjustedBuff : Percent
+                adjustedBuff =
+                    Quantity.multiplyBy (toFloat repetitions) buff
 
-                Just percent ->
-                    let
-                        adjustedBuff : Percent
-                        adjustedBuff =
-                            Quantity.multiplyBy (toFloat repetitions) buff
-
-                        buffedChance : Percent
-                        buffedChance =
-                            Quantity.plus percent adjustedBuff
-                    in
-                    taggedEffect
-                        |> Effect.setEffect
-                            (Effect.SpendResource
-                                { base = base
-                                , preservationChance = Just buffedChance
-                                , resource = resource
-                                }
-                            )
-                        |> ChangeEffect
+                buffedChance : Percent
+                buffedChance =
+                    Quantity.plus preservationChance adjustedBuff
+            in
+            taggedEffect
+                |> Effect.setEffect
+                    (Effect.SpendResource
+                        { base = base
+                        , preservationChance = buffedChance
+                        , resource = resource
+                        }
+                    )
+                |> ChangeEffect
 
         _ ->
             NoChange

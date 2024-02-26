@@ -512,8 +512,8 @@ studyHex1Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 12) Hexes
                 , Effect.gainMxp StudyHex1
-                , Effect.spendResource 1 Manure (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 1 Manure
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Hex1Scroll
                 ]
             }
@@ -547,8 +547,8 @@ studyJinx1Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 18) Hexes
                 , Effect.gainMxp StudyJinx1
-                , Effect.spendResource 1 GreenhouseDirt (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 1 GreenhouseDirt
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Jinx1Scroll
                 ]
             }
@@ -582,9 +582,9 @@ studyCurse1Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 24) Hexes
                 , Effect.gainMxp StudyCurse1
-                , Effect.spendResource 1 WashWater (Just Percent.zero)
-                , Effect.spendResource 1 Soot (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 1 WashWater
+                , Effect.spendResource 1 Soot
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Curse1Scroll
                 ]
             }
@@ -618,8 +618,8 @@ studyHex2Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 54) Hexes
                 , Effect.gainMxp StudyHex2
-                , Effect.spendResource 4 Manure (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 4 Manure
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Hex2Scroll
                 ]
             }
@@ -653,8 +653,8 @@ studyJinx2Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 65) Hexes
                 , Effect.gainMxp StudyJinx2
-                , Effect.spendResource 5 GreenhouseDirt (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 5 GreenhouseDirt
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Jinx2Scroll
                 ]
             }
@@ -688,9 +688,9 @@ studyCurse2Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 99) Hexes
                 , Effect.gainMxp StudyCurse2
-                , Effect.spendResource 2 WashWater (Just Percent.zero)
-                , Effect.spendResource 1 Scrap (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 2 WashWater
+                , Effect.spendResource 1 Scrap
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Curse2Scroll
                 ]
             }
@@ -724,8 +724,8 @@ studyHex3Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 94) Hexes
                 , Effect.gainMxp StudyHex3
-                , Effect.spendResource 10 Manure (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 10 Manure
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Hex3Scroll
                 ]
             }
@@ -759,9 +759,9 @@ studyJinx3Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 144) Hexes
                 , Effect.gainMxp StudyJinx3
-                , Effect.spendResource 6 GreenhouseDirt (Just Percent.zero)
-                , Effect.spendResource 1 Ectoplasm (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 6 GreenhouseDirt
+                , Effect.spendResource 1 Ectoplasm
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Jinx2Scroll
                 ]
             }
@@ -795,11 +795,11 @@ studyCurse3Stats =
             , effects =
                 [ Effect.gainXp (Xp.int 200) Hexes
                 , Effect.gainMxp StudyCurse3
-                , Effect.spendResource 2 WashWater (Just Percent.zero)
-                , Effect.spendResource 2 Soot (Just Percent.zero)
-                , Effect.spendResource 2 Scrap (Just Percent.zero)
-                , Effect.spendResource 2 Manure (Just Percent.zero)
-                , Effect.spendResource 1 Parchment (Just Percent.zero)
+                , Effect.spendResource 2 WashWater
+                , Effect.spendResource 2 Soot
+                , Effect.spendResource 2 Scrap
+                , Effect.spendResource 2 Manure
+                , Effect.spendResource 1 Parchment
                 , Effect.gainResource 1 Curse3Scroll
                 ]
             }

@@ -635,20 +635,15 @@ applyEffect effect game =
                     )
 
         Effect.SpendResource { base, resource, preservationChance } ->
-            case preservationChance of
-                Nothing ->
-                    Random.constant (adjustResource resource base game)
+            probabilityGenerator preservationChance
+                |> Random.map
+                    (\preserved ->
+                        if preserved then
+                            adjustResource resource 0 game
 
-                Just percent ->
-                    probabilityGenerator percent
-                        |> Random.map
-                            (\preserved ->
-                                if preserved then
-                                    adjustResource resource 0 game
-
-                                else
-                                    adjustResource resource (-1 * base) game
-                            )
+                        else
+                            adjustResource resource (-1 * base) game
+                    )
 
         Effect.GainXp { base, percentIncrease, skill } ->
             { game = addXp skill (Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base) game

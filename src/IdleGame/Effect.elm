@@ -50,7 +50,7 @@ type alias GainResourceParams =
 
 
 type alias SpendResourceParams =
-    { base : Int, resource : Resource, preservationChance : Maybe Percent }
+    { base : Int, resource : Resource, preservationChance : Percent }
 
 
 type Effect
@@ -102,11 +102,23 @@ gainResource quantity kind =
     }
 
 
-spendResource : Int -> Resource -> Maybe Percent -> TaggedEffect
-spendResource quantity kind preservationChance =
-    { effect = SpendResource { base = quantity, preservationChance = preservationChance, resource = kind }
+spendResource : Int -> Resource -> TaggedEffect
+spendResource quantity kind =
+    { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind }
     , tags = []
     }
+
+
+withPreservationChance : Percent -> TaggedEffect -> TaggedEffect
+withPreservationChance preservationChance taggedEffect =
+    case taggedEffect.effect of
+        SpendResource spendResourceParams ->
+            { taggedEffect
+                | effect = SpendResource { base = spendResourceParams.base, resource = spendResourceParams.resource, preservationChance = preservationChance }
+            }
+
+        _ ->
+            taggedEffect
 
 
 gainResourceWithDoubling : Int -> Resource -> Percent -> TaggedEffect
