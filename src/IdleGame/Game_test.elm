@@ -185,7 +185,7 @@ applyEffectsTest =
                 , check = expectOk (expectResource 1 EmptyBottle)
                 }
             , testEffects "cannot go below 0 of a resource"
-                { effects = [ Effect.spendResource 1 EmptyBottle (Just (Percent.float 1)) ]
+                { effects = [ Effect.spendResource 1 EmptyBottle ]
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffectsDistribution "doubling chance of 50% works"
