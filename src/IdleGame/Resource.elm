@@ -19,25 +19,6 @@ type alias Stats =
     }
 
 
-
--- scrolls : List String
--- scrolls =
---     [ "Hex1"
---     , "Hex2"
---     , "Hex3"
---     , "Jinx1"
---     , "Jinx2"
---     , "Jinx3"
---     , "Curse1"
---     , "Curse2"
---     , "Curse3"
---     , "Wind"
---     , "Water"
---     , "Sun"
---     ]
---     |> List.map (\s -> s ++ "Scroll")
-
-
 allStats : ResourceRecord Stats
 allStats =
     { manure = manureStats
@@ -48,15 +29,6 @@ allStats =
     , scrap = scrapStats
     , ectoplasm = ectoplasmStats
     , parchment = parchmentStats
-    , hex1Scroll = scrollStats "Hex I (scroll)"
-    , hex2Scroll = scrollStats "Hex II (scroll)"
-    , hex3Scroll = scrollStats "Hex III (scroll)"
-    , jinx1Scroll = scrollStats "Jinx I (scroll)"
-    , jinx2Scroll = scrollStats "Jinx II (scroll)"
-    , jinx3Scroll = scrollStats "Jinx III (scroll)"
-    , curse1Scroll = scrollStats "Curse I (scroll)"
-    , curse2Scroll = scrollStats "Curse II (scroll)"
-    , curse3Scroll = scrollStats "Curse III (scroll)"
     }
 
 
@@ -152,15 +124,6 @@ emptyResourceResourceRecord =
     , scrap = 0
     , ectoplasm = 0
     , parchment = 0
-    , hex1Scroll = 0
-    , hex2Scroll = 0
-    , hex3Scroll = 0
-    , jinx1Scroll = 0
-    , jinx2Scroll = 0
-    , jinx3Scroll = 0
-    , curse1Scroll = 0
-    , curse2Scroll = 0
-    , curse3Scroll = 0
     }
 
 
@@ -193,15 +156,6 @@ getDiff { original, current } =
     , scrap = current.scrap - original.scrap
     , ectoplasm = current.ectoplasm - original.ectoplasm
     , parchment = current.parchment - original.parchment
-    , hex1Scroll = current.hex1Scroll - original.hex1Scroll
-    , hex2Scroll = current.hex2Scroll - original.hex2Scroll
-    , hex3Scroll = current.hex3Scroll - original.hex3Scroll
-    , jinx1Scroll = current.jinx1Scroll - original.jinx1Scroll
-    , jinx2Scroll = current.jinx2Scroll - original.jinx2Scroll
-    , jinx3Scroll = current.jinx3Scroll - original.jinx3Scroll
-    , curse1Scroll = current.curse1Scroll - original.curse1Scroll
-    , curse2Scroll = current.curse2Scroll - original.curse2Scroll
-    , curse3Scroll = current.curse3Scroll - original.curse3Scroll
     }
 
 

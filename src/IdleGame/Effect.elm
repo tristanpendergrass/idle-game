@@ -55,6 +55,8 @@ type alias SpendResourceParams =
 
 type Effect
     = VariableSuccess { successProbability : Percent, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
+    | GainScroll { base : Int, spell : Spell }
+    | SpendScroll { base : Int, spell : Spell }
     | GainResource GainResourceParams
     | SpendResource SpendResourceParams
     | GainXp GainXpParams
@@ -91,6 +93,20 @@ gainCoin quantity =
 gainMxp : Activity -> TaggedEffect
 gainMxp activity =
     { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
+    , tags = []
+    }
+
+
+gainScroll : Int -> Spell -> TaggedEffect
+gainScroll count spell =
+    { effect = GainScroll { base = count, spell = spell }
+    , tags = []
+    }
+
+
+spendScroll : Int -> Spell -> TaggedEffect
+spendScroll amount spell =
+    { effect = SpendScroll { base = amount, spell = spell }
     , tags = []
     }
 

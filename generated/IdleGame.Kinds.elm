@@ -16,15 +16,6 @@ type Resource
     | Scrap
     | Ectoplasm
     | Parchment
-    | Hex1Scroll
-    | Hex2Scroll
-    | Hex3Scroll
-    | Jinx1Scroll
-    | Jinx2Scroll
-    | Jinx3Scroll
-    | Curse1Scroll
-    | Curse2Scroll
-    | Curse3Scroll
 
 
 allResources : List Resource
@@ -37,15 +28,6 @@ allResources =
     , Scrap
     , Ectoplasm
     , Parchment
-    , Hex1Scroll
-    , Hex2Scroll
-    , Hex3Scroll
-    , Jinx1Scroll
-    , Jinx2Scroll
-    , Jinx3Scroll
-    , Curse1Scroll
-    , Curse2Scroll
-    , Curse3Scroll
     ]
 
 
@@ -58,15 +40,6 @@ type alias ResourceRecord a =
     , scrap : a
     , ectoplasm : a
     , parchment : a
-    , hex1Scroll : a
-    , hex2Scroll : a
-    , hex3Scroll : a
-    , jinx1Scroll : a
-    , jinx2Scroll : a
-    , jinx3Scroll : a
-    , curse1Scroll : a
-    , curse2Scroll : a
-    , curse3Scroll : a
     }
 
 
@@ -80,19 +53,10 @@ resourceRecord a =
     , scrap = a
     , ectoplasm = a
     , parchment = a
-    , hex1Scroll = a
-    , hex2Scroll = a
-    , hex3Scroll = a
-    , jinx1Scroll = a
-    , jinx2Scroll = a
-    , jinx3Scroll = a
-    , curse1Scroll = a
-    , curse2Scroll = a
-    , curse3Scroll = a
     }
 
 
-getByResource : Resource -> ResourceRecord curse3Scroll -> curse3Scroll
+getByResource : Resource -> ResourceRecord parchment -> parchment
 getByResource kind data =
     case kind of
         Manure ->
@@ -118,33 +82,6 @@ getByResource kind data =
 
         Parchment ->
             data.parchment
-
-        Hex1Scroll ->
-            data.hex1Scroll
-
-        Hex2Scroll ->
-            data.hex2Scroll
-
-        Hex3Scroll ->
-            data.hex3Scroll
-
-        Jinx1Scroll ->
-            data.jinx1Scroll
-
-        Jinx2Scroll ->
-            data.jinx2Scroll
-
-        Jinx3Scroll ->
-            data.jinx3Scroll
-
-        Curse1Scroll ->
-            data.curse1Scroll
-
-        Curse2Scroll ->
-            data.curse2Scroll
-
-        Curse3Scroll ->
-            data.curse3Scroll
 
 
 setByResource :
@@ -174,33 +111,6 @@ setByResource kind value data =
 
         Parchment ->
             { data | parchment = value }
-
-        Hex1Scroll ->
-            { data | hex1Scroll = value }
-
-        Hex2Scroll ->
-            { data | hex2Scroll = value }
-
-        Hex3Scroll ->
-            { data | hex3Scroll = value }
-
-        Jinx1Scroll ->
-            { data | jinx1Scroll = value }
-
-        Jinx2Scroll ->
-            { data | jinx2Scroll = value }
-
-        Jinx3Scroll ->
-            { data | jinx3Scroll = value }
-
-        Curse1Scroll ->
-            { data | curse1Scroll = value }
-
-        Curse2Scroll ->
-            { data | curse2Scroll = value }
-
-        Curse3Scroll ->
-            { data | curse3Scroll = value }
 
 
 {- Skills -}

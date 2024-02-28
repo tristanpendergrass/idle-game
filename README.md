@@ -68,6 +68,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Fix bug with displaying e.g. combat rewards and variable rewards in chores that have been modded. Right now they show the base but not the modded value because of how applyEffects work (only applying mod to successEffects when generator returns a success). Another possible solution: make use of includeVariableEffects, if only in the view layer.
 - [ ] Fix that on mobile you can view detail and keep scrolling and drag detail view up past bottom you'll see something like resource rewards behind.
 - [ ] Potential bug: the purchasing of shop upgrades isn't done with an effect. And the view isn't set up with one either, so any future buff that e.g. decreases shop prices won't be priced in or applied.
+- [ ] Resource doubling caps at 100%. We should make it so a chance of 100% + n% guarantees two items with a chance at even more. Need to edit applyEffect in Game, I think.
 
 ### Tech stuff
 - [ ] Load pictures in sprite sheet at init and dont show app until loaded

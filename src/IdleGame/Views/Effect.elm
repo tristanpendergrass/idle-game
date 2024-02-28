@@ -14,6 +14,7 @@ import IdleGame.Location as Location exposing (findableResources, foundResources
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
+import IdleGame.Spell as Spell
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
@@ -40,6 +41,12 @@ renderModdedEffect renderType game effect =
     case Effect.getEffect effect of
         Effect.GainCoin coin ->
             renderCoin coin
+
+        Effect.GainScroll params ->
+            renderScroll game params.spell params.base
+
+        Effect.SpendScroll params ->
+            renderScroll game params.spell (-1 * params.base)
 
         Effect.GainResource params ->
             renderResource game params.resource params.base
@@ -123,6 +130,30 @@ renderExplore game location =
                 (\resource -> (Resource.getStats resource).icon |> Icon.toHtml)
                 foundResources
             )
+        ]
+
+
+renderScroll : Game -> Spell -> Int -> Html msg
+renderScroll game spell base =
+    let
+        owned : Int
+        owned =
+            getBySpell spell game.scrolls
+
+        isNegativeAmount : Bool
+        isNegativeAmount =
+            base < 0
+
+        icon : Html msg
+        icon =
+            (Spell.getStats spell).icon
+                |> Icon.toHtml
+    in
+    div [ class "flex items-center gap-1" ]
+        [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (Utils.intToString base) ]
+        , icon
+        , div [ classList [ ( "hidden", not isNegativeAmount || owned >= abs base ) ] ]
+            [ text <| "(Owned: " ++ Utils.intToString owned ++ ")" ]
         ]
 
 

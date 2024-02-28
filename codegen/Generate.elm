@@ -122,20 +122,6 @@ getDeclarations category categoryPlural names =
 
 -- Resources
 
-scrolls : List String
-scrolls =
-    [ "Hex1"
-    , "Hex2"
-    , "Hex3"
-    , "Jinx1"
-    , "Jinx2"
-    , "Jinx3"
-    , "Curse1"
-    , "Curse2"
-    , "Curse3"
-    ]
-    |> List.map (\s -> s ++ "Scroll")
-
 resources : List String
 resources =
     [ "Manure"
@@ -146,7 +132,7 @@ resources =
     , "Scrap"
     , "Ectoplasm"
     , "Parchment"
-    ] ++ scrolls
+    ]
 
 
 

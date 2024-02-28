@@ -514,7 +514,7 @@ studyHex1Stats =
                 , Effect.gainMxp StudyHex1
                 , Effect.spendResource 1 Manure
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Hex1Scroll
+                , Effect.gainScroll 1 Hex1
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -549,7 +549,7 @@ studyJinx1Stats =
                 , Effect.gainMxp StudyJinx1
                 , Effect.spendResource 1 GreenhouseDirt
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Jinx1Scroll
+                , Effect.gainScroll 1 Jinx1
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -585,7 +585,7 @@ studyCurse1Stats =
                 , Effect.spendResource 1 WashWater
                 , Effect.spendResource 1 Soot
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Curse1Scroll
+                , Effect.gainScroll 1 Curse1
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -620,7 +620,7 @@ studyHex2Stats =
                 , Effect.gainMxp StudyHex2
                 , Effect.spendResource 4 Manure
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Hex2Scroll
+                , Effect.gainScroll 1 Hex2
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -655,7 +655,7 @@ studyJinx2Stats =
                 , Effect.gainMxp StudyJinx2
                 , Effect.spendResource 5 GreenhouseDirt
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Jinx2Scroll
+                , Effect.gainScroll 1 Jinx2
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -691,7 +691,7 @@ studyCurse2Stats =
                 , Effect.spendResource 2 WashWater
                 , Effect.spendResource 1 Scrap
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Curse2Scroll
+                , Effect.gainScroll 1 Curse2
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -726,7 +726,7 @@ studyHex3Stats =
                 , Effect.gainMxp StudyHex3
                 , Effect.spendResource 10 Manure
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Hex3Scroll
+                , Effect.gainScroll 1 Hex3
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -762,7 +762,7 @@ studyJinx3Stats =
                 , Effect.spendResource 6 GreenhouseDirt
                 , Effect.spendResource 1 Ectoplasm
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Jinx2Scroll
+                , Effect.gainScroll 1 Jinx3
                 ]
             }
     , mastery = Just studyHexesMastery
@@ -800,7 +800,7 @@ studyCurse3Stats =
                 , Effect.spendResource 2 Scrap
                 , Effect.spendResource 2 Manure
                 , Effect.spendResource 1 Parchment
-                , Effect.gainResource 1 Curse3Scroll
+                , Effect.gainScroll 1 Curse3
                 ]
             }
     , mastery = Just studyHexesMastery

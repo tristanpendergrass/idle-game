@@ -75,6 +75,7 @@ type alias Game =
     , combatsWon : Int
     , combatsLost : Int
     , spellSelectors : ActivityRecord (Maybe Spell)
+    , scrolls : SpellRecord Int
     }
 
 

@@ -60,6 +60,7 @@ createProd seed =
     , combatsWon = 0
     , combatsLost = 0
     , spellSelectors = activityRecord Nothing
+    , scrolls = spellRecord 0
     }
 
 
@@ -88,6 +89,7 @@ createDev seed =
     , combatsWon = 0
     , combatsLost = 0
     , spellSelectors = activityRecord Nothing
+    , scrolls = spellRecord 100
     }
 
 
@@ -623,6 +625,14 @@ applyEffect effect game =
             addCoin product game
                 |> Random.constant
 
+        Effect.GainScroll { base, spell } ->
+            adjustScroll spell base game
+                |> Random.constant
+
+        Effect.SpendScroll { base, spell } ->
+            adjustScroll spell (-1 * base) game
+                |> Random.constant
+
         Effect.GainResource { base, resource, doublingChance } ->
             probabilityGenerator doublingChance
                 |> Random.map
@@ -716,6 +726,41 @@ addMxp kind amount game =
 addMasteryPoolXp : Xp -> Game -> Game
 addMasteryPoolXp amount game =
     { game | choresMxp = Quantity.plus game.choresMxp amount }
+
+
+addScroll : Spell -> Int -> SpellRecord Int -> Result EffectErr (SpellRecord Int)
+addScroll spell amount scrolls =
+    let
+        oldAmount : Int
+        oldAmount =
+            getBySpell spell scrolls
+
+        newAmount : Int
+        newAmount =
+            oldAmount + amount
+    in
+    if newAmount >= 0 then
+        Ok (setBySpell spell newAmount scrolls)
+
+    else
+        Err EffectErr.NegativeAmount
+
+
+adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
+adjustScroll spell amount game =
+    let
+        newScrolls : Result EffectErr (SpellRecord Int)
+        newScrolls =
+            addScroll spell amount game.scrolls
+    in
+    newScrolls
+        |> Result.map
+            (\val ->
+                { game = { game | scrolls = val }
+                , toasts = [ GainedScroll amount spell ]
+                , additionalEffects = []
+                }
+            )
 
 
 adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
@@ -1022,16 +1067,18 @@ getActivityMods game =
 
 getSelectedSpellMods : Game -> List Mod
 getSelectedSpellMods game =
-    -- Get all activities, map to the selected spell (Just spell or Nothing), then filterMap to the mods from spell
-    allActivities
+    [ game.activityAdventuring, game.activitySkilling ]
+        |> List.filterMap (Maybe.map (\( activity, _ ) -> activity))
         |> List.filterMap
             (\activity ->
-                case getByActivity activity game.spellSelectors of
-                    Just spell ->
-                        Just (addActivityTagToMods activity (Spell.getStats spell).mods)
-
-                    Nothing ->
-                        Nothing
+                getByActivity activity game.spellSelectors
+                    |> Maybe.map (\spell -> ( activity, spell ))
+            )
+        |> List.filter (\( _, spell ) -> getBySpell spell game.scrolls > 0)
+        |> List.map
+            (\( activity, spell ) ->
+                (Spell.getStats spell).mods
+                    |> addActivityTagToMods activity
             )
         |> List.concat
 

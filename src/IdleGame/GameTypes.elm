@@ -11,6 +11,7 @@ import Percent exposing (Percent)
 type Toast
     = GainedCoin Coin
     | GainedResource Int Resource
+    | GainedScroll Int Spell
     | LostCombat
     | NegativeAmountErr
     | QuestAlreadyCompleteErr

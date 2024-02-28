@@ -1236,6 +1236,34 @@ toastToHtml notification =
                     |> Icon.toHtml
                 ]
 
+        GainedScroll amount spell ->
+            let
+                stats : Spell.Stats
+                stats =
+                    Spell.getStats spell
+
+                plusOrMinus : String
+                plusOrMinus =
+                    if amount >= 0 then
+                        "+"
+
+                    else
+                        "-"
+
+                colorClass : Attribute msg
+                colorClass =
+                    if amount >= 0 then
+                        successClass
+
+                    else
+                        errClass
+            in
+            div [ baseClass, colorClass, class "flex gap-1 items-center" ]
+                [ span [] [ text <| plusOrMinus ++ ViewUtils.intToString (abs amount) ]
+                , stats.icon
+                    |> Icon.toHtml
+                ]
+
         GainedResource amount resource ->
             let
                 stats : Resource.Stats
