@@ -17,9 +17,7 @@ $ lamdera live
 Using [node-test-runner](https://github.com/rtfeldman/node-test-runner)
 
 ```
-$ npm test // runs all tests
-# npm test -- --watch // runs all tests in watch mode
-$ npx elm-test path/to/my/test.elm // runs one test
+$ npx elm-test path/to/my/test.elm --watch // runs one test file (in watch mode)
 $ npx elm-test "src/**/*Tests.elm" // runs all tests in glob
 ```
 
