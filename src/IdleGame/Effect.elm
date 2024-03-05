@@ -79,7 +79,7 @@ setEffect newEffect taggedEffect =
 gainXp : Xp -> Skill -> TaggedEffect
 gainXp quantity skill =
     { effect = GainXp { base = quantity, percentIncrease = Percent.zero, skill = skill }
-    , tags = []
+    , tags = [ XpTag, SkillTag skill ]
     }
 
 

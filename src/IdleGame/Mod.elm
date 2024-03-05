@@ -441,6 +441,11 @@ powerTransformer buff repetitions taggedEffect =
             NoChange
 
 
+addEffectsTransformer : List Effect.TaggedEffect -> Transformer
+addEffectsTransformer effects repetitions taggedEffect =
+    ChangeAndAddEffects taggedEffect (List.concat (List.repeat repetitions effects))
+
+
 activityXpBuff : Activity -> Percent -> Mod
 activityXpBuff activity amount =
     { tags = [ Effect.XpTag, Effect.ActivityTag activity ]
@@ -548,8 +553,19 @@ powerBuff buff =
     }
 
 
+addEffects : List Effect.TaggedEffect -> Mod
+addEffects effects =
+    { tags = []
+    , label = NullLabel
+    , transformer = addEffectsTransformer effects
+    , source = AdminCrimes
+    , repetitions = 1
+    }
+
+
 type Label
-    = XpActivityLabel Percent
+    = NullLabel -- for mods that don't make sense to label
+    | XpActivityLabel Percent
     | XpSkillLabel Percent Skill
     | MxpModLabel Percent
     | ResourceDoublingLabel Percent

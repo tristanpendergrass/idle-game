@@ -1077,8 +1077,14 @@ getSelectedSpellMods game =
         |> List.filter (\( _, spell ) -> getBySpell spell game.scrolls > 0)
         |> List.map
             (\( activity, spell ) ->
+                -- Where we attach the spell mods to the activity
                 (Spell.getStats spell).mods
                     |> addActivityTagToMods activity
+                    -- Where we add the effect to pay the scroll
+                    |> (::)
+                        (Mod.addEffects [ Effect.spendScroll 1 spell ]
+                            |> Mod.withTags [ Effect.ActivityTag activity ]
+                        )
             )
         |> List.concat
 

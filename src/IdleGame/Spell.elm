@@ -95,7 +95,9 @@ allStats =
     , wind =
         { title = "Envigorating Breeze"
         , icon = Icon.fromString "Wd1"
-        , mods = [ Mod.xpBuff (Percent.float 0.1) ]
+        , mods =
+            [ Mod.xpBuff (Percent.float 0.2)
+            ]
         , inclusions = [ IfSkill Chores ]
         }
     , water =

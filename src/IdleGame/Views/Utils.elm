@@ -332,6 +332,9 @@ resourceQuantity { quantity } =
 modToString : Mod -> String
 modToString mod =
     case mod.label of
+        Mod.NullLabel ->
+            ""
+
         Mod.XpActivityLabel buff ->
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% XP"
 

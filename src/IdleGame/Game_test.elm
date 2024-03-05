@@ -262,7 +262,50 @@ applyEffectsTest =
   - That a spell that's selected with no scrolls left has no effects applied
 
 -}
+grantScrolls : Game -> Game
+grantScrolls game =
+    { game | scrolls = spellRecord 1000 }
+
+
 spellSelectorTest : Test
 spellSelectorTest =
-     describe "SpellSelector"
-        [ test "selected spell applies its mods"
+    let
+        effect : Effect.TaggedEffect
+        effect =
+            Effect.gainXp (Xp.int 10) Chores
+                |> Effect.withTags [ Effect.ActivityTag CleanBigBubba ]
+    in
+    describe "SpellSelector"
+        [ testEffects "Spell has the correct effect"
+            { initialGame =
+                defaultGame
+                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
+                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
+                    |> grantScrolls
+            , effects = [ effect ]
+            , check = expectOk (expectXp (Xp.int 12) Chores)
+            }
+        , testEffects "Spell has no effect when no scrolls"
+            { initialGame =
+                defaultGame
+                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
+                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
+            , effects = [ effect ]
+            , check = expectOk (expectXp (Xp.int 10) Chores)
+            }
+        , testEffects
+            "Spell deducts a scroll"
+            { initialGame =
+                defaultGame
+                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
+                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
+                    |> grantScrolls
+            , effects = [ effect ]
+            , check =
+                expectOk
+                    (\game ->
+                        getBySpell Wind game.scrolls
+                            |> Expect.equal 999
+                    )
+            }
+        ]
