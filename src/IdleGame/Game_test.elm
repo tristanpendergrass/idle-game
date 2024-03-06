@@ -254,17 +254,9 @@ applyEffectsTest =
         ]
 
 
-{-| Test some scenarios related to spell selectors:
-
-  - That a spell that's selected has its effects applied (use Game.selectSpell)
-  - That a spell that's selected but not learned has no effects applied
-  - That a spell that's selected and used deducts the appropriate scroll
-  - That a spell that's selected with no scrolls left has no effects applied
-
--}
-grantScrolls : Game -> Game
-grantScrolls game =
-    { game | scrolls = spellRecord 1000 }
+grantScrolls : Int -> Game -> Game
+grantScrolls amount game =
+    { game | scrolls = spellRecord amount }
 
 
 spellSelectorTest : Test
@@ -281,7 +273,7 @@ spellSelectorTest =
                 defaultGame
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-                    |> grantScrolls
+                    |> grantScrolls 1
             , effects = [ effect ]
             , check = expectOk (expectXp (Xp.int 12) Chores)
             }
@@ -293,13 +285,12 @@ spellSelectorTest =
             , effects = [ effect ]
             , check = expectOk (expectXp (Xp.int 10) Chores)
             }
-        , testEffects
-            "Spell deducts a scroll"
+        , testEffects "Spell deducts a scroll"
             { initialGame =
                 defaultGame
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-                    |> grantScrolls
+                    |> grantScrolls 1000
             , effects = [ effect ]
             , check =
                 expectOk
@@ -307,5 +298,13 @@ spellSelectorTest =
                         getBySpell Wind game.scrolls
                             |> Expect.equal 999
                     )
+            }
+        , testEffects "Spell has no effect when no spell"
+            { initialGame =
+                defaultGame
+                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Nothing }
+                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
+            , effects = [ effect ]
+            , check = expectOk (expectXp (Xp.int 10) Chores)
             }
         ]
