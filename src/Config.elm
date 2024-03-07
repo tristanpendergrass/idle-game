@@ -41,7 +41,7 @@ devFlags =
     -- (^_^) < "Here are the dev flags :)"
     -- c(")(")
     { isDev = True
-    , showFastForwardSpeed = False
+    , showFastForwardSpeed = True
     , extraFastForwardTime = Duration.hours 0
     , debugTimePasses = False
     , showTimePasses = True
