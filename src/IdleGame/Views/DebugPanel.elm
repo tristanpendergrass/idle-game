@@ -33,16 +33,17 @@ render model =
                 [ Icon.close
                     |> Icon.toHtml
                 ]
-
-        addTimeButton =
-            button [ onClick (AddTime (Duration.hours 8)), class "btn" ] [ text "Add 8 hrs" ]
     in
     div
-        [ class "fixed bottom-0 w-full h-48 bg-accent text-accent-content border-t border-accent-content relative p-2"
+        [ class "fixed flex gap-4 top-0 w-full h-48 bg-accent text-accent-content border-t border-accent-content p-2"
         , classList [ ( "hidden", not model.showDebugPanel ) ]
         , Utils.zIndexes.debugPanel
         , id panelId
         ]
-        [ addTimeButton
+        [ button [ onClick (AddTime (Duration.minutes 30)), class "btn" ] [ text "Add 30 min" ]
+        , button [ onClick (AddTime (Duration.hours 8)), class "btn" ] [ text "Add 8 hrs" ]
+        , button [ onClick (AddTime (Duration.days 3)), class "btn" ] [ text "Add 3 days" ]
+        , button [ onClick (AddTime (Duration.days 30)), class "btn" ] [ text "Add 30 days" ]
+        , button [ onClick (AddTime (Duration.days 365)), class "btn" ] [ text "Add 1 year" ]
         , div [ class "absolute top-0 right-0" ] [ closeButton ]
         ]
