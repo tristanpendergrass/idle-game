@@ -1,5 +1,7 @@
 module IdleGame.Views.TimePasses exposing (..)
 
+import Config
+import Duration exposing (Duration)
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -73,15 +75,19 @@ renderTimePassesDiscovery discovery =
         ]
 
 
-render : Posix -> TimePassesData -> Html FrontendMsg
-render timePassed timePassesData =
+render : Duration -> Posix -> TimePassesData -> Html FrontendMsg
+render timeToFastForward timePassed timePassesData =
     let
         { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
             timePassesData
+
+        timeStr =
+            Utils.intToString (floor (Duration.inMilliseconds timeToFastForward))
     in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , span [] [ text timeStr ]
         , ul [ class "t-column font-semibold" ]
             (List.map renderTimePassesDiscovery timePassesData.discoveries)
         , ul [ class "t-column font-semibold" ]

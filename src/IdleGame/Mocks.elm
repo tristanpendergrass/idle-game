@@ -35,6 +35,10 @@ import Types exposing (..)
 timePassesModal : Modal
 timePassesModal =
     let
+        duration : Duration
+        duration =
+            Duration.seconds 10
+
         time : Time.Posix
         time =
             Time.millisToPosix (1000 * 60 * 10)
@@ -51,4 +55,4 @@ timePassesModal =
             , combatsLostDiff = 0
             }
     in
-    TimePassesModal time data
+    TimePassesModal duration time data

@@ -89,6 +89,7 @@ init _ key =
                 Nothing
     in
     ( { key = key
+      , lastFastForwardDuration = Nothing
       , showDebugPanel = False
       , tray = Toast.tray
       , isDrawerOpen = False
@@ -168,7 +169,7 @@ setActiveModal activeModal model =
         -- This supports the DebugPanel's "Show Time Passes" checkbox
         filteredActiveModal =
             case activeModal of
-                Just (TimePassesModal _ _) ->
+                Just (TimePassesModal _ _ _) ->
                     -- showTimePasses can be set to False for disabling this during development
                     -- debugTimePasses forces it to be shown with debug values
                     if Config.flags.showTimePasses || Config.flags.debugTimePasses then
@@ -183,8 +184,8 @@ setActiveModal activeModal model =
     { model | activeModal = filteredActiveModal }
 
 
-createTimePassesModal : Snapshot Game -> Snapshot Game -> Maybe Modal
-createTimePassesModal oldSnap newSnap =
+createTimePassesModal : Duration -> Snapshot Game -> Snapshot Game -> Maybe Modal
+createTimePassesModal duration oldSnap newSnap =
     let
         oldGame =
             Snapshot.getValue oldSnap
@@ -196,7 +197,7 @@ createTimePassesModal oldSnap newSnap =
             Snapshot.getTimeDifference oldSnap newSnap
     in
     Game.getTimePassesData oldGame newGame
-        |> Maybe.map (TimePassesModal timePassed)
+        |> Maybe.map (TimePassesModal duration timePassed)
 
 
 setTabSkilling : Tab -> FrontendModel -> FrontendModel
@@ -463,6 +464,30 @@ update msg model =
         UrlChanged _ ->
             noOp
 
+        InitializeGameHelp serverSnapshot now ->
+            let
+                adjustedServerSnapshot : Snapshot Game
+                adjustedServerSnapshot =
+                    Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
+            in
+            case model.gameState of
+                Initializing ->
+                    ( model
+                        |> setGameState
+                            (FastForward
+                                { original = adjustedServerSnapshot
+                                , current = adjustedServerSnapshot
+                                , previousIntervalTimer = NotStarted
+                                , whenItStarted = now
+                                }
+                            )
+                    , Task.perform HandleFastForward Time.now
+                    )
+
+                _ ->
+                    -- If we receive an InitializeGame message from backend while already initialized we ignore it
+                    ( model, Cmd.none )
+
         OpenDebugPanel ->
             ( { model | showDebugPanel = True }
               -- We added this sleep + focus commands here to try to give focus to the debug panel after it's opened.
@@ -525,7 +550,7 @@ update msg model =
 
         HandleFastForward now ->
             case model.gameState of
-                FastForward { original, current, previousIntervalTimer } ->
+                FastForward { original, current, previousIntervalTimer, whenItStarted } ->
                     let
                         nextInterval =
                             getFastForwardPoint (Snapshot.getTime current)
@@ -549,7 +574,7 @@ update msg model =
                         in
                         ( model
                             |> setGameState
-                                (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer })
+                                (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer, whenItStarted = whenItStarted })
                         , Task.perform HandleFastForward (Process.sleep sleepTime |> Task.andThen (\_ -> Time.now))
                         )
 
@@ -564,7 +589,7 @@ update msg model =
                                     Just IdleGame.Mocks.timePassesModal
 
                                 else
-                                    createTimePassesModal original newSnap
+                                    createTimePassesModal (Duration.milliseconds (toFloat (Time.posixToMillis (Debug.log "1" now) - Time.posixToMillis (Debug.log "2" whenItStarted)))) original newSnap
                         in
                         ( model
                             |> setGameState
@@ -829,6 +854,9 @@ update msg model =
                         )
 
         HandleVisibilityChange visibility ->
+            ( model, Task.perform (HandleVisibilityChangeHelp visibility) Time.now )
+
+        HandleVisibilityChangeHelp visibility now ->
             if visibility == Browser.Events.Visible then
                 case model.gameState of
                     Initializing ->
@@ -846,7 +874,7 @@ update msg model =
                     Playing snapshot ->
                         ( model
                             |> setIsVisible True
-                            |> setGameState (FastForward { original = snapshot, current = snapshot, previousIntervalTimer = NotStarted })
+                            |> setGameState (FastForward { original = snapshot, current = snapshot, previousIntervalTimer = NotStarted, whenItStarted = now })
                         , Task.perform HandleFastForward Time.now
                         )
 
@@ -1012,6 +1040,9 @@ update msg model =
             ( { model | pointerState = Nothing }, Cmd.none )
 
         AddTime amount ->
+            ( model, Task.perform (AddTimeHelp amount) Time.now )
+
+        AddTimeHelp amount now ->
             case model.gameState of
                 Playing snapshot ->
                     let
@@ -1020,7 +1051,7 @@ update msg model =
 
                         fastForwardState : FastForwardState
                         fastForwardState =
-                            { original = current, current = current, previousIntervalTimer = NotStarted }
+                            { original = current, current = current, previousIntervalTimer = NotStarted, whenItStarted = Debug.log "3" now }
                     in
                     ( model
                         |> setGameState (FastForward fastForwardState)
@@ -1034,7 +1065,7 @@ update msg model =
             case model.activeModal of
                 Just (ShopResourceModal quantity resource price) ->
                     ( { model
-                        | activeModal = Just (ShopResourceModal (Debug.log "new quantity" <| Basics.max 1 (quantity - 1)) resource price)
+                        | activeModal = Just (ShopResourceModal (Basics.max 1 (quantity - 1)) resource price)
                       }
                     , Cmd.none
                     )
@@ -1140,27 +1171,7 @@ updateFromBackend msg model =
             ( model, Cmd.none )
 
         InitializeGame serverSnapshot ->
-            let
-                adjustedServerSnapshot : Snapshot Game
-                adjustedServerSnapshot =
-                    Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
-            in
-            case model.gameState of
-                Initializing ->
-                    ( model
-                        |> setGameState
-                            (FastForward
-                                { original = adjustedServerSnapshot
-                                , current = adjustedServerSnapshot
-                                , previousIntervalTimer = NotStarted
-                                }
-                            )
-                    , Task.perform HandleFastForward Time.now
-                    )
-
-                _ ->
-                    -- If we receive an InitializeGame message from backend while already initialized we ignore it
-                    ( model, Cmd.none )
+            ( model, Task.perform (InitializeGameHelp serverSnapshot) Time.now )
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
@@ -1322,14 +1333,14 @@ toastToHtml notification =
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg
 renderModal activeModal game =
-    case Debug.log "activeModal" activeModal of
+    case activeModal of
         Nothing ->
             nothing
 
-        Just (TimePassesModal timePassed timePassesData) ->
+        Just (TimePassesModal timeSpentOnFastForward timePassed timePassesData) ->
             let
                 children =
-                    IdleGame.Views.TimePasses.render timePassed timePassesData
+                    IdleGame.Views.TimePasses.render timeSpentOnFastForward timePassed timePassesData
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"

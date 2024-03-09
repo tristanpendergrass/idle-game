@@ -80,7 +80,7 @@ type alias Game =
 
 
 type Modal
-    = TimePassesModal Posix TimePassesData
+    = TimePassesModal Duration Posix TimePassesData
     | ChoreItemUnlocksModal
     | ShopResourceModal Int Resource Coin
     | SyllabusModal Skill
@@ -96,6 +96,7 @@ type alias FastForwardState =
     { original : Snapshot Game
     , current : Snapshot Game
     , previousIntervalTimer : PreviousIntervalTimer
+    , whenItStarted : Posix -- the time when fast forward began, to calculate how long it takes
     }
 
 
@@ -135,6 +136,7 @@ type LocationFilter
 
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
@@ -175,6 +177,7 @@ type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
     | UrlChanged Url
+    | InitializeGameHelp (Snapshot Game) Posix
       -- Detail View
     | SwitchMode Mode
     | ClosePreview
@@ -194,6 +197,7 @@ type FrontendMsg
     | OpenDebugPanel
     | CloseDebugPanel
     | AddTime Duration
+    | AddTimeHelp Duration Posix
       -- Shop Resource Purchase modal
     | HandleShopResourceClick Resource -- Opens the modal
     | HandleOneLessButtonClick
@@ -209,6 +213,7 @@ type FrontendMsg
     | HandleAnimationFrame Posix
     | HandleAnimationFrameDelta Float
     | SetDrawerOpen Bool
+    | HandleVisibilityChangeHelp Browser.Events.Visibility Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
     | OpenMasteryUnlocksModal
