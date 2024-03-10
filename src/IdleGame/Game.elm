@@ -332,12 +332,16 @@ tick delta game =
                     , newEffects
                     )
 
+        mods : List Mod
+        mods =
+            getAllMods game
+
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
                 |> setActivitySkilling newActivitySkilling
                 |> setActivityAdventuring newActivityAdventuring
-                |> (\g -> List.foldl applyEvent (Random.constant ( g, [] )) (effectsSkilling ++ effectsAdventuring))
+                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (effectsSkilling ++ effectsAdventuring))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -368,9 +372,13 @@ attemptPurchaseResource amount resource game =
         effects =
             getPurchaseEffects amount resource
 
+        mods : List Mod
+        mods =
+            getAllMods game
+
         gen : ApplyEffectsResultGenerator
         gen =
-            applyEffects effects game
+            applyEffects mods effects game
 
         ( result, newSeed ) =
             Random.step gen game.seed
@@ -411,9 +419,13 @@ attemptCompleteQuest quest game =
                 , questStats.reward
                 ]
 
+        mods : List Mod
+        mods =
+            getAllMods game
+
         gen : ApplyEffectsResultGenerator
         gen =
-            applyEffects effects game
+            applyEffects mods effects game
 
         ( result, newSeed ) =
             Random.step gen game.seed
@@ -445,12 +457,12 @@ priceToPurchaseResource amount ( resource, price ) game =
     Quantity.multiplyBy (toFloat amount) price
 
 
-applyEvent : List Effect.TaggedEffect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-applyEvent effects =
+applyEvent : List Mod -> List Effect.TaggedEffect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent mods effects =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
         (\( game, toasts ) ->
-            applyEffects effects game
+            applyEffects mods effects game
                 |> Random.andThen
                     (\res ->
                         case res of
@@ -486,8 +498,8 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Effect.TaggedEffect -> Game -> ApplyEffectsResultGenerator
-applyEffects effects game =
+applyEffects : List Mod -> List Effect.TaggedEffect -> Game -> ApplyEffectsResultGenerator
+applyEffects mods effects game =
     case effects of
         [] ->
             Random.constant (Ok { game = game, toasts = [] })
@@ -495,7 +507,7 @@ applyEffects effects game =
         effect :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
-                    Mod.applyModsToEffect (getAllMods game) effect
+                    Mod.applyModsToEffect mods effect
             in
             applyEffect moddedEffect game
                 |> Random.andThen
@@ -518,7 +530,7 @@ applyEffects effects game =
                                     additionalEffects =
                                         applyEffectVal.additionalEffects
                                 in
-                                applyEffects (rest ++ additionalEffectsFromMod ++ additionalEffects) g
+                                applyEffects mods (rest ++ additionalEffectsFromMod ++ additionalEffects) g
                                     |> Random.andThen
                                         (\res2 ->
                                             case res2 of

@@ -119,7 +119,7 @@ testEffects : String -> { initialGame : Game, effects : List Effect.TaggedEffect
 testEffects name { initialGame, effects, check } =
     Test.Random.check
         name
-        (Game.applyEffects effects initialGame)
+        (Game.applyEffects (Game.getAllMods initialGame) effects initialGame)
         check
 
 
@@ -136,7 +136,7 @@ testEffectsDistribution name { initialGame, effects, distribution } =
         { runs = 100
         , distribution = distribution
         }
-        (Fuzz.fromGenerator (Game.applyEffects effects initialGame))
+        (Fuzz.fromGenerator (Game.applyEffects (Game.getAllMods initialGame) effects initialGame))
         name
         (\_ -> Expect.pass)
 
