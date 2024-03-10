@@ -60,8 +60,6 @@ prodFlags =
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
-
-    -- , showDebugPanel = False
     , showDebugPanel = True -- Setting to True for now so play testers can enjoy
     , defaultMode = Skilling
     , defaultTabSkilling = Tab.Chores

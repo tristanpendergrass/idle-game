@@ -87,7 +87,7 @@ render timeToFastForward timePassed timePassesData =
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
-        , span [] [ text timeStr ]
+        , span [ classList [ ( "hidden", not Config.flags.showTimePasses ) ] ] [ text timeStr ]
         , ul [ class "t-column font-semibold" ]
             (List.map renderTimePassesDiscovery timePassesData.discoveries)
         , ul [ class "t-column font-semibold" ]

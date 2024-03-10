@@ -260,14 +260,14 @@ sleepTime =
     1
 
 
-fastForwardTime : Int
-fastForwardTime =
-    1000 * 60 * 10
-
-
 getFastForwardPoint : Posix -> Posix
 getFastForwardPoint =
-    Time.Extra.add Time.Extra.Millisecond fastForwardTime Time.utc
+    let
+        amountOfTimeToFastForward : Duration
+        amountOfTimeToFastForward =
+            Duration.hours 1
+    in
+    Time.Extra.add Time.Extra.Millisecond (floor (Duration.inMilliseconds amountOfTimeToFastForward)) Time.utc
 
 
 {-| A standard tick for using to progress the game in an animation frame.
@@ -1410,27 +1410,7 @@ view model =
                 nothing
 
             FastForward { previousIntervalTimer } ->
-                let
-                    speed : IdleGame.Views.FastForward.Speed
-                    speed =
-                        case previousIntervalTimer of
-                            NotStarted ->
-                                IdleGame.Views.FastForward.SpeedCalculating
-
-                            HaveStart _ ->
-                                IdleGame.Views.FastForward.SpeedCalculating
-
-                            HaveStartAndEnd start end ->
-                                let
-                                    diff =
-                                        Time.posixToMillis end - Time.posixToMillis start
-
-                                    millisPerMilli =
-                                        toFloat fastForwardTime / (toFloat diff - sleepTime)
-                                in
-                                IdleGame.Views.FastForward.Speed millisPerMilli
-                in
-                IdleGame.Views.FastForward.render speed
+                IdleGame.Views.FastForward.render
 
             Playing snapshot ->
                 let
