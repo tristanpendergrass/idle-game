@@ -4,7 +4,7 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Location as Location
@@ -127,7 +127,7 @@ type alias Stats =
     , image : CardImage
     , unlockRequirements : Maybe ( Skill, Int )
     , duration : Duration
-    , effects : List Effect.TaggedEffect
+    , effects : List Effect
     , mastery : Maybe Mastery
     , teachesSpell : Maybe Spell -- Does this activity represent training a specific spell
     , showDuration : Bool
@@ -170,7 +170,7 @@ allStats =
     }
 
 
-activityEffects : { belongsTo : BelongsTo, activity : Activity, effects : List Effect.TaggedEffect } -> List Effect.TaggedEffect
+activityEffects : { belongsTo : BelongsTo, activity : Activity, effects : List Effect } -> List Effect
 activityEffects { belongsTo, activity, effects } =
     case belongsTo of
         BelongsToSkill skill ->
@@ -190,7 +190,7 @@ choreEffects :
     , coin : Coin
     , maybeResource : Maybe { resource : Resource, amount : Int, probability : Percent }
     }
-    -> List Effect.TaggedEffect
+    -> List Effect
 choreEffects { activity, xp, coin, maybeResource } =
     activityEffects
         { belongsTo = BelongsToSkill Chores
@@ -949,7 +949,7 @@ exploreSecretGardenStats =
     }
 
 
-monsterEffects : { location : Location, activity : Activity, rewards : List Effect.TaggedEffect, power : Int } -> List Effect.TaggedEffect
+monsterEffects : { location : Location, activity : Activity, rewards : List Effect, power : Int } -> List Effect
 monsterEffects { location, activity, rewards, power } =
     activityEffects
         { belongsTo = BelongsToLocation location
@@ -1037,11 +1037,11 @@ fightWhisperingWind =
 isCombatActivity : Activity -> Bool
 isCombatActivity activity =
     let
-        effects : List Effect.TaggedEffect
+        effects : List Effect
         effects =
             (getStats activity).effects
 
-        effectIsCombat : Effect.TaggedEffect -> Bool
+        effectIsCombat : Effect -> Bool
         effectIsCombat effect =
             case effect.effect of
                 Effect.ResolveCombat _ ->

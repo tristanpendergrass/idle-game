@@ -6,7 +6,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -29,14 +29,14 @@ type RenderType
     | DetailView
 
 
-render : { game : Game, mods : List Mod, effect : Effect.TaggedEffect, renderType : RenderType } -> Html FrontendMsg
+render : { game : Game, mods : List Mod, effect : Effect, renderType : RenderType } -> Html FrontendMsg
 render { game, mods, effect, renderType } =
     Mod.applyModsToEffect mods effect
         |> Tuple.first
         |> renderModdedEffect renderType game
 
 
-renderModdedEffect : RenderType -> Game -> Effect.TaggedEffect -> Html msg
+renderModdedEffect : RenderType -> Game -> Effect -> Html msg
 renderModdedEffect renderType game effect =
     case Effect.getEffect effect of
         Effect.GainCoin coin ->
@@ -250,7 +250,7 @@ renderMonsterPower strength =
 
 renderCombat :
     { renderType : RenderType
-    , successEffects : List Effect.TaggedEffect
+    , successEffects : List Effect
     , combat : Combat
     , game : Game
     }

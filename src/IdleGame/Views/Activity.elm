@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -108,7 +108,7 @@ getTimerForActivity activity game =
     either maybeTimerSkilling maybeTimerAdventuring
 
 
-notMasteryXpEffect : Effect.TaggedEffect -> Bool
+notMasteryXpEffect : Effect -> Bool
 notMasteryXpEffect taggedEffect =
     case taggedEffect.effect of
         Effect.GainMxp _ ->
@@ -129,7 +129,7 @@ renderActivityCard activity game screenWidth =
         stats =
             Activity.getStats activity
 
-        effects : List Effect.TaggedEffect
+        effects : List Effect
         effects =
             stats.effects
 
@@ -137,7 +137,7 @@ renderActivityCard activity game screenWidth =
         mods =
             Game.getAllMods game
 
-        orderedAndFilteredEffects : List Effect.TaggedEffect
+        orderedAndFilteredEffects : List Effect
         orderedAndFilteredEffects =
             List.sortWith Effect.order effects
                 |> List.filter notMasteryXpEffect

@@ -5,7 +5,7 @@ import Fuzz exposing (frequency)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Timer as Timer exposing (Timer)
@@ -190,7 +190,7 @@ getLabel kind =
 
 type alias ExploreResult =
     { state : State
-    , effects : List Effect.TaggedEffect
+    , effects : List Effect
     , toasts : List Toast
     }
 
@@ -221,11 +221,11 @@ explorationGenerator location state =
 gatherResource : Resource -> Percent -> ExploreResult -> ExploreResult
 gatherResource resource chanceToGather result =
     let
-        gainResourceEffect : Effect.TaggedEffect
+        gainResourceEffect : Effect
         gainResourceEffect =
             Effect.gainResource 1 resource
 
-        variableGainResourceEffect : Effect.TaggedEffect
+        variableGainResourceEffect : Effect
         variableGainResourceEffect =
             Effect.gainWithProbability chanceToGather [ gainResourceEffect ]
 

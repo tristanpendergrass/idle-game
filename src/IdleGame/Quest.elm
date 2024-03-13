@@ -3,7 +3,7 @@ module IdleGame.Quest exposing (..)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Monster as Monster
@@ -18,13 +18,13 @@ import IdleGame.Xp as Xp exposing (Xp)
 
 
 type Criteria
-    = CanApplyEffect Effect.TaggedEffect
+    = CanApplyEffect Effect
 
 
 type alias Stats =
     { title : String
     , criteria : List Criteria
-    , reward : List Effect.TaggedEffect
+    , reward : List Effect
     , image : CardImage
     }
 
@@ -51,14 +51,14 @@ allStats =
     }
 
 
-getCompletionEffects : Quest -> List Effect.TaggedEffect
+getCompletionEffects : Quest -> List Effect
 getCompletionEffects quest =
     let
         questStats : Stats
         questStats =
             getStats quest
 
-        criteriaEffects : List Effect.TaggedEffect
+        criteriaEffects : List Effect
         criteriaEffects =
             questStats.criteria
                 |> List.map

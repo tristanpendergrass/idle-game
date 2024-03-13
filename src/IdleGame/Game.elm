@@ -6,7 +6,7 @@ import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -270,7 +270,7 @@ getModdedDuration game kind =
         |> applyIntervalMods mods
 
 
-combatReward : List Effect.TaggedEffect
+combatReward : List Effect
 combatReward =
     [ Effect.gainCoin (Coin.int 25) ]
 
@@ -297,7 +297,7 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect.TaggedEffect)
+                        newEffects : List (List Effect)
                         newEffects =
                             List.repeat completions stats.effects
                     in
@@ -324,7 +324,7 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect.TaggedEffect)
+                        newEffects : List (List Effect)
                         newEffects =
                             List.repeat completions stats.effects
                     in
@@ -349,7 +349,7 @@ tick delta game =
     ( { newGame | seed = newSeed }, notifications )
 
 
-getPurchaseEffects : Int -> Resource -> List Effect.TaggedEffect
+getPurchaseEffects : Int -> Resource -> List Effect
 getPurchaseEffects amount resource =
     case (Resource.getStats resource).purchasing of
         Resource.Purchasable price ->
@@ -368,7 +368,7 @@ getPurchaseEffects amount resource =
 attemptPurchaseResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
 attemptPurchaseResource amount resource game =
     let
-        effects : List Effect.TaggedEffect
+        effects : List Effect
         effects =
             getPurchaseEffects amount resource
 
@@ -408,11 +408,11 @@ attemptCompleteQuest quest game =
         questState =
             getByQuest quest game.quests
 
-        effectsToComplete : List Effect.TaggedEffect
+        effectsToComplete : List Effect
         effectsToComplete =
             Quest.getCompletionEffects quest
 
-        effects : List Effect.TaggedEffect
+        effects : List Effect
         effects =
             List.concat
                 [ effectsToComplete
@@ -457,7 +457,7 @@ priceToPurchaseResource amount ( resource, price ) game =
     Quantity.multiplyBy (toFloat amount) price
 
 
-applyEvent : List Mod -> List Effect.TaggedEffect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent : List Mod -> List Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 applyEvent mods effects =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
@@ -498,7 +498,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Mod -> List Effect.TaggedEffect -> Game -> ApplyEffectsResultGenerator
+applyEffects : List Mod -> List Effect -> Game -> ApplyEffectsResultGenerator
 applyEffects mods effects game =
     case effects of
         [] ->
@@ -526,7 +526,7 @@ applyEffects mods effects game =
                                     toasts =
                                         applyEffectVal.toasts
 
-                                    additionalEffects : List Effect.TaggedEffect
+                                    additionalEffects : List Effect
                                     additionalEffects =
                                         applyEffectVal.additionalEffects
                                 in
@@ -588,14 +588,14 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List Effect.TaggedEffect }
+    { game : Game, toasts : List Toast, additionalEffects : List Effect }
 
 
 type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-applyEffect : Effect.TaggedEffect -> Game -> ApplyEffectResultGenerator
+applyEffect : Effect -> Game -> ApplyEffectResultGenerator
 applyEffect effect game =
     case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->

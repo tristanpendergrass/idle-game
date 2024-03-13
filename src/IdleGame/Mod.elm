@@ -1,7 +1,7 @@
 module IdleGame.Mod exposing (..)
 
 import IdleGame.Combat as Combat exposing (Combat)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
@@ -25,17 +25,17 @@ type alias Mod =
 
 
 type alias Transformer =
-    Int -> Effect.TaggedEffect -> TransformerResult
+    Int -> Effect -> TransformerResult
 
 
 type TransformerResult
     = NoChange
-    | ChangeEffect Effect.TaggedEffect
-    | ChangeAndAddEffects Effect.TaggedEffect (List Effect.TaggedEffect)
+    | ChangeEffect Effect
+    | ChangeAndAddEffects Effect (List Effect)
 
 
 type alias SimpleTransformer =
-    Effect -> Effect
+    EffectType -> EffectType
 
 
 scopeTransformerToTags : List Effect.Tag -> Transformer -> Transformer
@@ -54,14 +54,14 @@ includeVariableEffects mod =
         transformer =
             mod.transformer
 
-        newTransformer : Int -> Effect.TaggedEffect -> TransformerResult
+        newTransformer : Int -> Effect -> TransformerResult
         newTransformer multiplier taggedEffect =
             case taggedEffect.effect of
                 Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
                     let
                         ( successEffectsDidChange, newSuccessEffects ) =
                             let
-                                newEffects : List Effect.TaggedEffect
+                                newEffects : List Effect
                                 newEffects =
                                     successEffects
                                         |> List.concatMap
@@ -77,7 +77,7 @@ includeVariableEffects mod =
 
                         ( failureEffectsDidChange, newFailureEffects ) =
                             let
-                                newEffects : List Effect.TaggedEffect
+                                newEffects : List Effect
                                 newEffects =
                                     failureEffects
                                         |> List.concatMap
@@ -113,7 +113,7 @@ includeVariableEffects mod =
                     let
                         ( successEffectsDidChange, newSuccessEffects ) =
                             let
-                                newEffects : List Effect.TaggedEffect
+                                newEffects : List Effect
                                 newEffects =
                                     successEffects
                                         |> List.concatMap
@@ -129,7 +129,7 @@ includeVariableEffects mod =
 
                         ( failureEffectsDidChange, newFailureEffects ) =
                             let
-                                newEffects : List Effect.TaggedEffect
+                                newEffects : List Effect
                                 newEffects =
                                     successEffects
                                         |> List.concatMap
@@ -193,7 +193,7 @@ useSimpleTransformerHelp depth transformFn repetitions taggedEffect =
         ChangeEffect newEffect
 
 
-applyModToEffect : Mod -> ( Effect.TaggedEffect, List Effect.TaggedEffect ) -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
+applyModToEffect : Mod -> ( Effect, List Effect ) -> ( Effect, List Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if Effect.hasTags mod.tags effectAccum then
         case mod.transformer mod.repetitions effectAccum of
@@ -210,7 +210,7 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : List Mod -> Effect.TaggedEffect -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
+applyModsToEffect : List Mod -> Effect -> ( Effect, List Effect )
 applyModsToEffect =
     applyModsToEffectHelp 0
 
@@ -220,7 +220,7 @@ tupleToList ( x, xs ) =
     x :: xs
 
 
-applyModsToEffectHelp : Int -> List Mod -> Effect.TaggedEffect -> ( Effect.TaggedEffect, List Effect.TaggedEffect )
+applyModsToEffectHelp : Int -> List Mod -> Effect -> ( Effect, List Effect )
 applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
@@ -429,7 +429,7 @@ powerTransformer buff repetitions taggedEffect =
                 newCombat =
                     Combat.addPlayerPower (buff * repetitions) combat
 
-                newEffect : Effect
+                newEffect : EffectType
                 newEffect =
                     Effect.ResolveCombat { combat = newCombat, successEffects = successEffects, failureEffects = failureEffects }
             in
@@ -441,7 +441,7 @@ powerTransformer buff repetitions taggedEffect =
             NoChange
 
 
-addEffectsTransformer : List Effect.TaggedEffect -> Transformer
+addEffectsTransformer : List Effect -> Transformer
 addEffectsTransformer effects repetitions taggedEffect =
     ChangeAndAddEffects taggedEffect (List.concat (List.repeat repetitions effects))
 
@@ -553,7 +553,7 @@ powerBuff buff =
     }
 
 
-addEffects : List Effect.TaggedEffect -> Mod
+addEffects : List Effect -> Mod
 addEffects effects =
     { tags = []
     , label = NullLabel

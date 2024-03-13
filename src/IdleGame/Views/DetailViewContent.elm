@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -115,7 +115,7 @@ renderContent obj extraBottomPadding game =
         mxp =
             getByActivity activity game.mxp
 
-        effects : List Effect.TaggedEffect
+        effects : List Effect
         effects =
             (Activity.getStats activity).effects
 
@@ -123,7 +123,7 @@ renderContent obj extraBottomPadding game =
         mods =
             Game.getAllMods game
 
-        orderedEffects : List Effect.TaggedEffect
+        orderedEffects : List Effect
         orderedEffects =
             List.sortWith Effect.order effects
 

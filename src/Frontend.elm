@@ -13,7 +13,7 @@ import Html.Extra exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)

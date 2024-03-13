@@ -6,7 +6,7 @@ import Fuzz exposing (Fuzzer)
 import Html.Attributes exposing (download)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter
-import IdleGame.Effect as Effect
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
@@ -115,7 +115,7 @@ defaultGame =
     Game.createProd (Random.initialSeed 0)
 
 
-testEffects : String -> { initialGame : Game, effects : List Effect.TaggedEffect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects : String -> { initialGame : Game, effects : List Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
 testEffects name { initialGame, effects, check } =
     Test.Random.check
         name
@@ -127,7 +127,7 @@ testEffectsDistribution :
     String
     ->
         { initialGame : Game
-        , effects : List Effect.TaggedEffect
+        , effects : List Effect
         , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
         }
     -> Test
@@ -262,7 +262,7 @@ grantScrolls amount game =
 spellSelectorTest : Test
 spellSelectorTest =
     let
-        effect : Effect.TaggedEffect
+        effect : Effect
         effect =
             Effect.gainXp (Xp.int 10) Chores
                 |> Effect.withTags [ Effect.ActivityTag CleanBigBubba ]

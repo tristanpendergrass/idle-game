@@ -20,8 +20,8 @@ type Tag
     | LocationTag Location
 
 
-type alias TaggedEffect =
-    { effect : Effect
+type alias Effect =
+    { effect : EffectType
     , tags : List Tag
     }
 
@@ -53,8 +53,8 @@ type alias SpendResourceParams =
     { base : Int, resource : Resource, preservationChance : Percent }
 
 
-type Effect
-    = VariableSuccess { successProbability : Percent, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
+type EffectType
+    = VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
     | GainScroll { base : Int, spell : Spell }
     | SpendScroll { base : Int, spell : Spell }
     | GainResource GainResourceParams
@@ -62,70 +62,70 @@ type Effect
     | GainXp GainXpParams
     | GainMxp GainMxpParams
     | GainCoin GainCoinParams
-    | ResolveCombat { combat : Combat, successEffects : List TaggedEffect, failureEffects : List TaggedEffect }
+    | ResolveCombat { combat : Combat, successEffects : List Effect, failureEffects : List Effect }
     | Explore { location : Location }
 
 
-getEffect : TaggedEffect -> Effect
+getEffect : Effect -> EffectType
 getEffect { effect } =
     effect
 
 
-setEffect : Effect -> TaggedEffect -> TaggedEffect
+setEffect : EffectType -> Effect -> Effect
 setEffect newEffect taggedEffect =
     { taggedEffect | effect = newEffect }
 
 
-gainXp : Xp -> Skill -> TaggedEffect
+gainXp : Xp -> Skill -> Effect
 gainXp quantity skill =
     { effect = GainXp { base = quantity, percentIncrease = Percent.zero, skill = skill }
     , tags = [ XpTag, SkillTag skill ]
     }
 
 
-gainCoin : Coin -> TaggedEffect
+gainCoin : Coin -> Effect
 gainCoin quantity =
     { effect = GainCoin { base = quantity, percentIncrease = Percent.zero }
     , tags = []
     }
 
 
-gainMxp : Activity -> TaggedEffect
+gainMxp : Activity -> Effect
 gainMxp activity =
     { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
     , tags = []
     }
 
 
-gainScroll : Int -> Spell -> TaggedEffect
+gainScroll : Int -> Spell -> Effect
 gainScroll count spell =
     { effect = GainScroll { base = count, spell = spell }
     , tags = []
     }
 
 
-spendScroll : Int -> Spell -> TaggedEffect
+spendScroll : Int -> Spell -> Effect
 spendScroll amount spell =
     { effect = SpendScroll { base = amount, spell = spell }
     , tags = []
     }
 
 
-gainResource : Int -> Resource -> TaggedEffect
+gainResource : Int -> Resource -> Effect
 gainResource quantity kind =
     { effect = GainResource { base = quantity, doublingChance = Percent.zero, resource = kind }
     , tags = []
     }
 
 
-spendResource : Int -> Resource -> TaggedEffect
+spendResource : Int -> Resource -> Effect
 spendResource quantity kind =
     { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind }
     , tags = []
     }
 
 
-withPreservationChance : Percent -> TaggedEffect -> TaggedEffect
+withPreservationChance : Percent -> Effect -> Effect
 withPreservationChance preservationChance taggedEffect =
     case taggedEffect.effect of
         SpendResource spendResourceParams ->
@@ -137,35 +137,35 @@ withPreservationChance preservationChance taggedEffect =
             taggedEffect
 
 
-gainResourceWithDoubling : Int -> Resource -> Percent -> TaggedEffect
+gainResourceWithDoubling : Int -> Resource -> Percent -> Effect
 gainResourceWithDoubling quantity kind doubling =
     { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
     , tags = []
     }
 
 
-gainWithProbability : Percent -> List TaggedEffect -> TaggedEffect
+gainWithProbability : Percent -> List Effect -> Effect
 gainWithProbability probability successEffects =
     { effect = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }
     , tags = []
     }
 
 
-resolveCombat : Combat -> List TaggedEffect -> TaggedEffect
+resolveCombat : Combat -> List Effect -> Effect
 resolveCombat combat successEffects =
     { effect = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }
     , tags = []
     }
 
 
-explore : Location -> TaggedEffect
+explore : Location -> Effect
 explore location =
     { effect = Explore { location = location }
     , tags = []
     }
 
 
-withTags : List Tag -> TaggedEffect -> TaggedEffect
+withTags : List Tag -> Effect -> Effect
 withTags newTags taggedEffect =
     { taggedEffect
       -- TODO: dedupe tags?
@@ -173,7 +173,7 @@ withTags newTags taggedEffect =
     }
 
 
-order : TaggedEffect -> TaggedEffect -> Order
+order : Effect -> Effect -> Order
 order effect1 effect2 =
     case ( getEffect effect1, getEffect effect2 ) of
         -- Coin comes at front
@@ -207,7 +207,7 @@ order effect1 effect2 =
             EQ
 
 
-hasTags : List Tag -> TaggedEffect -> Bool
+hasTags : List Tag -> Effect -> Bool
 hasTags requiredTags { tags } =
     List.all
         (\tag ->

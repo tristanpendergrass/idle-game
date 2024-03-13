@@ -1,6 +1,6 @@
 module IdleGame.Spell exposing (..)
 
-import IdleGame.Effect as Effect exposing (Effect, TaggedEffect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod
 import IdleGame.Views.Icon as Icon exposing (Icon)

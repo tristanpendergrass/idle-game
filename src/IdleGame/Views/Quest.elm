@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -100,7 +100,7 @@ renderQuestCriteria game criteria =
                 ]
 
 
-renderQuestReward : Game -> Effect.TaggedEffect -> Html FrontendMsg
+renderQuestReward : Game -> Effect -> Html FrontendMsg
 renderQuestReward game reward =
     let
         mods : List Mod
