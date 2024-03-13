@@ -275,13 +275,17 @@ combatReward =
     [ Effect.gainCoin (Coin.int 25) ]
 
 
+type alias Event =
+    { effects : List Effect, count : Int }
+
+
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActivitySkilling, effectsSkilling ) =
+        ( newActivitySkilling, eventSkilling ) =
             case game.activitySkilling of
                 Nothing ->
-                    ( game.activitySkilling, [] )
+                    ( game.activitySkilling, Nothing )
 
                 Just ( activityKind, timer ) ->
                     let
@@ -297,18 +301,22 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect)
-                        newEffects =
-                            List.repeat completions stats.effects
+                        maybeEvent : Maybe Event
+                        maybeEvent =
+                            if completions >= 1 then
+                                Just { effects = stats.effects, count = completions }
+
+                            else
+                                Nothing
                     in
                     ( Just ( activityKind, newTimer )
-                    , newEffects
+                    , maybeEvent
                     )
 
-        ( newActivityAdventuring, effectsAdventuring ) =
+        ( newActivityAdventuring, eventAdventuring ) =
             case game.activityAdventuring of
                 Nothing ->
-                    ( game.activityAdventuring, [] )
+                    ( game.activityAdventuring, Nothing )
 
                 Just ( activityKind, timer ) ->
                     let
@@ -324,12 +332,16 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        newEffects : List (List Effect)
-                        newEffects =
-                            List.repeat completions stats.effects
+                        maybeEvent : Maybe Event
+                        maybeEvent =
+                            if completions >= 1 then
+                                Just { effects = stats.effects, count = completions }
+
+                            else
+                                Nothing
                     in
                     ( Just ( activityKind, newTimer )
-                    , newEffects
+                    , maybeEvent
                     )
 
         mods : List Mod
@@ -341,7 +353,7 @@ tick delta game =
             game
                 |> setActivitySkilling newActivitySkilling
                 |> setActivityAdventuring newActivityAdventuring
-                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (effectsSkilling ++ effectsAdventuring))
+                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ eventSkilling, eventAdventuring ]))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -378,7 +390,7 @@ attemptPurchaseResource amount resource game =
 
         gen : ApplyEffectsResultGenerator
         gen =
-            applyEffects mods effects game
+            applyEffects mods effects 1 game
 
         ( result, newSeed ) =
             Random.step gen game.seed
@@ -425,7 +437,7 @@ attemptCompleteQuest quest game =
 
         gen : ApplyEffectsResultGenerator
         gen =
-            applyEffects mods effects game
+            applyEffects mods effects 1 game
 
         ( result, newSeed ) =
             Random.step gen game.seed
@@ -457,12 +469,12 @@ priceToPurchaseResource amount ( resource, price ) game =
     Quantity.multiplyBy (toFloat amount) price
 
 
-applyEvent : List Mod -> List Effect -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
-applyEvent mods effects =
+applyEvent : List Mod -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent mods { effects, count } =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
         (\( game, toasts ) ->
-            applyEffects mods effects game
+            applyEffects mods effects count game
                 |> Random.andThen
                     (\res ->
                         case res of
@@ -498,8 +510,8 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Mod -> List Effect -> Game -> ApplyEffectsResultGenerator
-applyEffects mods effects game =
+applyEffects : List Mod -> List Effect -> Int -> Game -> ApplyEffectsResultGenerator
+applyEffects mods effects count game =
     case effects of
         [] ->
             Random.constant (Ok { game = game, toasts = [] })
@@ -509,7 +521,7 @@ applyEffects mods effects game =
                 ( moddedEffect, additionalEffectsFromMod ) =
                     Mod.applyModsToEffect mods effect
             in
-            applyEffect moddedEffect game
+            applyEffect moddedEffect count game
                 |> Random.andThen
                     (\applyEffectResult ->
                         case applyEffectResult of
@@ -530,7 +542,7 @@ applyEffects mods effects game =
                                     additionalEffects =
                                         applyEffectVal.additionalEffects
                                 in
-                                applyEffects mods (rest ++ additionalEffectsFromMod ++ additionalEffects) g
+                                applyEffects mods (rest ++ additionalEffectsFromMod ++ additionalEffects) count g
                                     |> Random.andThen
                                         (\res2 ->
                                             case res2 of
@@ -595,8 +607,8 @@ type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-applyEffect : Effect -> Game -> ApplyEffectResultGenerator
-applyEffect effect game =
+applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
+applyEffect effect count game =
     case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             probabilityGenerator successProbability
@@ -632,28 +644,35 @@ applyEffect effect game =
             let
                 product : Coin
                 product =
-                    Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base
+                    base
+                        |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
+                        |> Quantity.multiplyBy (toFloat count)
             in
             addCoin product game
                 |> Random.constant
 
         Effect.GainScroll { base, spell } ->
-            adjustScroll spell base game
+            adjustScroll spell (base * count) game
                 |> Random.constant
 
         Effect.SpendScroll { base, spell } ->
-            adjustScroll spell (-1 * base) game
+            adjustScroll spell (-1 * base * count) game
                 |> Random.constant
 
         Effect.GainResource { base, resource, doublingChance } ->
             probabilityGenerator doublingChance
                 |> Random.map
                     (\doubled ->
-                        if doubled then
-                            adjustResource resource (base * 2) game
+                        let
+                            result : Int
+                            result =
+                                if doubled then
+                                    2 * base * count
 
-                        else
-                            adjustResource resource base game
+                                else
+                                    base * count
+                        in
+                        adjustResource resource result game
                     )
 
         Effect.SpendResource { base, resource, preservationChance } ->
@@ -664,11 +683,18 @@ applyEffect effect game =
                             adjustResource resource 0 game
 
                         else
-                            adjustResource resource (-1 * base) game
+                            adjustResource resource (-1 * base * count) game
                     )
 
         Effect.GainXp { base, percentIncrease, skill } ->
-            { game = addXp skill (Quantity.multiplyBy (Percent.toMultiplier percentIncrease) base) game
+            let
+                xp : Xp
+                xp =
+                    base
+                        |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
+                        |> Quantity.multiplyBy (toFloat count)
+            in
+            { game = addXp skill xp game
             , toasts = []
             , additionalEffects = []
             }
@@ -683,7 +709,9 @@ applyEffect effect game =
 
                 mxp : Xp
                 mxp =
-                    Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) base
+                    base
+                        |> Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease)
+                        |> Quantity.multiplyBy (toFloat count)
             in
             game
                 |> addMxp params.activity mxp
@@ -696,7 +724,7 @@ applyEffect effect game =
                 locationState =
                     getByLocation location game.locations
             in
-            Location.explorationGenerator location locationState
+            Location.explorationGenerator location locationState count
                 |> Random.map
                     (\{ state, effects, toasts } ->
                         Ok

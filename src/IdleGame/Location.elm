@@ -201,14 +201,14 @@ type Discoverable
     | DiscoverResource Resource
 
 
-explorationGenerator : Location -> State -> Random.Generator ExploreResult
-explorationGenerator location state =
+explorationGenerator : Location -> State -> Int -> Random.Generator ExploreResult
+explorationGenerator location state count =
     let
         gatherResult : ExploreResult
         gatherResult =
             getGatherResult location state
     in
-    discoveryGenerator location gatherResult.state
+    discoveryGenerator location gatherResult.state count
         |> Random.map
             (\discoveryResult ->
                 { state = discoveryResult.state
@@ -239,37 +239,6 @@ gatherResource resource chanceToGather result =
     }
 
 
-
--- didGatherGenerator : Resource -> Location -> State -> Random.Generator (Maybe Resource)
--- didGatherGenerator resource location state =
---     let
---         isFound : Bool
---         isFound =
---             getByResource resource state.foundResources
---         locationStats : Stats
---         locationStats =
---             getStats location
---         maybeFrequency : Maybe ResourceFrequency
---         maybeFrequency =
---             getByResource resource locationStats.resources
---     in
---     if isFound then
---         case maybeFrequency of
---             Nothing ->
---                 Random.constant Nothing
---             Just resourceFrequency ->
---                 frequencyGenerator resourceFrequency
---                     |> Random.map
---                         (\didGather ->
---                             if didGather then
---                                 Just resource
---                             else
---                                 Nothing
---                         )
---     else
---         Random.constant Nothing
-
-
 getGatherResult : Location -> State -> ExploreResult
 getGatherResult location state =
     -- TODO: rename from generator
@@ -291,11 +260,11 @@ getGatherResult location state =
             initialResult
 
 
-discoveryGenerator : Location -> State -> Random.Generator ExploreResult
-discoveryGenerator location state =
+discoveryGenerator : Location -> State -> Int -> Random.Generator ExploreResult
+discoveryGenerator location state count =
     let
         ( newDiscoveryTimer, discoveryCount ) =
-            Timer.increment (getInterval location) exploreActivityDuration state.discoveryTimer
+            Timer.increment (getInterval location) (Quantity.multiplyBy (toFloat count) exploreActivityDuration) state.discoveryTimer
     in
     explorationGeneratorHelper discoveryCount location { state = { state | discoveryTimer = newDiscoveryTimer }, effects = [], toasts = [] }
 
