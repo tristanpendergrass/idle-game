@@ -115,11 +115,11 @@ defaultGame =
     Game.createProd (Random.initialSeed 0)
 
 
-testEffects : String -> { initialGame : Game, effects : List Effect, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
-testEffects name { initialGame, effects, check } =
+testEffects : String -> { initialGame : Game, effects : List Effect, count : Int, check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation } -> Test
+testEffects name { initialGame, effects, count, check } =
     Test.Random.check
         name
-        (Game.applyEffects (Game.getAllMods initialGame) effects initialGame)
+        (Game.applyEffects (Game.getAllMods initialGame) effects count initialGame)
         check
 
 
@@ -128,15 +128,16 @@ testEffectsDistribution :
     ->
         { initialGame : Game
         , effects : List Effect
+        , count : Int
         , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
         }
     -> Test
-testEffectsDistribution name { initialGame, effects, distribution } =
+testEffectsDistribution name { initialGame, effects, count, distribution } =
     Test.fuzzWith
         { runs = 100
         , distribution = distribution
         }
-        (Fuzz.fromGenerator (Game.applyEffects (Game.getAllMods initialGame) effects initialGame))
+        (Fuzz.fromGenerator (Game.applyEffects (Game.getAllMods initialGame) effects count initialGame))
         name
         (\_ -> Expect.pass)
 
@@ -149,7 +150,14 @@ applyEffectsTest =
             [ testEffects "can get a coin"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainCoin (Coin.int 5) ]
+                , count = 1
                 , check = expectOk (expectCoin (Coin.int 5))
+                }
+            , testEffects "can get a coin with count of 5"
+                { initialGame = defaultGame
+                , effects = [ Effect.gainCoin (Coin.int 5) ]
+                , count = 5
+                , check = expectOk (expectCoin (Coin.int 25))
                 }
             , testEffects "can add and remove coin"
                 { initialGame = defaultGame
@@ -157,11 +165,13 @@ applyEffectsTest =
                     [ Effect.gainCoin (Coin.int 5)
                     , Effect.gainCoin (Coin.int -4)
                     ]
+                , count = 1
                 , check = expectOk (expectCoin (Coin.int 1))
                 }
             , testEffects "cannot go below zero coin"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainCoin (Coin.int -5) ]
+                , count = 1
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffects "cannot go below zero coin and order matters"
@@ -171,6 +181,7 @@ applyEffectsTest =
                     , Effect.gainCoin (Coin.int -6)
                     , Effect.gainCoin (Coin.int 2)
                     ]
+                , count = 1
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
@@ -178,28 +189,46 @@ applyEffectsTest =
             [ testEffects "can get Xp for Chores"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainXp (Xp.int 5) Chores ]
+                , count = 1
                 , check = expectOk (expectXp (Xp.int 5) Chores)
                 }
             , testEffects "can get Xp for Hexes"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainXp (Xp.int 5) Hexes ]
+                , count = 1
                 , check = expectOk (expectXp (Xp.int 5) Hexes)
+                }
+            , testEffects "can get Xp for Chores with count of 5"
+                { initialGame = defaultGame
+                , effects = [ Effect.gainXp (Xp.int 5) Chores ]
+                , count = 5
+                , check = expectOk (expectXp (Xp.int 25) Chores)
                 }
             ]
         , describe "GainResource"
             [ testEffects "can get resources"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainResource 1 EmptyBottle ]
+                , count = 1
                 , check = expectOk (expectResource 1 EmptyBottle)
+                }
+            , testEffects
+                "can get resources with count of 5"
+                { initialGame = defaultGame
+                , effects = [ Effect.gainResource 1 EmptyBottle ]
+                , count = 5
+                , check = expectOk (expectResource 5 EmptyBottle)
                 }
             , testEffects "cannot go below 0 of a resource"
                 { initialGame = defaultGame
                 , effects = [ Effect.spendResource 1 EmptyBottle ]
+                , count = 1
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             , testEffectsDistribution "doubling chance of 50% works"
                 { initialGame = defaultGame
                 , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
+                , count = 1
                 , distribution =
                     Test.expectDistribution
                         [ ( Test.Distribution.atLeast 45
@@ -221,6 +250,31 @@ applyEffectsTest =
                           )
                         ]
                 }
+            , testEffectsDistribution "doubling chance of 50% works with count of 5"
+                { initialGame = defaultGame
+                , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
+                , count = 5
+                , distribution =
+                    Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 5 of resource"
+                          , hasOk (hasResource 5 EmptyBottle)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 10 of resource"
+                          , hasOk (hasResource 10 EmptyBottle)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 5 EmptyBottle
+                                    , hasResource 10 EmptyBottle
+                                    ]
+                                )
+                          )
+                        ]
+                }
             ]
         , describe "variable effects"
             [ testEffectsDistribution "can have a 50% chance to gain a resource"
@@ -229,6 +283,7 @@ applyEffectsTest =
                     [ Effect.gainWithProbability (Percent.float 0.5)
                         [ Effect.gainResource 1 EmptyBottle ]
                     ]
+                , count = 1
                 , distribution =
                     Test.expectDistribution
                         [ ( Test.Distribution.atLeast 45
@@ -275,6 +330,7 @@ spellSelectorTest =
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
                     |> grantScrolls 1
             , effects = [ effect ]
+            , count = 1
             , check = expectOk (expectXp (Xp.int 12) Chores)
             }
         , testEffects "Spell has no effect when no scrolls"
@@ -283,6 +339,7 @@ spellSelectorTest =
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
             , effects = [ effect ]
+            , count = 1
             , check = expectOk (expectXp (Xp.int 10) Chores)
             }
         , testEffects "Spell deducts a scroll"
@@ -292,6 +349,7 @@ spellSelectorTest =
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
                     |> grantScrolls 1000
             , effects = [ effect ]
+            , count = 1
             , check =
                 expectOk
                     (\game ->
@@ -305,6 +363,7 @@ spellSelectorTest =
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Nothing }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
             , effects = [ effect ]
+            , count = 1
             , check = expectOk (expectXp (Xp.int 10) Chores)
             }
         ]
