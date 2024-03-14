@@ -477,7 +477,6 @@ update msg model =
                             (FastForward
                                 { original = adjustedServerSnapshot
                                 , current = adjustedServerSnapshot
-                                , previousIntervalTimer = NotStarted
                                 , whenItStarted = now
                                 }
                             )
@@ -550,7 +549,7 @@ update msg model =
 
         HandleFastForward now ->
             case model.gameState of
-                FastForward { original, current, previousIntervalTimer, whenItStarted } ->
+                FastForward { original, current, whenItStarted } ->
                     let
                         nextInterval =
                             getFastForwardPoint (Snapshot.getTime current)
@@ -560,21 +559,10 @@ update msg model =
                         let
                             newSnap =
                                 Snapshot.tickUntil performantTick nextInterval current
-
-                            newPreviousIntervalTimer =
-                                case previousIntervalTimer of
-                                    NotStarted ->
-                                        HaveStart now
-
-                                    HaveStart start ->
-                                        HaveStartAndEnd start now
-
-                                    HaveStartAndEnd _ end ->
-                                        HaveStartAndEnd end now
                         in
                         ( model
                             |> setGameState
-                                (FastForward { original = original, current = newSnap, previousIntervalTimer = newPreviousIntervalTimer, whenItStarted = whenItStarted })
+                                (FastForward { original = original, current = newSnap, whenItStarted = whenItStarted })
                         , Task.perform HandleFastForward (Process.sleep sleepTime |> Task.andThen (\_ -> Time.now))
                         )
 
@@ -874,7 +862,7 @@ update msg model =
                     Playing snapshot ->
                         ( model
                             |> setIsVisible True
-                            |> setGameState (FastForward { original = snapshot, current = snapshot, previousIntervalTimer = NotStarted, whenItStarted = now })
+                            |> setGameState (FastForward { original = snapshot, current = snapshot, whenItStarted = now })
                         , Task.perform HandleFastForward Time.now
                         )
 
@@ -1051,7 +1039,7 @@ update msg model =
 
                         fastForwardState : FastForwardState
                         fastForwardState =
-                            { original = current, current = current, previousIntervalTimer = NotStarted, whenItStarted = Debug.log "3" now }
+                            { original = current, current = current, whenItStarted = now }
                     in
                     ( model
                         |> setGameState (FastForward fastForwardState)
@@ -1409,7 +1397,7 @@ view model =
             Initializing ->
                 nothing
 
-            FastForward { previousIntervalTimer } ->
+            FastForward _ ->
                 IdleGame.Views.FastForward.render
 
             Playing snapshot ->

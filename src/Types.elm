@@ -86,16 +86,9 @@ type Modal
     | SyllabusModal Skill
 
 
-type PreviousIntervalTimer
-    = NotStarted
-    | HaveStart Posix
-    | HaveStartAndEnd Posix Posix
-
-
 type alias FastForwardState =
     { original : Snapshot Game
     , current : Snapshot Game
-    , previousIntervalTimer : PreviousIntervalTimer
     , whenItStarted : Posix -- the time when fast forward began, to calculate how long it takes
     }
 
