@@ -75,7 +75,7 @@ tickUntil tick endTime snapshot =
 
         shouldTick : Bool
         shouldTick =
-            timeOfNextTick < Time.posixToMillis endTime
+            timeOfNextTick <= Time.posixToMillis endTime
     in
     if shouldTick then
         let

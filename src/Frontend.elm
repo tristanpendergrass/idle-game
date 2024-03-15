@@ -295,10 +295,10 @@ b) animations won't look right if the tick duration is longer than an animation 
 This tick also discards the notifications of Game.tick.
 
 -}
-performantTick : Snapshot.Tick Game
-performantTick =
-    Snapshot.createTick (Duration.minutes 1)
-        (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
+tickForDuration : Duration -> Snapshot.Tick Game
+tickForDuration duration =
+    Snapshot.createTick duration
+        (\d oldGame -> Game.tick d oldGame |> Tuple.first)
 
 
 setPreview : Mode -> Maybe Preview -> FrontendModel -> FrontendModel
@@ -551,14 +551,50 @@ update msg model =
             case model.gameState of
                 FastForward { original, current, whenItStarted } ->
                     let
+                        timeOfCurrent : Posix
+                        timeOfCurrent =
+                            Snapshot.getTime current
+
+                        timeLeft : Duration
+                        timeLeft =
+                            (Time.posixToMillis now - Time.posixToMillis timeOfCurrent)
+                                |> toFloat
+                                |> Duration.milliseconds
+
+                        isLongerThanDay : Bool
+                        isLongerThanDay =
+                            timeLeft
+                                |> Quantity.greaterThan (Duration.days 1)
+
+                        isLongerThanHour : Bool
+                        isLongerThanHour =
+                            timeLeft
+                                |> Quantity.greaterThan (Duration.hours 1)
+
+                        timeToAdd : Duration
+                        timeToAdd =
+                            if isLongerThanDay then
+                                Duration.days 1
+
+                            else if isLongerThanHour then
+                                Duration.hours 1
+
+                            else
+                                Duration.minutes 1
+
+                        nextInterval : Posix
                         nextInterval =
-                            getFastForwardPoint (Snapshot.getTime current)
+                            timeOfCurrent
+                                |> Time.Extra.add Time.Extra.Millisecond
+                                    (floor (Duration.inMilliseconds timeToAdd))
+                                    Time.utc
                     in
                     if Time.posixToMillis nextInterval < Time.posixToMillis now then
                         -- We want to only part of the work then suspend for a short period so the app doesn't freeze up
                         let
+                            newSnap : Snapshot Game
                             newSnap =
-                                Snapshot.tickUntil performantTick nextInterval current
+                                Snapshot.tickUntil (tickForDuration timeToAdd) nextInterval current
                         in
                         ( model
                             |> setGameState
@@ -570,14 +606,14 @@ update msg model =
                         -- run calculation to completion
                         let
                             newSnap =
-                                Snapshot.tickUntil performantTick now current
+                                Snapshot.tickUntil (tickForDuration (Duration.minutes 1)) now current
 
                             newModal =
                                 if Config.flags.debugTimePasses then
                                     Just IdleGame.Mocks.timePassesModal
 
                                 else
-                                    createTimePassesModal (Duration.milliseconds (toFloat (Time.posixToMillis (Debug.log "1" now) - Time.posixToMillis (Debug.log "2" whenItStarted)))) original newSnap
+                                    createTimePassesModal (Duration.milliseconds (toFloat (Time.posixToMillis now - Time.posixToMillis whenItStarted))) original newSnap
                         in
                         ( model
                             |> setGameState
