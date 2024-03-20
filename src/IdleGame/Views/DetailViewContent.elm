@@ -131,7 +131,7 @@ renderContent obj extraBottomPadding game =
         playButtonState =
             case obj of
                 DetailViewActivity _ ->
-                    Pause
+                    Stop
 
                 DetailViewPreview _ ->
                     Play
@@ -192,8 +192,8 @@ renderContent obj extraBottomPadding game =
             _ ->
                 div [ class "invisible" ] [ activityProgress Timer.create ]
 
-        -- Play/pause button
-        , playPauseButton playButtonState activity
+        -- Play/stop button
+        , playStopButton playButtonState activity
 
         -- Duration
         , div [ class "relative" ]
@@ -390,11 +390,11 @@ activityProgress timer =
 
 type PlayButtonState
     = Play
-    | Pause
+    | Stop
 
 
-playPauseButton : PlayButtonState -> Activity -> Html FrontendMsg
-playPauseButton state kind =
+playStopButton : PlayButtonState -> Activity -> Html FrontendMsg
+playStopButton state kind =
     let
         icon : Icon
         icon =
@@ -402,8 +402,8 @@ playPauseButton state kind =
                 Play ->
                     Icon.play
 
-                Pause ->
-                    Icon.pause
+                Stop ->
+                    Icon.stop
 
         handleClick : FrontendMsg
         handleClick =
@@ -411,7 +411,7 @@ playPauseButton state kind =
                 Play ->
                     HandlePlayClick kind
 
-                Pause ->
+                Stop ->
                     HandleStopClick kind
     in
     button

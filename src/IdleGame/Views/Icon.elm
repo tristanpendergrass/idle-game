@@ -399,8 +399,8 @@ play =
     createIconFeather FeatherIcons.play
 
 
-pause : Icon
-pause =
+stop : Icon
+stop =
     createIconFeather FeatherIcons.pause
 
 

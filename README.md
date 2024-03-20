@@ -51,10 +51,12 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 ## Version 0.4
 - [x] Attempt to address perf
 - [ ] Redesign activity quick view with a focus on clarity over form
-- [ ] Award spell resource on activity completion
-- [ ] Consume spell resource when assigned on slot
+- [x] Award spell resource on activity completion
+- [x] Consume spell resource when assigned on slot
 - [ ] Feature: Changelog
 - [ ] Skill: Wild Magic
+- [ ] Create custom spell selector menu
+- [ ] Show spell selector on activity image
 - [x] Feature: Syllabus for each class
 - [x] Tech stuff: Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
   - [x] Modify definition of gain resource to have preservation chance
