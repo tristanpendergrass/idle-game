@@ -169,6 +169,15 @@ renderActivityCard activity game screenWidth =
         showMastery : Bool
         showMastery =
             Maybe.Extra.isJust stats.mastery
+
+        spellSelectorOptions : List Spell
+        spellSelectorOptions =
+            Game.spellSelectorOptions activity
+
+        showSpellSelectorWarning : Bool
+        showSpellSelectorWarning =
+            not (List.isEmpty spellSelectorOptions)
+                && (getByActivity activity game.spellSelectors == Nothing)
     in
     div [ class "relative" ]
         [ div
@@ -181,8 +190,19 @@ renderActivityCard activity game screenWidth =
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             [ -- preview image
-              div [ Utils.card.imageContainer ]
+              div [ Utils.card.imageContainer, class "relative" ]
                 [ Utils.cardImage (Activity.getStats activity).image
+
+                -- Spell selector warning
+                , div
+                    [ class "absolute bottom-0 right-0 mr-1 mb-1 bg-warning text-warning-content rounded flex items-center p-1 gap-1"
+                    , classList [ ( "hidden", not showSpellSelectorWarning ) ]
+                    ]
+                    [ Icon.createIconFeather FeatherIcons.alertTriangle
+                        |> Icon.withSize Icon.Small
+                        |> Icon.toHtml
+                    , span [ class "text-xs" ] [ text "No spell selected" ]
+                    ]
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]

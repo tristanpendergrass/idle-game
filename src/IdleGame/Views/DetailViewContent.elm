@@ -237,7 +237,7 @@ renderContent obj extraBottomPadding game =
 
                                 spellUnlocked : Bool
                                 spellUnlocked =
-                                    Game.isSpellLearned game spell
+                                    getBySpell spell game.scrolls > 0
 
                                 unlearnedString : String
                                 unlearnedString =
@@ -295,15 +295,6 @@ masterySection mxp mastery =
                 rewardText : String
                 rewardText =
                     case reward of
-                        Activity.SpellAvailable ->
-                            "Spell available"
-
-                        Activity.SecondaryEnabled ->
-                            "Secondary enabled"
-
-                        Activity.ImbueEnabled ->
-                            "Imbue enabled"
-
                         Activity.GameMod mod ->
                             Utils.modToString mod
 

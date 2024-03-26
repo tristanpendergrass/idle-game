@@ -1164,29 +1164,6 @@ getAllIntervalMods game =
 --
 
 
-isSpellLearned : Game -> Spell -> Bool
-isSpellLearned game spell =
-    -- NOTE this is not the same as the Activity corresponding to the spell being unlocked.
-    -- As of current writing all spells require Mastery level 25 to let the spell be "learned" enough to use
-    -- which is what this function indicates
-    let
-        maybeActivity : Maybe Activity
-        maybeActivity =
-            Activity.getBySpell spell
-    in
-    case maybeActivity of
-        Nothing ->
-            False
-
-        Just activity ->
-            let
-                masteryRewards : List Activity.MasteryReward
-                masteryRewards =
-                    getMasteryRewards game activity
-            in
-            List.member Activity.SpellAvailable masteryRewards
-
-
 getMaxPurchase : Coin -> Game -> Int
 getMaxPurchase price game =
     let

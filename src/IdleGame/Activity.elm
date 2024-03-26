@@ -75,10 +75,7 @@ getBySpell spell =
 
 
 type MasteryReward
-    = SpellAvailable -- Spell can now be used
-    | SecondaryEnabled -- Spell can be used as secondary
-    | ImbueEnabled -- Spell can be embued with elements
-    | IntervalMod IntervalMod -- Activity interval decreased by this much
+    = IntervalMod IntervalMod -- Activity interval decreased by this much
     | GameMod Mod -- Apply mod to game
 
 
@@ -472,19 +469,13 @@ organizeSpellBooksStats =
 
 studyHexesMastery : Mastery
 studyHexesMastery =
-    [ ( 25, SpellAvailable )
-    , ( 50, SecondaryEnabled )
-    , ( 75, ImbueEnabled )
-    , ( 100, GameMod (Mod.powerBuff 1) )
+    [ ( 100, GameMod (Mod.skillXpBuff Chores (Percent.float 0.05)) )
     ]
 
 
 studyWeathermancingMastery : Mastery
 studyWeathermancingMastery =
-    [ ( 25, SpellAvailable )
-    , ( 50, SecondaryEnabled )
-    , ( 75, ImbueEnabled )
-    , ( 100, GameMod (Mod.skillXpBuff Chores (Percent.float 0.05)) )
+    [ ( 100, GameMod (Mod.skillXpBuff Chores (Percent.float 0.05)) )
     ]
 
 

@@ -97,19 +97,26 @@ allStats =
         , icon = Icon.fromString "Wd1"
         , mods =
             [ Mod.xpBuff (Percent.float 0.2)
+            , Mod.powerBuff 10
             ]
-        , inclusions = [ IfSkill Chores ]
+        , inclusions = [ IfSkill Chores, IfCombat ]
         }
     , water =
         { title = "Refreshing Mizzle"
         , icon = Icon.fromString "Wt1"
-        , mods = [ Mod.successBuff (Percent.float 0.1) ]
-        , inclusions = [ IfSkill Chores ]
+        , mods =
+            [ Mod.successBuff (Percent.float 0.1)
+            , Mod.powerBuff 10
+            ]
+        , inclusions = [ IfSkill Chores, IfCombat ]
         }
     , sun =
         { title = "Warming Sunrays"
         , icon = Icon.fromString "Sn1"
-        , mods = [ Mod.mxpBuff (Percent.float 0.15) ]
-        , inclusions = [ IfSkill Chores ]
+        , mods =
+            [ Mod.mxpBuff (Percent.float 0.15)
+            , Mod.powerBuff 10
+            ]
+        , inclusions = [ IfSkill Chores, IfCombat ]
         }
     }
