@@ -49,14 +49,16 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [x] Attempt to address perf
+- [ ] Greatly enhance perf by optimizing tick of long duration
 - [ ] Redesign activity quick view with a focus on clarity over form
+  - [ ] Add a green plus sign or something to each gained thing
+  - [ ] Add name of thing you're getting in addition to the icon
+  - [ ] Put gains in a row with comma between, wrapping to next line if needed. Xp/Mxp gains on their own row
+- [ ] FIX: when assigning Wind scroll to Clean Big bubba i see 4 scroll usages in toasts
+- [ ] Show spell selector on activity
+- [ ] Put duration back in detail view
 - [x] Award spell resource on activity completion
 - [x] Consume spell resource when assigned on slot
-- [ ] Feature: Changelog
-- [ ] Skill: Wild Magic
-- [ ] Create custom spell selector menu
-- [ ] Show spell selector on activity image
 - [x] Feature: Syllabus for each class
 - [x] Tech stuff: Make resource preservation mod work. Change gain resource to have a % chance to not happen that defaults to 0
   - [x] Modify definition of gain resource to have preservation chance
@@ -104,6 +106,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Quests that require you to do some more exploring (find something lost)
 - [ ] Quests that require you to defeat a certain monster
 #### Other
+- [ ] Feature: Changelog
 - [ ] Feature: Tutorial?
 - [ ] Purchase Diploma & Certificate of Completion in shop when completing all classes and *everything*
 
