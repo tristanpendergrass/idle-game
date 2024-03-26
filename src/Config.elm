@@ -46,8 +46,8 @@ devFlags =
     , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True
-    , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Hexes
+    , defaultMode = Adventuring
+    , defaultTabSkilling = Tab.Chores
     , defaultTabAdventuring = Tab.SchoolGrounds
     , maxOutSkillXp = True
     }

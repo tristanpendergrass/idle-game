@@ -172,7 +172,7 @@ renderActivityCard activity game screenWidth =
 
         spellSelectorOptions : List Spell
         spellSelectorOptions =
-            Game.spellSelectorOptions activity
+            Game.spellSelectorOptions game activity
 
         showSpellSelectorWarning : Bool
         showSpellSelectorWarning =

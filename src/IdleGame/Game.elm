@@ -1174,8 +1174,8 @@ getMaxPurchase price game =
     floor (Quantity.ratio playerCoin price)
 
 
-spellSelectorOptions : Activity -> List Spell
-spellSelectorOptions activity =
+spellSelectorOptions : Game -> Activity -> List Spell
+spellSelectorOptions game activity =
     let
         spellIsIncluded : Spell -> Bool
         spellIsIncluded spell =
@@ -1197,5 +1197,9 @@ spellSelectorOptions activity =
                             Activity.isCombatActivity activity
                 )
                 (Spell.getStats spell).inclusions
+
+        atLeastOne : Spell -> Bool
+        atLeastOne spell =
+            getBySpell spell game.scrolls > 0
     in
-    List.filter (\spell -> spellIsIncluded spell) allSpells
+    List.filter (\spell -> atLeastOne spell && spellIsIncluded spell) allSpells

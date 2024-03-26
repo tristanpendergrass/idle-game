@@ -155,7 +155,7 @@ renderContent obj extraBottomPadding game =
 
         spellSelectorOptions : List Spell
         spellSelectorOptions =
-            Game.spellSelectorOptions activity
+            Game.spellSelectorOptions game activity
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
@@ -195,18 +195,6 @@ renderContent obj extraBottomPadding game =
         -- Play/stop button
         , playStopButton playButtonState activity
 
-        -- Duration
-        , div [ class "relative" ]
-            [ ActivityView.activityDuration (Game.getModdedDuration game activity)
-            , fade isPreview
-            ]
-        , case stats.teachesSpell of
-            Nothing ->
-                div [ class "hidden" ] []
-
-            Just spell ->
-                SpellView.renderSpellEffects spell
-
         -- The effects of the activity
         , div [ class "t-column relative" ]
             (List.map
@@ -223,8 +211,9 @@ renderContent obj extraBottomPadding game =
             )
 
         -- Spell selector
-        , div [ class "flex flex-col items-start gap-1", classList [ ( "hidden", List.isEmpty spellSelectorOptions ) ] ]
-            [ label [ for "selector" ] [ text "Spell selector" ]
+        , div [ class "divider" ] []
+        , div [ class "flex flex-col items-center gap-2", classList [ ( "hidden", List.isEmpty spellSelectorOptions ) ] ]
+            [ label [ for "selector" ] [ text "Use spell" ]
             , select [ id "selector", class "select w-full", onInput (HandleSpellSelect activity) ]
                 ([ option [ selected (selectedSpell == Nothing), value "" ] [ text "None" ]
                  ]
@@ -235,29 +224,31 @@ renderContent obj extraBottomPadding game =
                                 title =
                                     (Spell.getStats spell).title
 
-                                spellUnlocked : Bool
-                                spellUnlocked =
-                                    getBySpell spell game.scrolls > 0
+                                scrolls : Int
+                                scrolls =
+                                    getBySpell spell game.scrolls
 
-                                unlearnedString : String
-                                unlearnedString =
-                                    if spellUnlocked then
-                                        ""
-
-                                    else
-                                        " (unlearned)"
+                                scrollQuantity : String
+                                scrollQuantity =
+                                    Utils.intToString scrolls
                             in
                             option
                                 [ selected (selectedSpell == Just spell)
-                                , disabled (not spellUnlocked)
+                                , disabled (scrolls == 0)
                                 , value title
                                 , class "flex items-center gap-1"
                                 ]
-                                [ span [] [ text (title ++ unlearnedString) ]
+                                [ span [] [ text (title ++ " (" ++ scrollQuantity ++ ")") ]
                                 ]
                         )
                         spellSelectorOptions
                 )
+            , case selectedSpell of
+                Just spell ->
+                    SpellView.renderSpellEffects spell
+
+                Nothing ->
+                    div [] []
             ]
         , div [ class "divider" ] []
 
