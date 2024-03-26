@@ -195,6 +195,18 @@ renderContent obj extraBottomPadding game =
         -- Play/stop button
         , playStopButton playButtonState activity
 
+        -- Duration
+        , div [ class "relative" ]
+            [ ActivityView.activityDuration (Game.getModdedDuration game activity)
+            , fade isPreview
+            ]
+        , case stats.teachesSpell of
+            Nothing ->
+                div [ class "hidden" ] []
+
+            Just spell ->
+                SpellView.renderSpellEffects spell
+
         -- The effects of the activity
         , div [ class "t-column relative" ]
             (List.map
