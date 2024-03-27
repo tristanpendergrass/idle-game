@@ -49,14 +49,14 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 # Todos
 
 ## Version 0.4
-- [ ] Greatly enhance perf by optimizing tick of long duration
+- [x] Greatly enhance perf by optimizing tick of long duration
 - [ ] Redesign activity quick view with a focus on clarity over form
   - [ ] Add a green plus sign or something to each gained thing
   - [ ] Add name of thing you're getting in addition to the icon
   - [ ] Put gains in a row with comma between, wrapping to next line if needed. Xp/Mxp gains on their own row
-- [ ] FIX: when assigning Wind scroll to Clean Big bubba i see 4 scroll usages in toasts
-- [ ] Show spell selector on activity
-- [ ] Put duration back in detail view
+- [ ] FIX: when assigning Wind scroll to Clean Big bubba I see 4 scroll usages in toasts
+- [ ] Show assigned spell on activity card
+- [x] Put duration back in detail view
 - [x] Award spell resource on activity completion
 - [x] Consume spell resource when assigned on slot
 - [x] Feature: Syllabus for each class
@@ -122,6 +122,7 @@ To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. 
 - [ ] Show Skill XP as "X / Y" rather than just "X"; where X is current XP and Y is the XP required for the next level.
 - [ ] Remove animation on right rail
 - [ ] Add a way of giving hints to the player. Old wise man?
+- [ ] Add tags to activities (like scrollwriting, crafting, etc.)
 
 # Changelog
 

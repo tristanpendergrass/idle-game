@@ -55,8 +55,8 @@ type alias SpendResourceParams =
 
 type EffectType
     = VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
-    | GainScroll { base : Int, spell : Spell }
-    | SpendScroll { base : Int, spell : Spell }
+    | GainScroll { base : Int, spell : Spell, doublingChance : Percent }
+    | SpendScroll { base : Int, spell : Spell, preservationChance : Percent }
     | GainResource GainResourceParams
     | SpendResource SpendResourceParams
     | GainXp GainXpParams
@@ -99,14 +99,14 @@ gainMxp activity =
 
 gainScroll : Int -> Spell -> Effect
 gainScroll count spell =
-    { effect = GainScroll { base = count, spell = spell }
+    { effect = GainScroll { base = count, spell = spell, doublingChance = Percent.zero }
     , tags = []
     }
 
 
 spendScroll : Int -> Spell -> Effect
 spendScroll amount spell =
-    { effect = SpendScroll { base = amount, spell = spell }
+    { effect = SpendScroll { base = amount, spell = spell, preservationChance = Percent.zero }
     , tags = []
     }
 

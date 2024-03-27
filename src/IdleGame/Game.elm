@@ -600,11 +600,16 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List Effect }
+    { game : Game, toasts : List Toast, additionalEffects : List Effect, additionalMods : List Mod }
 
 
 type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
+
+
+setScrolls : Spell -> Int -> Game -> Game
+setScrolls spell amount game =
+    { game | scrolls = setBySpell spell amount game.scrolls }
 
 
 applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
@@ -622,7 +627,7 @@ applyEffect effect count game =
                                 else
                                     failureEffects
                         in
-                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects))
+                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects []))
                     )
 
         Effect.ResolveCombat { combat, successEffects, failureEffects } ->
@@ -637,7 +642,7 @@ applyEffect effect count game =
                                 else
                                     ( failureEffects, [ LostCombat ] )
                         in
-                        Random.constant (Ok (ApplyEffectValue game toasts chosenEffects))
+                        Random.constant (Ok (ApplyEffectValue game toasts chosenEffects []))
                     )
 
         Effect.GainCoin { base, percentIncrease } ->
@@ -651,13 +656,58 @@ applyEffect effect count game =
             addCoin product game
                 |> Random.constant
 
-        Effect.GainScroll { base, spell } ->
-            adjustScroll spell (base * count) game
-                |> Random.constant
+        -- adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
+        -- adjustScroll spell amount game =
+        --     let
+        --         newScrolls : Result EffectErr (SpellRecord Int)
+        --         newScrolls =
+        --             addScroll spell amount game.scrolls
+        --     in
+        --     newScrolls
+        --         |> Result.map
+        --             (\val ->
+        --                 { game = { game | scrolls = val }
+        --                 , toasts = [ GainedScroll amount spell ]
+        --                 , additionalEffects = []
+        --                 }
+        --             )
+        Effect.GainScroll { base, spell, doublingChance } ->
+            probabilityGenerator doublingChance
+                |> Random.map
+                    (\doubled ->
+                        let
+                            amount : Int
+                            amount =
+                                if doubled then
+                                    2 * base * count
 
-        Effect.SpendScroll { base, spell } ->
-            adjustScroll spell (-1 * base * count) game
-                |> Random.constant
+                                else
+                                    base * count
+                        in
+                        case addScroll spell amount game.scrolls of
+                            Err e ->
+                                Random.constant { game = game, toasts = [], addtionalEffects = [], additionalMods = [] }
+
+                            Ok newScrolls ->
+                                Random.constant { game = setScrolls spell newScrolls game, toasts = [ GainedScroll (base * count) spell ], additionalEffects = [], additionalMods = [] }
+                    )
+
+        Effect.SpendScroll { base, spell, preservationChance } ->
+            probabilityGenerator preservationChance
+                |> Random.map
+                    (\preserved ->
+                        if preserved then
+                            Random.constant { game = game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
+
+                        else
+                            case addScroll spell (-1 * base * count) game.scrolls of
+                                Err e ->
+                                    Random.constant { game = game, toasts = [], addtionalEffects = [], additionalMods = [] }
+
+                                -- We don't propagate the error because this is considered optional
+                                Ok newScrolls ->
+                                    Random.constant { game = setScrolls spell newScrolls game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
+                    )
 
         Effect.GainResource { base, resource, doublingChance } ->
             probabilityGenerator doublingChance
@@ -786,21 +836,22 @@ addScroll spell amount scrolls =
         Err EffectErr.NegativeAmount
 
 
-adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
-adjustScroll spell amount game =
-    let
-        newScrolls : Result EffectErr (SpellRecord Int)
-        newScrolls =
-            addScroll spell amount game.scrolls
-    in
-    newScrolls
-        |> Result.map
-            (\val ->
-                { game = { game | scrolls = val }
-                , toasts = [ GainedScroll amount spell ]
-                , additionalEffects = []
-                }
-            )
+
+-- adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
+-- adjustScroll spell amount game =
+--     let
+--         newScrolls : Result EffectErr (SpellRecord Int)
+--         newScrolls =
+--             addScroll spell amount game.scrolls
+--     in
+--     newScrolls
+--         |> Result.map
+--             (\val ->
+--                 { game = { game | scrolls = val }
+--                 , toasts = [ GainedScroll amount spell ]
+--                 , additionalEffects = []
+--                 }
+--             )
 
 
 adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
@@ -816,6 +867,7 @@ adjustResource resource amount game =
                 { game = { game | resources = val }
                 , toasts = [ GainedResource amount resource ]
                 , additionalEffects = []
+                , additionalMods = []
                 }
             )
 
@@ -839,6 +891,7 @@ addCoin amount game =
             { game = { game | coin = newCoin }
             , toasts = [ GainedCoin amount ]
             , additionalEffects = []
+            , additionalMods = []
             }
 
 
@@ -1120,11 +1173,6 @@ getSelectedSpellMods game =
                 -- Where we attach the spell mods to the activity
                 (Spell.getStats spell).mods
                     |> addActivityTagToMods activity
-                    -- Where we add the effect to pay the scroll
-                    |> (::)
-                        (Mod.addEffects [ Effect.spendScroll 1 spell ]
-                            |> Mod.withTags [ Effect.ActivityTag activity ]
-                        )
             )
         |> List.concat
 
