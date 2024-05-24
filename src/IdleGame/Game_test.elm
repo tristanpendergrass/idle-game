@@ -348,7 +348,7 @@ spellSelectorTest =
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
                     |> grantScrolls 1000
-            , effects = [ effect ]
+            , effects = [ Effect.spendScroll 1 Wind ]
             , count = 1
             , check =
                 expectOk
@@ -362,7 +362,7 @@ spellSelectorTest =
                 defaultGame
                     |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Nothing }
                     |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-            , effects = [ effect ]
+            , effects = [ Effect.spendScroll 1 Wind ]
             , count = 1
             , check = expectOk (expectXp (Xp.int 10) Chores)
             }

@@ -607,9 +607,9 @@ type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-setScrolls : Spell -> Int -> Game -> Game
-setScrolls spell amount game =
-    { game | scrolls = setBySpell spell amount game.scrolls }
+setScrolls : SpellRecord Int -> Game -> Game
+setScrolls newScrolls game =
+    { game | scrolls = newScrolls }
 
 
 applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
@@ -656,21 +656,6 @@ applyEffect effect count game =
             addCoin product game
                 |> Random.constant
 
-        -- adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
-        -- adjustScroll spell amount game =
-        --     let
-        --         newScrolls : Result EffectErr (SpellRecord Int)
-        --         newScrolls =
-        --             addScroll spell amount game.scrolls
-        --     in
-        --     newScrolls
-        --         |> Result.map
-        --             (\val ->
-        --                 { game = { game | scrolls = val }
-        --                 , toasts = [ GainedScroll amount spell ]
-        --                 , additionalEffects = []
-        --                 }
-        --             )
         Effect.GainScroll { base, spell, doublingChance } ->
             probabilityGenerator doublingChance
                 |> Random.map
@@ -684,12 +669,16 @@ applyEffect effect count game =
                                 else
                                     base * count
                         in
-                        case addScroll spell amount game.scrolls of
-                            Err e ->
-                                Random.constant { game = game, toasts = [], addtionalEffects = [], additionalMods = [] }
-
-                            Ok newScrolls ->
-                                Random.constant { game = setScrolls spell newScrolls game, toasts = [ GainedScroll (base * count) spell ], additionalEffects = [], additionalMods = [] }
+                        addScroll spell amount game.scrolls
+                            -- problem here is addScroll returns the whole record but setScrolls below wants a spell and an int
+                            |> Result.map
+                                (\newScrolls ->
+                                    { game = setScrolls newScrolls game
+                                    , toasts = [ GainedScroll (base * count) spell ]
+                                    , additionalEffects = []
+                                    , additionalMods = []
+                                    }
+                                )
                     )
 
         Effect.SpendScroll { base, spell, preservationChance } ->
@@ -697,16 +686,18 @@ applyEffect effect count game =
                 |> Random.map
                     (\preserved ->
                         if preserved then
-                            Random.constant { game = game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
+                            Ok { game = game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
 
                         else
-                            case addScroll spell (-1 * base * count) game.scrolls of
-                                Err e ->
-                                    Random.constant { game = game, toasts = [], addtionalEffects = [], additionalMods = [] }
-
-                                -- We don't propagate the error because this is considered optional
-                                Ok newScrolls ->
-                                    Random.constant { game = setScrolls spell newScrolls game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
+                            addScroll spell (-1 * base * count) game.scrolls
+                                |> Result.map
+                                    (\newScrolls ->
+                                        { game = setScrolls newScrolls game
+                                        , toasts = [ GainedScroll (base * count) spell ]
+                                        , additionalEffects = []
+                                        , additionalMods = (Spell.getStats spell).mods
+                                        }
+                                    )
                     )
 
         Effect.GainResource { base, resource, doublingChance } ->
@@ -747,6 +738,7 @@ applyEffect effect count game =
             { game = addXp skill xp game
             , toasts = []
             , additionalEffects = []
+            , additionalMods = []
             }
                 |> Random.constant
                 |> Random.map Ok
@@ -765,7 +757,7 @@ applyEffect effect count game =
             in
             game
                 |> addMxp params.activity mxp
-                |> (\newGame -> Random.constant (ApplyEffectValue newGame [] []))
+                |> (\newGame -> Random.constant (ApplyEffectValue newGame [] [] []))
                 |> Random.map Ok
 
         Effect.Explore { location } ->
@@ -783,6 +775,7 @@ applyEffect effect count game =
                                     |> updateLocations (setByLocation location state)
                             , toasts = toasts
                             , additionalEffects = effects
+                            , additionalMods = []
                             }
                     )
 
