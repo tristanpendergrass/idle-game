@@ -11,18 +11,13 @@ import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
-import IdleGame.Monster as Monster
-import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
-import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
-import IdleGame.Views.Spell as SpellView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Json.Decode as D
@@ -51,61 +46,23 @@ probabilityToInt x =
 -- Activity title
 
 
-monsterImage : Monster -> Html FrontendMsg
-monsterImage kind =
-    div
-        [ class "h-full w-full flex items-center justify-center bg-accent" ]
-        [ (Monster.getStats kind).icon
-            |> Icon.withSize Icon.Large
-            |> Icon.toHtml
-        ]
-
-
 activityDuration : Duration -> Html msg
 activityDuration duration =
     div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
 
-either : Maybe a -> Maybe a -> Maybe a
-either a b =
-    case a of
-        Just _ ->
-            a
-
-        _ ->
-            b
-
-
 getTimerForActivity : Activity -> Game -> Maybe Timer
 getTimerForActivity activity game =
-    let
-        maybeTimerSkilling : Maybe Timer
-        maybeTimerSkilling =
-            case game.activitySkilling of
-                Just ( activeType, timer ) ->
-                    if activity == activeType then
-                        Just timer
+    case game.activity of
+        Just ( activeType, timer ) ->
+            if activity == activeType then
+                Just timer
 
-                    else
-                        Nothing
+            else
+                Nothing
 
-                _ ->
-                    Nothing
-
-        maybeTimerAdventuring : Maybe Timer
-        maybeTimerAdventuring =
-            case game.activityAdventuring of
-                Just ( activeType, timer ) ->
-                    if activity == activeType then
-                        Just timer
-
-                    else
-                        Nothing
-
-                _ ->
-                    Nothing
-    in
-    either maybeTimerSkilling maybeTimerAdventuring
+        _ ->
+            Nothing
 
 
 notMasteryXpEffect : Effect -> Bool
@@ -169,15 +126,6 @@ renderActivityCard activity game screenWidth =
         showMastery : Bool
         showMastery =
             Maybe.Extra.isJust stats.mastery
-
-        spellSelectorOptions : List Spell
-        spellSelectorOptions =
-            Game.spellSelectorOptions game activity
-
-        showSpellSelectorWarning : Bool
-        showSpellSelectorWarning =
-            not (List.isEmpty spellSelectorOptions)
-                && (getByActivity activity game.spellSelectors == Nothing)
     in
     div [ class "relative" ]
         [ div
@@ -190,19 +138,8 @@ renderActivityCard activity game screenWidth =
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             [ -- preview image
-              div [ Utils.card.imageContainer, class "relative" ]
+              div [ Utils.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
                 [ Utils.cardImage (Activity.getStats activity).image
-
-                -- Spell selector warning
-                , div
-                    [ class "absolute bottom-0 right-0 mr-1 mb-1 bg-warning text-warning-content rounded flex items-center p-1 gap-1"
-                    , classList [ ( "hidden", not showSpellSelectorWarning ) ]
-                    ]
-                    [ Icon.createIconFeather FeatherIcons.alertTriangle
-                        |> Icon.withSize Icon.Small
-                        |> Icon.toHtml
-                    , span [ class "text-xs" ] [ text "No spell selected" ]
-                    ]
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
@@ -216,25 +153,6 @@ renderActivityCard activity game screenWidth =
                     [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
                     , div [ classList [ ( "hidden", not stats.showDuration ) ] ] [ activityDuration duration ]
                     ]
-                , div [ class "t-column" ]
-                    ((case stats.teachesSpell of
-                        Nothing ->
-                            []
-
-                        Just spell ->
-                            [ SpellView.renderSpellEffects spell ]
-                     )
-                        ++ List.map
-                            (\taggedEffect ->
-                                EffectView.render
-                                    { game = game
-                                    , mods = mods
-                                    , effect = taggedEffect
-                                    , renderType = EffectView.Card
-                                    }
-                            )
-                            orderedAndFilteredEffects
-                    )
                 , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
                     [ Utils.progressBar
                         { progressText = Utils.intToString masteryLevel

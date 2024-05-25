@@ -1,23 +1,17 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
-import Html.Attributes exposing (download)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat as Combat
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location
 import IdleGame.Mod as Mod exposing (Mod)
-import IdleGame.Monster as Monster
-import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
-import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -40,27 +34,17 @@ createProd seed =
     let
         xp : SkillRecord Xp
         xp =
-            { chores = Xp.int 0
-            , hexes = Xp.int 0
-            , weathermancing = Xp.int 0
+            { anatomy = Xp.int 0
+            , medicalEthics = Xp.int 0
             }
     in
     { seed = seed
     , xp = xp
     , mxp = activityRecord (Xp.int 0)
-    , locations = locationRecord Location.createState
-    , quests = questRecord Quest.Incomplete
-    , choresMxp = Xp.int 0
-    , activitySkilling = Nothing
-    , activityAdventuring = Nothing
-    , monster = Nothing
+    , activity = Nothing
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , combatsWon = 0
-    , combatsLost = 0
-    , spellSelectors = activityRecord Nothing
-    , scrolls = spellRecord 0
     }
 
 
@@ -69,33 +53,18 @@ createDev seed =
     let
         xp : SkillRecord Xp
         xp =
-            { chores = Xp.int 9000000
-            , hexes = Xp.int 9000000
-            , weathermancing = Xp.int 9000000
+            { anatomy = Xp.int 0
+            , medicalEthics = Xp.int 0
             }
     in
     { seed = seed
     , xp = xp
     , mxp = activityRecord (Xp.int 0)
-    , locations = locationRecord Location.createState
-    , quests = questRecord Quest.Incomplete
-    , choresMxp = Xp.int 0
-    , activitySkilling = Nothing
-    , activityAdventuring = Nothing
-    , monster = Nothing
-    , coin = Coin.int 100000
+    , activity = Nothing
+    , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , combatsWon = 0
-    , combatsLost = 0
-    , spellSelectors = activityRecord Nothing
-    , scrolls = spellRecord 100
     }
-
-
-selectSpell : { activity : Activity, maybeSpell : Maybe Spell } -> Game -> Game
-selectSpell { activity, maybeSpell } game =
-    { game | spellSelectors = Activity.updateByKindActivity activity (\_ -> maybeSpell) game.spellSelectors }
 
 
 type ActivityListItem
@@ -106,10 +75,6 @@ type ActivityListItem
 getActivityListItems : Skill -> Game -> List ActivityListItem
 getActivityListItems skill game =
     let
-        xp : Xp
-        xp =
-            getBySkill skill game.xp
-
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
             case (Activity.getStats kind).unlockRequirements of
@@ -199,7 +164,7 @@ toggleActivity kind game =
         let
             newActivity : Maybe ( Activity, Timer )
             newActivity =
-                case game.activitySkilling of
+                case game.activity of
                     Just ( k, _ ) ->
                         if kind == k then
                             Nothing
@@ -210,12 +175,12 @@ toggleActivity kind game =
                     Nothing ->
                         Just ( kind, Timer.create )
         in
-        setActivitySkilling newActivity game
+        setActivity newActivity game
 
 
 activityIsActive : Activity -> Game -> Bool
 activityIsActive kind game =
-    case game.activitySkilling of
+    case game.activity of
         Just ( k, _ ) ->
             kind == k
 
@@ -223,19 +188,9 @@ activityIsActive kind game =
             False
 
 
-updateLocations : (LocationRecord Location.State -> LocationRecord Location.State) -> Game -> Game
-updateLocations fn game =
-    { game | locations = fn game.locations }
-
-
-setActivitySkilling : Maybe ( Activity, Timer ) -> Game -> Game
-setActivitySkilling activity g =
-    { g | activitySkilling = activity }
-
-
-setActivityAdventuring : Maybe ( Activity, Timer ) -> Game -> Game
-setActivityAdventuring activity g =
-    { g | activityAdventuring = activity }
+setActivity : Maybe ( Activity, Timer ) -> Game -> Game
+setActivity activity g =
+    { g | activity = activity }
 
 
 applyIntervalMods : List IntervalMod -> Duration -> Duration
@@ -282,41 +237,10 @@ type alias Event =
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActivitySkilling, eventSkilling ) =
-            case game.activitySkilling of
+        ( newActivity, eventSkilling ) =
+            case game.activity of
                 Nothing ->
-                    ( game.activitySkilling, Nothing )
-
-                Just ( activityKind, timer ) ->
-                    let
-                        stats : Activity.Stats
-                        stats =
-                            Activity.getStats activityKind
-
-                        activityDuration : Duration
-                        activityDuration =
-                            getModdedDuration game activityKind
-
-                        ( newTimer, completions ) =
-                            timer
-                                |> Timer.increment activityDuration delta
-
-                        maybeEvent : Maybe Event
-                        maybeEvent =
-                            if completions >= 1 then
-                                Just { effects = stats.effects, count = completions }
-
-                            else
-                                Nothing
-                    in
-                    ( Just ( activityKind, newTimer )
-                    , maybeEvent
-                    )
-
-        ( newActivityAdventuring, eventAdventuring ) =
-            case game.activityAdventuring of
-                Nothing ->
-                    ( game.activityAdventuring, Nothing )
+                    ( game.activity, Nothing )
 
                 Just ( activityKind, timer ) ->
                     let
@@ -351,9 +275,8 @@ tick delta game =
         gameGenerator : Generator ( Game, List Toast )
         gameGenerator =
             game
-                |> setActivitySkilling newActivitySkilling
-                |> setActivityAdventuring newActivityAdventuring
-                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ eventSkilling, eventAdventuring ]))
+                |> setActivity newActivity
+                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ eventSkilling ]))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed
@@ -404,60 +327,6 @@ attemptPurchaseResource amount resource game =
         result
 
 
-setQuestToComplete : Quest -> Game -> Game
-setQuestToComplete quest game =
-    { game | quests = setByQuest quest Quest.Complete game.quests }
-
-
-attemptCompleteQuest : Quest -> Game -> Result EffectErr ApplyEffectsValue
-attemptCompleteQuest quest game =
-    let
-        questStats : Quest.Stats
-        questStats =
-            Quest.getStats quest
-
-        questState : Quest.State
-        questState =
-            getByQuest quest game.quests
-
-        effectsToComplete : List Effect
-        effectsToComplete =
-            Quest.getCompletionEffects quest
-
-        effects : List Effect
-        effects =
-            List.concat
-                [ effectsToComplete
-                , questStats.reward
-                ]
-
-        mods : List Mod
-        mods =
-            getAllMods game
-
-        gen : ApplyEffectsResultGenerator
-        gen =
-            applyEffects mods effects 1 game
-
-        ( result, newSeed ) =
-            Random.step gen game.seed
-    in
-    if questState == Quest.Complete then
-        Err EffectErr.QuestAlreadyComplete
-
-    else
-        Result.map
-            (\applyEffectsResult ->
-                { applyEffectsResult
-                    | game =
-                        applyEffectsResult.game
-                            |> setSeed newSeed
-                            |> setQuestToComplete quest
-                }
-            )
-            result
-
-
 setSeed : Random.Seed -> Game -> Game
 setSeed seed game =
     { game | seed = seed }
@@ -497,9 +366,6 @@ getToastForErr err =
     case err of
         EffectErr.NegativeAmount ->
             NegativeAmountErr
-
-        EffectErr.QuestAlreadyComplete ->
-            QuestAlreadyCompleteErr
 
 
 type alias ApplyEffectsValue =
@@ -607,11 +473,6 @@ type alias ApplyEffectResultGenerator =
     Generator (Result EffectErr ApplyEffectValue)
 
 
-setScrolls : SpellRecord Int -> Game -> Game
-setScrolls newScrolls game =
-    { game | scrolls = newScrolls }
-
-
 applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
 applyEffect effect count game =
     case Effect.getEffect effect of
@@ -630,21 +491,6 @@ applyEffect effect count game =
                         Random.constant (Ok (ApplyEffectValue game [] chosenEffects []))
                     )
 
-        Effect.ResolveCombat { combat, successEffects, failureEffects } ->
-            Combat.resolve combat
-                |> Random.andThen
-                    (\{ playerWon } ->
-                        let
-                            ( chosenEffects, toasts ) =
-                                if playerWon then
-                                    ( successEffects, [] )
-
-                                else
-                                    ( failureEffects, [ LostCombat ] )
-                        in
-                        Random.constant (Ok (ApplyEffectValue game toasts chosenEffects []))
-                    )
-
         Effect.GainCoin { base, percentIncrease } ->
             let
                 product : Coin
@@ -655,50 +501,6 @@ applyEffect effect count game =
             in
             addCoin product game
                 |> Random.constant
-
-        Effect.GainScroll { base, spell, doublingChance } ->
-            probabilityGenerator doublingChance
-                |> Random.map
-                    (\doubled ->
-                        let
-                            amount : Int
-                            amount =
-                                if doubled then
-                                    2 * base * count
-
-                                else
-                                    base * count
-                        in
-                        addScroll spell amount game.scrolls
-                            -- problem here is addScroll returns the whole record but setScrolls below wants a spell and an int
-                            |> Result.map
-                                (\newScrolls ->
-                                    { game = setScrolls newScrolls game
-                                    , toasts = [ GainedScroll (base * count) spell ]
-                                    , additionalEffects = []
-                                    , additionalMods = []
-                                    }
-                                )
-                    )
-
-        Effect.SpendScroll { base, spell, preservationChance } ->
-            probabilityGenerator preservationChance
-                |> Random.map
-                    (\preserved ->
-                        if preserved then
-                            Ok { game = game, toasts = [], additionalEffects = [], additionalMods = (Spell.getStats spell).mods }
-
-                        else
-                            addScroll spell (-1 * base * count) game.scrolls
-                                |> Result.map
-                                    (\newScrolls ->
-                                        { game = setScrolls newScrolls game
-                                        , toasts = [ GainedScroll (base * count) spell ]
-                                        , additionalEffects = []
-                                        , additionalMods = (Spell.getStats spell).mods
-                                        }
-                                    )
-                    )
 
         Effect.GainResource { base, resource, doublingChance } ->
             probabilityGenerator doublingChance
@@ -760,37 +562,15 @@ applyEffect effect count game =
                 |> (\newGame -> Random.constant (ApplyEffectValue newGame [] [] []))
                 |> Random.map Ok
 
-        Effect.Explore { location } ->
-            let
-                locationState : Location.State
-                locationState =
-                    getByLocation location game.locations
-            in
-            Location.explorationGenerator location locationState count
-                |> Random.map
-                    (\{ state, effects, toasts } ->
-                        Ok
-                            { game =
-                                game
-                                    |> updateLocations (setByLocation location state)
-                            , toasts = toasts
-                            , additionalEffects = effects
-                            , additionalMods = []
-                            }
-                    )
-
 
 addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
     case skill of
-        Chores ->
-            { game | xp = Skill.updateBySkill Chores (Quantity.plus amount) game.xp }
+        Anatomy ->
+            { game | xp = Skill.updateBySkill Anatomy (Quantity.plus amount) game.xp }
 
-        Hexes ->
-            { game | xp = Skill.updateBySkill Hexes (Quantity.plus amount) game.xp }
-
-        Weathermancing ->
-            { game | xp = Skill.updateBySkill Weathermancing (Quantity.plus amount) game.xp }
+        MedicalEthics ->
+            { game | xp = Skill.updateBySkill MedicalEthics (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game
@@ -804,47 +584,6 @@ addMxp kind amount game =
             game.mxp
                 |> Activity.updateByKindActivity kind fn
     }
-
-
-addMasteryPoolXp : Xp -> Game -> Game
-addMasteryPoolXp amount game =
-    { game | choresMxp = Quantity.plus game.choresMxp amount }
-
-
-addScroll : Spell -> Int -> SpellRecord Int -> Result EffectErr (SpellRecord Int)
-addScroll spell amount scrolls =
-    let
-        oldAmount : Int
-        oldAmount =
-            getBySpell spell scrolls
-
-        newAmount : Int
-        newAmount =
-            oldAmount + amount
-    in
-    if newAmount >= 0 then
-        Ok (setBySpell spell newAmount scrolls)
-
-    else
-        Err EffectErr.NegativeAmount
-
-
-
--- adjustScroll : Spell -> Int -> Game -> Result EffectErr ApplyEffectValue
--- adjustScroll spell amount game =
---     let
---         newScrolls : Result EffectErr (SpellRecord Int)
---         newScrolls =
---             addScroll spell amount game.scrolls
---     in
---     newScrolls
---         |> Result.map
---             (\val ->
---                 { game = { game | scrolls = val }
---                 , toasts = [ GainedScroll amount spell ]
---                 , additionalEffects = []
---                 }
---             )
 
 
 adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
@@ -924,12 +663,6 @@ getTimePassesData originalGame currentGame =
         resourcesDiff =
             Resource.getDiff { original = originalGame.resources, current = currentGame.resources }
 
-        combatsWonDiff =
-            currentGame.combatsWon - originalGame.combatsWon
-
-        combatsLostDiff =
-            currentGame.combatsLost - originalGame.combatsLost
-
         coinGains : Maybe Coin
         coinGains =
             if Coin.toInt currentGame.coin > Coin.toInt originalGame.coin then
@@ -943,69 +676,13 @@ getTimePassesData originalGame currentGame =
                 (List.isEmpty xpGains
                     && Resource.isEmptyDiff resourcesDiff
                     && Maybe.Extra.isNothing coinGains
-                    && (combatsWonDiff == 0)
-                    && (combatsLostDiff == 0)
                 )
-
-        discoveredMonsters : Location -> List Monster
-        discoveredMonsters location =
-            let
-                originalMonsters : List Monster
-                originalMonsters =
-                    Location.foundMonsters location (getByLocation location originalGame.locations)
-
-                currentMonsters : List Monster
-                currentMonsters =
-                    Location.foundMonsters location (getByLocation location currentGame.locations)
-            in
-            diff originalMonsters currentMonsters
-
-        discoveredQuests : Location -> List Quest
-        discoveredQuests location =
-            let
-                originalQuests : List Quest
-                originalQuests =
-                    Location.foundQuests location (getByLocation location originalGame.locations)
-
-                currentQuests : List Quest
-                currentQuests =
-                    Location.foundQuests location (getByLocation location currentGame.locations)
-            in
-            diff originalQuests currentQuests
-
-        discoveredResources : Location -> List Resource
-        discoveredResources location =
-            let
-                originalResources : List Resource
-                originalResources =
-                    Location.foundResources location (getByLocation location originalGame.locations)
-
-                currentResources : List Resource
-                currentResources =
-                    Location.foundResources location (getByLocation location currentGame.locations)
-            in
-            diff originalResources currentResources
-
-        discoveriesAtLocation : Location -> List TimePassesDiscovery
-        discoveriesAtLocation location =
-            List.concat
-                [ List.map MonsterDiscovery (discoveredMonsters location)
-                , List.map QuestDiscovery (discoveredQuests location)
-                , List.map ResourceDiscovery (discoveredResources location)
-                ]
-
-        discoveries : List TimePassesDiscovery
-        discoveries =
-            List.concatMap discoveriesAtLocation allLocations
     in
     if hasNewData then
         Just
             { xpGains = xpGains
-            , discoveries = discoveries
             , coinGains = coinGains
             , resourcesDiff = resourcesDiff
-            , combatsWonDiff = combatsWonDiff
-            , combatsLostDiff = combatsLostDiff
             }
 
     else
@@ -1151,25 +828,6 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-getSelectedSpellMods : Game -> List Mod
-getSelectedSpellMods game =
-    [ game.activityAdventuring, game.activitySkilling ]
-        |> List.filterMap (Maybe.map (\( activity, _ ) -> activity))
-        |> List.filterMap
-            (\activity ->
-                getByActivity activity game.spellSelectors
-                    |> Maybe.map (\spell -> ( activity, spell ))
-            )
-        |> List.filter (\( _, spell ) -> getBySpell spell game.scrolls > 0)
-        |> List.map
-            (\( activity, spell ) ->
-                -- Where we attach the spell mods to the activity
-                (Spell.getStats spell).mods
-                    |> addActivityTagToMods activity
-            )
-        |> List.concat
-
-
 addActivityTagToMods : Activity -> List Mod -> List Mod
 addActivityTagToMods activity =
     List.map (Mod.withTags [ Effect.ActivityTag activity ])
@@ -1178,7 +836,6 @@ addActivityTagToMods activity =
 getAllMods : Game -> List Mod
 getAllMods game =
     []
-        ++ getSelectedSpellMods game
         ++ getActivityMods game
         ++ getShopItemMods game
 
@@ -1213,34 +870,3 @@ getMaxPurchase price game =
             game.coin
     in
     floor (Quantity.ratio playerCoin price)
-
-
-spellSelectorOptions : Game -> Activity -> List Spell
-spellSelectorOptions game activity =
-    let
-        spellIsIncluded : Spell -> Bool
-        spellIsIncluded spell =
-            List.any
-                (\inclusionCriteria ->
-                    case inclusionCriteria of
-                        Spell.IfActivity includedActivity ->
-                            includedActivity == activity
-
-                        Spell.IfSkill includedSkill ->
-                            case (Activity.getStats activity).belongsTo of
-                                Activity.BelongsToSkill activitySkill ->
-                                    includedSkill == activitySkill
-
-                                _ ->
-                                    False
-
-                        Spell.IfCombat ->
-                            Activity.isCombatActivity activity
-                )
-                (Spell.getStats spell).inclusions
-
-        atLeastOne : Spell -> Bool
-        atLeastOne spell =
-            getBySpell spell game.scrolls > 0
-    in
-    List.filter (\spell -> atLeastOne spell && spellIsIncluded spell) allSpells

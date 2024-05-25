@@ -11,15 +11,11 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
 import IdleGame.Views.Bag
-import IdleGame.Views.Chores
-import IdleGame.Views.Hexes
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Location
-import IdleGame.Views.QuestLog
 import IdleGame.Views.Shop
+import IdleGame.Views.SubjectViews
 import IdleGame.Views.UnderConstruction
 import IdleGame.Views.Utils
-import IdleGame.Views.Weathermancing
 import Types exposing (..)
 
 
@@ -55,26 +51,14 @@ renderContent model game activeTab =
                 ]
             ]
         , case activeTab of
-            Tab.Bag ->
+            Tab.Backpack ->
                 IdleGame.Views.Bag.render game
 
-            Tab.Chores ->
-                IdleGame.Views.Chores.render game
+            Tab.Anatomy ->
+                IdleGame.Views.SubjectViews.renderAnatomy game
 
-            Tab.Hexes ->
-                IdleGame.Views.Hexes.render game
-
-            Tab.Weathermancing ->
-                IdleGame.Views.Weathermancing.render game
-
-            Tab.Shop ->
-                IdleGame.Views.Shop.render game
-
-            Tab.SchoolGrounds ->
-                IdleGame.Views.Location.render model game SchoolGrounds
-
-            Tab.SecretGarden ->
-                IdleGame.Views.Location.render model game SecretGarden
+            Tab.MedicalEthics ->
+                IdleGame.Views.SubjectViews.renderMedicalEthics game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

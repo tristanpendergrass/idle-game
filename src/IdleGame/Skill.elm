@@ -26,28 +26,20 @@ getStats skill =
 
 allStats : SkillRecord Stats
 allStats =
-    { chores = choresStats
-    , hexes = hexesStats
-    , weathermancing = weathermancingStats
+    { anatomy = anatomyStats
+    , medicalEthics = medicalEthicsStats
     }
 
 
-choresStats : Stats
-choresStats =
-    { title = "Chores"
+anatomyStats : Stats
+anatomyStats =
+    { title = "Anatomy"
     , icon = Icon.chores
     }
 
 
-hexesStats : Stats
-hexesStats =
-    { title = "Hexes"
+medicalEthicsStats : Stats
+medicalEthicsStats =
+    { title = "Medical Ethics"
     , icon = Icon.hexes
-    }
-
-
-weathermancingStats : Stats
-weathermancingStats =
-    { title = "Weathermancing"
-    , icon = Icon.weathermancing
     }

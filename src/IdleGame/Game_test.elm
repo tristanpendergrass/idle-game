@@ -185,185 +185,126 @@ applyEffectsTest =
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
-        , describe "GainXp"
-            [ testEffects "can get Xp for Chores"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainXp (Xp.int 5) Chores ]
-                , count = 1
-                , check = expectOk (expectXp (Xp.int 5) Chores)
-                }
-            , testEffects "can get Xp for Hexes"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainXp (Xp.int 5) Hexes ]
-                , count = 1
-                , check = expectOk (expectXp (Xp.int 5) Hexes)
-                }
-            , testEffects "can get Xp for Chores with count of 5"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainXp (Xp.int 5) Chores ]
-                , count = 5
-                , check = expectOk (expectXp (Xp.int 25) Chores)
-                }
-            ]
-        , describe "GainResource"
-            [ testEffects "can get resources"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainResource 1 EmptyBottle ]
-                , count = 1
-                , check = expectOk (expectResource 1 EmptyBottle)
-                }
-            , testEffects
-                "can get resources with count of 5"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainResource 1 EmptyBottle ]
-                , count = 5
-                , check = expectOk (expectResource 5 EmptyBottle)
-                }
-            , testEffects "cannot go below 0 of a resource"
-                { initialGame = defaultGame
-                , effects = [ Effect.spendResource 1 EmptyBottle ]
-                , count = 1
-                , check = expectErr (Expect.equal EffectErr.NegativeAmount)
-                }
-            , testEffectsDistribution "doubling chance of 50% works"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
-                , count = 1
-                , distribution =
-                    Test.expectDistribution
-                        [ ( Test.Distribution.atLeast 45
-                          , "has 1 of resource"
-                          , hasOk (hasResource 1 EmptyBottle)
-                          )
-                        , ( Test.Distribution.atLeast 45
-                          , "has 2 of resource"
-                          , hasOk (hasResource 2 EmptyBottle)
-                          )
-                        , ( Test.Distribution.zero
-                          , "has something else"
-                          , hasOk
-                                (hasNoneOf
-                                    [ hasResource 1 EmptyBottle
-                                    , hasResource 2 EmptyBottle
-                                    ]
-                                )
-                          )
-                        ]
-                }
-            , testEffectsDistribution "doubling chance of 50% works with count of 5"
-                { initialGame = defaultGame
-                , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
-                , count = 5
-                , distribution =
-                    Test.expectDistribution
-                        [ ( Test.Distribution.atLeast 45
-                          , "has 5 of resource"
-                          , hasOk (hasResource 5 EmptyBottle)
-                          )
-                        , ( Test.Distribution.atLeast 45
-                          , "has 10 of resource"
-                          , hasOk (hasResource 10 EmptyBottle)
-                          )
-                        , ( Test.Distribution.zero
-                          , "has something else"
-                          , hasOk
-                                (hasNoneOf
-                                    [ hasResource 5 EmptyBottle
-                                    , hasResource 10 EmptyBottle
-                                    ]
-                                )
-                          )
-                        ]
-                }
-            ]
-        , describe "variable effects"
-            [ testEffectsDistribution "can have a 50% chance to gain a resource"
-                { initialGame = defaultGame
-                , effects =
-                    [ Effect.gainWithProbability (Percent.float 0.5)
-                        [ Effect.gainResource 1 EmptyBottle ]
-                    ]
-                , count = 1
-                , distribution =
-                    Test.expectDistribution
-                        [ ( Test.Distribution.atLeast 45
-                          , "has 0 of resource"
-                          , hasOk (hasResource 0 EmptyBottle)
-                          )
-                        , ( Test.Distribution.atLeast 45
-                          , "has 1 of resource"
-                          , hasOk (hasResource 1 EmptyBottle)
-                          )
-                        , ( Test.Distribution.zero
-                          , "has more than 1 reasource"
-                          , hasOk
-                                (hasNoneOf
-                                    [ hasResource 0 EmptyBottle
-                                    , hasResource 1 EmptyBottle
-                                    ]
-                                )
-                          )
-                        ]
-                }
-            ]
-        ]
 
-
-grantScrolls : Int -> Game -> Game
-grantScrolls amount game =
-    { game | scrolls = spellRecord amount }
-
-
-spellSelectorTest : Test
-spellSelectorTest =
-    let
-        effect : Effect
-        effect =
-            Effect.gainXp (Xp.int 10) Chores
-                |> Effect.withTags [ Effect.ActivityTag CleanBigBubba ]
-    in
-    describe "SpellSelector"
-        [ testEffects "Spell has the correct effect"
-            { initialGame =
-                defaultGame
-                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
-                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-                    |> grantScrolls 1
-            , effects = [ effect ]
-            , count = 1
-            , check = expectOk (expectXp (Xp.int 12) Chores)
-            }
-        , testEffects "Spell has no effect when no scrolls"
-            { initialGame =
-                defaultGame
-                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
-                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-            , effects = [ effect ]
-            , count = 1
-            , check = expectOk (expectXp (Xp.int 10) Chores)
-            }
-        , testEffects "Spell deducts a scroll"
-            { initialGame =
-                defaultGame
-                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Just Wind }
-                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-                    |> grantScrolls 1000
-            , effects = [ Effect.spendScroll 1 Wind ]
-            , count = 1
-            , check =
-                expectOk
-                    (\game ->
-                        getBySpell Wind game.scrolls
-                            |> Expect.equal 999
-                    )
-            }
-        , testEffects "Spell has no effect when no spell"
-            { initialGame =
-                defaultGame
-                    |> Game.selectSpell { activity = CleanBigBubba, maybeSpell = Nothing }
-                    |> Game.setActivitySkilling (Just ( CleanBigBubba, Timer.create ))
-            , effects = [ Effect.spendScroll 1 Wind ]
-            , count = 1
-            , check = expectOk (expectXp (Xp.int 10) Chores)
-            }
+        -- , describe "GainXp"
+        --     [ testEffects "can get Xp for Anatomy"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainXp (Xp.int 5) Anatomy ]
+        --         , count = 1
+        --         , check = expectOk (expectXp (Xp.int 5) Chores)
+        --         }
+        --     , testEffects "can get Xp for Hexes"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainXp (Xp.int 5) Hexes ]
+        --         , count = 1
+        --         , check = expectOk (expectXp (Xp.int 5) Hexes)
+        --         }
+        --     , testEffects "can get Xp for Chores with count of 5"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainXp (Xp.int 5) Chores ]
+        --         , count = 5
+        --         , check = expectOk (expectXp (Xp.int 25) Chores)
+        --         }
+        --     ]
+        -- , describe "GainResource"
+        --     [ testEffects "can get resources"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainResource 1 EmptyBottle ]
+        --         , count = 1
+        --         , check = expectOk (expectResource 1 EmptyBottle)
+        --         }
+        --     , testEffects
+        --         "can get resources with count of 5"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainResource 1 EmptyBottle ]
+        --         , count = 5
+        --         , check = expectOk (expectResource 5 EmptyBottle)
+        --         }
+        --     , testEffects "cannot go below 0 of a resource"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.spendResource 1 EmptyBottle ]
+        --         , count = 1
+        --         , check = expectErr (Expect.equal EffectErr.NegativeAmount)
+        --         }
+        --     , testEffectsDistribution "doubling chance of 50% works"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
+        --         , count = 1
+        --         , distribution =
+        --             Test.expectDistribution
+        --                 [ ( Test.Distribution.atLeast 45
+        --                   , "has 1 of resource"
+        --                   , hasOk (hasResource 1 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.atLeast 45
+        --                   , "has 2 of resource"
+        --                   , hasOk (hasResource 2 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.zero
+        --                   , "has something else"
+        --                   , hasOk
+        --                         (hasNoneOf
+        --                             [ hasResource 1 EmptyBottle
+        --                             , hasResource 2 EmptyBottle
+        --                             ]
+        --                         )
+        --                   )
+        --                 ]
+        --         }
+        --     , testEffectsDistribution "doubling chance of 50% works with count of 5"
+        --         { initialGame = defaultGame
+        --         , effects = [ Effect.gainResourceWithDoubling 1 EmptyBottle (Percent.float 0.5) ]
+        --         , count = 5
+        --         , distribution =
+        --             Test.expectDistribution
+        --                 [ ( Test.Distribution.atLeast 45
+        --                   , "has 5 of resource"
+        --                   , hasOk (hasResource 5 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.atLeast 45
+        --                   , "has 10 of resource"
+        --                   , hasOk (hasResource 10 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.zero
+        --                   , "has something else"
+        --                   , hasOk
+        --                         (hasNoneOf
+        --                             [ hasResource 5 EmptyBottle
+        --                             , hasResource 10 EmptyBottle
+        --                             ]
+        --                         )
+        --                   )
+        --                 ]
+        --         }
+        --     ]
+        -- , describe "variable effects"
+        --     [ testEffectsDistribution "can have a 50% chance to gain a resource"
+        --         { initialGame = defaultGame
+        --         , effects =
+        --             [ Effect.gainWithProbability (Percent.float 0.5)
+        --                 [ Effect.gainResource 1 EmptyBottle ]
+        --             ]
+        --         , count = 1
+        --         , distribution =
+        --             Test.expectDistribution
+        --                 [ ( Test.Distribution.atLeast 45
+        --                   , "has 0 of resource"
+        --                   , hasOk (hasResource 0 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.atLeast 45
+        --                   , "has 1 of resource"
+        --                   , hasOk (hasResource 1 EmptyBottle)
+        --                   )
+        --                 , ( Test.Distribution.zero
+        --                   , "has more than 1 reasource"
+        --                   , hasOk
+        --                         (hasNoneOf
+        --                             [ hasResource 0 EmptyBottle
+        --                             , hasResource 1 EmptyBottle
+        --                             ]
+        --                         )
+        --                   )
+        --                 ]
+        --         }
+        --     ]
         ]

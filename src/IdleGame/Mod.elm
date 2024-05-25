@@ -1,6 +1,5 @@
 module IdleGame.Mod exposing (..)
 
-import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -100,58 +99,6 @@ includeVariableEffects mod =
                             |> Effect.setEffect
                                 (Effect.VariableSuccess
                                     { successProbability = successProbability
-                                    , successEffects = newSuccessEffects
-                                    , failureEffects = newFailureEffects
-                                    }
-                                )
-                            |> ChangeEffect
-
-                    else
-                        NoChange
-
-                Effect.ResolveCombat { combat, successEffects, failureEffects } ->
-                    let
-                        ( successEffectsDidChange, newSuccessEffects ) =
-                            let
-                                newEffects : List Effect
-                                newEffects =
-                                    successEffects
-                                        |> List.concatMap
-                                            (\successEffect ->
-                                                let
-                                                    ( moddedSuccessEffect, additionalSuccessEffects ) =
-                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] successEffect
-                                                in
-                                                moddedSuccessEffect :: additionalSuccessEffects
-                                            )
-                            in
-                            ( successEffects /= newEffects, newEffects )
-
-                        ( failureEffectsDidChange, newFailureEffects ) =
-                            let
-                                newEffects : List Effect
-                                newEffects =
-                                    successEffects
-                                        |> List.concatMap
-                                            (\failureEffect ->
-                                                let
-                                                    ( moddedFailureEffect, additionalFailureEffects ) =
-                                                        applyModsToEffect [ { mod | transformer = newTransformer } ] failureEffect
-                                                in
-                                                moddedFailureEffect :: additionalFailureEffects
-                                            )
-                            in
-                            ( failureEffects /= newEffects, newEffects )
-
-                        effectDidChange : Bool
-                        effectDidChange =
-                            successEffectsDidChange || failureEffectsDidChange
-                    in
-                    if effectDidChange then
-                        taggedEffect
-                            |> Effect.setEffect
-                                (Effect.ResolveCombat
-                                    { combat = combat
                                     , successEffects = newSuccessEffects
                                     , failureEffects = newFailureEffects
                                     }
@@ -420,27 +367,6 @@ increaseSuccessTransformer buff repetitions taggedEffect =
             NoChange
 
 
-powerTransformer : Int -> Transformer
-powerTransformer buff repetitions taggedEffect =
-    case Effect.getEffect taggedEffect of
-        Effect.ResolveCombat { combat, successEffects, failureEffects } ->
-            let
-                newCombat : Combat
-                newCombat =
-                    Combat.addPlayerPower (buff * repetitions) combat
-
-                newEffect : EffectType
-                newEffect =
-                    Effect.ResolveCombat { combat = newCombat, successEffects = successEffects, failureEffects = failureEffects }
-            in
-            taggedEffect
-                |> Effect.setEffect newEffect
-                |> ChangeEffect
-
-        _ ->
-            NoChange
-
-
 addEffectsTransformer : List Effect -> Transformer
 addEffectsTransformer effects repetitions taggedEffect =
     ChangeAndAddEffects taggedEffect (List.concat (List.repeat repetitions effects))
@@ -473,9 +399,9 @@ skillXpBuff skill amount =
         |> withLabel (XpSkillLabel amount skill)
 
 
-choresXpBuff : Percent -> Mod
-choresXpBuff buff =
-    { tags = [ Effect.SkillTag Chores, Effect.XpTag ]
+anatomyXpBuff : Percent -> Mod
+anatomyXpBuff buff =
+    { tags = [ Effect.SkillTag Anatomy, Effect.XpTag ]
     , label = XpActivityLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
@@ -538,16 +464,6 @@ successBuff buff =
     { tags = []
     , label = SuccessLabel buff
     , transformer = increaseSuccessTransformer buff
-    , source = AdminCrimes
-    , repetitions = 1
-    }
-
-
-powerBuff : Int -> Mod
-powerBuff buff =
-    { tags = []
-    , label = PowerLabel buff
-    , transformer = powerTransformer buff
     , source = AdminCrimes
     , repetitions = 1
     }

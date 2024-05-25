@@ -6,4 +6,3 @@ module IdleGame.EffectErr exposing (..)
 
 type EffectErr
     = NegativeAmount -- Tried to subtract something and it went negative
-    | QuestAlreadyComplete -- Tried to complete a quest that was already complete

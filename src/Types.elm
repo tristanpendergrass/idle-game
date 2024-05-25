@@ -9,11 +9,8 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location
-import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
-import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -43,19 +40,10 @@ type alias TimePassesXpGain =
     }
 
 
-type TimePassesDiscovery
-    = MonsterDiscovery Monster
-    | QuestDiscovery Quest
-    | ResourceDiscovery Resource
-
-
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
-    , discoveries : List TimePassesDiscovery
     , coinGains : Maybe Coin
     , resourcesDiff : Resource.Diff
-    , combatsWonDiff : Int
-    , combatsLostDiff : Int
     }
 
 
@@ -63,19 +51,10 @@ type alias Game =
     { seed : Random.Seed
     , xp : SkillRecord Xp
     , mxp : ActivityRecord Xp
-    , locations : LocationRecord Location.State
-    , quests : QuestRecord Quest.State
-    , choresMxp : Xp
-    , activitySkilling : Maybe ( Activity, Timer )
-    , activityAdventuring : Maybe ( Activity, Timer )
-    , monster : Maybe Monster
+    , activity : Maybe ( Activity, Timer )
     , coin : Coin
     , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgradeRecord Bool
-    , combatsWon : Int
-    , combatsLost : Int
-    , spellSelectors : ActivityRecord (Maybe Spell)
-    , scrolls : SpellRecord Int
     }
 
 
@@ -109,11 +88,6 @@ type alias PointerState =
     }
 
 
-type Mode
-    = Skilling
-    | Adventuring
-
-
 type alias ModeState =
     { activeTab : Tab
     , preview : Maybe Preview
@@ -133,15 +107,12 @@ type alias FrontendModel =
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
-    , mode : Mode
     , skillingState : ModeState
-    , adventuringState : ModeState
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
-    , locationFilters : LocationRecord LocationFilter
     }
 
 
@@ -172,7 +143,6 @@ type FrontendMsg
     | UrlChanged Url
     | InitializeGameHelp (Snapshot Game) Posix
       -- Detail View
-    | SwitchMode Mode
     | ClosePreview
     | ExpandActivity
     | CollapseActivity
@@ -184,8 +154,6 @@ type FrontendMsg
     | HandlePreviewClick Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity
-    | HandleSpellSelect Activity String
-    | HandleQuestComplete Quest
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
@@ -210,12 +178,11 @@ type FrontendMsg
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
     | OpenMasteryUnlocksModal
-    | HandleTabClick Tab Mode
+    | HandleTabClick Tab
     | HandleShopUpgradeClick ShopUpgrade
     | HandlePointerDown PointerState
     | HandlePointerUp
     | HandlePointerCancel
-    | HandleLocationFilterClick Location LocationFilter
     | HandleGetViewportResult Browser.Dom.Viewport
 
 

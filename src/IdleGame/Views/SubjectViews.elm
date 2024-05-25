@@ -1,4 +1,4 @@
-module IdleGame.Views.QuestLog exposing (..)
+module IdleGame.Views.SubjectViews exposing (..)
 
 import Duration exposing (Duration)
 import FeatherIcons
@@ -10,8 +10,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location
-import IdleGame.Monster as Monster
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
@@ -25,6 +23,19 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-render : Game -> Html FrontendMsg
-render game =
-    div [] [ text "Quest Log" ]
+renderAnatomy : Game -> Html FrontendMsg
+renderAnatomy game =
+    div [ Utils.skills.wrapper ]
+        [ Utils.classTopNav { xp = game.xp.anatomy, skill = Anatomy }
+        , div [ Utils.skills.grid ]
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Anatomy game))
+        ]
+
+
+renderMedicalEthics : Game -> Html FrontendMsg
+renderMedicalEthics game =
+    div [ Utils.skills.wrapper ]
+        [ Utils.classTopNav { xp = game.xp.medicalEthics, skill = MedicalEthics }
+        , div [ Utils.skills.grid ]
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems MedicalEthics game))
+        ]

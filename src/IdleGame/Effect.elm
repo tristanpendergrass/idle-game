@@ -1,7 +1,6 @@
 module IdleGame.Effect exposing (..)
 
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -17,7 +16,6 @@ type Tag
     | XpTag
     | MxpTag
     | ActivityTag Activity
-    | LocationTag Location
 
 
 type alias Effect =
@@ -55,15 +53,11 @@ type alias SpendResourceParams =
 
 type EffectType
     = VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
-    | GainScroll { base : Int, spell : Spell, doublingChance : Percent }
-    | SpendScroll { base : Int, spell : Spell, preservationChance : Percent }
     | GainResource GainResourceParams
     | SpendResource SpendResourceParams
     | GainXp GainXpParams
     | GainMxp GainMxpParams
     | GainCoin GainCoinParams
-    | ResolveCombat { combat : Combat, successEffects : List Effect, failureEffects : List Effect }
-    | Explore { location : Location }
 
 
 getEffect : Effect -> EffectType
@@ -93,20 +87,6 @@ gainCoin quantity =
 gainMxp : Activity -> Effect
 gainMxp activity =
     { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
-    , tags = []
-    }
-
-
-gainScroll : Int -> Spell -> Effect
-gainScroll count spell =
-    { effect = GainScroll { base = count, spell = spell, doublingChance = Percent.zero }
-    , tags = []
-    }
-
-
-spendScroll : Int -> Spell -> Effect
-spendScroll amount spell =
-    { effect = SpendScroll { base = amount, spell = spell, preservationChance = Percent.zero }
     , tags = []
     }
 
@@ -147,20 +127,6 @@ gainResourceWithDoubling quantity kind doubling =
 gainWithProbability : Percent -> List Effect -> Effect
 gainWithProbability probability successEffects =
     { effect = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }
-    , tags = []
-    }
-
-
-resolveCombat : Combat -> List Effect -> Effect
-resolveCombat combat successEffects =
-    { effect = ResolveCombat { combat = combat, successEffects = successEffects, failureEffects = [] }
-    , tags = []
-    }
-
-
-explore : Location -> Effect
-explore location =
-    { effect = Explore { location = location }
     , tags = []
     }
 

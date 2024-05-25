@@ -26,16 +26,8 @@ file =
             , getDeclarations "Skill" "Skills" skills
             , [ Elm.comment "Activities" ]
             , getDeclarations "Activity" "Activities" activities
-            , [ Elm.comment "Spells" ]
-            , getDeclarations "Spell" "Spells" spells
-            , [ Elm.comment "Locations" ]
-            , getDeclarations "Location" "Locations" locations
-            , [ Elm.comment "Monsters" ]
-            , getDeclarations "Monster" "Monsters" monsters
             , [ Elm.comment "Shop Upgrades" ]
             , getDeclarations "ShopUpgrade" "ShopUpgrades" shopUpgrades
-            , [ Elm.comment "Quests" ]
-            , getDeclarations "Quest" "Quests" quests
             ]
         )
 
@@ -124,14 +116,7 @@ getDeclarations category categoryPlural names =
 
 resources : List String
 resources =
-    [ "Manure"
-    , "Soot"
-    , "GreenhouseDirt"
-    , "WashWater"
-    , "EmptyBottle"
-    , "Scrap"
-    , "Ectoplasm"
-    , "Parchment"
+    [ "Knowledge"
     ]
 
 
@@ -141,87 +126,20 @@ resources =
 
 skills : List String
 skills =
-    [ "Chores"
-    , "Hexes"
-    , "Weathermancing"
+    [ "Anatomy"
+    , "MedicalEthics"
     ]
 
 
 activities : List String
 activities =
-    [ "CleanStables"
-    , "CleanBigBubba"
-    , "SweepChimneys"
-    , "WaterGreenhousePlants"
-    , "WashAndIronRobes"
-    , "OrganizePotionIngredients"
-    , "RepairInstruments"
-    , "FlushDrainDemons"
-    , "OrganizeSpellBooks"
-    , "StudyHex1"
-    , "StudyJinx1"
-    , "StudyCurse1"
-    , "StudyHex2"
-    , "StudyJinx2"
-    , "StudyCurse2"
-    , "StudyHex3"
-    , "StudyJinx3"
-    , "StudyCurse3"
-    , "ExploreSchoolGrounds"
-    , "ExploreSecretGarden"
-    , "FightPrefect"
-    , "FightBookWyrm"
-    , "FightWhisperingWind"
-    , "StudyWind"
-    , "StudyWater"
-    , "StudySun"
-    ]
-
-
-spells : List String
-spells =
-    [ "Hex1"
-    , "Hex2"
-    , "Hex3"
-    , "Jinx1"
-    , "Jinx2"
-    , "Jinx3"
-    , "Curse1"
-    , "Curse2"
-    , "Curse3"
-    , "Wind"
-    , "Water"
-    , "Sun"
-    ]
-
-
-locations : List String
-locations =
-    [ "SchoolGrounds"
-    , "SecretGarden"
-    ]
-
-
-monsters : List String
-monsters =
-    [ "Prefect"
-    , "BookWyrm"
-    , "WhisperingWind"
+    [ "GrossAnatomy"
+    , "Neuroanatomy"
     ]
 
 
 shopUpgrades : List String
 shopUpgrades =
-    [ "Shovel"
-    , "Book"
-    , "Keyring"
-    , "ReadingGlasses"
-    , "OversizedBag"
+    [ "Glasses"
     ]
 
-
-quests : List String
-quests =
-    [ "MendCrackedBell"
-    , "ChopFirewood"
-    ]

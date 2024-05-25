@@ -8,7 +8,7 @@ import Types exposing (..)
 
 version : String
 version =
-    "0.3"
+    "0.1"
 
 
 type alias Flags =
@@ -18,9 +18,7 @@ type alias Flags =
     , debugTimePasses : Bool -- If True then Time Passes with mock values will appear when app starts
     , showTimePasses : Bool
     , showDebugPanel : Bool
-    , defaultMode : Mode
-    , defaultTabSkilling : Tab
-    , defaultTabAdventuring : Tab
+    , defaultTab : Tab
     , maxOutSkillXp : Bool
     }
 
@@ -46,9 +44,7 @@ devFlags =
     , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True
-    , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.SchoolGrounds
+    , defaultTab = Tab.Anatomy
     , maxOutSkillXp = True
     }
 
@@ -61,9 +57,7 @@ prodFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = True -- Setting to True for now so play testers can enjoy
-    , defaultMode = Skilling
-    , defaultTabSkilling = Tab.Chores
-    , defaultTabAdventuring = Tab.SchoolGrounds
+    , defaultTab = Tab.Anatomy
     , debugTimePasses = False
     , maxOutSkillXp = False
     }

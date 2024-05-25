@@ -4,17 +4,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat as Combat exposing (Combat)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location exposing (findableResources, foundResources)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
-import IdleGame.Spell as Spell
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
@@ -42,12 +39,6 @@ renderModdedEffect renderType game effect =
         Effect.GainCoin coin ->
             renderCoin coin
 
-        Effect.GainScroll params ->
-            renderScroll game params.spell params.base
-
-        Effect.SpendScroll params ->
-            renderScroll game params.spell (-1 * params.base)
-
         Effect.GainResource params ->
             renderResource game params.resource params.base
 
@@ -73,17 +64,6 @@ renderModdedEffect renderType game effect =
                 _ ->
                     div [] []
 
-        Effect.ResolveCombat { combat, successEffects } ->
-            renderCombat
-                { renderType = renderType
-                , combat = combat
-                , successEffects = successEffects
-                , game = game
-                }
-
-        Effect.Explore { location } ->
-            renderExplore game location
-
 
 renderCoin : { base : Coin, percentIncrease : Percent } -> Html msg
 renderCoin { base, percentIncrease } =
@@ -105,55 +85,6 @@ renderCoin { base, percentIncrease } =
             ]
         , Icon.coin
             |> Icon.toHtml
-        ]
-
-
-renderExplore : Game -> Location -> Html msg
-renderExplore game location =
-    let
-        locationState : Location.State
-        locationState =
-            getByLocation location game.locations
-
-        foundResources : List Resource
-        foundResources =
-            Location.foundResources location locationState
-
-        foundResourcesCount : Int
-        foundResourcesCount =
-            List.length foundResources
-    in
-    div [ class "t-column" ]
-        [ div [ class "italic text-sm" ] [ text "Gather" ]
-        , div [ class "grid max-w-full" ]
-            (List.map
-                (\resource -> (Resource.getStats resource).icon |> Icon.toHtml)
-                foundResources
-            )
-        ]
-
-
-renderScroll : Game -> Spell -> Int -> Html msg
-renderScroll game spell base =
-    let
-        owned : Int
-        owned =
-            getBySpell spell game.scrolls
-
-        isNegativeAmount : Bool
-        isNegativeAmount =
-            base < 0
-
-        icon : Html msg
-        icon =
-            (Spell.getStats spell).icon
-                |> Icon.toHtml
-    in
-    div [ class "flex items-center gap-1" ]
-        [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (Utils.intToString base) ]
-        , icon
-        , div [ classList [ ( "hidden", not isNegativeAmount || owned >= abs base ) ] ]
-            [ text <| "(Owned: " ++ Utils.intToString owned ++ ")" ]
         ]
 
 
@@ -246,71 +177,3 @@ renderMonsterPower strength =
             [ text (Utils.intToString strength)
             ]
         ]
-
-
-renderCombat :
-    { renderType : RenderType
-    , successEffects : List Effect
-    , combat : Combat
-    , game : Game
-    }
-    -> Html msg
-renderCombat { renderType, successEffects, combat, game } =
-    let
-        monsterPower : Int
-        monsterPower =
-            Combat.getMonsterPower combat
-
-        playerPower : Int
-        playerPower =
-            Combat.getPlayerPower combat
-    in
-    case renderType of
-        DetailView ->
-            let
-                ( predictionText, predictionColorClass ) =
-                    parsePrediction (Combat.getVictoryPrediction combat)
-            in
-            div [ class "t-column max-w-full" ]
-                [ div [ class "flex items-center gap-1 max-w-full overflow-hidden text-sm" ]
-                    [ span [] [ text "Victory:" ]
-                    , span [ predictionColorClass ] [ text predictionText ]
-                    ]
-                , div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
-                    [ renderMonsterPower monsterPower
-                    , div [ class "divider divider-horizontal h-full text-sm" ] [ text "Vs" ]
-                    , div [ class "t-column gap-0" ]
-                        [ div [ class "text-2xl font-bold" ] [ text (Utils.intToString playerPower) ]
-                        , div [ class "text-sm" ] [ text "Player Power" ]
-                        ]
-                    ]
-                , div [ class "flex items-center gap-4 max-w-full overflow-hidden" ]
-                    (List.map (renderModdedEffect renderType game) successEffects)
-                ]
-
-        Card ->
-            div [ class "t-column max-w-full" ]
-                [ div [ class "flex items-center gap-1 h-24 max-w-full overflow-hidden" ]
-                    [ renderMonsterPower monsterPower ]
-                , div [ class "flex items-center gap-4 max-w-full overflow-hidden" ]
-                    (List.map (renderModdedEffect renderType game) successEffects)
-                ]
-
-
-parsePrediction : Combat.Prediction -> ( String, Attribute msg )
-parsePrediction prediction =
-    case prediction of
-        Combat.VeryLow ->
-            ( "Doubtful", class "text-error" )
-
-        Combat.Low ->
-            ( "Plausible", class "text-warning" )
-
-        Combat.AboutEven ->
-            ( "Even", class "" )
-
-        Combat.Good ->
-            ( "Hopeful", class "text-success" )
-
-        Combat.VeryGood ->
-            ( "Likely", class "text-success" )

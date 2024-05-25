@@ -18,31 +18,11 @@ import Types exposing (..)
 render : Game -> Html FrontendMsg
 render game =
     let
-        choresSkillLevel : Int
-        choresSkillLevel =
-            game.xp.chores
-                |> Xp.level Xp.defaultSchedule
-
         ownedLabel =
             div [ class "flex-0 px-2 py-1 bg-primary text-primary-content rounded min-w-[3rem] text-center" ]
                 [ text "Owned"
                 ]
 
-        -- priceLabel : Coin -> Html FrontendMsg
-        -- priceLabel price =
-        --     div [ class "flex items-center gap-1" ]
-        --         [ Icon.coin
-        --             |> Icon.toHtml
-        --         , div
-        --             [ class "font-bold"
-        --             , classList [ ( "text-error", Coin.toInt price > Coin.toInt game.coin ) ]
-        --             ]
-        --             [ price
-        --                 |> Coin.toInt
-        --                 |> IdleGame.Views.Utils.intToString
-        --                 |> text
-        --             ]
-        --         ]
         renderShopUpgrade : ShopUpgradeRecord Bool -> ShopUpgrade -> Html FrontendMsg
         renderShopUpgrade ownedItems kind =
             let

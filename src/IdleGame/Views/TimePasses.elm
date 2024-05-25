@@ -9,8 +9,6 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game
-import IdleGame.Monster as Monster
-import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
@@ -54,31 +52,10 @@ hasGains { xpGains, coinGains, resourcesDiff } =
         )
 
 
-renderTimePassesDiscovery : TimePassesDiscovery -> Html FrontendMsg
-renderTimePassesDiscovery discovery =
-    let
-        ( icon, title ) =
-            case discovery of
-                MonsterDiscovery monster ->
-                    ( (Monster.getStats monster).icon, (Monster.getStats monster).title )
-
-                QuestDiscovery quest ->
-                    ( Icon.quest, (Quest.getStats quest).title )
-
-                ResourceDiscovery resource ->
-                    ( (Resource.getStats resource).icon, (Resource.getStats resource).title )
-    in
-    li [ class "flex items-center gap-2 text-success" ]
-        [ span [] [ text <| "Discovered:" ]
-        , span [] [ icon |> Icon.toHtml ]
-        , span [] [ text title ]
-        ]
-
-
 render : Duration -> Posix -> TimePassesData -> Html FrontendMsg
 render timeToFastForward timePassed timePassesData =
     let
-        { xpGains, coinGains, resourcesDiff, combatsWonDiff, combatsLostDiff } =
+        { xpGains, coinGains, resourcesDiff } =
             timePassesData
 
         timeStr =
@@ -88,22 +65,6 @@ render timeToFastForward timePassed timePassesData =
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
         , span [ classList [ ( "hidden", not Config.flags.showTimePasses ) ] ] [ text timeStr ]
-        , ul [ class "t-column font-semibold" ]
-            (List.map renderTimePassesDiscovery timePassesData.discoveries)
-        , ul [ class "t-column font-semibold" ]
-            (List.concat
-                [ if combatsWonDiff > 0 then
-                    [ renderCombatsWon combatsWonDiff ]
-
-                  else
-                    []
-                , if combatsLostDiff > 0 then
-                    [ renderCombatsLost combatsLostDiff ]
-
-                  else
-                    []
-                ]
-            )
         , div [ classList [ ( "hidden", not (hasGains timePassesData) ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []

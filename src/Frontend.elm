@@ -18,14 +18,10 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Location as Location
 import IdleGame.Mocks
-import IdleGame.Monster as Monster
-import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
-import IdleGame.Spell as Spell
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity
@@ -88,19 +84,25 @@ init _ key =
             else
                 Nothing
     in
+    -- { key : Key -- used by Browser.Navigation for things like pushUrl
+    -- , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
+    -- , showDebugPanel : Bool
+    -- , tray : Toast.Tray Toast
+    -- , isDrawerOpen : Bool
+    -- , skillingState : ModeState
+    -- , isVisible : Bool
+    -- , activeModal : Maybe Modal
+    -- , saveGameTimer : Timer
+    -- , gameState : FrontendGameState
+    -- , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
+    -- }
     ( { key = key
       , lastFastForwardDuration = Nothing
       , showDebugPanel = False
       , tray = Toast.tray
       , isDrawerOpen = False
-      , mode = Config.flags.defaultMode
       , skillingState =
-            { activeTab = Config.flags.defaultTabSkilling
-            , preview = Nothing
-            , activityExpanded = activityExpanded
-            }
-      , adventuringState =
-            { activeTab = Config.flags.defaultTabAdventuring
+            { activeTab = Config.flags.defaultTab
             , preview = Nothing
             , activityExpanded = activityExpanded
             }
@@ -109,7 +111,6 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
-      , locationFilters = locationRecord LocationAll
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -200,8 +201,8 @@ createTimePassesModal duration oldSnap newSnap =
         |> Maybe.map (TimePassesModal duration timePassed)
 
 
-setTabSkilling : Tab -> FrontendModel -> FrontendModel
-setTabSkilling tab model =
+setTab : Tab -> FrontendModel -> FrontendModel
+setTab tab model =
     let
         skillingState : ModeState
         skillingState =
@@ -212,20 +213,6 @@ setTabSkilling tab model =
             { skillingState | activeTab = tab }
     in
     { model | skillingState = newSkillingState }
-
-
-setTabAdventuring : Tab -> FrontendModel -> FrontendModel
-setTabAdventuring tab model =
-    let
-        adventuringState : ModeState
-        adventuringState =
-            model.adventuringState
-
-        newAdventuringState : ModeState
-        newAdventuringState =
-            { adventuringState | activeTab = tab }
-    in
-    { model | adventuringState = newAdventuringState }
 
 
 setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
@@ -301,105 +288,49 @@ tickForDuration duration =
         (\d oldGame -> Game.tick d oldGame |> Tuple.first)
 
 
-setPreview : Mode -> Maybe Preview -> FrontendModel -> FrontendModel
-setPreview mode =
+setPreview : Maybe Preview -> FrontendModel -> FrontendModel
+setPreview maybePreview model =
     let
-        setPreviewSkilling : Maybe Preview -> FrontendModel -> FrontendModel
-        setPreviewSkilling maybePreview model =
-            let
-                skillingState : ModeState
-                skillingState =
-                    model.skillingState
+        skillingState : ModeState
+        skillingState =
+            model.skillingState
 
-                newSkillingState : ModeState
-                newSkillingState =
-                    { skillingState | preview = maybePreview }
-            in
-            { model | skillingState = newSkillingState }
-
-        setPreviewAdventuring : Maybe Preview -> FrontendModel -> FrontendModel
-        setPreviewAdventuring maybePreview model =
-            let
-                adventuringState : ModeState
-                adventuringState =
-                    model.adventuringState
-
-                newAdventuringState : ModeState
-                newAdventuringState =
-                    { adventuringState | preview = maybePreview }
-            in
-            { model | adventuringState = newAdventuringState }
+        newSkillingState : ModeState
+        newSkillingState =
+            { skillingState | preview = maybePreview }
     in
-    case mode of
-        Skilling ->
-            setPreviewSkilling
-
-        Adventuring ->
-            setPreviewAdventuring
+    { model | skillingState = newSkillingState }
 
 
-setActivityExpanded : Mode -> Bool -> FrontendModel -> FrontendModel
-setActivityExpanded mode =
+setActivityExpanded : Bool -> FrontendModel -> FrontendModel
+setActivityExpanded activityExpanded model =
     let
-        setActivityExpandedSkilling : Bool -> FrontendModel -> FrontendModel
-        setActivityExpandedSkilling activityExpanded model =
-            let
-                skillingState : ModeState
-                skillingState =
-                    model.skillingState
+        skillingState : ModeState
+        skillingState =
+            model.skillingState
 
-                newSkillingState : ModeState
-                newSkillingState =
-                    { skillingState | activityExpanded = activityExpanded }
-            in
-            { model | skillingState = newSkillingState }
-
-        setActivityExpandedAdventuring : Bool -> FrontendModel -> FrontendModel
-        setActivityExpandedAdventuring activityExpanded model =
-            let
-                adventuringState : ModeState
-                adventuringState =
-                    model.adventuringState
-
-                newAdventuringState : ModeState
-                newAdventuringState =
-                    { adventuringState | activityExpanded = activityExpanded }
-            in
-            { model | adventuringState = newAdventuringState }
+        newSkillingState : ModeState
+        newSkillingState =
+            { skillingState | activityExpanded = activityExpanded }
     in
-    case mode of
-        Skilling ->
-            setActivityExpandedSkilling
-
-        Adventuring ->
-            setActivityExpandedAdventuring
+    { model | skillingState = newSkillingState }
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
         Playing snapshot ->
-            case model.mode of
-                Skilling ->
-                    (Snapshot.getValue snapshot).activitySkilling
-
-                Adventuring ->
-                    (Snapshot.getValue snapshot).activityAdventuring
+            (Snapshot.getValue snapshot).activity
 
         _ ->
             Nothing
 
 
-setActivity : Mode -> Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
-setActivity mode newActivity =
+setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
+setActivity newActivity =
     mapGame
         (\game ->
-            case mode of
-                Skilling ->
-                    Game.setActivitySkilling newActivity game
-
-                Adventuring ->
-                    Game.setActivityAdventuring newActivity game
+            Game.setActivity newActivity game
         )
 
 
@@ -432,11 +363,6 @@ updatePointer delta model =
                           }
                         , Cmd.none
                         )
-
-
-updateLocationFilters : (LocationRecord LocationFilter -> LocationRecord LocationFilter) -> FrontendModel -> FrontendModel
-updateLocationFilters fn model =
-    { model | locationFilters = fn model.locationFilters }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -496,36 +422,33 @@ update msg model =
                 |> Task.attempt (\_ -> NoOp)
             )
 
-        SwitchMode mode ->
-            ( { model | mode = mode }, Cmd.none )
-
         ClosePreview ->
             ( model
-                |> setPreview model.mode Nothing
+                |> setPreview Nothing
             , Cmd.none
             )
 
         CollapseActivity ->
             ( model
-                |> setActivityExpanded model.mode False
+                |> setActivityExpanded False
             , Cmd.none
             )
 
         ExpandActivity ->
             ( model
-                |> setActivityExpanded model.mode True
+                |> setActivityExpanded True
             , Cmd.none
             )
 
         CollapseDetailView ->
             ( model
-                |> setActivityExpanded model.mode False
+                |> setActivityExpanded False
             , Cmd.none
             )
 
         ExpandDetailView ->
             ( model
-                |> setActivityExpanded model.mode True
+                |> setActivityExpanded True
             , Cmd.none
             )
 
@@ -657,15 +580,15 @@ update msg model =
             in
             if ViewUtils.screenSupportsRighRail screenWidth then
                 ( model
-                    |> setActivity model.mode newActivity
-                    |> setActivityExpanded model.mode (not clickingActiveActivity)
+                    |> setActivity newActivity
+                    |> setActivityExpanded (not clickingActiveActivity)
                 , Cmd.none
                 )
 
             else
                 ( model
-                    |> setActivity model.mode newActivity
-                    |> setActivityExpanded model.mode False
+                    |> setActivity newActivity
+                    |> setActivityExpanded False
                 , Cmd.none
                 )
 
@@ -685,8 +608,8 @@ update msg model =
                             False
             in
             ( model
-                |> setPreview model.mode (Just (Preview activity))
-                |> setActivityExpanded model.mode
+                |> setPreview (Just (Preview activity))
+                |> setActivityExpanded
                     (if clickingActiveActivity then
                         True
 
@@ -698,105 +621,18 @@ update msg model =
 
         HandlePlayClick kind ->
             ( model
-                |> setActivity model.mode (Just ( kind, Timer.create ))
-                |> setPreview model.mode Nothing
-                |> setActivityExpanded model.mode True
+                |> setActivity (Just ( kind, Timer.create ))
+                |> setPreview Nothing
+                |> setActivityExpanded True
             , Cmd.none
             )
 
         HandleStopClick kind ->
             ( model
-                |> setActivity model.mode Nothing
-                |> setPreview model.mode (Just (Preview kind))
+                |> setActivity Nothing
+                |> setPreview (Just (Preview kind))
             , Cmd.none
             )
-
-        HandleSpellSelect activity spellTitle ->
-            ( model
-                |> mapGame
-                    (\game ->
-                        let
-                            maybeSpell : Maybe Spell
-                            maybeSpell =
-                                Spell.getByTitle spellTitle
-                        in
-                        Game.selectSpell { activity = activity, maybeSpell = maybeSpell } game
-                    )
-            , Cmd.none
-            )
-
-        HandleQuestComplete quest ->
-            -- case model.gameState of
-            --     Playing snapshot ->
-            --         let
-            --             game : Game
-            --             game =
-            --                 Snapshot.getValue snapshot
-            --             purchaseResult : Result EffectErr Game.ApplyEffectsValue
-            --             purchaseResult =
-            --                 Game.attemptPurchaseResource quantity resource game
-            --         in
-            --         case purchaseResult of
-            --             Ok res ->
-            --                 let
-            --                     newGame : Game
-            --                     newGame =
-            --                         res.game
-            --                     toasts : List Toast
-            --                     toasts =
-            --                         res.toasts
-            --                     newModel : FrontendModel
-            --                     newModel =
-            --                         { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
-            --                             |> setActiveModal Nothing
-            --                     notificationCmds : List (Cmd FrontendMsg)
-            --                     notificationCmds =
-            --                         List.map (AddToast >> delay 0) toasts
-            --                 in
-            --                 ( newModel, Cmd.batch notificationCmds )
-            --             Err _ ->
-            --                 -- We disable the buy button in this case so shouldn't normally reach this spot
-            --                 noOp
-            --     _ ->
-            --         noOp
-            case model.gameState of
-                Playing snapshot ->
-                    let
-                        game : Game
-                        game =
-                            Snapshot.getValue snapshot
-
-                        result : Result EffectErr Game.ApplyEffectsValue
-                        result =
-                            Game.attemptCompleteQuest quest game
-                    in
-                    case result of
-                        Ok res ->
-                            let
-                                newGame : Game
-                                newGame =
-                                    res.game
-
-                                toasts : List Toast
-                                toasts =
-                                    res.toasts
-
-                                newModel : FrontendModel
-                                newModel =
-                                    { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) }
-
-                                notificationCmds : List (Cmd FrontendMsg)
-                                notificationCmds =
-                                    List.map (AddToast >> delay 0) toasts
-                            in
-                            ( newModel, Cmd.batch notificationCmds )
-
-                        Err _ ->
-                            -- We disable the quest complete button in this case so shouldn't normally reach this spot
-                            noOp
-
-                _ ->
-                    noOp
 
         SetDrawerOpen newValue ->
             ( model
@@ -920,16 +756,7 @@ update msg model =
             , Cmd.none
             )
 
-        HandleTabClick tab mode ->
-            let
-                setTab =
-                    case mode of
-                        Skilling ->
-                            setTabSkilling
-
-                        Adventuring ->
-                            setTabAdventuring
-            in
+        HandleTabClick tab ->
             ( model
                 |> setTab tab
                 |> setIsDrawerOpen False
@@ -1147,21 +974,6 @@ update msg model =
                 _ ->
                     noOp
 
-        HandleLocationFilterClick location filter ->
-            let
-                updateFilter : LocationFilter -> LocationFilter
-                updateFilter oldFilter =
-                    if oldFilter == filter then
-                        LocationAll
-
-                    else
-                        filter
-            in
-            ( model
-                |> updateLocationFilters (Location.updateByKindLocation location updateFilter)
-            , Cmd.none
-            )
-
         HandleGetViewportResult viewport ->
             let
                 screenWidth : Float
@@ -1182,8 +994,7 @@ update msg model =
                         False
             in
             ( model
-                |> setActivityExpanded Skilling expandedValue
-                |> setActivityExpanded Adventuring expandedValue
+                |> setActivityExpanded expandedValue
             , Cmd.none
             )
 
@@ -1271,34 +1082,6 @@ toastToHtml notification =
                     |> Icon.toHtml
                 ]
 
-        GainedScroll amount spell ->
-            let
-                stats : Spell.Stats
-                stats =
-                    Spell.getStats spell
-
-                plusOrMinus : String
-                plusOrMinus =
-                    if amount >= 0 then
-                        "+"
-
-                    else
-                        "-"
-
-                colorClass : Attribute msg
-                colorClass =
-                    if amount >= 0 then
-                        successClass
-
-                    else
-                        errClass
-            in
-            div [ baseClass, colorClass, class "flex gap-1 items-center" ]
-                [ span [] [ text <| plusOrMinus ++ ViewUtils.intToString (abs amount) ]
-                , stats.icon
-                    |> Icon.toHtml
-                ]
-
         GainedResource amount resource ->
             let
                 stats : Resource.Stats
@@ -1327,32 +1110,9 @@ toastToHtml notification =
                     |> Icon.toHtml
                 ]
 
-        LostCombat ->
-            div [ baseClass, warningClass ]
-                [ text "Lost combat" ]
-
         NegativeAmountErr ->
             div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
-
-        QuestAlreadyCompleteErr ->
-            div [ baseClass, warningClass ]
-                [ text "Quest already complete" ]
-
-        DiscoveredMonster monster ->
-            div [ baseClass, successClass ]
-                [ text <| "Discovered Monster: " ++ Monster.getLabel monster ]
-
-        DiscoveredResource resource ->
-            div [ baseClass, successClass, class "flex gap-1 items-center" ]
-                [ span [] [ text <| "Discovered Resource: " ++ (Resource.getStats resource).title ]
-                , (Resource.getStats resource).icon
-                    |> Icon.toHtml
-                ]
-
-        DiscoveredQuest quest ->
-            div [ baseClass, successClass ]
-                [ text <| "Discovered Quest: " ++ Quest.getLabel quest ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg
@@ -1408,7 +1168,7 @@ renderBottomRightItems model =
             []
          )
             ++ (case model.skillingState.activeTab of
-                    Tab.Chores ->
+                    Tab.Anatomy ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
                     _ ->
@@ -1425,7 +1185,7 @@ view model =
             -- We're not using it for now because it's experimental but might be useful if we want to eliminate the flicker from the css loading in
             node "link" [ rel "stylesheet", href "/output.css" ] []
     in
-    { title = "Idle Game"
+    { title = "Med School Idle"
     , body =
         [ css
         , DebugPanel.render model
@@ -1444,12 +1204,7 @@ view model =
 
                     detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
-                        case model.mode of
-                            Skilling ->
-                                getDetailViewState game.activitySkilling model.skillingState.preview model.skillingState.activityExpanded
-
-                            Adventuring ->
-                                getDetailViewState game.activityAdventuring model.adventuringState.preview model.adventuringState.activityExpanded
+                        getDetailViewState game.activity model.skillingState.preview model.skillingState.activityExpanded
 
                     extraBottomPadding : Bool
                     extraBottomPadding =
@@ -1474,12 +1229,7 @@ view model =
 
                     activeTab : Tab
                     activeTab =
-                        case model.mode of
-                            Skilling ->
-                                model.skillingState.activeTab
-
-                            Adventuring ->
-                                model.adventuringState.activeTab
+                        model.skillingState.activeTab
 
                     detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
                     detailViewWrapperProps =
@@ -1504,7 +1254,7 @@ view model =
                             ]
                             []
                         , IdleGame.Views.Content.renderContent model game activeTab
-                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen model.mode activeTab
+                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen activeTab
                         ]
 
                     -- , IdleGame.Views.DetailViewWrapper.render

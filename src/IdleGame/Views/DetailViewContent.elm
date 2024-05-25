@@ -10,12 +10,10 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Skill as Skill
-import IdleGame.Spell as Spell
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Spell as SpellView
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
@@ -148,14 +146,6 @@ renderContent obj extraBottomPadding game =
         belongsToLabel : String
         belongsToLabel =
             Activity.belongsToLabel (Activity.getStats activity).belongsTo
-
-        selectedSpell : Maybe Spell
-        selectedSpell =
-            getByActivity activity game.spellSelectors
-
-        spellSelectorOptions : List Spell
-        spellSelectorOptions =
-            Game.spellSelectorOptions game activity
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
@@ -200,12 +190,6 @@ renderContent obj extraBottomPadding game =
             [ ActivityView.activityDuration (Game.getModdedDuration game activity)
             , fade isPreview
             ]
-        , case stats.teachesSpell of
-            Nothing ->
-                div [ class "hidden" ] []
-
-            Just spell ->
-                SpellView.renderSpellEffects spell
 
         -- The effects of the activity
         , div [ class "t-column relative" ]
@@ -221,47 +205,6 @@ renderContent obj extraBottomPadding game =
                 orderedEffects
                 ++ [ fade isPreview ]
             )
-
-        -- Spell selector
-        , div [ class "divider" ] []
-        , div [ class "flex flex-col items-center gap-2", classList [ ( "hidden", List.isEmpty spellSelectorOptions ) ] ]
-            [ label [ for "selector" ] [ text "Use spell" ]
-            , select [ id "selector", class "select w-full", onInput (HandleSpellSelect activity) ]
-                ([ option [ selected (selectedSpell == Nothing), value "" ] [ text "None" ]
-                 ]
-                    ++ List.map
-                        (\spell ->
-                            let
-                                title : String
-                                title =
-                                    (Spell.getStats spell).title
-
-                                scrolls : Int
-                                scrolls =
-                                    getBySpell spell game.scrolls
-
-                                scrollQuantity : String
-                                scrollQuantity =
-                                    Utils.intToString scrolls
-                            in
-                            option
-                                [ selected (selectedSpell == Just spell)
-                                , disabled (scrolls == 0)
-                                , value title
-                                , class "flex items-center gap-1"
-                                ]
-                                [ span [] [ text (title ++ " (" ++ scrollQuantity ++ ")") ]
-                                ]
-                        )
-                        spellSelectorOptions
-                )
-            , case selectedSpell of
-                Just spell ->
-                    SpellView.renderSpellEffects spell
-
-                Nothing ->
-                    div [] []
-            ]
         , div [ class "divider" ] []
 
         -- The current mastery level
