@@ -2,6 +2,7 @@ module Config exposing (Flags, flags, version)
 
 import Duration exposing (Duration)
 import Env
+import IdleGame.Kinds exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
 import Types exposing (..)
 
@@ -44,7 +45,7 @@ devFlags =
     , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True
-    , defaultTab = Tab.Anatomy
+    , defaultTab = Tab.SubjectTab Anatomy
     , maxOutSkillXp = True
     }
 
@@ -57,7 +58,7 @@ prodFlags =
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
     , showDebugPanel = True -- Setting to True for now so play testers can enjoy
-    , defaultTab = Tab.Anatomy
+    , defaultTab = Tab.SubjectTab Anatomy
     , debugTimePasses = False
     , maxOutSkillXp = False
     }

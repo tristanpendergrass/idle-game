@@ -143,12 +143,7 @@ renderActivityCard activity game screenWidth =
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
-                [ case stats.type_ of
-                    Nothing ->
-                        div [ class "hidden" ] []
-
-                    Just type_ ->
-                        div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString type_) ]
+                [ div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString stats.activityType) ]
                 , div [ class "t-column" ]
                     [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
                     , div [ classList [ ( "hidden", not stats.showDuration ) ] ] [ activityDuration duration ]
@@ -170,7 +165,7 @@ renderActivityCard activity game screenWidth =
 
                 Just percentComplete ->
                     div
-                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
+                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0 rounded-l-xl"
                         , Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]

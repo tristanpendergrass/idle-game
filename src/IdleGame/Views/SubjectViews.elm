@@ -23,19 +23,10 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-renderAnatomy : Game -> Html FrontendMsg
-renderAnatomy game =
+renderSubject : Skill -> Game -> Html FrontendMsg
+renderSubject skill game =
     div [ Utils.skills.wrapper ]
-        [ Utils.classTopNav { xp = game.xp.anatomy, skill = Anatomy }
+        [ Utils.classTopNav { xp = getBySkill skill game.xp, skill = skill }
         , div [ Utils.skills.grid ]
-            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems Anatomy game))
-        ]
-
-
-renderMedicalEthics : Game -> Html FrontendMsg
-renderMedicalEthics game =
-    div [ Utils.skills.wrapper ]
-        [ Utils.classTopNav { xp = game.xp.medicalEthics, skill = MedicalEthics }
-        , div [ Utils.skills.grid ]
-            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems MedicalEthics game))
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems skill game))
         ]

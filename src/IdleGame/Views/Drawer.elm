@@ -5,6 +5,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Kinds exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils as Utils
@@ -75,13 +76,10 @@ renderDrawer isDrawerOpen activeTab =
                 , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ onClick (HandleTabClick Tab.Anatomy) ] [ renderTab { tab = Tab.Anatomy, underConstruction = False } ]
-                ]
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ class "menu-title" ] [ span [] [ text "Other classes" ] ]
-                , li [ onClick (HandleTabClick Tab.MedicalEthics) ] [ renderTab { tab = Tab.MedicalEthics, underConstruction = True } ]
-                ]
+                (li [] []
+                    :: (allSkills
+                            |> List.map (\skill -> li [ onClick (HandleTabClick (Tab.SubjectTab skill)) ] [ renderTab { tab = Tab.SubjectTab skill, underConstruction = False } ])
+                       )
+                )
             ]
         ]

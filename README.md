@@ -31,7 +31,13 @@ npx elm-test src/IdleGame/PerfTesting/Test60Days.elm
 # Codegen
 
 We use [elm-codegen](https://github.com/mdgriffith/elm-codegen) to generate some boilerplate for the game.
-To make changes: edit `codegen/Generate.elm` then run `$ npm run generate-elm`. This will run elm-codegen and copy the results from `generated/` to `src/`.
+To make changes: edit `codegen/Generate.elm` then run
+
+```
+$ npm run generate-elm
+```
+
+This will run elm-codegen and copy the results from `generated/` to `src/`.
 
 # Deployment
 [ ] Run unit tests (see above)

@@ -161,12 +161,7 @@ renderContent obj extraBottomPadding game =
             [ Utils.cardImage (Activity.getStats activity).image
             , fade isPreview
             ]
-        , case stats.type_ of
-            Nothing ->
-                div [ class "hidden" ] []
-
-            Just type_ ->
-                div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString type_) ]
+        , div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString stats.activityType) ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]

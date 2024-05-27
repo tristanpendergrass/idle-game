@@ -26,20 +26,11 @@ getStats skill =
 
 allStats : SkillRecord Stats
 allStats =
-    { anatomy = anatomyStats
-    , medicalEthics = medicalEthicsStats
-    }
-
-
-anatomyStats : Stats
-anatomyStats =
-    { title = "Anatomy"
-    , icon = Icon.chores
-    }
-
-
-medicalEthicsStats : Stats
-medicalEthicsStats =
-    { title = "Medical Ethics"
-    , icon = Icon.hexes
+    { anatomy = { title = "Anatomy", icon = Icon.chores }
+    , biochemistry = { title = "Biochemistry", icon = Icon.chores }
+    , physiology = { title = "Physiology", icon = Icon.chores }
+    , pharmacology = { title = "Pharmacology", icon = Icon.chores }
+    , microbiology = { title = "Microbiology", icon = Icon.chores }
+    , pathology = { title = "Pathology", icon = Icon.chores }
+    , medicalEthics = { title = "Medical Ethics", icon = Icon.chores }
     }

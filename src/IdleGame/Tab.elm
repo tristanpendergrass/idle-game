@@ -1,5 +1,7 @@
 module IdleGame.Tab exposing (..)
 
+import IdleGame.Kinds exposing (..)
+import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
@@ -7,13 +9,7 @@ type Tab
     = Backpack
     | Shop
       -- | TestingCenter
-    | Anatomy
-      -- | Biochemistry
-      -- | Physiology
-      -- | Pharmacology
-      -- | MicrobiologyAndImmunology
-      -- | Pathology
-    | MedicalEthics
+    | SubjectTab Skill
 
 
 type alias TabConfig =
@@ -35,12 +31,7 @@ getConfig tab =
             , icon = Icon.fromString "S"
             }
 
-        Anatomy ->
-            { title = "Anatomy"
-            , icon = Icon.fromString "A"
-            }
-
-        MedicalEthics ->
-            { title = "Medical Ethics"
-            , icon = Icon.fromString "ME"
+        SubjectTab skill ->
+            { title = (Skill.getStats skill).title
+            , icon = (Skill.getStats skill).icon
             }

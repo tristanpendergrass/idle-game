@@ -1168,7 +1168,7 @@ renderBottomRightItems model =
             []
          )
             ++ (case model.skillingState.activeTab of
-                    Tab.Anatomy ->
+                    Tab.SubjectTab _ ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
                     _ ->

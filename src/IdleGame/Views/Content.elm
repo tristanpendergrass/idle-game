@@ -54,11 +54,8 @@ renderContent model game activeTab =
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
 
-            Tab.Anatomy ->
-                IdleGame.Views.SubjectViews.renderAnatomy game
-
-            Tab.MedicalEthics ->
-                IdleGame.Views.SubjectViews.renderMedicalEthics game
+            Tab.SubjectTab subject ->
+                IdleGame.Views.SubjectViews.renderSubject subject game
 
             _ ->
                 IdleGame.Views.UnderConstruction.render

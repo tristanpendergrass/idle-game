@@ -116,7 +116,20 @@ getDeclarations category categoryPlural names =
 
 resources : List String
 resources =
-    [ "Knowledge"
+    [ "AnatomyK"
+    , "AnatomyPk"
+    , "BiochemistryK"
+    , "BiochemistryPk"
+    , "PhysiologyK"
+    , "PhysiologyPk"
+    , "PharmacologyK"
+    , "PharmacologyPk"
+    , "MicrobiologyK"
+    , "MicrobiologyPk"
+    , "PathologyK"
+    , "PathologyPk"
+    , "MedicalEthicsK"
+    , "MedicalEthicsPk"
     ]
 
 
@@ -127,14 +140,46 @@ resources =
 skills : List String
 skills =
     [ "Anatomy"
+    , "Biochemistry"
+    , "Physiology"
+    , "Pharmacology"
+    , "Microbiology"
+    , "Pathology"
     , "MedicalEthics"
     ]
 
 
 activities : List String
 activities =
-    [ "GrossAnatomy"
-    , "Neuroanatomy"
+    [
+        -- Anatomy
+    "BackAndSpine"
+    , "UpperLimb"
+    , "LowerLimb"
+    -- Biochemistry
+    , "MetabolicPathways"
+    , "Enzymology"
+    , "MolecularBiology"
+    -- Physiology
+    , "CellularPhysiology"
+    , "CardiovascularPhysiology"
+    , "RespiratoryPhysiology"
+    -- Pharmacology
+    , "Pharmacokinetics"
+    , "Pharmacodynamics"
+    , "Toxicology"
+    -- Microbiology
+    , "Bacteriology"
+    , "Virology"
+    , "Mycology"
+    -- Pathology
+    , "CellInjury"
+    , "Inflammation"
+    , "HemodynamicDisorders"
+    -- Medical Ethics
+    , "PrinciplesOfMedicalEthics"
+    , "InformedConsent"
+    , "ConfidentialityAndPrivacy"
     ]
 
 

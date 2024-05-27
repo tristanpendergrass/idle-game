@@ -31,15 +31,8 @@ import Types exposing (..)
 
 createProd : Random.Seed -> Game
 createProd seed =
-    let
-        xp : SkillRecord Xp
-        xp =
-            { anatomy = Xp.int 0
-            , medicalEthics = Xp.int 0
-            }
-    in
     { seed = seed
-    , xp = xp
+    , xp = skillRecord (Xp.int 0)
     , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0
@@ -50,15 +43,8 @@ createProd seed =
 
 createDev : Random.Seed -> Game
 createDev seed =
-    let
-        xp : SkillRecord Xp
-        xp =
-            { anatomy = Xp.int 0
-            , medicalEthics = Xp.int 0
-            }
-    in
     { seed = seed
-    , xp = xp
+    , xp = skillRecord (Xp.int 0)
     , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0
@@ -565,12 +551,7 @@ applyEffect effect count game =
 
 addXp : Skill -> Xp -> Game -> Game
 addXp skill amount game =
-    case skill of
-        Anatomy ->
-            { game | xp = Skill.updateBySkill Anatomy (Quantity.plus amount) game.xp }
-
-        MedicalEthics ->
-            { game | xp = Skill.updateBySkill MedicalEthics (Quantity.plus amount) game.xp }
+    { game | xp = Skill.updateBySkill skill (Quantity.plus amount) game.xp }
 
 
 addMxp : Activity -> Xp -> Game -> Game
