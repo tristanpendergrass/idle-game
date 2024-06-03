@@ -40,9 +40,9 @@ collapseButton =
 renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
 renderStatusBar ( activity, timer ) =
     let
-        stats : Activity.Stats
+        stats : ActivityStats
         stats =
-            Activity.getStats activity
+            getActivityStats activity
 
         percentComplete : Percent
         percentComplete =
@@ -50,16 +50,11 @@ renderStatusBar ( activity, timer ) =
 
         belongsLabel : String
         belongsLabel =
-            Activity.belongsToLabel stats.belongsTo
+            (getSkillStats stats.subject).title
 
         image : Html FrontendMsg
         image =
-            case stats.image of
-                CardLandscape imgSrc ->
-                    img [ src imgSrc, class "object-cover h-full w-full object-center" ] []
-
-                CardIcon icon ->
-                    div [ class "h-full w-full flex items-center justify-center bg-accent" ] [ Icon.toHtml icon ]
+            img [ src stats.image, class "object-cover h-full w-full object-center" ] []
     in
     div [ class "w-full h-full bg-base-200 text-accent-content flex items-center overflow-hidden p-2 gap-3 relative cursor-pointer", onClick ExpandDetailView ]
         [ div [ class "w-[3rem] h-full overflow-hidden bg-red rounded" ]
@@ -105,9 +100,13 @@ renderContent obj extraBottomPadding game =
                 DetailViewPreview (Preview k) ->
                     k
 
-        stats : Activity.Stats
+        stats : ActivityStats
         stats =
-            Activity.getStats activity
+            getActivityStats activity
+
+        effectStats : Activity.EffectStats
+        effectStats =
+            Activity.getEffectStats activity
 
         mxp : Xp
         mxp =
@@ -115,7 +114,7 @@ renderContent obj extraBottomPadding game =
 
         effects : List Effect
         effects =
-            (Activity.getStats activity).effects
+            (Activity.getEffectStats activity).effects
 
         mods : List Mod
         mods =
@@ -145,7 +144,7 @@ renderContent obj extraBottomPadding game =
 
         belongsToLabel : String
         belongsToLabel =
-            Activity.belongsToLabel (Activity.getStats activity).belongsTo
+            (getSkillStats stats.subject).title
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
@@ -158,14 +157,14 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ Utils.cardImage (Activity.getStats activity).image
+            [ Utils.cardImage (CardLandscape (getActivityStats activity).image)
             , fade isPreview
             ]
-        , div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString stats.activityType) ]
+        , div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]
-            [ text (Activity.getStats activity).title
+            [ text (getActivityStats activity).title
             , fade isPreview
             ]
 
@@ -203,7 +202,7 @@ renderContent obj extraBottomPadding game =
         , div [ class "divider" ] []
 
         -- The current mastery level
-        , if stats.mastery /= Nothing then
+        , if effectStats.mastery /= Nothing then
             mxpSection mxp
 
           else
@@ -211,7 +210,7 @@ renderContent obj extraBottomPadding game =
             div [] []
 
         -- The mastery rewards for this activity
-        , case stats.mastery of
+        , case effectStats.mastery of
             Just mastery ->
                 masterySection mxp mastery
 

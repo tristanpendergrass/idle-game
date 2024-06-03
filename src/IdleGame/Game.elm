@@ -63,22 +63,21 @@ getActivityListItems skill game =
     let
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
-            case (Activity.getStats kind).unlockRequirements of
-                Just ( unlockSkill, unlockLevel ) ->
-                    let
-                        currentLevel : Int
-                        currentLevel =
-                            getBySkill unlockSkill game.xp
-                                |> Xp.level Xp.defaultSchedule
-                    in
-                    if currentLevel >= unlockLevel then
-                        ActivityListItem kind
+            let
+                stats : ActivityStats
+                stats =
+                    getActivityStats kind
 
-                    else
-                        LockedActivity ( unlockSkill, unlockLevel )
+                currentLevel : Int
+                currentLevel =
+                    getBySkill stats.subject game.xp
+                        |> Xp.level Xp.defaultSchedule
+            in
+            if currentLevel >= stats.level then
+                ActivityListItem kind
 
-                Nothing ->
-                    ActivityListItem kind
+            else
+                LockedActivity ( stats.subject, stats.level )
 
         reducer : Activity -> { items : List ActivityListItem, lockedItem : Bool } -> { items : List ActivityListItem, lockedItem : Bool }
         reducer kind accum =
@@ -124,24 +123,19 @@ type alias ActivityStatus =
 toggleActivity : Activity -> Game -> Game
 toggleActivity kind game =
     let
-        stats : Activity.Stats
+        stats : ActivityStats
         stats =
-            Activity.getStats kind
+            getActivityStats kind
 
         canToggle : Bool
         canToggle =
-            case stats.unlockRequirements of
-                Just ( unlockSkill, unlockLevel ) ->
-                    let
-                        currentLevel : Int
-                        currentLevel =
-                            getBySkill unlockSkill game.xp
-                                |> Xp.level Xp.defaultSchedule
-                    in
-                    currentLevel >= unlockLevel
-
-                Nothing ->
-                    True
+            let
+                currentLevel : Int
+                currentLevel =
+                    getBySkill stats.subject game.xp
+                        |> Xp.level Xp.defaultSchedule
+            in
+            currentLevel >= stats.level
     in
     if canToggle then
         game
@@ -198,7 +192,7 @@ getModdedDuration game kind =
     -- Important! Keep the application here in sync with IdleGame.Game:applyEffect
     let
         stats =
-            Activity.getStats kind
+            getActivityStats kind
 
         mods =
             getAllIntervalMods game
@@ -230,9 +224,9 @@ tick delta game =
 
                 Just ( activityKind, timer ) ->
                     let
-                        stats : Activity.Stats
-                        stats =
-                            Activity.getStats activityKind
+                        effectStats : Activity.EffectStats
+                        effectStats =
+                            Activity.getEffectStats activityKind
 
                         activityDuration : Duration
                         activityDuration =
@@ -245,7 +239,7 @@ tick delta game =
                         maybeEvent : Maybe Event
                         maybeEvent =
                             if completions >= 1 then
-                                Just { effects = stats.effects, count = completions }
+                                Just { effects = effectStats.effects, count = completions }
 
                             else
                                 Nothing
@@ -433,7 +427,7 @@ calculateActivityMxp : Activity -> Game -> Xp
 calculateActivityMxp kind game =
     let
         stats =
-            Activity.getStats kind
+            getActivityStats kind
 
         mxp : Xp
         mxp =
@@ -717,9 +711,9 @@ getMasteryIntervalMods game =
                 |> List.concatMap
                     (\activity ->
                         let
-                            stats : Activity.Stats
-                            stats =
-                                Activity.getStats activity
+                            effectStats : Activity.EffectStats
+                            effectStats =
+                                Activity.getEffectStats activity
 
                             mxp : Xp
                             mxp =
@@ -729,7 +723,7 @@ getMasteryIntervalMods game =
                             masteryLevel =
                                 Xp.level Xp.defaultSchedule mxp
                         in
-                        case stats.mastery of
+                        case effectStats.mastery of
                             Just mastery ->
                                 mastery
                                     |> List.filterMap
@@ -764,9 +758,9 @@ getMasteryIntervalMods game =
 getMasteryRewards : Game -> Activity -> List Activity.MasteryReward
 getMasteryRewards game activity =
     let
-        stats : Activity.Stats
-        stats =
-            Activity.getStats activity
+        effectStats : Activity.EffectStats
+        effectStats =
+            Activity.getEffectStats activity
 
         mxp : Xp
         mxp =
@@ -776,7 +770,7 @@ getMasteryRewards game activity =
         masteryLevel =
             Xp.level Xp.defaultSchedule mxp
     in
-    case stats.mastery of
+    case effectStats.mastery of
         Just mastery ->
             mastery
                 |> List.filterMap

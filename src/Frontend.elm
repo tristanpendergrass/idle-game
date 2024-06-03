@@ -38,6 +38,7 @@ import IdleGame.Views.ShopResourceModal
 import IdleGame.Views.SyllabusModal
 import IdleGame.Views.TimePasses
 import IdleGame.Views.Utils as ViewUtils
+import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
@@ -83,6 +84,9 @@ init _ key =
 
             else
                 Nothing
+
+        topicsFoo =
+            Debug.log "foobar" topics
     in
     -- { key : Key -- used by Browser.Navigation for things like pushUrl
     -- , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
@@ -1277,3 +1281,96 @@ view model =
                     ]
         ]
     }
+
+
+sample : String
+sample =
+    """[
+  {
+    "Name": "Cellular Function",
+    "Level": 1,
+    "Duration": 5,
+    "Knowledge": 1,
+    "Knowledge/s": 0.2
+  },
+  {
+    "Name": "Cardiovascular System",
+    "Level": 5,
+    "Duration": 5,
+    "Knowledge": 3,
+    "Knowledge/s": 0.6
+  },
+  {
+    "Name": "Respiratory System",
+    "Level": 15,
+    "Duration": 5,
+    "Knowledge": 5,
+    "Knowledge/s": 1
+  },
+  {
+    "Name": "Renal Function",
+    "Level": 25,
+    "Duration": 5,
+    "Knowledge": 10,
+    "Knowledge/s": 2
+  },
+  {
+    "Name": "Digestive System",
+    "Level": 40,
+    "Duration": 5,
+    "Knowledge": 12,
+    "Knowledge/s": 2.4
+  },
+  {
+    "Name": "Nervous System",
+    "Level": 50,
+    "Duration": 5,
+    "Knowledge": 15,
+    "Knowledge/s": 3
+  },
+  {
+    "Name": "Endocrine System",
+    "Level": 65,
+    "Duration": 5,
+    "Knowledge": 20,
+    "Knowledge/s": 4
+  },
+  {
+    "Name": "Reproductive System",
+    "Level": 75,
+    "Duration": 5,
+    "Knowledge": 22,
+    "Knowledge/s": 4.4
+  },
+  {
+    "Name": "Immune Response",
+    "Level": 90,
+    "Duration": 5,
+    "Knowledge": 25,
+    "Knowledge/s": 5
+  }
+]"""
+
+
+type alias Topic =
+    { name : String, level : Int, duration : Duration, knowledge : Int, knowledgePerSecond : Float }
+
+
+durationDecoder : D.Decoder Duration
+durationDecoder =
+    D.map Duration.seconds D.float
+
+
+topicDecoder : D.Decoder Topic
+topicDecoder =
+    D.map5 Topic
+        (D.field "Name" D.string)
+        (D.field "Level" D.int)
+        (D.field "Duration" durationDecoder)
+        (D.field "Knowledge" D.int)
+        (D.field "Knowledge/s" D.float)
+
+
+topics : Result D.Error (List Topic)
+topics =
+    D.decodeString (D.list topicDecoder) sample

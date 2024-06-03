@@ -32,6 +32,11 @@ getConfig tab =
             }
 
         SubjectTab skill ->
-            { title = (Skill.getStats skill).title
-            , icon = (Skill.getStats skill).icon
+            let
+                stats : SkillStats
+                stats =
+                    getSkillStats skill
+            in
+            { title = stats.title
+            , icon = stats.icon
             }

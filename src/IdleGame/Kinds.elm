@@ -1,5 +1,8 @@
 module IdleGame.Kinds exposing (..)
 
+import Duration
+import IdleGame.Views.Icon
+
 
 {- !! Generated code, do not edit by hand !! -}
 
@@ -271,6 +274,62 @@ setBySkill kind value data =
             { data | medicalEthics = value }
 
 
+type alias SkillStats =
+    { title : String, icon : IdleGame.Views.Icon.Icon }
+
+
+skillStats : SkillRecord SkillStats
+skillStats =
+    { anatomy =
+        { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , biochemistry =
+        { title = "Biochemistry", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , physiology =
+        { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , pharmacology =
+        { title = "Pharmacology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , microbiology =
+        { title = "Microbiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , pathology =
+        { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    , medicalEthics =
+        { title = "Medical Ethics", icon = IdleGame.Views.Icon.iconMap.anatomy }
+    }
+
+
+getSkillStats : Skill -> SkillStats
+getSkillStats kind =
+    case kind of
+        Anatomy ->
+            { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.anatomy }
+
+        Biochemistry ->
+            { title = "Biochemistry"
+            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            }
+
+        Physiology ->
+            { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+
+        Pharmacology ->
+            { title = "Pharmacology"
+            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            }
+
+        Microbiology ->
+            { title = "Microbiology"
+            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            }
+
+        Pathology ->
+            { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+
+        MedicalEthics ->
+            { title = "Medical Ethics"
+            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            }
+
+
 {- Activities -}
 
 
@@ -281,21 +340,9 @@ type Activity
     | MetabolicPathways
     | Enzymology
     | MolecularBiology
-    | CellularPhysiology
-    | CardiovascularPhysiology
-    | RespiratoryPhysiology
-    | Pharmacokinetics
-    | Pharmacodynamics
-    | Toxicology
-    | Bacteriology
-    | Virology
-    | Mycology
-    | CellInjury
-    | Inflammation
-    | HemodynamicDisorders
-    | PrinciplesOfMedicalEthics
-    | InformedConsent
-    | ConfidentialityAndPrivacy
+    | CellularFunction
+    | CardiovascularSystem
+    | RespiratorySystem
 
 
 allActivities : List Activity
@@ -306,21 +353,9 @@ allActivities =
     , MetabolicPathways
     , Enzymology
     , MolecularBiology
-    , CellularPhysiology
-    , CardiovascularPhysiology
-    , RespiratoryPhysiology
-    , Pharmacokinetics
-    , Pharmacodynamics
-    , Toxicology
-    , Bacteriology
-    , Virology
-    , Mycology
-    , CellInjury
-    , Inflammation
-    , HemodynamicDisorders
-    , PrinciplesOfMedicalEthics
-    , InformedConsent
-    , ConfidentialityAndPrivacy
+    , CellularFunction
+    , CardiovascularSystem
+    , RespiratorySystem
     ]
 
 
@@ -331,21 +366,9 @@ type alias ActivityRecord a =
     , metabolicPathways : a
     , enzymology : a
     , molecularBiology : a
-    , cellularPhysiology : a
-    , cardiovascularPhysiology : a
-    , respiratoryPhysiology : a
-    , pharmacokinetics : a
-    , pharmacodynamics : a
-    , toxicology : a
-    , bacteriology : a
-    , virology : a
-    , mycology : a
-    , cellInjury : a
-    , inflammation : a
-    , hemodynamicDisorders : a
-    , principlesOfMedicalEthics : a
-    , informedConsent : a
-    , confidentialityAndPrivacy : a
+    , cellularFunction : a
+    , cardiovascularSystem : a
+    , respiratorySystem : a
     }
 
 
@@ -357,28 +380,14 @@ activityRecord a =
     , metabolicPathways = a
     , enzymology = a
     , molecularBiology = a
-    , cellularPhysiology = a
-    , cardiovascularPhysiology = a
-    , respiratoryPhysiology = a
-    , pharmacokinetics = a
-    , pharmacodynamics = a
-    , toxicology = a
-    , bacteriology = a
-    , virology = a
-    , mycology = a
-    , cellInjury = a
-    , inflammation = a
-    , hemodynamicDisorders = a
-    , principlesOfMedicalEthics = a
-    , informedConsent = a
-    , confidentialityAndPrivacy = a
+    , cellularFunction = a
+    , cardiovascularSystem = a
+    , respiratorySystem = a
     }
 
 
 getByActivity :
-    Activity
-    -> ActivityRecord confidentialityAndPrivacy
-    -> confidentialityAndPrivacy
+    Activity -> ActivityRecord respiratorySystem -> respiratorySystem
 getByActivity kind data =
     case kind of
         BackAndSpine ->
@@ -399,50 +408,14 @@ getByActivity kind data =
         MolecularBiology ->
             data.molecularBiology
 
-        CellularPhysiology ->
-            data.cellularPhysiology
+        CellularFunction ->
+            data.cellularFunction
 
-        CardiovascularPhysiology ->
-            data.cardiovascularPhysiology
+        CardiovascularSystem ->
+            data.cardiovascularSystem
 
-        RespiratoryPhysiology ->
-            data.respiratoryPhysiology
-
-        Pharmacokinetics ->
-            data.pharmacokinetics
-
-        Pharmacodynamics ->
-            data.pharmacodynamics
-
-        Toxicology ->
-            data.toxicology
-
-        Bacteriology ->
-            data.bacteriology
-
-        Virology ->
-            data.virology
-
-        Mycology ->
-            data.mycology
-
-        CellInjury ->
-            data.cellInjury
-
-        Inflammation ->
-            data.inflammation
-
-        HemodynamicDisorders ->
-            data.hemodynamicDisorders
-
-        PrinciplesOfMedicalEthics ->
-            data.principlesOfMedicalEthics
-
-        InformedConsent ->
-            data.informedConsent
-
-        ConfidentialityAndPrivacy ->
-            data.confidentialityAndPrivacy
+        RespiratorySystem ->
+            data.respiratorySystem
 
 
 setByActivity :
@@ -467,50 +440,116 @@ setByActivity kind value data =
         MolecularBiology ->
             { data | molecularBiology = value }
 
-        CellularPhysiology ->
-            { data | cellularPhysiology = value }
+        CellularFunction ->
+            { data | cellularFunction = value }
 
-        CardiovascularPhysiology ->
-            { data | cardiovascularPhysiology = value }
+        CardiovascularSystem ->
+            { data | cardiovascularSystem = value }
 
-        RespiratoryPhysiology ->
-            { data | respiratoryPhysiology = value }
+        RespiratorySystem ->
+            { data | respiratorySystem = value }
 
-        Pharmacokinetics ->
-            { data | pharmacokinetics = value }
 
-        Pharmacodynamics ->
-            { data | pharmacodynamics = value }
+type alias ActivityStats =
+    { subject : Skill
+    , title : String
+    , image : String
+    , level : Int
+    , duration : Duration.Duration
+    , knowledge : Int
+    , type_ : String
+    }
 
-        Toxicology ->
-            { data | toxicology = value }
 
-        Bacteriology ->
-            { data | bacteriology = value }
+activityStats : ActivityRecord ActivityStats
+activityStats =
+    { backAndSpine =
+        { subject = Anatomy
+        , title = "Back and Spine"
+        , image = "backAndSpine.png"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , upperLimb =
+        { subject = Anatomy
+        , title = "Upper Limb"
+        , image = "backAndSpine.png"
+        , level = 5
+        , duration = Duration.seconds 6
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , lowerLimb =
+        { subject = Anatomy
+        , title = "Lower Limb"
+        , image = "backAndSpine.png"
+        , level = 10
+        , duration = Duration.seconds 7
+        , knowledge = 4
+        , type_ = "Study"
+        }
+    , metabolicPathways =
+        { subject = Biochemistry
+        , title = "Metabolic Pathways"
+        , image = "backAndSpine.png"
+        , level = 1
+        , duration = Duration.seconds 7
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , enzymology =
+        { subject = Biochemistry
+        , title = "Enzymology"
+        , image = "backAndSpine.png"
+        , level = 8
+        , duration = Duration.seconds 10
+        , knowledge = 2
+        , type_ = "Study"
+        }
+    , molecularBiology =
+        { subject = Biochemistry
+        , title = "Molecular Biology"
+        , image = "backAndSpine.png"
+        , level = 13
+        , duration = Duration.seconds 11
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , cellularFunction =
+        { subject = Physiology
+        , title = "Cellular Function"
+        , image = "backAndSpine.png"
+        , level = 1
+        , duration = Duration.seconds 4
+        , knowledge = 4
+        , type_ = "Study"
+        }
+    , cardiovascularSystem =
+        { subject = Physiology
+        , title = "Cardiovascular System"
+        , image = "backAndSpine.png"
+        , level = 5
+        , duration = Duration.seconds 8
+        , knowledge = 5
+        , type_ = "Study"
+        }
+    , respiratorySystem =
+        { subject = Physiology
+        , title = "Respiratory System"
+        , image = "backAndSpine.png"
+        , level = 12
+        , duration = Duration.seconds 6
+        , knowledge = 6
+        , type_ = "Study"
+        }
+    }
 
-        Virology ->
-            { data | virology = value }
 
-        Mycology ->
-            { data | mycology = value }
-
-        CellInjury ->
-            { data | cellInjury = value }
-
-        Inflammation ->
-            { data | inflammation = value }
-
-        HemodynamicDisorders ->
-            { data | hemodynamicDisorders = value }
-
-        PrinciplesOfMedicalEthics ->
-            { data | principlesOfMedicalEthics = value }
-
-        InformedConsent ->
-            { data | informedConsent = value }
-
-        ConfidentialityAndPrivacy ->
-            { data | confidentialityAndPrivacy = value }
+getActivityStats : Activity -> ActivityStats
+getActivityStats kind =
+    getByActivity kind activityStats
 
 
 {- Shop Upgrades -}

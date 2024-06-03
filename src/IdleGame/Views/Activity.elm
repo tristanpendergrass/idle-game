@@ -82,13 +82,13 @@ renderActivityCard activity game screenWidth =
         maybeTimer =
             getTimerForActivity activity game
 
-        stats : Activity.Stats
+        stats : ActivityStats
         stats =
-            Activity.getStats activity
+            getActivityStats activity
 
         effects : List Effect
         effects =
-            stats.effects
+            (Activity.getEffectStats activity).effects
 
         mods : List Mod
         mods =
@@ -125,7 +125,11 @@ renderActivityCard activity game screenWidth =
 
         showMastery : Bool
         showMastery =
-            Maybe.Extra.isJust stats.mastery
+            Maybe.Extra.isJust (Activity.getEffectStats activity).mastery
+
+        activityStats : ActivityStats
+        activityStats =
+            getActivityStats activity
     in
     div [ class "relative" ]
         [ div
@@ -139,14 +143,14 @@ renderActivityCard activity game screenWidth =
             ]
             [ -- preview image
               div [ Utils.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
-                [ Utils.cardImage (Activity.getStats activity).image
+                [ Utils.cardImage (CardLandscape activityStats.image)
                 ]
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
-                [ div [ Utils.card.activityTypeBadge ] [ text (Activity.typeToString stats.activityType) ]
+                [ div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
                 , div [ class "t-column" ]
-                    [ h2 [ Utils.card.title ] [ text (Activity.getStats activity).title ]
-                    , div [ classList [ ( "hidden", not stats.showDuration ) ] ] [ activityDuration duration ]
+                    [ h2 [ Utils.card.title ] [ text (getActivityStats activity).title ]
+                    , div [] [ activityDuration duration ]
                     ]
                 , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
                     [ Utils.progressBar
@@ -175,7 +179,7 @@ renderActivityCard activity game screenWidth =
 
 
 renderLockedActivity : Skill -> Int -> Html FrontendMsg
-renderLockedActivity unlockSkill unlockLevel =
+renderLockedActivity unlockSubject unlockLevel =
     div
         [ Utils.card.container
         , class "text-error"
@@ -194,7 +198,7 @@ renderLockedActivity unlockSkill unlockLevel =
                     |> FeatherIcons.toHtml []
                 , div [ class "text-lg font-semibold" ]
                     [ text <|
-                        (Skill.getStats unlockSkill).title
+                        (getSkillStats unlockSubject).title
                             ++ " level "
                             ++ Utils.intToString unlockLevel
                     ]

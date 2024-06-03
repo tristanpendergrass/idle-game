@@ -1,0 +1,37 @@
+[
+  {
+    "id": "anatomy",
+    "title": "Anatomy",
+    "icon": "anatomy"
+  },
+  {
+    "id": "biochemistry",
+    "title": "Biochemistry",
+    "icon": "anatomy"
+  },
+  {
+    "id": "physiology",
+    "title": "Physiology",
+    "icon": "anatomy"
+  },
+  {
+    "id": "pharmacology",
+    "title": "Pharmacology",
+    "icon": "anatomy"
+  },
+  {
+    "id": "microbiology",
+    "title": "Microbiology",
+    "icon": "anatomy"
+  },
+  {
+    "id": "pathology",
+    "title": "Pathology",
+    "icon": "anatomy"
+  },
+  {
+    "id": "medicalEthics",
+    "title": "Medical Ethics",
+    "icon": "anatomy"
+  }
+]

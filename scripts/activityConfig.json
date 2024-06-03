@@ -1,0 +1,92 @@
+[
+  {
+    "id": "backAndSpine",
+    "subject": "anatomy",
+    "title": "Back and Spine",
+    "image": "backAndSpine.png",
+    "level": 1,
+    "duration": 5,
+    "knowledge": 1,
+    "type": "Study"
+  },
+  {
+    "id": "upperLimb",
+    "subject": "anatomy",
+    "title": "Upper Limb",
+    "image": "backAndSpine.png",
+    "level": 5,
+    "duration": 6,
+    "knowledge": 3,
+    "type": "Study"
+  },
+  {
+    "id": "lowerLimb",
+    "subject": "anatomy",
+    "title": "Lower Limb",
+    "image": "backAndSpine.png",
+    "level": 10,
+    "duration": 7,
+    "knowledge": 4,
+    "type": "Study"
+  },
+  {
+    "id": "metabolicPathways",
+    "subject": "biochemistry",
+    "title": "Metabolic Pathways",
+    "image": "backAndSpine.png",
+    "level": 1,
+    "duration": 7,
+    "knowledge": 1,
+    "type": "Study"
+  },
+  {
+    "id": "enzymology",
+    "subject": "biochemistry",
+    "title": "Enzymology",
+    "image": "backAndSpine.png",
+    "level": 8,
+    "duration": 10,
+    "knowledge": 2,
+    "type": "Study"
+  },
+  {
+    "id": "molecularBiology",
+    "subject": "biochemistry",
+    "title": "Molecular Biology",
+    "image": "backAndSpine.png",
+    "level": 13,
+    "duration": 11,
+    "knowledge": 3,
+    "type": "Study"
+  },
+  {
+    "id": "cellularFunction",
+    "subject": "physiology",
+    "title": "Cellular Function",
+    "image": "backAndSpine.png",
+    "level": 1,
+    "duration": 4,
+    "knowledge": 4,
+    "type": "Study"
+  },
+  {
+    "id": "cardiovascularSystem",
+    "subject": "physiology",
+    "title": "Cardiovascular System",
+    "image": "backAndSpine.png",
+    "level": 5,
+    "duration": 8,
+    "knowledge": 5,
+    "type": "Study"
+  },
+  {
+    "id": "respiratorySystem",
+    "subject": "physiology",
+    "title": "Respiratory System",
+    "image": "backAndSpine.png",
+    "level": 12,
+    "duration": 6,
+    "knowledge": 6,
+    "type": "Study"
+  }
+]

@@ -39,6 +39,14 @@ $ npm run generate-elm
 
 This will run elm-codegen and copy the results from `generated/` to `src/`.
 
+If updated types in main app that are needed by codegen, run:
+
+```
+$ cd codegen
+$ npx elm-codegen install
+```
+
+
 # Deployment
 [ ] Run unit tests (see above)
 [ ] Run `$ npx elm-review --fix`
@@ -55,6 +63,7 @@ This will run elm-codegen and copy the results from `generated/` to `src/`.
 # Todos
 
 [x] Remove code references to old version
+[ ] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
 [ ] Add anatomy topics
 [ ] Support Practical Knowledge and Labs in Anatomy
 [ ] Add Biochemistry

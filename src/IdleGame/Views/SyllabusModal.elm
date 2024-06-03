@@ -16,27 +16,12 @@ import Svg.Attributes exposing (d, in_)
 import Types exposing (..)
 
 
-withUnlockLevel : Activity -> Maybe Int
-withUnlockLevel activity =
-    let
-        activityStats : Activity.Stats
-        activityStats =
-            Activity.getStats activity
-    in
-    case activityStats.unlockRequirements of
-        Just ( _, level ) ->
-            Just level
-
-        Nothing ->
-            Nothing
-
-
 render : Game -> Skill -> Html FrontendMsg
 render game skill =
     let
-        skillStats : Skill.Stats
+        skillStats : SkillStats
         skillStats =
-            Skill.getStats skill
+            getSkillStats skill
 
         activities : List Activity
         activities =
@@ -56,22 +41,13 @@ render game skill =
                     |> List.map
                         (\activity ->
                             let
-                                activityStats : Activity.Stats
+                                activityStats : ActivityStats
                                 activityStats =
-                                    Activity.getStats activity
-
-                                unlockLevel : Maybe Int
-                                unlockLevel =
-                                    withUnlockLevel activity
+                                    getActivityStats activity
 
                                 levelCell : Html FrontendMsg
                                 levelCell =
-                                    case unlockLevel of
-                                        Just level ->
-                                            td [] [ text (String.fromInt level) ]
-
-                                        Nothing ->
-                                            td [] []
+                                    td [] [ text (String.fromInt activityStats.level) ]
                             in
                             tr []
                                 [ levelCell

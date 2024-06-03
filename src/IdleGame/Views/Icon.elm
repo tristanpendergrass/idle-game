@@ -140,6 +140,17 @@ toHtml icon =
                 ]
 
 
+type alias IconMap =
+    { anatomy : Icon
+    }
+
+
+iconMap : IconMap
+iconMap =
+    { anatomy = anatomy
+    }
+
+
 
 -- Icon creators
 
@@ -452,3 +463,8 @@ checkboxEmpty =
 scroll : Icon
 scroll =
     createIconFeather FeatherIcons.mail
+
+
+anatomy : Icon
+anatomy =
+    createIconPublic "/subjects/anatomy.webp"
