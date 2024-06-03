@@ -211,7 +211,7 @@ shopUpgrades =
 
 stringToIcon : String -> Elm.Expression
 stringToIcon str =
-    Elm.get str Gen.IdleGame.Views.Icon.iconMap
+    Gen.IdleGame.Views.Icon.call_.createIconPublic (Elm.string str)
 
 
 skillStats : List SkillConfigObject -> List Elm.Declaration
