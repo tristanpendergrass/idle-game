@@ -32,6 +32,7 @@ renderDrawer isDrawerOpen activeTab =
                 ]
                 [ span [ class "flex-none" ]
                     [ config.icon
+                        |> Icon.withRounded True
                         |> Icon.toHtml
                     ]
                 , span [ class "flex-1" ] [ text config.title ]

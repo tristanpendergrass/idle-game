@@ -2,36 +2,36 @@
   {
     "id": "anatomy",
     "title": "Anatomy",
-    "icon": "anatomy"
+    "icon": "/subjects/anatomy.webp"
   },
   {
     "id": "biochemistry",
     "title": "Biochemistry",
-    "icon": "anatomy"
+    "icon": "/subjects/biochemistry.webp"
   },
   {
     "id": "physiology",
     "title": "Physiology",
-    "icon": "anatomy"
+    "icon": "/subjects/physiology.webp"
   },
   {
     "id": "pharmacology",
     "title": "Pharmacology",
-    "icon": "anatomy"
+    "icon": "/subjects/pharmacology.webp"
   },
   {
     "id": "microbiology",
     "title": "Microbiology",
-    "icon": "anatomy"
+    "icon": "/subjects/microbiology.webp"
   },
   {
     "id": "pathology",
     "title": "Pathology",
-    "icon": "anatomy"
+    "icon": "/subjects/pathology.webp"
   },
   {
     "id": "medicalEthics",
     "title": "Medical Ethics",
-    "icon": "anatomy"
+    "icon": "/subjects/medicalEthics.webp"
   }
 ]

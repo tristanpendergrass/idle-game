@@ -15,6 +15,7 @@ type Size
 type alias Params =
     { size : Size
     , isVisible : Bool
+    , isRounded : Bool
     }
 
 
@@ -28,6 +29,7 @@ defaultParams : Params
 defaultParams =
     { size = Medium
     , isVisible = True
+    , isRounded = False
     }
 
 
@@ -52,6 +54,11 @@ withSize size =
 withVisibility : Bool -> Icon -> Icon
 withVisibility isVisible =
     mapParams (\params -> { params | isVisible = isVisible })
+
+
+withRounded : Bool -> Icon -> Icon
+withRounded isRounded =
+    mapParams (\params -> { params | isRounded = isRounded })
 
 
 sizeToRem : Size -> Float
@@ -119,12 +126,16 @@ toHtml icon =
                 |> FeatherIcons.toHtml []
 
         IconPublic iconSrc params ->
-            img
-                [ src iconSrc
-                , class (sizeToTailwindClass params.size)
-                , class visibilityClass
+            div [ class "avatar", class visibilityClass ]
+                [ div [ class (sizeToTailwindClass params.size), class "rounded-xl" ]
+                    [ img
+                        [ src iconSrc
+                        , class (sizeToTailwindClass params.size)
+                        , class visibilityClass
+                        ]
+                        []
+                    ]
                 ]
-                []
 
         IconString str params ->
             div [ class "avatar", class visibilityClass ]
@@ -138,17 +149,6 @@ toHtml icon =
                         [ text str ]
                     ]
                 ]
-
-
-type alias IconMap =
-    { anatomy : Icon
-    }
-
-
-iconMap : IconMap
-iconMap =
-    { anatomy = anatomy
-    }
 
 
 
@@ -463,8 +463,3 @@ checkboxEmpty =
 scroll : Icon
 scroll =
     createIconFeather FeatherIcons.mail
-
-
-anatomy : Icon
-anatomy =
-    createIconPublic "/subjects/anatomy.webp"

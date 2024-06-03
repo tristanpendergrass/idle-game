@@ -281,19 +281,38 @@ type alias SkillStats =
 skillStats : SkillRecord SkillStats
 skillStats =
     { anatomy =
-        { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Anatomy"
+        , icon = IdleGame.Views.Icon.createIconPublic "/subjects/anatomy.webp"
+        }
     , biochemistry =
-        { title = "Biochemistry", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Biochemistry"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/subjects/biochemistry.webp"
+        }
     , physiology =
-        { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Physiology"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/subjects/physiology.webp"
+        }
     , pharmacology =
-        { title = "Pharmacology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Pharmacology"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/subjects/pharmacology.webp"
+        }
     , microbiology =
-        { title = "Microbiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Microbiology"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/subjects/microbiology.webp"
+        }
     , pathology =
-        { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Pathology"
+        , icon = IdleGame.Views.Icon.createIconPublic "/subjects/pathology.webp"
+        }
     , medicalEthics =
-        { title = "Medical Ethics", icon = IdleGame.Views.Icon.iconMap.anatomy }
+        { title = "Medical Ethics"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/subjects/medicalEthics.webp"
+        }
     }
 
 
@@ -301,32 +320,49 @@ getSkillStats : Skill -> SkillStats
 getSkillStats kind =
     case kind of
         Anatomy ->
-            { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.anatomy }
+            { title = "Anatomy"
+            , icon =
+                IdleGame.Views.Icon.createIconPublic "/subjects/anatomy.webp"
+            }
 
         Biochemistry ->
             { title = "Biochemistry"
-            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            , icon =
+                IdleGame.Views.Icon.createIconPublic
+                    "/subjects/biochemistry.webp"
             }
 
         Physiology ->
-            { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+            { title = "Physiology"
+            , icon =
+                IdleGame.Views.Icon.createIconPublic "/subjects/physiology.webp"
+            }
 
         Pharmacology ->
             { title = "Pharmacology"
-            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            , icon =
+                IdleGame.Views.Icon.createIconPublic
+                    "/subjects/pharmacology.webp"
             }
 
         Microbiology ->
             { title = "Microbiology"
-            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            , icon =
+                IdleGame.Views.Icon.createIconPublic
+                    "/subjects/microbiology.webp"
             }
 
         Pathology ->
-            { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.anatomy }
+            { title = "Pathology"
+            , icon =
+                IdleGame.Views.Icon.createIconPublic "/subjects/pathology.webp"
+            }
 
         MedicalEthics ->
             { title = "Medical Ethics"
-            , icon = IdleGame.Views.Icon.iconMap.anatomy
+            , icon =
+                IdleGame.Views.Icon.createIconPublic
+                    "/subjects/medicalEthics.webp"
             }
 
 
