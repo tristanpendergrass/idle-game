@@ -34,29 +34,6 @@ type
     | MaterialPolicy
 
 
-type alias IconMap =
-    { accessibility : Icon
-    , science : Icon
-    , bloodtype : Icon
-    , medication : Icon
-    , biotech : Icon
-    , summarize : Icon
-    , policy : Icon
-    }
-
-
-iconMap : IconMap
-iconMap =
-    { accessibility = accessibility
-    , science = science
-    , bloodtype = bloodtype
-    , medication = medication
-    , biotech = biotech
-    , summarize = summarize
-    , policy = policy
-    }
-
-
 myMaterialIconToHtml : MyMaterialIcon -> Material.Icons.Types.Icon msg
 myMaterialIconToHtml icon =
     case icon of

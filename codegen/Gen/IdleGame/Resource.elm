@@ -1,6 +1,6 @@
 module Gen.IdleGame.Resource exposing (add, allStats, annotation_, call_, caseOf_, getDiff, getLabel, getStats, isEmptyDiff, knowledgeStats, make_, mapDiff, mapResources, moduleName_, toList, values_)
 
-{-| 
+{-|
 @docs moduleName_, knowledgeStats, getLabel, toList, mapResources, isEmptyDiff, mapDiff, getDiff, add, getStats, allStats, annotation_, make_, caseOf_, call_, values_
 -}
 
@@ -16,7 +16,7 @@ moduleName_ =
     [ "IdleGame", "Resource" ]
 
 
-{-| knowledgeStats: IdleGame.Resource.Stats -}
+{-| knowledgeStats: IdleGame.ResourceStats -}
 knowledgeStats : Elm.Expression
 knowledgeStats =
     Elm.value
@@ -80,7 +80,7 @@ toList toListArg =
         [ toListArg ]
 
 
-{-| mapResources: 
+{-| mapResources:
     (Int -> IdleGame.Resource.Resource -> a)
     -> IdleGame.Resource.ResourceRecord Int
     -> List a
@@ -144,7 +144,7 @@ isEmptyDiff isEmptyDiffArg =
         [ isEmptyDiffArg ]
 
 
-{-| mapDiff: 
+{-| mapDiff:
     (Int -> IdleGame.Resource.Resource -> a)
     -> IdleGame.Resource.ResourceRecord Int
     -> List a
@@ -187,7 +187,7 @@ mapDiff mapDiffArg mapDiffArg0 =
         ]
 
 
-{-| getDiff: 
+{-| getDiff:
     { original : IdleGame.Resource.ResourceRecord Int
     , current : IdleGame.Resource.ResourceRecord Int
     }
@@ -229,7 +229,7 @@ getDiff getDiffArg =
         ]
 
 
-{-| add: 
+{-| add:
     IdleGame.Resource.Resource
     -> Int
     -> IdleGame.Resource.ResourceRecord Int
@@ -273,7 +273,7 @@ add addArg addArg0 addArg1 =
         [ addArg, Elm.int addArg0, addArg1 ]
 
 
-{-| getStats: IdleGame.Resource.Resource -> IdleGame.Resource.Stats -}
+{-| getStats: IdleGame.Resource.Resource -> IdleGame.ResourceStats -}
 getStats : Elm.Expression -> Elm.Expression
 getStats getStatsArg =
     Elm.apply
@@ -295,7 +295,7 @@ getStats getStatsArg =
         [ getStatsArg ]
 
 
-{-| allStats: IdleGame.Resource.ResourceRecord IdleGame.Resource.Stats -}
+{-| allStats: IdleGame.Resource.ResourceRecord IdleGame.ResourceStats -}
 allStats : Elm.Expression
 allStats =
     Elm.value

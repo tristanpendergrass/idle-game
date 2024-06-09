@@ -1,179 +1,11 @@
 module IdleGame.Kinds exposing (..)
 
 import Duration
+import IdleGame.Coin
 import IdleGame.Views.Icon
 
 
 {- !! Generated code, do not edit by hand !! -}
-
-
-{- Resources -}
-
-
-type Resource
-    = AnatomyK
-    | AnatomyPk
-    | BiochemistryK
-    | BiochemistryPk
-    | PhysiologyK
-    | PhysiologyPk
-    | PharmacologyK
-    | PharmacologyPk
-    | MicrobiologyK
-    | MicrobiologyPk
-    | PathologyK
-    | PathologyPk
-    | MedicalEthicsK
-    | MedicalEthicsPk
-
-
-allResources : List Resource
-allResources =
-    [ AnatomyK
-    , AnatomyPk
-    , BiochemistryK
-    , BiochemistryPk
-    , PhysiologyK
-    , PhysiologyPk
-    , PharmacologyK
-    , PharmacologyPk
-    , MicrobiologyK
-    , MicrobiologyPk
-    , PathologyK
-    , PathologyPk
-    , MedicalEthicsK
-    , MedicalEthicsPk
-    ]
-
-
-type alias ResourceRecord a =
-    { anatomyK : a
-    , anatomyPk : a
-    , biochemistryK : a
-    , biochemistryPk : a
-    , physiologyK : a
-    , physiologyPk : a
-    , pharmacologyK : a
-    , pharmacologyPk : a
-    , microbiologyK : a
-    , microbiologyPk : a
-    , pathologyK : a
-    , pathologyPk : a
-    , medicalEthicsK : a
-    , medicalEthicsPk : a
-    }
-
-
-resourceRecord : a -> ResourceRecord a
-resourceRecord a =
-    { anatomyK = a
-    , anatomyPk = a
-    , biochemistryK = a
-    , biochemistryPk = a
-    , physiologyK = a
-    , physiologyPk = a
-    , pharmacologyK = a
-    , pharmacologyPk = a
-    , microbiologyK = a
-    , microbiologyPk = a
-    , pathologyK = a
-    , pathologyPk = a
-    , medicalEthicsK = a
-    , medicalEthicsPk = a
-    }
-
-
-getByResource : Resource -> ResourceRecord medicalEthicsPk -> medicalEthicsPk
-getByResource kind data =
-    case kind of
-        AnatomyK ->
-            data.anatomyK
-
-        AnatomyPk ->
-            data.anatomyPk
-
-        BiochemistryK ->
-            data.biochemistryK
-
-        BiochemistryPk ->
-            data.biochemistryPk
-
-        PhysiologyK ->
-            data.physiologyK
-
-        PhysiologyPk ->
-            data.physiologyPk
-
-        PharmacologyK ->
-            data.pharmacologyK
-
-        PharmacologyPk ->
-            data.pharmacologyPk
-
-        MicrobiologyK ->
-            data.microbiologyK
-
-        MicrobiologyPk ->
-            data.microbiologyPk
-
-        PathologyK ->
-            data.pathologyK
-
-        PathologyPk ->
-            data.pathologyPk
-
-        MedicalEthicsK ->
-            data.medicalEthicsK
-
-        MedicalEthicsPk ->
-            data.medicalEthicsPk
-
-
-setByResource :
-    Resource -> value -> ResourceRecord value -> ResourceRecord value
-setByResource kind value data =
-    case kind of
-        AnatomyK ->
-            { data | anatomyK = value }
-
-        AnatomyPk ->
-            { data | anatomyPk = value }
-
-        BiochemistryK ->
-            { data | biochemistryK = value }
-
-        BiochemistryPk ->
-            { data | biochemistryPk = value }
-
-        PhysiologyK ->
-            { data | physiologyK = value }
-
-        PhysiologyPk ->
-            { data | physiologyPk = value }
-
-        PharmacologyK ->
-            { data | pharmacologyK = value }
-
-        PharmacologyPk ->
-            { data | pharmacologyPk = value }
-
-        MicrobiologyK ->
-            { data | microbiologyK = value }
-
-        MicrobiologyPk ->
-            { data | microbiologyPk = value }
-
-        PathologyK ->
-            { data | pathologyK = value }
-
-        PathologyPk ->
-            { data | pathologyPk = value }
-
-        MedicalEthicsK ->
-            { data | medicalEthicsK = value }
-
-        MedicalEthicsPk ->
-            { data | medicalEthicsPk = value }
 
 
 {- Skills -}
@@ -280,62 +112,24 @@ type alias SkillStats =
 
 skillStats : SkillRecord SkillStats
 skillStats =
-    { anatomy =
-        { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.accessibility }
+    { anatomy = { title = "Anatomy", icon = IdleGame.Views.Icon.accessibility }
     , biochemistry =
-        { title = "Biochemistry", icon = IdleGame.Views.Icon.iconMap.science }
+        { title = "Biochemistry", icon = IdleGame.Views.Icon.science }
     , physiology =
-        { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.bloodtype }
+        { title = "Physiology", icon = IdleGame.Views.Icon.bloodtype }
     , pharmacology =
-        { title = "Pharmacology"
-        , icon = IdleGame.Views.Icon.iconMap.medication
-        }
+        { title = "Pharmacology", icon = IdleGame.Views.Icon.medication }
     , microbiology =
-        { title = "Microbiology", icon = IdleGame.Views.Icon.iconMap.biotech }
-    , pathology =
-        { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.summarize }
+        { title = "Microbiology", icon = IdleGame.Views.Icon.biotech }
+    , pathology = { title = "Pathology", icon = IdleGame.Views.Icon.summarize }
     , medicalEthics =
-        { title = "Medical Ethics", icon = IdleGame.Views.Icon.iconMap.policy }
+        { title = "Medical Ethics", icon = IdleGame.Views.Icon.policy }
     }
 
 
 getSkillStats : Skill -> SkillStats
 getSkillStats kind =
-    case kind of
-        Anatomy ->
-            { title = "Anatomy"
-            , icon = IdleGame.Views.Icon.iconMap.accessibility
-            }
-
-        Biochemistry ->
-            { title = "Biochemistry"
-            , icon = IdleGame.Views.Icon.iconMap.science
-            }
-
-        Physiology ->
-            { title = "Physiology"
-            , icon = IdleGame.Views.Icon.iconMap.bloodtype
-            }
-
-        Pharmacology ->
-            { title = "Pharmacology"
-            , icon = IdleGame.Views.Icon.iconMap.medication
-            }
-
-        Microbiology ->
-            { title = "Microbiology"
-            , icon = IdleGame.Views.Icon.iconMap.biotech
-            }
-
-        Pathology ->
-            { title = "Pathology"
-            , icon = IdleGame.Views.Icon.iconMap.summarize
-            }
-
-        MedicalEthics ->
-            { title = "Medical Ethics"
-            , icon = IdleGame.Views.Icon.iconMap.policy
-            }
+    getBySkill kind skillStats
 
 
 {- Activities -}
@@ -351,6 +145,18 @@ type Activity
     | CellularFunction
     | CardiovascularSystem
     | RespiratorySystem
+    | Pharmacokinetics
+    | Pharmacodynamics
+    | Toxicology
+    | Bacteriology
+    | Virology
+    | Mycology
+    | CellInjury
+    | Inflammation
+    | HemodynamicDisorders
+    | PrinciplesOfBiomedicalEthics
+    | InformedConsent
+    | ConfidentialityAndPrivacy
 
 
 allActivities : List Activity
@@ -364,6 +170,18 @@ allActivities =
     , CellularFunction
     , CardiovascularSystem
     , RespiratorySystem
+    , Pharmacokinetics
+    , Pharmacodynamics
+    , Toxicology
+    , Bacteriology
+    , Virology
+    , Mycology
+    , CellInjury
+    , Inflammation
+    , HemodynamicDisorders
+    , PrinciplesOfBiomedicalEthics
+    , InformedConsent
+    , ConfidentialityAndPrivacy
     ]
 
 
@@ -377,6 +195,18 @@ type alias ActivityRecord a =
     , cellularFunction : a
     , cardiovascularSystem : a
     , respiratorySystem : a
+    , pharmacokinetics : a
+    , pharmacodynamics : a
+    , toxicology : a
+    , bacteriology : a
+    , virology : a
+    , mycology : a
+    , cellInjury : a
+    , inflammation : a
+    , hemodynamicDisorders : a
+    , principlesOfBiomedicalEthics : a
+    , informedConsent : a
+    , confidentialityAndPrivacy : a
     }
 
 
@@ -391,11 +221,25 @@ activityRecord a =
     , cellularFunction = a
     , cardiovascularSystem = a
     , respiratorySystem = a
+    , pharmacokinetics = a
+    , pharmacodynamics = a
+    , toxicology = a
+    , bacteriology = a
+    , virology = a
+    , mycology = a
+    , cellInjury = a
+    , inflammation = a
+    , hemodynamicDisorders = a
+    , principlesOfBiomedicalEthics = a
+    , informedConsent = a
+    , confidentialityAndPrivacy = a
     }
 
 
 getByActivity :
-    Activity -> ActivityRecord respiratorySystem -> respiratorySystem
+    Activity
+    -> ActivityRecord confidentialityAndPrivacy
+    -> confidentialityAndPrivacy
 getByActivity kind data =
     case kind of
         BackAndSpine ->
@@ -424,6 +268,42 @@ getByActivity kind data =
 
         RespiratorySystem ->
             data.respiratorySystem
+
+        Pharmacokinetics ->
+            data.pharmacokinetics
+
+        Pharmacodynamics ->
+            data.pharmacodynamics
+
+        Toxicology ->
+            data.toxicology
+
+        Bacteriology ->
+            data.bacteriology
+
+        Virology ->
+            data.virology
+
+        Mycology ->
+            data.mycology
+
+        CellInjury ->
+            data.cellInjury
+
+        Inflammation ->
+            data.inflammation
+
+        HemodynamicDisorders ->
+            data.hemodynamicDisorders
+
+        PrinciplesOfBiomedicalEthics ->
+            data.principlesOfBiomedicalEthics
+
+        InformedConsent ->
+            data.informedConsent
+
+        ConfidentialityAndPrivacy ->
+            data.confidentialityAndPrivacy
 
 
 setByActivity :
@@ -457,6 +337,42 @@ setByActivity kind value data =
         RespiratorySystem ->
             { data | respiratorySystem = value }
 
+        Pharmacokinetics ->
+            { data | pharmacokinetics = value }
+
+        Pharmacodynamics ->
+            { data | pharmacodynamics = value }
+
+        Toxicology ->
+            { data | toxicology = value }
+
+        Bacteriology ->
+            { data | bacteriology = value }
+
+        Virology ->
+            { data | virology = value }
+
+        Mycology ->
+            { data | mycology = value }
+
+        CellInjury ->
+            { data | cellInjury = value }
+
+        Inflammation ->
+            { data | inflammation = value }
+
+        HemodynamicDisorders ->
+            { data | hemodynamicDisorders = value }
+
+        PrinciplesOfBiomedicalEthics ->
+            { data | principlesOfBiomedicalEthics = value }
+
+        InformedConsent ->
+            { data | informedConsent = value }
+
+        ConfidentialityAndPrivacy ->
+            { data | confidentialityAndPrivacy = value }
+
 
 type alias ActivityStats =
     { subject : Skill
@@ -473,7 +389,7 @@ activityStats : ActivityRecord ActivityStats
 activityStats =
     { backAndSpine =
         { subject = Anatomy
-        , title = "Back and mSpine"
+        , title = "Back and Spine"
         , image = "/activities/backAndSpine.webp"
         , level = 1
         , duration = Duration.seconds 5
@@ -486,7 +402,7 @@ activityStats =
         , image = "/activities/upperLimb.webp"
         , level = 5
         , duration = Duration.seconds 6
-        , knowledge = 3
+        , knowledge = 2
         , type_ = "Study"
         }
     , lowerLimb =
@@ -495,7 +411,7 @@ activityStats =
         , image = "/activities/lowerLimb.webp"
         , level = 10
         , duration = Duration.seconds 7
-        , knowledge = 4
+        , knowledge = 3
         , type_ = "Study"
         }
     , metabolicPathways =
@@ -531,7 +447,7 @@ activityStats =
         , image = "/activities/cellularFunction.webp"
         , level = 1
         , duration = Duration.seconds 4
-        , knowledge = 4
+        , knowledge = 1
         , type_ = "Study"
         }
     , cardiovascularSystem =
@@ -540,7 +456,7 @@ activityStats =
         , image = "/activities/cardiovascularSystem.webp"
         , level = 5
         , duration = Duration.seconds 8
-        , knowledge = 5
+        , knowledge = 2
         , type_ = "Study"
         }
     , respiratorySystem =
@@ -549,7 +465,115 @@ activityStats =
         , image = "/activities/respiratorySystem.webp"
         , level = 12
         , duration = Duration.seconds 6
-        , knowledge = 6
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , pharmacokinetics =
+        { subject = Pharmacology
+        , title = "Pharmacokinetics"
+        , image = "/activities/backAndSpine.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , pharmacodynamics =
+        { subject = Pharmacology
+        , title = "Pharmacodynamics"
+        , image = "/activities/backAndSpine.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = 2
+        , type_ = "Study"
+        }
+    , toxicology =
+        { subject = Pharmacology
+        , title = "Toxicology"
+        , image = "/activities/backAndSpine.webp"
+        , level = 10
+        , duration = Duration.seconds 5
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , bacteriology =
+        { subject = Microbiology
+        , title = "Bacteriology"
+        , image = "/activities/backAndSpine.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , virology =
+        { subject = Microbiology
+        , title = "Virology"
+        , image = "/activities/backAndSpine.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = 2
+        , type_ = "Study"
+        }
+    , mycology =
+        { subject = Microbiology
+        , title = "Mycology"
+        , image = "/activities/backAndSpine.webp"
+        , level = 10
+        , duration = Duration.seconds 5
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , cellInjury =
+        { subject = Pathology
+        , title = "Cell Injury and Adaptation"
+        , image = "/activities/backAndSpine.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , inflammation =
+        { subject = Pathology
+        , title = "Inflammation and Repair"
+        , image = "/activities/backAndSpine.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = 2
+        , type_ = "Study"
+        }
+    , hemodynamicDisorders =
+        { subject = Pathology
+        , title = "Hemodynamic Disorders"
+        , image = "/activities/backAndSpine.webp"
+        , level = 10
+        , duration = Duration.seconds 5
+        , knowledge = 3
+        , type_ = "Study"
+        }
+    , principlesOfBiomedicalEthics =
+        { subject = MedicalEthics
+        , title = "Principles of Biomedical Ethics"
+        , image = "/activities/backAndSpine.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = 1
+        , type_ = "Study"
+        }
+    , informedConsent =
+        { subject = MedicalEthics
+        , title = "InformedConsent"
+        , image = "/activities/backAndSpine.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = 2
+        , type_ = "Study"
+        }
+    , confidentialityAndPrivacy =
+        { subject = MedicalEthics
+        , title = "Confidentiality and Privacy"
+        , image = "/activities/backAndSpine.webp"
+        , level = 10
+        , duration = Duration.seconds 5
+        , knowledge = 3
         , type_ = "Study"
         }
     }
@@ -558,6 +582,164 @@ activityStats =
 getActivityStats : Activity -> ActivityStats
 getActivityStats kind =
     getByActivity kind activityStats
+
+
+{- Resources -}
+
+
+type Resource
+    = AnatomyK
+    | BiochemistryK
+    | PhysiologyK
+    | PharmacologyK
+    | MicrobiologyK
+    | PathologyK
+    | MedicalEthicsK
+
+
+allResources : List Resource
+allResources =
+    [ AnatomyK
+    , BiochemistryK
+    , PhysiologyK
+    , PharmacologyK
+    , MicrobiologyK
+    , PathologyK
+    , MedicalEthicsK
+    ]
+
+
+type alias ResourceRecord a =
+    { anatomyK : a
+    , biochemistryK : a
+    , physiologyK : a
+    , pharmacologyK : a
+    , microbiologyK : a
+    , pathologyK : a
+    , medicalEthicsK : a
+    }
+
+
+resourceRecord : a -> ResourceRecord a
+resourceRecord a =
+    { anatomyK = a
+    , biochemistryK = a
+    , physiologyK = a
+    , pharmacologyK = a
+    , microbiologyK = a
+    , pathologyK = a
+    , medicalEthicsK = a
+    }
+
+
+getByResource : Resource -> ResourceRecord medicalEthicsK -> medicalEthicsK
+getByResource kind data =
+    case kind of
+        AnatomyK ->
+            data.anatomyK
+
+        BiochemistryK ->
+            data.biochemistryK
+
+        PhysiologyK ->
+            data.physiologyK
+
+        PharmacologyK ->
+            data.pharmacologyK
+
+        MicrobiologyK ->
+            data.microbiologyK
+
+        PathologyK ->
+            data.pathologyK
+
+        MedicalEthicsK ->
+            data.medicalEthicsK
+
+
+setByResource :
+    Resource -> value -> ResourceRecord value -> ResourceRecord value
+setByResource kind value data =
+    case kind of
+        AnatomyK ->
+            { data | anatomyK = value }
+
+        BiochemistryK ->
+            { data | biochemistryK = value }
+
+        PhysiologyK ->
+            { data | physiologyK = value }
+
+        PharmacologyK ->
+            { data | pharmacologyK = value }
+
+        MicrobiologyK ->
+            { data | microbiologyK = value }
+
+        PathologyK ->
+            { data | pathologyK = value }
+
+        MedicalEthicsK ->
+            { data | medicalEthicsK = value }
+
+
+type alias ResourceStats =
+    { title : String
+    , icon : IdleGame.Views.Icon.Icon
+    , price : Maybe IdleGame.Coin.Coin
+    }
+
+
+resourceStats : ResourceRecord ResourceStats
+resourceStats =
+    { anatomyK =
+        { title = "Knowledge (Anatomy)"
+        , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
+        , price = Just (IdleGame.Coin.int 10)
+        }
+    , biochemistryK =
+        { title = "Knowledge (Biochemistry)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
+        , price = Nothing
+        }
+    , physiologyK =
+        { title = "Knowledge (Physiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
+        , price = Nothing
+        }
+    , pharmacologyK =
+        { title = "Knowledge (Pharmacology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
+        , price = Nothing
+        }
+    , microbiologyK =
+        { title = "Knowledge (Microbiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
+        , price = Nothing
+        }
+    , pathologyK =
+        { title = "Knowledge (Pathology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
+        , price = Nothing
+        }
+    , medicalEthicsK =
+        { title = "Knowledge (Medical Ethics)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/medical_ethics_k.png"
+        , price = Nothing
+        }
+    }
+
+
+getResourceStats : Resource -> ResourceStats
+getResourceStats kind =
+    getByResource kind resourceStats
 
 
 {- Shop Upgrades -}

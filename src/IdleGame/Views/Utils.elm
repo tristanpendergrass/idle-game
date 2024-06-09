@@ -311,9 +311,9 @@ resourceAndQuantity params =
 resource : { resource : Resource, iconSize : Icon.Size } -> Html msg
 resource params =
     let
-        stats : Resource.Stats
+        stats : ResourceStats
         stats =
-            Resource.getStats params.resource
+            getResourceStats params.resource
     in
     div [ class "border-2 border-primary bg-primary/50 rounded relative" ]
         [ stats.icon

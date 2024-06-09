@@ -20,7 +20,7 @@ render game =
         listItem ( resource, quantity ) =
             let
                 stats =
-                    Resource.getStats resource
+                    getResourceStats resource
             in
             li []
                 [ div [ class "t-column gap-4" ]

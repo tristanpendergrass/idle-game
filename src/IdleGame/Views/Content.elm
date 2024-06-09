@@ -41,6 +41,7 @@ renderContent model game activeTab =
                     -- Left side stuff
                     , div [ class "flex items-center gap-2" ]
                         [ icon
+                            |> Icon.withSize Icon.Large
                             |> Icon.toHtml
                         , span [] [ text title ]
                         ]

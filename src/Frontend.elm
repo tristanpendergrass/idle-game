@@ -801,15 +801,15 @@ update msg model =
             )
 
         HandleShopResourceClick resource ->
-            case (Resource.getStats resource).purchasing of
-                Resource.Purchasable price ->
+            case (getResourceStats resource).price of
+                Just price ->
                     ( { model
                         | activeModal = Just (ShopResourceModal 1 resource price)
                       }
                     , Cmd.none
                     )
 
-                Resource.NotPurchasable ->
+                Nothing ->
                     noOp
 
         HandleShopResourceBuyClick ->
@@ -1088,9 +1088,9 @@ toastToHtml notification =
 
         GainedResource amount resource ->
             let
-                stats : Resource.Stats
+                stats : ResourceStats
                 stats =
-                    Resource.getStats resource
+                    getResourceStats resource
 
                 plusOrMinus : String
                 plusOrMinus =

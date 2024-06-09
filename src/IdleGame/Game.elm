@@ -266,8 +266,8 @@ tick delta game =
 
 getPurchaseEffects : Int -> Resource -> List Effect
 getPurchaseEffects amount resource =
-    case (Resource.getStats resource).purchasing of
-        Resource.Purchasable price ->
+    case (getResourceStats resource).price of
+        Just price ->
             let
                 cost : Coin.Coin
                 cost =
@@ -276,7 +276,7 @@ getPurchaseEffects amount resource =
             in
             [ Effect.gainCoin cost, Effect.gainResource amount resource ]
 
-        Resource.NotPurchasable ->
+        Nothing ->
             []
 
 

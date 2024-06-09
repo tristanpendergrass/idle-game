@@ -9,6 +9,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Game as Game
+import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
@@ -136,9 +137,9 @@ render timeToFastForward timePassed timePassesData =
                                             )
                                         ]
                                         [ text <| Utils.intToString amount ]
-                                    , (Resource.getStats resource).icon
+                                    , (getResourceStats resource).icon
                                         |> Icon.toHtml
-                                    , span [] [ text <| (Resource.getStats resource).title ]
+                                    , span [] [ text <| (getResourceStats resource).title ]
                                     ]
                             )
                     ]

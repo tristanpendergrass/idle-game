@@ -101,7 +101,8 @@ renderResource game resource base =
 
         icon : Html msg
         icon =
-            (Resource.getStats resource).icon
+            (getResourceStats resource).icon
+                -- |> Icon.withSize Icon.Large
                 |> Icon.toHtml
     in
     div [ class "flex items-center gap-1" ]
@@ -162,7 +163,7 @@ renderVariableResource probability kind =
     div [ class "flex items-center gap-2" ]
         [ div [ class "border border-info text-info px-2 rounded-full" ] [ text probabilityStr ]
         , div [] [ text ":" ]
-        , (Resource.getStats kind).icon
+        , (getResourceStats kind).icon
             |> Icon.toHtml
         ]
 

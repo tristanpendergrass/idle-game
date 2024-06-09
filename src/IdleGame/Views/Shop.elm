@@ -71,9 +71,9 @@ render game =
         renderResource : ( Resource, Coin ) -> Html FrontendMsg
         renderResource ( resource, price ) =
             let
-                resourceStats : Resource.Stats
+                resourceStats : ResourceStats
                 resourceStats =
-                    Resource.getStats resource
+                    getResourceStats resource
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
@@ -96,11 +96,11 @@ render game =
             allResources
                 |> List.filterMap
                     (\kind ->
-                        case (Resource.getStats kind).purchasing of
-                            Resource.Purchasable price ->
+                        case (getResourceStats kind).price of
+                            Just price ->
                                 Just ( kind, price )
 
-                            Resource.NotPurchasable ->
+                            Nothing ->
                                 Nothing
                     )
     in

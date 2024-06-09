@@ -135,6 +135,7 @@ renderActivityCard activity game screenWidth =
         [ div
             [ Utils.card.container
             , Utils.card.containerClickable
+            , class "overflow-hidden"
 
             -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
             , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
@@ -151,6 +152,20 @@ renderActivityCard activity game screenWidth =
                 , div [ class "t-column" ]
                     [ h2 [ Utils.card.title ] [ text (getActivityStats activity).title ]
                     , div [] [ activityDuration duration ]
+
+                    -- The effects of the activity
+                    , div [ class "t-column relative" ]
+                        (List.map
+                            (\taggedEffect ->
+                                EffectView.render
+                                    { game = game
+                                    , mods = mods
+                                    , effect = taggedEffect
+                                    , renderType = EffectView.DetailView
+                                    }
+                            )
+                            orderedAndFilteredEffects
+                        )
                     ]
                 , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
                     [ Utils.progressBar
@@ -169,7 +184,8 @@ renderActivityCard activity game screenWidth =
 
                 Just percentComplete ->
                     div
-                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0 rounded-l-xl"
+                        -- [ class "absolute h-full bg-base-content opacity-20 top-0 left-0 rounded-l-xl"
+                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
                         , Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]

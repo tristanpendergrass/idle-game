@@ -17,9 +17,9 @@ import Types exposing (..)
 render : Game -> Int -> ( Resource, Coin ) -> Html FrontendMsg
 render game quantity ( resource, price ) =
     let
-        resourceStats : Resource.Stats
+        resourceStats : ResourceStats
         resourceStats =
-            Resource.getStats resource
+            getResourceStats resource
 
         owned : Int
         owned =

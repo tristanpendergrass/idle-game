@@ -7,6 +7,7 @@ import Elm.Annotation as Type
 import Elm.Case
 import Gen.CodeGen.Generate as Generate
 import Gen.Duration
+import Gen.IdleGame.Coin
 import Gen.IdleGame.Views.Icon
 import Json.Decode
 
@@ -26,16 +27,17 @@ file flags =
     Elm.file [ "IdleGame", "Kinds" ]
         (List.concat
             [ [ Elm.comment "!! Generated code, do not edit by hand !!" ]
-            , [ Elm.comment "Resources" ]
-            , getDeclarations "Resource" "Resources" resources
             , [ Elm.comment "Skills" ]
-            , getDeclarations "Skill" "Skills" skills
+            , getDeclarations "Skill" "Skills" (List.map (\configObject -> capitalize configObject.id) flags.subjectConfig)
             , skillStats flags.subjectConfig
             , [ Elm.comment "Activities" ]
-            , getDeclarations "Activity" "Activities" activities
+            , getDeclarations "Activity" "Activities" (List.map (\configObject -> capitalize configObject.id) flags.activityConfig)
             , activityStats flags.activityConfig
+            , [ Elm.comment "Resources" ]
+            , getDeclarations "Resource" "Resources" (List.map (\configObject -> capitalize configObject.id) flags.resourceConfig)
+            , resourceStats flags.resourceConfig
             , [ Elm.comment "Shop Upgrades" ]
-            , getDeclarations "ShopUpgrade" "ShopUpgrades" shopUpgrades
+            , getDeclarations "ShopUpgrade" "ShopUpgrades" [ "Glasses" ]
             ]
         )
 
@@ -129,144 +131,72 @@ getDeclarations category categoryPlural names =
 
 
 
--- Resources
-
-
-resources : List String
-resources =
-    [ "AnatomyK"
-    , "AnatomyPk"
-    , "BiochemistryK"
-    , "BiochemistryPk"
-    , "PhysiologyK"
-    , "PhysiologyPk"
-    , "PharmacologyK"
-    , "PharmacologyPk"
-    , "MicrobiologyK"
-    , "MicrobiologyPk"
-    , "PathologyK"
-    , "PathologyPk"
-    , "MedicalEthicsK"
-    , "MedicalEthicsPk"
-    ]
-
-
-
 -- Skills
 
 
-skills : List String
-skills =
-    [ "Anatomy"
-    , "Biochemistry"
-    , "Physiology"
-    , "Pharmacology"
-    , "Microbiology"
-    , "Pathology"
-    , "MedicalEthics"
+getStats : String -> Type.Annotation -> (a -> ( String, Elm.Expression )) -> List a -> List Elm.Declaration
+getStats title annotation fn objects =
+    [ Elm.alias (title ++ "Stats")
+        annotation
+    , Elm.declaration (uncapitalize title ++ "Stats") <|
+        Elm.withType (Type.namedWith [] (title ++ "Record") [ Type.named [] (title ++ "Stats") ])
+            (Elm.record (List.map fn objects))
+    , Elm.declaration ("get" ++ title ++ "Stats") <|
+        Elm.withType (Type.function [ Type.named [] (uncapitalize title) ] (Type.named [] (title ++ "Stats")))
+            (Elm.fn ( "kind", Nothing )
+                (\kind ->
+                    Elm.apply (Elm.val ("getBy" ++ title)) [ kind, Elm.val (uncapitalize title ++ "Stats") ]
+                )
+            )
     ]
 
 
-activities : List String
-activities =
-    [ -- Anatomy
-      "BackAndSpine"
-    , "UpperLimb"
-    , "LowerLimb"
-
-    -- Biochemistry
-    , "MetabolicPathways"
-    , "Enzymology"
-    , "MolecularBiology"
-
-    -- Physiology
-    , "CellularFunction"
-    , "CardiovascularSystem"
-    , "RespiratorySystem"
-
-    -- Pharmacology
-    -- , "Pharmacokinetics"
-    -- , "Pharmacodynamics"
-    -- , "Toxicology"
-    -- Microbiology
-    -- , "Bacteriology"
-    -- , "Virology"
-    -- , "Mycology"
-    -- Pathology
-    -- , "CellInjury"
-    -- , "Inflammation"
-    -- , "HemodynamicDisorders"
-    -- Medical Ethics
-    -- , "PrinciplesOfMedicalEthics"
-    -- , "InformedConsent"
-    -- , "ConfidentialityAndPrivacy"
-    ]
-
-
-shopUpgrades : List String
-shopUpgrades =
-    [ "Glasses"
-    ]
-
-
-stringToIcon : String -> Elm.Expression
-stringToIcon str =
-    Gen.IdleGame.Views.Icon.call_.createIconPublic (Elm.string str)
+iconImport : String -> Elm.Expression
+iconImport icon =
+    Elm.value { importFrom = [ "IdleGame", "Views", "Icon" ], name = icon, annotation = Nothing }
 
 
 skillStats : List SkillConfigObject -> List Elm.Declaration
 skillStats subjectConfigResult =
-    [ Elm.alias "SkillStats"
-        (Type.record
-            [ ( "title", Type.string )
-            , ( "icon", Gen.IdleGame.Views.Icon.annotation_.icon )
-            ]
-        )
-    , Elm.declaration "skillStats" <|
-        Elm.withType (Type.namedWith [] "SkillRecord" [ Type.named [] "SkillStats" ])
-            (Elm.record
-                (List.map
-                    (\n ->
-                        let
-                            icon : Elm.Expression
-                            icon =
-                                Elm.get n.icon Gen.IdleGame.Views.Icon.iconMap
-                        in
-                        ( n.id, Elm.record [ ( "title", Elm.string n.title ), ( "icon", icon ) ] )
-                    )
-                    subjectConfigResult
-                )
-            )
-    , Elm.declaration "getSkillStats" <|
-        Elm.withType (Type.function [ Type.named [] "skill" ] (Type.named [] "SkillStats"))
-            (Elm.fn ( "kind", Nothing )
-                (\kind ->
-                    Elm.Case.custom kind
-                        (Type.named [] "kind")
-                        (List.map
-                            (\n ->
-                                let
-                                    icon : Elm.Expression
-                                    icon =
-                                        Elm.get n.icon Gen.IdleGame.Views.Icon.iconMap
-                                in
-                                Elm.Case.branch0
-                                    n.id
-                                    (Elm.record [ ( "title", Elm.string n.title ), ( "icon", icon ) ])
-                            )
-                            subjectConfigResult
-                        )
-                )
-            )
-    ]
+    let
+        skillStatsType : Type.Annotation
+        skillStatsType =
+            Type.record
+                [ ( "title", Type.string )
+                , ( "icon", Gen.IdleGame.Views.Icon.annotation_.icon )
+                ]
+
+        toExpression : SkillConfigObject -> Elm.Expression
+        toExpression skillConfig =
+            Elm.record
+                [ ( "title", Elm.string skillConfig.title )
+                , ( "icon", iconImport skillConfig.icon )
+                ]
+    in
+    getStats "Skill"
+        skillStatsType
+        (\skillConfig -> ( skillConfig.id, toExpression skillConfig ))
+        subjectConfigResult
 
 
 activityStats : List ActivityConfigObject -> List Elm.Declaration
 activityStats activityConfigObjects =
     let
+        activityStatsType : Type.Annotation
+        activityStatsType =
+            Type.record
+                [ ( "subject", Type.named [] "Skill" )
+                , ( "title", Type.string )
+                , ( "image", Type.string )
+                , ( "level", Type.int )
+                , ( "duration", Gen.Duration.annotation_.duration )
+                , ( "knowledge", Type.int )
+                , ( "type_", Type.string )
+                ]
+
         toExpression : ActivityConfigObject -> Elm.Expression
         toExpression activityConfig =
-            Elm.record <|
+            Elm.record
                 [ ( "subject", Elm.val (capitalize activityConfig.subject) )
                 , ( "title", Elm.string activityConfig.title )
                 , ( "image", Elm.string activityConfig.image )
@@ -276,48 +206,32 @@ activityStats activityConfigObjects =
                 , ( "type_", Elm.string activityConfig.type_ )
                 ]
     in
-    [ Elm.alias "ActivityStats"
+    getStats "Activity"
+        activityStatsType
+        (\activityConfig -> ( activityConfig.id, toExpression activityConfig ))
+        activityConfigObjects
+
+
+resourceStats : List ResourceConfigObject -> List Elm.Declaration
+resourceStats resourceConfigObjects =
+    let
+        toExpression : ResourceConfigObject -> Elm.Expression
+        toExpression resourceConfig =
+            Elm.record <|
+                [ ( "title", Elm.string resourceConfig.title )
+                , ( "icon", Gen.IdleGame.Views.Icon.call_.createIconPublic (Elm.string resourceConfig.icon) )
+                , ( "price", Elm.maybe (Maybe.map Gen.IdleGame.Coin.int resourceConfig.price) )
+                ]
+    in
+    getStats "Resource"
         (Type.record
-            [ ( "subject", Type.named [] "Skill" )
-            , ( "title", Type.string )
-            , ( "image", Type.string )
-            , ( "level", Type.int )
-            , ( "duration", Gen.Duration.annotation_.duration )
-            , ( "knowledge", Type.int )
-            , ( "type_", Type.string )
+            [ ( "title", Type.string )
+            , ( "icon", Gen.IdleGame.Views.Icon.annotation_.icon )
+            , ( "price", Type.maybe Gen.IdleGame.Coin.annotation_.coin )
             ]
         )
-    , Elm.declaration "activityStats" <|
-        Elm.withType (Type.namedWith [] "ActivityRecord" [ Type.named [] "ActivityStats" ])
-            (Elm.record
-                (List.map (\activityConfig -> ( activityConfig.id, toExpression activityConfig )) activityConfigObjects)
-            )
-    , Elm.declaration "getActivityStats" <|
-        Elm.withType (Type.function [ Type.named [] "activity" ] (Type.named [] "ActivityStats"))
-            (Elm.fn ( "kind", Nothing )
-                (\kind ->
-                    Elm.apply (Elm.val "getByActivity") [ kind, Elm.val "activityStats" ]
-                )
-            )
-
-    -- , Elm.declaration "getActivityStats" <|
-    --     Elm.withType (Type.function [ Type.named [] "skill" ] (Type.named [] "SkillStats"))
-    --         (Elm.fn ( "kind", Nothing )
-    --             (\kind ->
-    --                 Elm.Case.custom kind
-    --                     (Type.named [] "kind")
-    --                     (List.map
-    --                         (\n ->
-    --                             Elm.Case.branch0
-    --                                 n.id
-    --                                 -- (Elm.record [ ( "title", Elm.string n.title ), ( "icon", stringToIcon n.icon ) ])
-    --                                 (toExpression n)
-    --                         )
-    --                         activityConfigObjects
-    --                     )
-    --             )
-    --         )
-    ]
+        (\resourceConfig -> ( resourceConfig.id, toExpression resourceConfig ))
+        resourceConfigObjects
 
 
 
@@ -343,15 +257,24 @@ type alias ActivityConfigObject =
     }
 
 
+type alias ResourceConfigObject =
+    { id : String
+    , title : String
+    , icon : String
+    , price : Maybe Int
+    }
+
+
 type alias Flags =
-    { subjectConfig : List SkillConfigObject, activityConfig : List ActivityConfigObject }
+    { subjectConfig : List SkillConfigObject, activityConfig : List ActivityConfigObject, resourceConfig : List ResourceConfigObject }
 
 
 flagsDecoder : Json.Decode.Decoder Flags
 flagsDecoder =
-    Json.Decode.map2 Flags
+    Json.Decode.map3 Flags
         (Json.Decode.field "subjectConfig" (Json.Decode.list subjectConfigDecoder))
         (Json.Decode.field "activityConfig" (Json.Decode.list activityConfigDecoder))
+        (Json.Decode.field "resourceConfig" (Json.Decode.list resourceConfigDecoder))
 
 
 subjectConfigDecoder : Json.Decode.Decoder SkillConfigObject
@@ -373,3 +296,12 @@ activityConfigDecoder =
         (Json.Decode.field "duration" Json.Decode.int)
         (Json.Decode.field "knowledge" Json.Decode.int)
         (Json.Decode.field "type" Json.Decode.string)
+
+
+resourceConfigDecoder : Json.Decode.Decoder ResourceConfigObject
+resourceConfigDecoder =
+    Json.Decode.map4 ResourceConfigObject
+        (Json.Decode.field "id" Json.Decode.string)
+        (Json.Decode.field "title" Json.Decode.string)
+        (Json.Decode.field "icon" Json.Decode.string)
+        (Json.Decode.maybe (Json.Decode.field "price" Json.Decode.int))
