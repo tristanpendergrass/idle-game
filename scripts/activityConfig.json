@@ -4,7 +4,7 @@
     "title": "Back and Spine",
     "subject": "anatomy",
     "level": 1,
-    "image": "backAndSpine.webp",
+    "image": "/activities/backAndSpine.webp",
     "duration": 5,
     "knowledge": 1,
     "type": "Study"
@@ -14,7 +14,7 @@
     "title": "Upper Limb",
     "subject": "anatomy",
     "level": 5,
-    "image": "upperLimb.webp",
+    "image": "/activities/upperLimb.webp",
     "duration": 6,
     "knowledge": 3,
     "type": "Study"
@@ -24,7 +24,7 @@
     "title": "Lower Limb",
     "subject": "anatomy",
     "level": 10,
-    "image": "lowerLimb.webp",
+    "image": "/activities/lowerLimb.webp",
     "duration": 7,
     "knowledge": 4,
     "type": "Study"
@@ -34,7 +34,7 @@
     "title": "Metabolic Pathways",
     "subject": "biochemistry",
     "level": 1,
-    "image": "metabolicPathways.webp",
+    "image": "/activities/metabolicPathways.webp",
     "duration": 7,
     "knowledge": 1,
     "type": "Study"
@@ -44,7 +44,7 @@
     "title": "Enzymology",
     "subject": "biochemistry",
     "level": 8,
-    "image": "enzymology.webp",
+    "image": "/activities/enzymology.webp",
     "duration": 10,
     "knowledge": 2,
     "type": "Study"
@@ -54,7 +54,7 @@
     "title": "Molecular Biology",
     "subject": "biochemistry",
     "level": 13,
-    "image": "molecularBiology.webp",
+    "image": "/activities/molecularBiology.webp",
     "duration": 11,
     "knowledge": 3,
     "type": "Study"
@@ -64,7 +64,7 @@
     "title": "Cellular Function",
     "subject": "physiology",
     "level": 1,
-    "image": "cellularFunction.webp",
+    "image": "/activities/cellularFunction.webp",
     "duration": 4,
     "knowledge": 4,
     "type": "Study"
@@ -74,7 +74,7 @@
     "title": "Cardiovascular System",
     "subject": "physiology",
     "level": 5,
-    "image": "cardiovascularSystem.webp",
+    "image": "/activities/cardiovascularSystem.webp",
     "duration": 8,
     "knowledge": 5,
     "type": "Study"
@@ -84,7 +84,7 @@
     "title": "Respiratory System",
     "subject": "physiology",
     "level": 12,
-    "image": "respiratorySystem.webp",
+    "image": "/activities/respiratorySystem.webp",
     "duration": 6,
     "knowledge": 6,
     "type": "Study"

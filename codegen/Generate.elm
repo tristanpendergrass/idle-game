@@ -226,7 +226,14 @@ skillStats subjectConfigResult =
         Elm.withType (Type.namedWith [] "SkillRecord" [ Type.named [] "SkillStats" ])
             (Elm.record
                 (List.map
-                    (\n -> ( n.id, Elm.record [ ( "title", Elm.string n.title ), ( "icon", stringToIcon n.icon ) ] ))
+                    (\n ->
+                        let
+                            icon : Elm.Expression
+                            icon =
+                                Elm.get n.icon Gen.IdleGame.Views.Icon.iconMap
+                        in
+                        ( n.id, Elm.record [ ( "title", Elm.string n.title ), ( "icon", icon ) ] )
+                    )
                     subjectConfigResult
                 )
             )
@@ -238,9 +245,14 @@ skillStats subjectConfigResult =
                         (Type.named [] "kind")
                         (List.map
                             (\n ->
+                                let
+                                    icon : Elm.Expression
+                                    icon =
+                                        Elm.get n.icon Gen.IdleGame.Views.Icon.iconMap
+                                in
                                 Elm.Case.branch0
                                     n.id
-                                    (Elm.record [ ( "title", Elm.string n.title ), ( "icon", stringToIcon n.icon ) ])
+                                    (Elm.record [ ( "title", Elm.string n.title ), ( "icon", icon ) ])
                             )
                             subjectConfigResult
                         )

@@ -3566,6 +3566,22 @@ input.tab:checked + .tab-content,
   height: 100%;
 }
 
+.h-\[0\.75rem\] {
+  height: 0.75rem;
+}
+
+.h-\[1\.25rem\] {
+  height: 1.25rem;
+}
+
+.h-\[3rem\] {
+  height: 3rem;
+}
+
+.h-\[6rem\] {
+  height: 6rem;
+}
+
 .max-h-\[90\%\] {
   max-height: 90%;
 }
@@ -3644,6 +3660,18 @@ input.tab:checked + .tab-content,
 
 .w-screen {
   width: 100vw;
+}
+
+.w-\[0\.75rem\] {
+  width: 0.75rem;
+}
+
+.w-\[1\.25rem\] {
+  width: 1.25rem;
+}
+
+.w-\[6rem\] {
+  width: 6rem;
 }
 
 .min-w-\[2\.5rem\] {

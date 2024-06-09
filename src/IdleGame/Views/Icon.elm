@@ -3,6 +3,9 @@ module IdleGame.Views.Icon exposing (..)
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Material.Icons
+import Material.Icons.Types
+import Svg exposing (Svg)
 
 
 type Size
@@ -19,10 +22,72 @@ type alias Params =
     }
 
 
+type
+    MyMaterialIcon
+    -- These are wrappers around the Material.Icon library to remove the `msg` from the Icon type
+    = MaterialAccessibility
+    | MaterialScience
+    | MaterialBloodtype
+    | MaterialMedication
+    | MaterialBiotech
+    | MaterialSummarize
+    | MaterialPolicy
+
+
+type alias IconMap =
+    { accessibility : Icon
+    , science : Icon
+    , bloodtype : Icon
+    , medication : Icon
+    , biotech : Icon
+    , summarize : Icon
+    , policy : Icon
+    }
+
+
+iconMap : IconMap
+iconMap =
+    { accessibility = accessibility
+    , science = science
+    , bloodtype = bloodtype
+    , medication = medication
+    , biotech = biotech
+    , summarize = summarize
+    , policy = policy
+    }
+
+
+myMaterialIconToHtml : MyMaterialIcon -> Material.Icons.Types.Icon msg
+myMaterialIconToHtml icon =
+    case icon of
+        MaterialAccessibility ->
+            Material.Icons.accessibility
+
+        MaterialScience ->
+            Material.Icons.science
+
+        MaterialBloodtype ->
+            Material.Icons.bloodtype
+
+        MaterialMedication ->
+            Material.Icons.medication
+
+        MaterialBiotech ->
+            Material.Icons.biotech
+
+        MaterialSummarize ->
+            Material.Icons.summarize
+
+        MaterialPolicy ->
+            Material.Icons.policy
+
+
 type Icon
     = IconFeather FeatherIcons.Icon Params -- Icons sourced from FeatherIcons library
     | IconPublic String Params -- Icons sourced from the /public folder e.g. pngs
     | IconString String Params -- Icons sourced from the alphabet. Should just be one or two characters
+      -- Note the MyMaterialIcon instead of Material.Icons.Types.Icon msg. Because we want to avoid having `msg` on all Icons in the app
+    | IconMaterial MyMaterialIcon Params -- Icons sourced from the Material Icons library
 
 
 defaultParams : Params
@@ -45,6 +110,9 @@ mapParams fn icon =
         IconString c params ->
             IconString c (fn params)
 
+        IconMaterial i params ->
+            IconMaterial i (fn params)
+
 
 withSize : Size -> Icon -> Icon
 withSize size =
@@ -61,6 +129,22 @@ withRounded isRounded =
     mapParams (\params -> { params | isRounded = isRounded })
 
 
+sizeToPixel : Size -> Int
+sizeToPixel size =
+    case size of
+        Small ->
+            12
+
+        Medium ->
+            20
+
+        Large ->
+            48
+
+        ExtraLarge ->
+            96
+
+
 sizeToRem : Size -> Float
 sizeToRem size =
     case size of
@@ -68,7 +152,7 @@ sizeToRem size =
             0.75
 
         Medium ->
-            1.2
+            1.25
 
         Large ->
             3.0
@@ -81,16 +165,16 @@ sizeToTailwindClass : Size -> String
 sizeToTailwindClass size =
     case size of
         Small ->
-            "w-3 h-3 text-[8px]"
+            "w-[0.75rem] h-[0.75rem] text-xs"
 
         Medium ->
-            "w-6 h-6 text-sm font-semibold"
+            "w-[1.25rem] h-[1.25rem] text-sm font-semibold"
 
         Large ->
-            "w-12 h-12 text-2xl font-bold"
+            "w-[3rem] h-[3rem] text-2xl font-bold"
 
         ExtraLarge ->
-            "w-24 h-24 text-4xl font-bold"
+            "w-[6rem] h-[6rem] text-4xl font-bold"
 
 
 getParams : Icon -> Params
@@ -103,6 +187,9 @@ getParams icon =
             p
 
         IconString _ p ->
+            p
+
+        IconMaterial _ p ->
             p
 
 
@@ -150,6 +237,9 @@ toHtml icon =
                     ]
                 ]
 
+        IconMaterial materialIcon params ->
+            myMaterialIconToHtml materialIcon (sizeToPixel params.size) Material.Icons.Types.Inherit
+
 
 
 -- Icon creators
@@ -168,6 +258,11 @@ createIconFeather featherIcon =
 createIconPublic : String -> Icon
 createIconPublic iconSrc =
     IconPublic iconSrc defaultParams
+
+
+createIconMaterial : MyMaterialIcon -> Icon
+createIconMaterial materialIcon =
+    IconMaterial materialIcon defaultParams
 
 
 close : Icon
@@ -463,3 +558,38 @@ checkboxEmpty =
 scroll : Icon
 scroll =
     createIconFeather FeatherIcons.mail
+
+
+accessibility : Icon
+accessibility =
+    createIconMaterial MaterialAccessibility
+
+
+science : Icon
+science =
+    createIconMaterial MaterialScience
+
+
+bloodtype : Icon
+bloodtype =
+    createIconMaterial MaterialBloodtype
+
+
+medication : Icon
+medication =
+    createIconMaterial MaterialMedication
+
+
+biotech : Icon
+biotech =
+    createIconMaterial MaterialBiotech
+
+
+summarize : Icon
+summarize =
+    createIconMaterial MaterialSummarize
+
+
+policy : Icon
+policy =
+    createIconMaterial MaterialPolicy

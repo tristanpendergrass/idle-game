@@ -281,38 +281,21 @@ type alias SkillStats =
 skillStats : SkillRecord SkillStats
 skillStats =
     { anatomy =
-        { title = "Anatomy"
-        , icon = IdleGame.Views.Icon.createIconPublic "/subjects/anatomy.webp"
-        }
+        { title = "Anatomy", icon = IdleGame.Views.Icon.iconMap.accessibility }
     , biochemistry =
-        { title = "Biochemistry"
-        , icon =
-            IdleGame.Views.Icon.createIconPublic "/subjects/biochemistry.webp"
-        }
+        { title = "Biochemistry", icon = IdleGame.Views.Icon.iconMap.science }
     , physiology =
-        { title = "Physiology"
-        , icon =
-            IdleGame.Views.Icon.createIconPublic "/subjects/physiology.webp"
-        }
+        { title = "Physiology", icon = IdleGame.Views.Icon.iconMap.bloodtype }
     , pharmacology =
         { title = "Pharmacology"
-        , icon =
-            IdleGame.Views.Icon.createIconPublic "/subjects/pharmacology.webp"
+        , icon = IdleGame.Views.Icon.iconMap.medication
         }
     , microbiology =
-        { title = "Microbiology"
-        , icon =
-            IdleGame.Views.Icon.createIconPublic "/subjects/microbiology.webp"
-        }
+        { title = "Microbiology", icon = IdleGame.Views.Icon.iconMap.biotech }
     , pathology =
-        { title = "Pathology"
-        , icon = IdleGame.Views.Icon.createIconPublic "/subjects/pathology.webp"
-        }
+        { title = "Pathology", icon = IdleGame.Views.Icon.iconMap.summarize }
     , medicalEthics =
-        { title = "Medical Ethics"
-        , icon =
-            IdleGame.Views.Icon.createIconPublic "/subjects/medicalEthics.webp"
-        }
+        { title = "Medical Ethics", icon = IdleGame.Views.Icon.iconMap.policy }
     }
 
 
@@ -321,48 +304,37 @@ getSkillStats kind =
     case kind of
         Anatomy ->
             { title = "Anatomy"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic "/subjects/anatomy.webp"
+            , icon = IdleGame.Views.Icon.iconMap.accessibility
             }
 
         Biochemistry ->
             { title = "Biochemistry"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic
-                    "/subjects/biochemistry.webp"
+            , icon = IdleGame.Views.Icon.iconMap.science
             }
 
         Physiology ->
             { title = "Physiology"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic "/subjects/physiology.webp"
+            , icon = IdleGame.Views.Icon.iconMap.bloodtype
             }
 
         Pharmacology ->
             { title = "Pharmacology"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic
-                    "/subjects/pharmacology.webp"
+            , icon = IdleGame.Views.Icon.iconMap.medication
             }
 
         Microbiology ->
             { title = "Microbiology"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic
-                    "/subjects/microbiology.webp"
+            , icon = IdleGame.Views.Icon.iconMap.biotech
             }
 
         Pathology ->
             { title = "Pathology"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic "/subjects/pathology.webp"
+            , icon = IdleGame.Views.Icon.iconMap.summarize
             }
 
         MedicalEthics ->
             { title = "Medical Ethics"
-            , icon =
-                IdleGame.Views.Icon.createIconPublic
-                    "/subjects/medicalEthics.webp"
+            , icon = IdleGame.Views.Icon.iconMap.policy
             }
 
 
@@ -501,8 +473,8 @@ activityStats : ActivityRecord ActivityStats
 activityStats =
     { backAndSpine =
         { subject = Anatomy
-        , title = "Back and Spine"
-        , image = "backAndSpine.png"
+        , title = "Back and mSpine"
+        , image = "/activities/backAndSpine.webp"
         , level = 1
         , duration = Duration.seconds 5
         , knowledge = 1
@@ -511,7 +483,7 @@ activityStats =
     , upperLimb =
         { subject = Anatomy
         , title = "Upper Limb"
-        , image = "backAndSpine.png"
+        , image = "/activities/upperLimb.webp"
         , level = 5
         , duration = Duration.seconds 6
         , knowledge = 3
@@ -520,7 +492,7 @@ activityStats =
     , lowerLimb =
         { subject = Anatomy
         , title = "Lower Limb"
-        , image = "backAndSpine.png"
+        , image = "/activities/lowerLimb.webp"
         , level = 10
         , duration = Duration.seconds 7
         , knowledge = 4
@@ -529,7 +501,7 @@ activityStats =
     , metabolicPathways =
         { subject = Biochemistry
         , title = "Metabolic Pathways"
-        , image = "backAndSpine.png"
+        , image = "/activities/metabolicPathways.webp"
         , level = 1
         , duration = Duration.seconds 7
         , knowledge = 1
@@ -538,7 +510,7 @@ activityStats =
     , enzymology =
         { subject = Biochemistry
         , title = "Enzymology"
-        , image = "backAndSpine.png"
+        , image = "/activities/enzymology.webp"
         , level = 8
         , duration = Duration.seconds 10
         , knowledge = 2
@@ -547,7 +519,7 @@ activityStats =
     , molecularBiology =
         { subject = Biochemistry
         , title = "Molecular Biology"
-        , image = "backAndSpine.png"
+        , image = "/activities/molecularBiology.webp"
         , level = 13
         , duration = Duration.seconds 11
         , knowledge = 3
@@ -556,7 +528,7 @@ activityStats =
     , cellularFunction =
         { subject = Physiology
         , title = "Cellular Function"
-        , image = "backAndSpine.png"
+        , image = "/activities/cellularFunction.webp"
         , level = 1
         , duration = Duration.seconds 4
         , knowledge = 4
@@ -565,7 +537,7 @@ activityStats =
     , cardiovascularSystem =
         { subject = Physiology
         , title = "Cardiovascular System"
-        , image = "backAndSpine.png"
+        , image = "/activities/cardiovascularSystem.webp"
         , level = 5
         , duration = Duration.seconds 8
         , knowledge = 5
@@ -574,7 +546,7 @@ activityStats =
     , respiratorySystem =
         { subject = Physiology
         , title = "Respiratory System"
-        , image = "backAndSpine.png"
+        , image = "/activities/respiratorySystem.webp"
         , level = 12
         , duration = Duration.seconds 6
         , knowledge = 6

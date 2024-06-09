@@ -1,7 +1,7 @@
-module Gen.IdleGame.Kinds exposing (activityRecord, allActivities, allResources, allShopUpgrades, allSkills, annotation_, call_, caseOf_, getByActivity, getByResource, getByShopUpgrade, getBySkill, make_, moduleName_, resourceRecord, setByActivity, setByResource, setByShopUpgrade, setBySkill, shopUpgradeRecord, skillRecord, values_)
+module Gen.IdleGame.Kinds exposing (activityRecord, activityStats, allActivities, allResources, allShopUpgrades, allSkills, annotation_, call_, caseOf_, getActivityStats, getByActivity, getByResource, getByShopUpgrade, getBySkill, getSkillStats, make_, moduleName_, resourceRecord, setByActivity, setByResource, setByShopUpgrade, setBySkill, shopUpgradeRecord, skillRecord, skillStats, values_)
 
 {-| 
-@docs moduleName_, setByShopUpgrade, getByShopUpgrade, shopUpgradeRecord, allShopUpgrades, setByActivity, getByActivity, activityRecord, allActivities, setBySkill, getBySkill, skillRecord, allSkills, setByResource, getByResource, resourceRecord, allResources, annotation_, make_, caseOf_, call_, values_
+@docs moduleName_, setByShopUpgrade, getByShopUpgrade, shopUpgradeRecord, allShopUpgrades, getActivityStats, activityStats, setByActivity, getByActivity, activityRecord, allActivities, getSkillStats, skillStats, setBySkill, getBySkill, skillRecord, allSkills, setByResource, getByResource, resourceRecord, allResources, annotation_, make_, caseOf_, call_, values_
 -}
 
 
@@ -119,6 +119,46 @@ allShopUpgrades =
         }
 
 
+{-| getActivityStats: IdleGame.Kinds.Activity -> IdleGame.Kinds.ActivityStats -}
+getActivityStats : Elm.Expression -> Elm.Expression
+getActivityStats getActivityStatsArg =
+    Elm.apply
+        (Elm.value
+             { importFrom = [ "IdleGame", "Kinds" ]
+             , name = "getActivityStats"
+             , annotation =
+                 Just
+                     (Type.function
+                          [ Type.namedWith [ "IdleGame", "Kinds" ] "Activity" []
+                          ]
+                          (Type.namedWith
+                               [ "IdleGame", "Kinds" ]
+                               "ActivityStats"
+                               []
+                          )
+                     )
+             }
+        )
+        [ getActivityStatsArg ]
+
+
+{-| activityStats: IdleGame.Kinds.ActivityRecord IdleGame.Kinds.ActivityStats -}
+activityStats : Elm.Expression
+activityStats =
+    Elm.value
+        { importFrom = [ "IdleGame", "Kinds" ]
+        , name = "activityStats"
+        , annotation =
+            Just
+                (Type.namedWith
+                     [ "IdleGame", "Kinds" ]
+                     "ActivityRecord"
+                     [ Type.namedWith [ "IdleGame", "Kinds" ] "ActivityStats" []
+                     ]
+                )
+        }
+
+
 {-| setByActivity: 
     IdleGame.Kinds.Activity
     -> value
@@ -155,8 +195,8 @@ setByActivity setByActivityArg setByActivityArg0 setByActivityArg1 =
 
 {-| getByActivity: 
     IdleGame.Kinds.Activity
-    -> IdleGame.Kinds.ActivityRecord confidentialityAndPrivacy
-    -> confidentialityAndPrivacy
+    -> IdleGame.Kinds.ActivityRecord respiratorySystem
+    -> respiratorySystem
 -}
 getByActivity : Elm.Expression -> Elm.Expression -> Elm.Expression
 getByActivity getByActivityArg getByActivityArg0 =
@@ -171,9 +211,9 @@ getByActivity getByActivityArg getByActivityArg0 =
                           , Type.namedWith
                               [ "IdleGame", "Kinds" ]
                               "ActivityRecord"
-                              [ Type.var "confidentialityAndPrivacy" ]
+                              [ Type.var "respiratorySystem" ]
                           ]
-                          (Type.var "confidentialityAndPrivacy")
+                          (Type.var "respiratorySystem")
                      )
              }
         )
@@ -212,6 +252,44 @@ allActivities =
             Just
                 (Type.list
                      (Type.namedWith [ "IdleGame", "Kinds" ] "Activity" [])
+                )
+        }
+
+
+{-| getSkillStats: IdleGame.Kinds.Skill -> IdleGame.Kinds.SkillStats -}
+getSkillStats : Elm.Expression -> Elm.Expression
+getSkillStats getSkillStatsArg =
+    Elm.apply
+        (Elm.value
+             { importFrom = [ "IdleGame", "Kinds" ]
+             , name = "getSkillStats"
+             , annotation =
+                 Just
+                     (Type.function
+                          [ Type.namedWith [ "IdleGame", "Kinds" ] "Skill" [] ]
+                          (Type.namedWith
+                               [ "IdleGame", "Kinds" ]
+                               "SkillStats"
+                               []
+                          )
+                     )
+             }
+        )
+        [ getSkillStatsArg ]
+
+
+{-| skillStats: IdleGame.Kinds.SkillRecord IdleGame.Kinds.SkillStats -}
+skillStats : Elm.Expression
+skillStats =
+    Elm.value
+        { importFrom = [ "IdleGame", "Kinds" ]
+        , name = "skillStats"
+        , annotation =
+            Just
+                (Type.namedWith
+                     [ "IdleGame", "Kinds" ]
+                     "SkillRecord"
+                     [ Type.namedWith [ "IdleGame", "Kinds" ] "SkillStats" [] ]
                 )
         }
 
@@ -409,7 +487,9 @@ allResources =
 
 annotation_ :
     { shopUpgradeRecord : Type.Annotation -> Type.Annotation
+    , activityStats : Type.Annotation
     , activityRecord : Type.Annotation -> Type.Annotation
+    , skillStats : Type.Annotation
     , skillRecord : Type.Annotation -> Type.Annotation
     , resourceRecord : Type.Annotation -> Type.Annotation
     , shopUpgrade : Type.Annotation
@@ -425,6 +505,23 @@ annotation_ =
                 "ShopUpgradeRecord"
                 [ shopUpgradeRecordArg0 ]
                 (Type.record [ ( "glasses", Type.var "a" ) ])
+    , activityStats =
+        Type.alias
+            moduleName_
+            "ActivityStats"
+            []
+            (Type.record
+                 [ ( "subject"
+                   , Type.namedWith [ "IdleGame", "Kinds" ] "Skill" []
+                   )
+                 , ( "title", Type.string )
+                 , ( "image", Type.string )
+                 , ( "level", Type.int )
+                 , ( "duration", Type.namedWith [ "Duration" ] "Duration" [] )
+                 , ( "knowledge", Type.int )
+                 , ( "type_", Type.string )
+                 ]
+            )
     , activityRecord =
         \activityRecordArg0 ->
             Type.alias
@@ -438,23 +535,23 @@ annotation_ =
                      , ( "metabolicPathways", Type.var "a" )
                      , ( "enzymology", Type.var "a" )
                      , ( "molecularBiology", Type.var "a" )
-                     , ( "cellularPhysiology", Type.var "a" )
-                     , ( "cardiovascularPhysiology", Type.var "a" )
-                     , ( "respiratoryPhysiology", Type.var "a" )
-                     , ( "pharmacokinetics", Type.var "a" )
-                     , ( "pharmacodynamics", Type.var "a" )
-                     , ( "toxicology", Type.var "a" )
-                     , ( "bacteriology", Type.var "a" )
-                     , ( "virology", Type.var "a" )
-                     , ( "mycology", Type.var "a" )
-                     , ( "cellInjury", Type.var "a" )
-                     , ( "inflammation", Type.var "a" )
-                     , ( "hemodynamicDisorders", Type.var "a" )
-                     , ( "principlesOfMedicalEthics", Type.var "a" )
-                     , ( "informedConsent", Type.var "a" )
-                     , ( "confidentialityAndPrivacy", Type.var "a" )
+                     , ( "cellularFunction", Type.var "a" )
+                     , ( "cardiovascularSystem", Type.var "a" )
+                     , ( "respiratorySystem", Type.var "a" )
                      ]
                 )
+    , skillStats =
+        Type.alias
+            moduleName_
+            "SkillStats"
+            []
+            (Type.record
+                 [ ( "title", Type.string )
+                 , ( "icon"
+                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
+                   )
+                 ]
+            )
     , skillRecord =
         \skillRecordArg0 ->
             Type.alias
@@ -503,6 +600,16 @@ annotation_ =
 
 make_ :
     { shopUpgradeRecord : { glasses : Elm.Expression } -> Elm.Expression
+    , activityStats :
+        { subject : Elm.Expression
+        , title : Elm.Expression
+        , image : Elm.Expression
+        , level : Elm.Expression
+        , duration : Elm.Expression
+        , knowledge : Elm.Expression
+        , type_ : Elm.Expression
+        }
+        -> Elm.Expression
     , activityRecord :
         { backAndSpine : Elm.Expression
         , upperLimb : Elm.Expression
@@ -510,23 +617,13 @@ make_ :
         , metabolicPathways : Elm.Expression
         , enzymology : Elm.Expression
         , molecularBiology : Elm.Expression
-        , cellularPhysiology : Elm.Expression
-        , cardiovascularPhysiology : Elm.Expression
-        , respiratoryPhysiology : Elm.Expression
-        , pharmacokinetics : Elm.Expression
-        , pharmacodynamics : Elm.Expression
-        , toxicology : Elm.Expression
-        , bacteriology : Elm.Expression
-        , virology : Elm.Expression
-        , mycology : Elm.Expression
-        , cellInjury : Elm.Expression
-        , inflammation : Elm.Expression
-        , hemodynamicDisorders : Elm.Expression
-        , principlesOfMedicalEthics : Elm.Expression
-        , informedConsent : Elm.Expression
-        , confidentialityAndPrivacy : Elm.Expression
+        , cellularFunction : Elm.Expression
+        , cardiovascularSystem : Elm.Expression
+        , respiratorySystem : Elm.Expression
         }
         -> Elm.Expression
+    , skillStats :
+        { title : Elm.Expression, icon : Elm.Expression } -> Elm.Expression
     , skillRecord :
         { anatomy : Elm.Expression
         , biochemistry : Elm.Expression
@@ -561,21 +658,9 @@ make_ :
     , metabolicPathways : Elm.Expression
     , enzymology : Elm.Expression
     , molecularBiology : Elm.Expression
-    , cellularPhysiology : Elm.Expression
-    , cardiovascularPhysiology : Elm.Expression
-    , respiratoryPhysiology : Elm.Expression
-    , pharmacokinetics : Elm.Expression
-    , pharmacodynamics : Elm.Expression
-    , toxicology : Elm.Expression
-    , bacteriology : Elm.Expression
-    , virology : Elm.Expression
-    , mycology : Elm.Expression
-    , cellInjury : Elm.Expression
-    , inflammation : Elm.Expression
-    , hemodynamicDisorders : Elm.Expression
-    , principlesOfMedicalEthics : Elm.Expression
-    , informedConsent : Elm.Expression
-    , confidentialityAndPrivacy : Elm.Expression
+    , cellularFunction : Elm.Expression
+    , cardiovascularSystem : Elm.Expression
+    , respiratorySystem : Elm.Expression
     , anatomy : Elm.Expression
     , biochemistry : Elm.Expression
     , physiology : Elm.Expression
@@ -611,6 +696,38 @@ make_ =
                 (Elm.record
                      [ Tuple.pair "glasses" shopUpgradeRecord_args.glasses ]
                 )
+    , activityStats =
+        \activityStats_args ->
+            Elm.withType
+                (Type.alias
+                     [ "IdleGame", "Kinds" ]
+                     "ActivityStats"
+                     []
+                     (Type.record
+                          [ ( "subject"
+                            , Type.namedWith [ "IdleGame", "Kinds" ] "Skill" []
+                            )
+                          , ( "title", Type.string )
+                          , ( "image", Type.string )
+                          , ( "level", Type.int )
+                          , ( "duration"
+                            , Type.namedWith [ "Duration" ] "Duration" []
+                            )
+                          , ( "knowledge", Type.int )
+                          , ( "type_", Type.string )
+                          ]
+                     )
+                )
+                (Elm.record
+                     [ Tuple.pair "subject" activityStats_args.subject
+                     , Tuple.pair "title" activityStats_args.title
+                     , Tuple.pair "image" activityStats_args.image
+                     , Tuple.pair "level" activityStats_args.level
+                     , Tuple.pair "duration" activityStats_args.duration
+                     , Tuple.pair "knowledge" activityStats_args.knowledge
+                     , Tuple.pair "type_" activityStats_args.type_
+                     ]
+                )
     , activityRecord =
         \activityRecord_args ->
             Elm.withType
@@ -625,21 +742,9 @@ make_ =
                           , ( "metabolicPathways", Type.var "a" )
                           , ( "enzymology", Type.var "a" )
                           , ( "molecularBiology", Type.var "a" )
-                          , ( "cellularPhysiology", Type.var "a" )
-                          , ( "cardiovascularPhysiology", Type.var "a" )
-                          , ( "respiratoryPhysiology", Type.var "a" )
-                          , ( "pharmacokinetics", Type.var "a" )
-                          , ( "pharmacodynamics", Type.var "a" )
-                          , ( "toxicology", Type.var "a" )
-                          , ( "bacteriology", Type.var "a" )
-                          , ( "virology", Type.var "a" )
-                          , ( "mycology", Type.var "a" )
-                          , ( "cellInjury", Type.var "a" )
-                          , ( "inflammation", Type.var "a" )
-                          , ( "hemodynamicDisorders", Type.var "a" )
-                          , ( "principlesOfMedicalEthics", Type.var "a" )
-                          , ( "informedConsent", Type.var "a" )
-                          , ( "confidentialityAndPrivacy", Type.var "a" )
+                          , ( "cellularFunction", Type.var "a" )
+                          , ( "cardiovascularSystem", Type.var "a" )
+                          , ( "respiratorySystem", Type.var "a" )
                           ]
                      )
                 )
@@ -657,42 +762,37 @@ make_ =
                          "molecularBiology"
                          activityRecord_args.molecularBiology
                      , Tuple.pair
-                         "cellularPhysiology"
-                         activityRecord_args.cellularPhysiology
+                         "cellularFunction"
+                         activityRecord_args.cellularFunction
                      , Tuple.pair
-                         "cardiovascularPhysiology"
-                         activityRecord_args.cardiovascularPhysiology
+                         "cardiovascularSystem"
+                         activityRecord_args.cardiovascularSystem
                      , Tuple.pair
-                         "respiratoryPhysiology"
-                         activityRecord_args.respiratoryPhysiology
-                     , Tuple.pair
-                         "pharmacokinetics"
-                         activityRecord_args.pharmacokinetics
-                     , Tuple.pair
-                         "pharmacodynamics"
-                         activityRecord_args.pharmacodynamics
-                     , Tuple.pair "toxicology" activityRecord_args.toxicology
-                     , Tuple.pair
-                         "bacteriology"
-                         activityRecord_args.bacteriology
-                     , Tuple.pair "virology" activityRecord_args.virology
-                     , Tuple.pair "mycology" activityRecord_args.mycology
-                     , Tuple.pair "cellInjury" activityRecord_args.cellInjury
-                     , Tuple.pair
-                         "inflammation"
-                         activityRecord_args.inflammation
-                     , Tuple.pair
-                         "hemodynamicDisorders"
-                         activityRecord_args.hemodynamicDisorders
-                     , Tuple.pair
-                         "principlesOfMedicalEthics"
-                         activityRecord_args.principlesOfMedicalEthics
-                     , Tuple.pair
-                         "informedConsent"
-                         activityRecord_args.informedConsent
-                     , Tuple.pair
-                         "confidentialityAndPrivacy"
-                         activityRecord_args.confidentialityAndPrivacy
+                         "respiratorySystem"
+                         activityRecord_args.respiratorySystem
+                     ]
+                )
+    , skillStats =
+        \skillStats_args ->
+            Elm.withType
+                (Type.alias
+                     [ "IdleGame", "Kinds" ]
+                     "SkillStats"
+                     []
+                     (Type.record
+                          [ ( "title", Type.string )
+                          , ( "icon"
+                            , Type.namedWith
+                                  [ "IdleGame", "Views", "Icon" ]
+                                  "Icon"
+                                  []
+                            )
+                          ]
+                     )
+                )
+                (Elm.record
+                     [ Tuple.pair "title" skillStats_args.title
+                     , Tuple.pair "icon" skillStats_args.icon
                      ]
                 )
     , skillRecord =
@@ -825,94 +925,22 @@ make_ =
             , name = "MolecularBiology"
             , annotation = Just (Type.namedWith [] "Activity" [])
             }
-    , cellularPhysiology =
+    , cellularFunction =
         Elm.value
             { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "CellularPhysiology"
+            , name = "CellularFunction"
             , annotation = Just (Type.namedWith [] "Activity" [])
             }
-    , cardiovascularPhysiology =
+    , cardiovascularSystem =
         Elm.value
             { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "CardiovascularPhysiology"
+            , name = "CardiovascularSystem"
             , annotation = Just (Type.namedWith [] "Activity" [])
             }
-    , respiratoryPhysiology =
+    , respiratorySystem =
         Elm.value
             { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "RespiratoryPhysiology"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , pharmacokinetics =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Pharmacokinetics"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , pharmacodynamics =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Pharmacodynamics"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , toxicology =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Toxicology"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , bacteriology =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Bacteriology"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , virology =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Virology"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , mycology =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Mycology"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , cellInjury =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "CellInjury"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , inflammation =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "Inflammation"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , hemodynamicDisorders =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "HemodynamicDisorders"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , principlesOfMedicalEthics =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "PrinciplesOfMedicalEthics"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , informedConsent =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "InformedConsent"
-            , annotation = Just (Type.namedWith [] "Activity" [])
-            }
-    , confidentialityAndPrivacy =
-        Elm.value
-            { importFrom = [ "IdleGame", "Kinds" ]
-            , name = "ConfidentialityAndPrivacy"
+            , name = "RespiratorySystem"
             , annotation = Just (Type.namedWith [] "Activity" [])
             }
     , anatomy =
@@ -1058,21 +1086,9 @@ caseOf_ :
             , metabolicPathways : Elm.Expression
             , enzymology : Elm.Expression
             , molecularBiology : Elm.Expression
-            , cellularPhysiology : Elm.Expression
-            , cardiovascularPhysiology : Elm.Expression
-            , respiratoryPhysiology : Elm.Expression
-            , pharmacokinetics : Elm.Expression
-            , pharmacodynamics : Elm.Expression
-            , toxicology : Elm.Expression
-            , bacteriology : Elm.Expression
-            , virology : Elm.Expression
-            , mycology : Elm.Expression
-            , cellInjury : Elm.Expression
-            , inflammation : Elm.Expression
-            , hemodynamicDisorders : Elm.Expression
-            , principlesOfMedicalEthics : Elm.Expression
-            , informedConsent : Elm.Expression
-            , confidentialityAndPrivacy : Elm.Expression
+            , cellularFunction : Elm.Expression
+            , cardiovascularSystem : Elm.Expression
+            , respiratorySystem : Elm.Expression
         }
         -> Elm.Expression
     , skill :
@@ -1130,38 +1146,14 @@ caseOf_ =
                     "MolecularBiology"
                     activityTags.molecularBiology
                 , Elm.Case.branch0
-                    "CellularPhysiology"
-                    activityTags.cellularPhysiology
+                    "CellularFunction"
+                    activityTags.cellularFunction
                 , Elm.Case.branch0
-                    "CardiovascularPhysiology"
-                    activityTags.cardiovascularPhysiology
+                    "CardiovascularSystem"
+                    activityTags.cardiovascularSystem
                 , Elm.Case.branch0
-                    "RespiratoryPhysiology"
-                    activityTags.respiratoryPhysiology
-                , Elm.Case.branch0
-                    "Pharmacokinetics"
-                    activityTags.pharmacokinetics
-                , Elm.Case.branch0
-                    "Pharmacodynamics"
-                    activityTags.pharmacodynamics
-                , Elm.Case.branch0 "Toxicology" activityTags.toxicology
-                , Elm.Case.branch0 "Bacteriology" activityTags.bacteriology
-                , Elm.Case.branch0 "Virology" activityTags.virology
-                , Elm.Case.branch0 "Mycology" activityTags.mycology
-                , Elm.Case.branch0 "CellInjury" activityTags.cellInjury
-                , Elm.Case.branch0 "Inflammation" activityTags.inflammation
-                , Elm.Case.branch0
-                    "HemodynamicDisorders"
-                    activityTags.hemodynamicDisorders
-                , Elm.Case.branch0
-                    "PrinciplesOfMedicalEthics"
-                    activityTags.principlesOfMedicalEthics
-                , Elm.Case.branch0
-                    "InformedConsent"
-                    activityTags.informedConsent
-                , Elm.Case.branch0
-                    "ConfidentialityAndPrivacy"
-                    activityTags.confidentialityAndPrivacy
+                    "RespiratorySystem"
+                    activityTags.respiratorySystem
                 ]
     , skill =
         \skillExpression skillTags ->
@@ -1206,10 +1198,12 @@ call_ :
         Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
     , getByShopUpgrade : Elm.Expression -> Elm.Expression -> Elm.Expression
     , shopUpgradeRecord : Elm.Expression -> Elm.Expression
+    , getActivityStats : Elm.Expression -> Elm.Expression
     , setByActivity :
         Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
     , getByActivity : Elm.Expression -> Elm.Expression -> Elm.Expression
     , activityRecord : Elm.Expression -> Elm.Expression
+    , getSkillStats : Elm.Expression -> Elm.Expression
     , setBySkill :
         Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
     , getBySkill : Elm.Expression -> Elm.Expression -> Elm.Expression
@@ -1293,6 +1287,29 @@ call_ =
                      }
                 )
                 [ shopUpgradeRecordArg ]
+    , getActivityStats =
+        \getActivityStatsArg ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Kinds" ]
+                     , name = "getActivityStats"
+                     , annotation =
+                         Just
+                             (Type.function
+                                  [ Type.namedWith
+                                      [ "IdleGame", "Kinds" ]
+                                      "Activity"
+                                      []
+                                  ]
+                                  (Type.namedWith
+                                       [ "IdleGame", "Kinds" ]
+                                       "ActivityStats"
+                                       []
+                                  )
+                             )
+                     }
+                )
+                [ getActivityStatsArg ]
     , setByActivity =
         \setByActivityArg setByActivityArg0 setByActivityArg1 ->
             Elm.apply
@@ -1337,9 +1354,9 @@ call_ =
                                   , Type.namedWith
                                       [ "IdleGame", "Kinds" ]
                                       "ActivityRecord"
-                                      [ Type.var "confidentialityAndPrivacy" ]
+                                      [ Type.var "respiratorySystem" ]
                                   ]
-                                  (Type.var "confidentialityAndPrivacy")
+                                  (Type.var "respiratorySystem")
                              )
                      }
                 )
@@ -1363,6 +1380,29 @@ call_ =
                      }
                 )
                 [ activityRecordArg ]
+    , getSkillStats =
+        \getSkillStatsArg ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Kinds" ]
+                     , name = "getSkillStats"
+                     , annotation =
+                         Just
+                             (Type.function
+                                  [ Type.namedWith
+                                      [ "IdleGame", "Kinds" ]
+                                      "Skill"
+                                      []
+                                  ]
+                                  (Type.namedWith
+                                       [ "IdleGame", "Kinds" ]
+                                       "SkillStats"
+                                       []
+                                  )
+                             )
+                     }
+                )
+                [ getSkillStatsArg ]
     , setBySkill =
         \setBySkillArg setBySkillArg0 setBySkillArg1 ->
             Elm.apply
@@ -1511,10 +1551,14 @@ values_ :
     , getByShopUpgrade : Elm.Expression
     , shopUpgradeRecord : Elm.Expression
     , allShopUpgrades : Elm.Expression
+    , getActivityStats : Elm.Expression
+    , activityStats : Elm.Expression
     , setByActivity : Elm.Expression
     , getByActivity : Elm.Expression
     , activityRecord : Elm.Expression
     , allActivities : Elm.Expression
+    , getSkillStats : Elm.Expression
+    , skillStats : Elm.Expression
     , setBySkill : Elm.Expression
     , getBySkill : Elm.Expression
     , skillRecord : Elm.Expression
@@ -1597,6 +1641,38 @@ values_ =
                          )
                     )
             }
+    , getActivityStats =
+        Elm.value
+            { importFrom = [ "IdleGame", "Kinds" ]
+            , name = "getActivityStats"
+            , annotation =
+                Just
+                    (Type.function
+                         [ Type.namedWith [ "IdleGame", "Kinds" ] "Activity" []
+                         ]
+                         (Type.namedWith
+                              [ "IdleGame", "Kinds" ]
+                              "ActivityStats"
+                              []
+                         )
+                    )
+            }
+    , activityStats =
+        Elm.value
+            { importFrom = [ "IdleGame", "Kinds" ]
+            , name = "activityStats"
+            , annotation =
+                Just
+                    (Type.namedWith
+                         [ "IdleGame", "Kinds" ]
+                         "ActivityRecord"
+                         [ Type.namedWith
+                             [ "IdleGame", "Kinds" ]
+                             "ActivityStats"
+                             []
+                         ]
+                    )
+            }
     , setByActivity =
         Elm.value
             { importFrom = [ "IdleGame", "Kinds" ]
@@ -1629,9 +1705,9 @@ values_ =
                          , Type.namedWith
                              [ "IdleGame", "Kinds" ]
                              "ActivityRecord"
-                             [ Type.var "confidentialityAndPrivacy" ]
+                             [ Type.var "respiratorySystem" ]
                          ]
-                         (Type.var "confidentialityAndPrivacy")
+                         (Type.var "respiratorySystem")
                     )
             }
     , activityRecord =
@@ -1657,6 +1733,34 @@ values_ =
                 Just
                     (Type.list
                          (Type.namedWith [ "IdleGame", "Kinds" ] "Activity" [])
+                    )
+            }
+    , getSkillStats =
+        Elm.value
+            { importFrom = [ "IdleGame", "Kinds" ]
+            , name = "getSkillStats"
+            , annotation =
+                Just
+                    (Type.function
+                         [ Type.namedWith [ "IdleGame", "Kinds" ] "Skill" [] ]
+                         (Type.namedWith [ "IdleGame", "Kinds" ] "SkillStats" []
+                         )
+                    )
+            }
+    , skillStats =
+        Elm.value
+            { importFrom = [ "IdleGame", "Kinds" ]
+            , name = "skillStats"
+            , annotation =
+                Just
+                    (Type.namedWith
+                         [ "IdleGame", "Kinds" ]
+                         "SkillRecord"
+                         [ Type.namedWith
+                             [ "IdleGame", "Kinds" ]
+                             "SkillStats"
+                             []
+                         ]
                     )
             }
     , setBySkill =
