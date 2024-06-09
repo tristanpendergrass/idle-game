@@ -1,9 +1,5 @@
 import axios from "axios";
-import path from "path";
 import * as CodeGen from "elm-codegen";
-import { writeFile } from "fs/promises";
-import subjectConfig from "./subjectConfig.json";
-import activityConfig from "./activityConfig.json";
 
 async function fetchGoogleSheetData() {
   const url =
@@ -22,25 +18,6 @@ async function fetchGoogleSheetData() {
     console.error("There has been a problem with your fetch operation:", error);
   }
 }
-
-async function saveJSONToFile() {
-  const data = await fetchGoogleSheetData();
-
-  if (data) {
-    const jsonContent = JSON.stringify(data, null, 2);
-
-    const filePath = "./activityConfig.json"; // Change to your desired path
-
-    try {
-      await writeFile(filePath, jsonContent);
-      console.log("JSON file has been saved");
-    } catch (err) {
-      console.error("Error writing to file", err);
-    }
-  }
-}
-
-// saveJSONToFile();
 
 fetchGoogleSheetData().then((data) => {
   const { subjects: subjectConfig, activities: activityConfig } = data;
