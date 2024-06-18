@@ -21,7 +21,7 @@ getBySkill skill =
     allActivities
         |> List.filter
             (\kind ->
-                (getActivityStats kind).subject == skill
+                (getActivityStats kind).skill == skill
             )
 
 
@@ -45,18 +45,60 @@ type alias EffectStats =
     }
 
 
-getEffectStats : Activity -> EffectStats
-getEffectStats activity =
-    case (getActivityStats activity).subject of
+knowledgeResource : Skill -> Maybe Resource
+knowledgeResource skill =
+    case skill of
         Anatomy ->
-            { effects = [ Effect.gainResource 1 BiochemistryK ]
-            , mastery = Nothing
-            }
+            Just AnatomyK
+
+        Biochemistry ->
+            Just BiochemistryK
+
+        Physiology ->
+            Just PhysiologyK
+
+        Pharmacology ->
+            Just PharmacologyK
+
+        Microbiology ->
+            Just MicrobiologyK
+
+        Pathology ->
+            Just PathologyK
+
+        MedicalEthics ->
+            Just MedicalEthicsK
 
         _ ->
-            { effects = [ Effect.gainResource 1 PhysiologyK ]
-            , mastery = Nothing
-            }
+            Nothing
+
+
+getEffectStats : Activity -> EffectStats
+getEffectStats activity =
+    let
+        stats : ActivityStats
+        stats =
+            getActivityStats activity
+
+        knowledgeEffects : List Effect
+        knowledgeEffects =
+            case ( knowledgeResource stats.skill, stats.knowledge ) of
+                ( Just resource, Just amount ) ->
+                    [ Effect.gainResource amount resource ]
+
+                _ ->
+                    []
+
+        labEffects : List Effect
+        labEffects =
+            -- case activity of
+            --     Lab1 ->
+            --         []
+            []
+    in
+    { effects = List.concat [ knowledgeEffects, labEffects ]
+    , mastery = Nothing
+    }
 
 
 updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a

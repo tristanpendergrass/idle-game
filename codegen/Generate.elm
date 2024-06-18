@@ -28,8 +28,8 @@ file flags =
         (List.concat
             [ [ Elm.comment "!! Generated code, do not edit by hand !!" ]
             , [ Elm.comment "Skills" ]
-            , getDeclarations "Skill" "Skills" (List.map (\configObject -> capitalize configObject.id) flags.subjectConfig)
-            , skillStats flags.subjectConfig
+            , getDeclarations "Skill" "Skills" (List.map (\configObject -> capitalize configObject.id) flags.skillConfig)
+            , skillStats flags.skillConfig
             , [ Elm.comment "Activities" ]
             , getDeclarations "Activity" "Activities" (List.map (\configObject -> capitalize configObject.id) flags.activityConfig)
             , activityStats flags.activityConfig
@@ -157,7 +157,7 @@ iconImport icon =
 
 
 skillStats : List SkillConfigObject -> List Elm.Declaration
-skillStats subjectConfigResult =
+skillStats skillConfigResult =
     let
         skillStatsType : Type.Annotation
         skillStatsType =
@@ -176,7 +176,7 @@ skillStats subjectConfigResult =
     getStats "Skill"
         skillStatsType
         (\skillConfig -> ( skillConfig.id, toExpression skillConfig ))
-        subjectConfigResult
+        skillConfigResult
 
 
 activityStats : List ActivityConfigObject -> List Elm.Declaration
@@ -185,24 +185,28 @@ activityStats activityConfigObjects =
         activityStatsType : Type.Annotation
         activityStatsType =
             Type.record
-                [ ( "subject", Type.named [] "Skill" )
+                [ ( "skill", Type.named [] "Skill" )
                 , ( "title", Type.string )
                 , ( "image", Type.string )
                 , ( "level", Type.int )
                 , ( "duration", Gen.Duration.annotation_.duration )
-                , ( "knowledge", Type.int )
+                , ( "knowledge", Type.maybe Type.int )
                 , ( "type_", Type.string )
                 ]
 
         toExpression : ActivityConfigObject -> Elm.Expression
         toExpression activityConfig =
             Elm.record
-                [ ( "subject", Elm.val (capitalize activityConfig.subject) )
+                [ ( "skill", Elm.val (capitalize activityConfig.skill) )
                 , ( "title", Elm.string activityConfig.title )
                 , ( "image", Elm.string activityConfig.image )
                 , ( "level", Elm.int activityConfig.level )
                 , ( "duration", Gen.Duration.call_.seconds (Elm.int activityConfig.duration) )
-                , ( "knowledge", Elm.int activityConfig.knowledge )
+                , ( "knowledge"
+                  , activityConfig.knowledge
+                        |> Maybe.map Elm.int
+                        |> Elm.maybe
+                  )
                 , ( "type_", Elm.string activityConfig.type_ )
                 ]
     in
@@ -247,12 +251,12 @@ type alias SkillConfigObject =
 
 type alias ActivityConfigObject =
     { id : String
-    , subject : String
+    , skill : String
     , title : String
     , image : String
     , level : Int
     , duration : Int
-    , knowledge : Int
+    , knowledge : Maybe Int
     , type_ : String
     }
 
@@ -266,19 +270,22 @@ type alias ResourceConfigObject =
 
 
 type alias Flags =
-    { subjectConfig : List SkillConfigObject, activityConfig : List ActivityConfigObject, resourceConfig : List ResourceConfigObject }
+    { skillConfig : List SkillConfigObject
+    , activityConfig : List ActivityConfigObject
+    , resourceConfig : List ResourceConfigObject
+    }
 
 
 flagsDecoder : Json.Decode.Decoder Flags
 flagsDecoder =
     Json.Decode.map3 Flags
-        (Json.Decode.field "subjectConfig" (Json.Decode.list subjectConfigDecoder))
+        (Json.Decode.field "skillConfig" (Json.Decode.list skillConfigDecoder))
         (Json.Decode.field "activityConfig" (Json.Decode.list activityConfigDecoder))
         (Json.Decode.field "resourceConfig" (Json.Decode.list resourceConfigDecoder))
 
 
-subjectConfigDecoder : Json.Decode.Decoder SkillConfigObject
-subjectConfigDecoder =
+skillConfigDecoder : Json.Decode.Decoder SkillConfigObject
+skillConfigDecoder =
     Json.Decode.map3 SkillConfigObject
         (Json.Decode.field "id" Json.Decode.string)
         (Json.Decode.field "title" Json.Decode.string)
@@ -289,12 +296,12 @@ activityConfigDecoder : Json.Decode.Decoder ActivityConfigObject
 activityConfigDecoder =
     Json.Decode.map8 ActivityConfigObject
         (Json.Decode.field "id" Json.Decode.string)
-        (Json.Decode.field "subject" Json.Decode.string)
+        (Json.Decode.field "skill" Json.Decode.string)
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "image" Json.Decode.string)
         (Json.Decode.field "level" Json.Decode.int)
         (Json.Decode.field "duration" Json.Decode.int)
-        (Json.Decode.field "knowledge" Json.Decode.int)
+        (Json.Decode.field "knowledge" (Json.Decode.maybe Json.Decode.int))
         (Json.Decode.field "type" Json.Decode.string)
 
 

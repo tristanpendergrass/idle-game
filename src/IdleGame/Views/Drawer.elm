@@ -79,7 +79,7 @@ renderDrawer isDrawerOpen activeTab =
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 (li [] []
                     :: (allSkills
-                            |> List.map (\skill -> li [ onClick (HandleTabClick (Tab.SubjectTab skill)) ] [ renderTab { tab = Tab.SubjectTab skill, underConstruction = False } ])
+                            |> List.map (\skill -> li [ onClick (HandleTabClick (Tab.SkillTab skill)) ] [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ])
                        )
                 )
             ]

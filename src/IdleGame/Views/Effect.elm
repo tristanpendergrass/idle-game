@@ -102,7 +102,7 @@ renderResource game resource base =
         icon : Html msg
         icon =
             (getResourceStats resource).icon
-                -- |> Icon.withSize Icon.Large
+                |> Icon.withSize Icon.Large
                 |> Icon.toHtml
     in
     div [ class "flex items-center gap-1" ]

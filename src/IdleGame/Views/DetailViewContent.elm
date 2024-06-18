@@ -50,7 +50,7 @@ renderStatusBar ( activity, timer ) =
 
         belongsLabel : String
         belongsLabel =
-            (getSkillStats stats.subject).title
+            (getSkillStats stats.skill).title
 
         image : Html FrontendMsg
         image =
@@ -144,7 +144,7 @@ renderContent obj extraBottomPadding game =
 
         belongsToLabel : String
         belongsToLabel =
-            (getSkillStats stats.subject).title
+            (getSkillStats stats.skill).title
     in
     div
         [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"

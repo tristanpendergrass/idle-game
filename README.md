@@ -62,11 +62,14 @@ $ npx elm-codegen install
 
 # Todos
 
-[x] Remove code references to old version
-[ ] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
-[ ] Add anatomy topics
+[ ] Support mail
+[ ] Support Testing Center tab
+[ ] Support Labs skill
 [ ] Support Practical Knowledge and Labs in Anatomy
-[ ] Add Biochemistry
-[ ] Add Microchemistry and Immunology (experiments)
-[ ] Add Pathology
 [ ] Change DaisyUI theme
+[x] Remove code references to old version
+[x] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
+[x] Add anatomy topics
+[x] Add Biochemistry
+[x] Add Microchemistry and Immunology (experiments)
+[x] Add Pathology

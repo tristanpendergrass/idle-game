@@ -19,6 +19,7 @@ type Skill
     | Microbiology
     | Pathology
     | MedicalEthics
+    | Labs
 
 
 allSkills : List Skill
@@ -30,6 +31,7 @@ allSkills =
     , Microbiology
     , Pathology
     , MedicalEthics
+    , Labs
     ]
 
 
@@ -41,6 +43,7 @@ type alias SkillRecord a =
     , microbiology : a
     , pathology : a
     , medicalEthics : a
+    , labs : a
     }
 
 
@@ -53,10 +56,11 @@ skillRecord a =
     , microbiology = a
     , pathology = a
     , medicalEthics = a
+    , labs = a
     }
 
 
-getBySkill : Skill -> SkillRecord medicalEthics -> medicalEthics
+getBySkill : Skill -> SkillRecord labs -> labs
 getBySkill kind data =
     case kind of
         Anatomy ->
@@ -79,6 +83,9 @@ getBySkill kind data =
 
         MedicalEthics ->
             data.medicalEthics
+
+        Labs ->
+            data.labs
 
 
 setBySkill : Skill -> value -> SkillRecord value -> SkillRecord value
@@ -105,6 +112,9 @@ setBySkill kind value data =
         MedicalEthics ->
             { data | medicalEthics = value }
 
+        Labs ->
+            { data | labs = value }
+
 
 type alias SkillStats =
     { title : String, icon : IdleGame.Views.Icon.Icon }
@@ -124,6 +134,7 @@ skillStats =
     , pathology = { title = "Pathology", icon = IdleGame.Views.Icon.summarize }
     , medicalEthics =
         { title = "Medical Ethics", icon = IdleGame.Views.Icon.policy }
+    , labs = { title = "Labs", icon = IdleGame.Views.Icon.workspaces }
     }
 
 
@@ -139,17 +150,30 @@ type Activity
     = BackAndSpine
     | UpperLimb
     | LowerLimb
+    | Thorax
+    | Abdomen
+    | PelvisAndPerineum
+    | HeadAndNeck
+    | IntegumentarySystem
+    | LymphaticAndImmuneSystem
     | MetabolicPathways
     | Enzymology
     | MolecularBiology
+    | LipidMetabolism
+    | CarbohydrateMetabolism
+    | ProteinSynthesis
+    | NucleicAcidMetabolism
+    | BiochemicalSignaling
+    | VitaminsAndCoenzymes
     | CellularFunction
     | CardiovascularSystem
     | RespiratorySystem
-    | Pharmacokinetics
-    | Pharmacodynamics
-    | Toxicology
-    | Bacteriology
-    | Virology
+    | RenalFunction
+    | DigestiveSystem
+    | NervousSystem
+    | EndocrineSystem
+    | ReproductiveSystem
+    | ImmuneResponse
     | Mycology
     | CellInjury
     | Inflammation
@@ -157,6 +181,9 @@ type Activity
     | PrinciplesOfBiomedicalEthics
     | InformedConsent
     | ConfidentialityAndPrivacy
+    | Lab1
+    | Lab2
+    | Lab3
 
 
 allActivities : List Activity
@@ -164,17 +191,30 @@ allActivities =
     [ BackAndSpine
     , UpperLimb
     , LowerLimb
+    , Thorax
+    , Abdomen
+    , PelvisAndPerineum
+    , HeadAndNeck
+    , IntegumentarySystem
+    , LymphaticAndImmuneSystem
     , MetabolicPathways
     , Enzymology
     , MolecularBiology
+    , LipidMetabolism
+    , CarbohydrateMetabolism
+    , ProteinSynthesis
+    , NucleicAcidMetabolism
+    , BiochemicalSignaling
+    , VitaminsAndCoenzymes
     , CellularFunction
     , CardiovascularSystem
     , RespiratorySystem
-    , Pharmacokinetics
-    , Pharmacodynamics
-    , Toxicology
-    , Bacteriology
-    , Virology
+    , RenalFunction
+    , DigestiveSystem
+    , NervousSystem
+    , EndocrineSystem
+    , ReproductiveSystem
+    , ImmuneResponse
     , Mycology
     , CellInjury
     , Inflammation
@@ -182,6 +222,9 @@ allActivities =
     , PrinciplesOfBiomedicalEthics
     , InformedConsent
     , ConfidentialityAndPrivacy
+    , Lab1
+    , Lab2
+    , Lab3
     ]
 
 
@@ -189,17 +232,30 @@ type alias ActivityRecord a =
     { backAndSpine : a
     , upperLimb : a
     , lowerLimb : a
+    , thorax : a
+    , abdomen : a
+    , pelvisAndPerineum : a
+    , headAndNeck : a
+    , integumentarySystem : a
+    , lymphaticAndImmuneSystem : a
     , metabolicPathways : a
     , enzymology : a
     , molecularBiology : a
+    , lipidMetabolism : a
+    , carbohydrateMetabolism : a
+    , proteinSynthesis : a
+    , nucleicAcidMetabolism : a
+    , biochemicalSignaling : a
+    , vitaminsAndCoenzymes : a
     , cellularFunction : a
     , cardiovascularSystem : a
     , respiratorySystem : a
-    , pharmacokinetics : a
-    , pharmacodynamics : a
-    , toxicology : a
-    , bacteriology : a
-    , virology : a
+    , renalFunction : a
+    , digestiveSystem : a
+    , nervousSystem : a
+    , endocrineSystem : a
+    , reproductiveSystem : a
+    , immuneResponse : a
     , mycology : a
     , cellInjury : a
     , inflammation : a
@@ -207,6 +263,9 @@ type alias ActivityRecord a =
     , principlesOfBiomedicalEthics : a
     , informedConsent : a
     , confidentialityAndPrivacy : a
+    , lab1 : a
+    , lab2 : a
+    , lab3 : a
     }
 
 
@@ -215,17 +274,30 @@ activityRecord a =
     { backAndSpine = a
     , upperLimb = a
     , lowerLimb = a
+    , thorax = a
+    , abdomen = a
+    , pelvisAndPerineum = a
+    , headAndNeck = a
+    , integumentarySystem = a
+    , lymphaticAndImmuneSystem = a
     , metabolicPathways = a
     , enzymology = a
     , molecularBiology = a
+    , lipidMetabolism = a
+    , carbohydrateMetabolism = a
+    , proteinSynthesis = a
+    , nucleicAcidMetabolism = a
+    , biochemicalSignaling = a
+    , vitaminsAndCoenzymes = a
     , cellularFunction = a
     , cardiovascularSystem = a
     , respiratorySystem = a
-    , pharmacokinetics = a
-    , pharmacodynamics = a
-    , toxicology = a
-    , bacteriology = a
-    , virology = a
+    , renalFunction = a
+    , digestiveSystem = a
+    , nervousSystem = a
+    , endocrineSystem = a
+    , reproductiveSystem = a
+    , immuneResponse = a
     , mycology = a
     , cellInjury = a
     , inflammation = a
@@ -233,13 +305,13 @@ activityRecord a =
     , principlesOfBiomedicalEthics = a
     , informedConsent = a
     , confidentialityAndPrivacy = a
+    , lab1 = a
+    , lab2 = a
+    , lab3 = a
     }
 
 
-getByActivity :
-    Activity
-    -> ActivityRecord confidentialityAndPrivacy
-    -> confidentialityAndPrivacy
+getByActivity : Activity -> ActivityRecord lab3 -> lab3
 getByActivity kind data =
     case kind of
         BackAndSpine ->
@@ -251,6 +323,24 @@ getByActivity kind data =
         LowerLimb ->
             data.lowerLimb
 
+        Thorax ->
+            data.thorax
+
+        Abdomen ->
+            data.abdomen
+
+        PelvisAndPerineum ->
+            data.pelvisAndPerineum
+
+        HeadAndNeck ->
+            data.headAndNeck
+
+        IntegumentarySystem ->
+            data.integumentarySystem
+
+        LymphaticAndImmuneSystem ->
+            data.lymphaticAndImmuneSystem
+
         MetabolicPathways ->
             data.metabolicPathways
 
@@ -259,6 +349,24 @@ getByActivity kind data =
 
         MolecularBiology ->
             data.molecularBiology
+
+        LipidMetabolism ->
+            data.lipidMetabolism
+
+        CarbohydrateMetabolism ->
+            data.carbohydrateMetabolism
+
+        ProteinSynthesis ->
+            data.proteinSynthesis
+
+        NucleicAcidMetabolism ->
+            data.nucleicAcidMetabolism
+
+        BiochemicalSignaling ->
+            data.biochemicalSignaling
+
+        VitaminsAndCoenzymes ->
+            data.vitaminsAndCoenzymes
 
         CellularFunction ->
             data.cellularFunction
@@ -269,20 +377,23 @@ getByActivity kind data =
         RespiratorySystem ->
             data.respiratorySystem
 
-        Pharmacokinetics ->
-            data.pharmacokinetics
+        RenalFunction ->
+            data.renalFunction
 
-        Pharmacodynamics ->
-            data.pharmacodynamics
+        DigestiveSystem ->
+            data.digestiveSystem
 
-        Toxicology ->
-            data.toxicology
+        NervousSystem ->
+            data.nervousSystem
 
-        Bacteriology ->
-            data.bacteriology
+        EndocrineSystem ->
+            data.endocrineSystem
 
-        Virology ->
-            data.virology
+        ReproductiveSystem ->
+            data.reproductiveSystem
+
+        ImmuneResponse ->
+            data.immuneResponse
 
         Mycology ->
             data.mycology
@@ -305,6 +416,15 @@ getByActivity kind data =
         ConfidentialityAndPrivacy ->
             data.confidentialityAndPrivacy
 
+        Lab1 ->
+            data.lab1
+
+        Lab2 ->
+            data.lab2
+
+        Lab3 ->
+            data.lab3
+
 
 setByActivity :
     Activity -> value -> ActivityRecord value -> ActivityRecord value
@@ -319,6 +439,24 @@ setByActivity kind value data =
         LowerLimb ->
             { data | lowerLimb = value }
 
+        Thorax ->
+            { data | thorax = value }
+
+        Abdomen ->
+            { data | abdomen = value }
+
+        PelvisAndPerineum ->
+            { data | pelvisAndPerineum = value }
+
+        HeadAndNeck ->
+            { data | headAndNeck = value }
+
+        IntegumentarySystem ->
+            { data | integumentarySystem = value }
+
+        LymphaticAndImmuneSystem ->
+            { data | lymphaticAndImmuneSystem = value }
+
         MetabolicPathways ->
             { data | metabolicPathways = value }
 
@@ -327,6 +465,24 @@ setByActivity kind value data =
 
         MolecularBiology ->
             { data | molecularBiology = value }
+
+        LipidMetabolism ->
+            { data | lipidMetabolism = value }
+
+        CarbohydrateMetabolism ->
+            { data | carbohydrateMetabolism = value }
+
+        ProteinSynthesis ->
+            { data | proteinSynthesis = value }
+
+        NucleicAcidMetabolism ->
+            { data | nucleicAcidMetabolism = value }
+
+        BiochemicalSignaling ->
+            { data | biochemicalSignaling = value }
+
+        VitaminsAndCoenzymes ->
+            { data | vitaminsAndCoenzymes = value }
 
         CellularFunction ->
             { data | cellularFunction = value }
@@ -337,20 +493,23 @@ setByActivity kind value data =
         RespiratorySystem ->
             { data | respiratorySystem = value }
 
-        Pharmacokinetics ->
-            { data | pharmacokinetics = value }
+        RenalFunction ->
+            { data | renalFunction = value }
 
-        Pharmacodynamics ->
-            { data | pharmacodynamics = value }
+        DigestiveSystem ->
+            { data | digestiveSystem = value }
 
-        Toxicology ->
-            { data | toxicology = value }
+        NervousSystem ->
+            { data | nervousSystem = value }
 
-        Bacteriology ->
-            { data | bacteriology = value }
+        EndocrineSystem ->
+            { data | endocrineSystem = value }
 
-        Virology ->
-            { data | virology = value }
+        ReproductiveSystem ->
+            { data | reproductiveSystem = value }
+
+        ImmuneResponse ->
+            { data | immuneResponse = value }
 
         Mycology ->
             { data | mycology = value }
@@ -373,14 +532,23 @@ setByActivity kind value data =
         ConfidentialityAndPrivacy ->
             { data | confidentialityAndPrivacy = value }
 
+        Lab1 ->
+            { data | lab1 = value }
+
+        Lab2 ->
+            { data | lab2 = value }
+
+        Lab3 ->
+            { data | lab3 = value }
+
 
 type alias ActivityStats =
-    { subject : Skill
+    { skill : Skill
     , title : String
     , image : String
     , level : Int
     , duration : Duration.Duration
-    , knowledge : Int
+    , knowledge : Maybe Int
     , type_ : String
     }
 
@@ -388,193 +556,337 @@ type alias ActivityStats =
 activityStats : ActivityRecord ActivityStats
 activityStats =
     { backAndSpine =
-        { subject = Anatomy
+        { skill = Anatomy
         , title = "Back and Spine"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/anatomy/backAndSpine.webp"
         , level = 1
         , duration = Duration.seconds 5
-        , knowledge = 1
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , upperLimb =
-        { subject = Anatomy
+        { skill = Anatomy
         , title = "Upper Limb"
-        , image = "/activities/upperLimb.webp"
+        , image = "/activities/anatomy/upperLimb.webp"
         , level = 5
         , duration = Duration.seconds 6
-        , knowledge = 2
+        , knowledge = Just 2
         , type_ = "Study"
         }
     , lowerLimb =
-        { subject = Anatomy
+        { skill = Anatomy
         , title = "Lower Limb"
-        , image = "/activities/lowerLimb.webp"
+        , image = "/activities/anatomy/lowerLimb.webp"
         , level = 10
         , duration = Duration.seconds 7
-        , knowledge = 3
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , thorax =
+        { skill = Anatomy
+        , title = "Thorax"
+        , image = "/activities/anatomy/thorax.webp"
+        , level = 20
+        , duration = Duration.seconds 8
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , abdomen =
+        { skill = Anatomy
+        , title = "Abdomen"
+        , image = "/activities/anatomy/abdomen.webp"
+        , level = 30
+        , duration = Duration.seconds 9
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , pelvisAndPerineum =
+        { skill = Anatomy
+        , title = "Pelvis and Perineum"
+        , image = "/activities/anatomy/pelvisAndPerineum.webp"
+        , level = 45
+        , duration = Duration.seconds 10
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , headAndNeck =
+        { skill = Anatomy
+        , title = "Head and Neck"
+        , image = "/activities/anatomy/headAndNeck.webp"
+        , level = 55
+        , duration = Duration.seconds 11
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , integumentarySystem =
+        { skill = Anatomy
+        , title = "Integumentary System"
+        , image = "/activities/anatomy/integumentarySystem.webp"
+        , level = 70
+        , duration = Duration.seconds 12
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , lymphaticAndImmuneSystem =
+        { skill = Anatomy
+        , title = "Lymphatic And Immune System"
+        , image = "/activities/anatomy/lymphaticAndImmuneSystem.webp"
+        , level = 75
+        , duration = Duration.seconds 13
+        , knowledge = Just 3
         , type_ = "Study"
         }
     , metabolicPathways =
-        { subject = Biochemistry
+        { skill = Biochemistry
         , title = "Metabolic Pathways"
-        , image = "/activities/metabolicPathways.webp"
+        , image = "/activities/biochemistry/metabolicPathways.webp"
         , level = 1
-        , duration = Duration.seconds 7
-        , knowledge = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , enzymology =
-        { subject = Biochemistry
+        { skill = Biochemistry
         , title = "Enzymology"
-        , image = "/activities/enzymology.webp"
-        , level = 8
-        , duration = Duration.seconds 10
-        , knowledge = 2
+        , image = "/activities/biochemistry/enzymology.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , molecularBiology =
-        { subject = Biochemistry
+        { skill = Biochemistry
         , title = "Molecular Biology"
-        , image = "/activities/molecularBiology.webp"
-        , level = 13
-        , duration = Duration.seconds 11
-        , knowledge = 3
+        , image = "/activities/biochemistry/molecularBiology.webp"
+        , level = 10
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , lipidMetabolism =
+        { skill = Biochemistry
+        , title = "Lipid Metabolism"
+        , image = "/activities/biochemistry/lipidMetabolism.webp"
+        , level = 20
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , carbohydrateMetabolism =
+        { skill = Biochemistry
+        , title = "Carbohydrate Metabolism"
+        , image = "/activities/biochemistry/carbohydrateMetabolism.webp"
+        , level = 30
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , proteinSynthesis =
+        { skill = Biochemistry
+        , title = "Protein Synthesis"
+        , image = "/activities/biochemistry/proteinSynthesis.webp"
+        , level = 45
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , nucleicAcidMetabolism =
+        { skill = Biochemistry
+        , title = "Nucleic Acid Metabolism"
+        , image = "/activities/biochemistry/nucleicAcidMetabolism.webp"
+        , level = 55
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , biochemicalSignaling =
+        { skill = Biochemistry
+        , title = "Biochemical Signaling"
+        , image = "/activities/biochemistry/biochemicalSignaling.webp"
+        , level = 70
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , vitaminsAndCoenzymes =
+        { skill = Biochemistry
+        , title = "Vitamins and Coenzymes"
+        , image = "/activities/biochemistry/vitaminsAndCoenzymes.webp"
+        , level = 75
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , cellularFunction =
-        { subject = Physiology
+        { skill = Physiology
         , title = "Cellular Function"
-        , image = "/activities/cellularFunction.webp"
+        , image = "/activities/physiology/cellularFunction.webp"
         , level = 1
-        , duration = Duration.seconds 4
-        , knowledge = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , cardiovascularSystem =
-        { subject = Physiology
+        { skill = Physiology
         , title = "Cardiovascular System"
-        , image = "/activities/cardiovascularSystem.webp"
+        , image = "/activities/physiology/cardiovascularSystem.webp"
         , level = 5
-        , duration = Duration.seconds 8
-        , knowledge = 2
+        , duration = Duration.seconds 5
+        , knowledge = Just 2
         , type_ = "Study"
         }
     , respiratorySystem =
-        { subject = Physiology
+        { skill = Physiology
         , title = "Respiratory System"
-        , image = "/activities/respiratorySystem.webp"
+        , image = "/activities/physiology/respiratorySystem.webp"
         , level = 12
-        , duration = Duration.seconds 6
-        , knowledge = 3
+        , duration = Duration.seconds 5
+        , knowledge = Just 3
         , type_ = "Study"
         }
-    , pharmacokinetics =
-        { subject = Pharmacology
-        , title = "Pharmacokinetics"
-        , image = "/activities/backAndSpine.webp"
-        , level = 1
+    , renalFunction =
+        { skill = Physiology
+        , title = "Renal Function"
+        , image = "/activities/physiology/renalFunction.webp"
+        , level = 20
         , duration = Duration.seconds 5
-        , knowledge = 1
+        , knowledge = Just 4
         , type_ = "Study"
         }
-    , pharmacodynamics =
-        { subject = Pharmacology
-        , title = "Pharmacodynamics"
-        , image = "/activities/backAndSpine.webp"
-        , level = 5
+    , digestiveSystem =
+        { skill = Physiology
+        , title = "Digestive System"
+        , image = "/activities/physiology/digestiveSystem.webp"
+        , level = 30
         , duration = Duration.seconds 5
-        , knowledge = 2
+        , knowledge = Just 5
         , type_ = "Study"
         }
-    , toxicology =
-        { subject = Pharmacology
-        , title = "Toxicology"
-        , image = "/activities/backAndSpine.webp"
-        , level = 10
+    , nervousSystem =
+        { skill = Physiology
+        , title = "Nervous System"
+        , image = "/activities/physiology/nervousSystem.webp"
+        , level = 40
         , duration = Duration.seconds 5
-        , knowledge = 3
+        , knowledge = Just 6
         , type_ = "Study"
         }
-    , bacteriology =
-        { subject = Microbiology
-        , title = "Bacteriology"
-        , image = "/activities/backAndSpine.webp"
-        , level = 1
+    , endocrineSystem =
+        { skill = Physiology
+        , title = "Endocrine System"
+        , image = "/activities/physiology/endocrineSystem.webp"
+        , level = 50
         , duration = Duration.seconds 5
-        , knowledge = 1
+        , knowledge = Just 7
         , type_ = "Study"
         }
-    , virology =
-        { subject = Microbiology
-        , title = "Virology"
-        , image = "/activities/backAndSpine.webp"
-        , level = 5
+    , reproductiveSystem =
+        { skill = Physiology
+        , title = "Reproductive System"
+        , image = "/activities/physiology/reproductiveSystem.webp"
+        , level = 60
         , duration = Duration.seconds 5
-        , knowledge = 2
+        , knowledge = Just 8
+        , type_ = "Study"
+        }
+    , immuneResponse =
+        { skill = Physiology
+        , title = "Immune Response"
+        , image = "/activities/physiology/immuneResponse.webp"
+        , level = 70
+        , duration = Duration.seconds 5
+        , knowledge = Just 9
         , type_ = "Study"
         }
     , mycology =
-        { subject = Microbiology
+        { skill = Microbiology
         , title = "Mycology"
         , image = "/activities/backAndSpine.webp"
         , level = 10
         , duration = Duration.seconds 5
-        , knowledge = 3
+        , knowledge = Just 3
         , type_ = "Study"
         }
     , cellInjury =
-        { subject = Pathology
+        { skill = Pathology
         , title = "Cell Injury and Adaptation"
         , image = "/activities/backAndSpine.webp"
         , level = 1
         , duration = Duration.seconds 5
-        , knowledge = 1
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , inflammation =
-        { subject = Pathology
+        { skill = Pathology
         , title = "Inflammation and Repair"
         , image = "/activities/backAndSpine.webp"
         , level = 5
         , duration = Duration.seconds 5
-        , knowledge = 2
+        , knowledge = Just 2
         , type_ = "Study"
         }
     , hemodynamicDisorders =
-        { subject = Pathology
+        { skill = Pathology
         , title = "Hemodynamic Disorders"
         , image = "/activities/backAndSpine.webp"
         , level = 10
         , duration = Duration.seconds 5
-        , knowledge = 3
+        , knowledge = Just 3
         , type_ = "Study"
         }
     , principlesOfBiomedicalEthics =
-        { subject = MedicalEthics
+        { skill = MedicalEthics
         , title = "Principles of Biomedical Ethics"
         , image = "/activities/backAndSpine.webp"
         , level = 1
         , duration = Duration.seconds 5
-        , knowledge = 1
+        , knowledge = Just 1
         , type_ = "Study"
         }
     , informedConsent =
-        { subject = MedicalEthics
+        { skill = MedicalEthics
         , title = "InformedConsent"
         , image = "/activities/backAndSpine.webp"
         , level = 5
         , duration = Duration.seconds 5
-        , knowledge = 2
+        , knowledge = Just 2
         , type_ = "Study"
         }
     , confidentialityAndPrivacy =
-        { subject = MedicalEthics
+        { skill = MedicalEthics
         , title = "Confidentiality and Privacy"
         , image = "/activities/backAndSpine.webp"
         , level = 10
         , duration = Duration.seconds 5
-        , knowledge = 3
+        , knowledge = Just 3
         , type_ = "Study"
+        }
+    , lab1 =
+        { skill = Labs
+        , title = "Lab 1"
+        , image = "/activities/backAndSpine.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = Nothing
+        , type_ = "Lab"
+        }
+    , lab2 =
+        { skill = Labs
+        , title = "Lab 2"
+        , image = "/activities/backAndSpine.webp"
+        , level = 2
+        , duration = Duration.seconds 5
+        , knowledge = Nothing
+        , type_ = "Lab"
+        }
+    , lab3 =
+        { skill = Labs
+        , title = "Lab 3"
+        , image = "/activities/backAndSpine.webp"
+        , level = 3
+        , duration = Duration.seconds 5
+        , knowledge = Nothing
+        , type_ = "Lab"
         }
     }
 

@@ -9,7 +9,7 @@ type Tab
     = Backpack
     | Shop
       -- | TestingCenter
-    | SubjectTab Skill
+    | SkillTab Skill
 
 
 type alias TabConfig =
@@ -31,7 +31,7 @@ getConfig tab =
             , icon = Icon.fromString "S"
             }
 
-        SubjectTab skill ->
+        SkillTab skill ->
             let
                 stats : SkillStats
                 stats =

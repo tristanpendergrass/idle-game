@@ -44,7 +44,7 @@ createProd seed =
 createDev : Random.Seed -> Game
 createDev seed =
     { seed = seed
-    , xp = skillRecord (Xp.int 999999)
+    , xp = skillRecord (Xp.int 9999999)
     , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0
@@ -70,14 +70,14 @@ getActivityListItems skill game =
 
                 currentLevel : Int
                 currentLevel =
-                    getBySkill stats.subject game.xp
+                    getBySkill stats.skill game.xp
                         |> Xp.level Xp.defaultSchedule
             in
             if currentLevel >= stats.level then
                 ActivityListItem kind
 
             else
-                LockedActivity ( stats.subject, stats.level )
+                LockedActivity ( stats.skill, stats.level )
 
         reducer : Activity -> { items : List ActivityListItem, lockedItem : Bool } -> { items : List ActivityListItem, lockedItem : Bool }
         reducer kind accum =
@@ -132,7 +132,7 @@ toggleActivity kind game =
             let
                 currentLevel : Int
                 currentLevel =
-                    getBySkill stats.subject game.xp
+                    getBySkill stats.skill game.xp
                         |> Xp.level Xp.defaultSchedule
             in
             currentLevel >= stats.level

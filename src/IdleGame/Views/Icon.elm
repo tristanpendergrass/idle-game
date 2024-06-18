@@ -32,6 +32,7 @@ type
     | MaterialBiotech
     | MaterialSummarize
     | MaterialPolicy
+    | MaterialWorkspaces
 
 
 myMaterialIconToHtml : MyMaterialIcon -> Material.Icons.Types.Icon msg
@@ -57,6 +58,9 @@ myMaterialIconToHtml icon =
 
         MaterialPolicy ->
             Material.Icons.policy
+
+        MaterialWorkspaces ->
+            Material.Icons.workspaces
 
 
 type Icon
@@ -570,3 +574,8 @@ summarize =
 policy : Icon
 policy =
     createIconMaterial MaterialPolicy
+
+
+workspaces : Icon
+workspaces =
+    createIconMaterial MaterialWorkspaces

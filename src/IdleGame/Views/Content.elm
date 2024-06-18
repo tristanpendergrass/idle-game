@@ -55,7 +55,7 @@ renderContent model game activeTab =
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
 
-            Tab.SubjectTab subject ->
+            Tab.SkillTab subject ->
                 IdleGame.Views.SubjectViews.renderSubject subject game
 
             _ ->

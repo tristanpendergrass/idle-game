@@ -3,7 +3,7 @@ import * as CodeGen from "elm-codegen";
 
 async function fetchGoogleSheetData() {
   const url =
-    "https://script.google.com/macros/s/AKfycbxtYsr5UPnWImRzcgLhMPtokBLneUjSJp5mEK4LPjnQlkzQVRRjPXJr1nWS_qjvYZqghQ/exec";
+    "https://script.google.com/macros/s/AKfycby-XD8oAHLaeW0SOpRU486qCPtyfhXiXrWcN4biQOFv59qA3vReLBrTcOkYeZ7uW8LkrQ/exec";
 
   try {
     const response = await axios.get(url);
@@ -21,14 +21,14 @@ async function fetchGoogleSheetData() {
 
 fetchGoogleSheetData().then((data) => {
   const {
-    subjects: subjectConfig,
+    skills: skillConfig,
     activities: activityConfig,
     resources: resourceConfig,
   } = data;
   CodeGen.run("Generate.elm", {
     debug: true,
     output: "src",
-    flags: { subjectConfig, activityConfig, resourceConfig },
+    flags: { skillConfig, activityConfig, resourceConfig },
     cwd: "./codegen",
   });
 });
