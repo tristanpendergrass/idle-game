@@ -47,13 +47,13 @@ config =
     -- , NoMissingTypeExpose.rule
     -- , NoSimpleLetBody.rule
     -- , NoPrematureLetComputation.rule
-    -- , NoUnused.CustomTypeConstructors.rule []
-    -- , NoUnused.CustomTypeConstructorArgs.rule
-    -- , NoUnused.Dependencies.rule
-    -- , NoUnused.Exports.rule
-    -- , NoUnused.Parameters.rule
-    -- , NoUnused.Patterns.rule
-    -- , NoUnused.Variables.rule
+    , NoUnused.CustomTypeConstructors.rule []
+    , NoUnused.CustomTypeConstructorArgs.rule
+    , NoUnused.Dependencies.rule
+    , NoUnused.Exports.rule
+    , NoUnused.Parameters.rule
+    , NoUnused.Patterns.rule
+    , NoUnused.Variables.rule
     , Simplify.rule Simplify.defaults
     ]
 
