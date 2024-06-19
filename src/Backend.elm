@@ -2,13 +2,12 @@ module Backend exposing (app)
 
 import Config
 import Dict
-import IdleGame.Game as Game exposing (..)
+import IdleGame.Game as Game
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Task
-import Time exposing (Posix)
-import Time.Extra
+import Time
 import Types exposing (..)
 
 

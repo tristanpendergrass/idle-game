@@ -2,22 +2,16 @@ module IdleGame.Views.Effect exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
-import Quantity exposing (Quantity)
-import Svg.Attributes exposing (lengthAdjust)
+import Quantity
 import Types exposing (..)
 
 

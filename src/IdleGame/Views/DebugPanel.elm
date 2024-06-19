@@ -1,10 +1,10 @@
 module IdleGame.Views.DebugPanel exposing (..)
 
-import Duration exposing (Duration)
+import Duration
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Utils as Utils
 import Types exposing (..)
 

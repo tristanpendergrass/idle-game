@@ -13,7 +13,6 @@ module IdleGame.Snapshot exposing
 
 import Duration exposing (Duration)
 import Time exposing (Posix)
-import Time.Extra
 
 
 type

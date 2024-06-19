@@ -1,7 +1,6 @@
 module IdleGame.Tab exposing (..)
 
 import IdleGame.Kinds exposing (..)
-import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 
 

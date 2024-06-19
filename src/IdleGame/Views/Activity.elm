@@ -6,17 +6,13 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
+import IdleGame.Mod exposing (Mod)
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect as EffectView
-import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)

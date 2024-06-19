@@ -1,6 +1,5 @@
 module IdleGame.Views.FastForward exposing (..)
 
-import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Types exposing (..)

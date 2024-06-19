@@ -1,16 +1,10 @@
 module IdleGame.ShopUpgrade exposing (..)
 
-import Html exposing (..)
-import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
-import IdleGame.Skill as Skill
-import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
-import List.Extra
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import Percent exposing (Percent)
 
 

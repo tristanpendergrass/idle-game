@@ -1,14 +1,9 @@
 module IdleGame.Views.MasteryUnlocks exposing (..)
 
-import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import IdleGame.Game
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils
-import Json.Decode
-import Round
 import Types exposing (..)
 
 

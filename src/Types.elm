@@ -6,14 +6,14 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
-import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.Snapshot as Snapshot exposing (Snapshot)
-import IdleGame.Tab as Tab exposing (Tab)
+import IdleGame.Snapshot exposing (Snapshot)
+import IdleGame.Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
-import IdleGame.Xp as Xp exposing (Xp)
+import IdleGame.Xp exposing (Xp)
 import Lamdera exposing (ClientId, SessionId)
 import Random
 import Time exposing (Posix)

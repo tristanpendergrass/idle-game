@@ -5,18 +5,15 @@ import Duration exposing (Duration)
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Game as Game
+import IdleGame.Coin as Coin
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.Utils as Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Maybe.Extra
-import Quantity exposing (Quantity)
+import Quantity
 import Time exposing (Posix)
 import Types exposing (..)
 

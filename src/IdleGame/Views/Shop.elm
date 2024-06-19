@@ -4,14 +4,10 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Game
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod exposing (..)
-import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Utils
-import IdleGame.Xp as Xp exposing (Xp)
 import Types exposing (..)
 
 
@@ -51,21 +47,6 @@ render game =
                         { price = stats.price
                         , isError = Coin.toInt stats.price > Coin.toInt game.coin
                         }
-                ]
-
-        renderLockedShopItem : Int -> Html FrontendMsg
-        renderLockedShopItem levelNeeded =
-            div
-                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bg-error text-error-content"
-                ]
-                [ div [ class "w-24 h-24 flex items-center justify-center" ]
-                    [ Icon.unknownItem
-                        |> Icon.toHtml
-                    ]
-                , div [ class "flex-1 t-column" ]
-                    [ span [ class "font-bold" ] [ text "???" ]
-                    , span [ class "text-sm" ] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
-                    ]
                 ]
 
         renderResource : ( Resource, Coin ) -> Html FrontendMsg

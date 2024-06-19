@@ -4,7 +4,6 @@ import Duration exposing (Duration)
 import Env
 import IdleGame.Kinds exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
-import Types exposing (..)
 
 
 version : String

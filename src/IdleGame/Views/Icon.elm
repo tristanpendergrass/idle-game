@@ -5,7 +5,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Material.Icons
 import Material.Icons.Types
-import Svg exposing (Svg)
 
 
 type Size

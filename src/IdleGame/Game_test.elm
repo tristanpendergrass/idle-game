@@ -1,26 +1,16 @@
 module IdleGame.Game_test exposing (..)
 
-import Duration exposing (Duration)
 import Expect exposing (..)
-import Fuzz exposing (Fuzzer)
-import Html.Attributes exposing (download)
+import Fuzz
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Event exposing (..)
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
-import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Xp as Xp exposing (Xp)
-import Percent exposing (Percent)
-import Quantity
+import IdleGame.Xp exposing (Xp)
 import Random
 import Test exposing (..)
-import Test.Distribution
 import Test.Random
 import Types exposing (..)
 

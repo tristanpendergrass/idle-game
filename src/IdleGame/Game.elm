@@ -3,8 +3,7 @@ module IdleGame.Game exposing (..)
 import Duration exposing (Duration)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -13,15 +12,11 @@ import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
-import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
-import List.Extra
 import Maybe.Extra
 import Percent exposing (Percent)
 import Quantity
 import Random exposing (Generator)
-import Svg.Attributes exposing (preserveAlpha)
-import Tuple
 import Types exposing (..)
 
 
@@ -324,7 +319,7 @@ applyEvent mods { effects, count } =
     Random.andThen
         (\( game, toasts ) ->
             applyEffects mods effects count game
-                |> Random.andThen
+                |> Random.map
                     (\res ->
                         case res of
                             Err err ->
@@ -333,10 +328,10 @@ applyEvent mods { effects, count } =
                                     toast =
                                         getToastForErr err
                                 in
-                                Random.constant ( game, toast :: toasts )
+                                ( game, toast :: toasts )
 
                             Ok val ->
-                                Random.constant ( val.game, toasts ++ val.toasts )
+                                ( val.game, toasts ++ val.toasts )
                     )
         )
 
@@ -389,14 +384,14 @@ applyEffects mods effects count game =
                                         applyEffectVal.additionalEffects
                                 in
                                 applyEffects mods (rest ++ additionalEffectsFromMod ++ additionalEffects) count g
-                                    |> Random.andThen
+                                    |> Random.map
                                         (\res2 ->
                                             case res2 of
                                                 Err e2 ->
-                                                    Random.constant (Err e2)
+                                                    Err e2
 
                                                 Ok val ->
-                                                    Random.constant (Ok { game = val.game, toasts = val.toasts ++ toasts })
+                                                    Ok { game = val.game, toasts = val.toasts ++ toasts }
                                         )
                     )
 
@@ -458,7 +453,7 @@ applyEffect effect count game =
     case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             probabilityGenerator successProbability
-                |> Random.andThen
+                |> Random.map
                     (\succeeded ->
                         let
                             chosenEffects =
@@ -468,7 +463,7 @@ applyEffect effect count game =
                                 else
                                     failureEffects
                         in
-                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects []))
+                        Ok (ApplyEffectValue game [] chosenEffects [])
                     )
 
         Effect.GainCoin { base, percentIncrease } ->
@@ -522,8 +517,8 @@ applyEffect effect count game =
             , additionalEffects = []
             , additionalMods = []
             }
+                |> Ok
                 |> Random.constant
-                |> Random.map Ok
 
         Effect.GainMxp params ->
             let
@@ -810,9 +805,10 @@ addActivityTagToMods activity =
 
 getAllMods : Game -> List Mod
 getAllMods game =
-    []
-        ++ getActivityMods game
-        ++ getShopItemMods game
+    List.concat
+        [ getActivityMods game
+        , getShopItemMods game
+        ]
 
 
 

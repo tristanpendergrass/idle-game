@@ -1,14 +1,9 @@
 module IdleGame.Effect exposing (..)
 
-import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.GameTypes exposing (..)
+import IdleGame.Coin exposing (Coin)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
-import IdleGame.Xp as Xp exposing (Xp)
+import IdleGame.Xp exposing (Xp)
 import Percent exposing (Percent)
-import Task exposing (fail)
 
 
 type Tag

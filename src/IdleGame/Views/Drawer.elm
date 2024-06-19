@@ -1,13 +1,12 @@
 module IdleGame.Views.Drawer exposing (..)
 
 import Config
-import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.Utils as Utils
 import Types exposing (..)
 

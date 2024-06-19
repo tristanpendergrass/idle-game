@@ -54,5 +54,11 @@ config =
     -- , NoUnused.Parameters.rule
     -- , NoUnused.Patterns.rule
     -- , NoUnused.Variables.rule
-    -- , Simplify.rule Simplify.defaults
+    , Simplify.rule Simplify.defaults
     ]
+
+-- tristansConfig : List Rule
+-- tristansConfig =
+--     [ Docs.ReviewAtDocs.rule
+--     , NoUnused.Variables.rule
+--     ]

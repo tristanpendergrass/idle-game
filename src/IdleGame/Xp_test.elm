@@ -1,8 +1,8 @@
 module IdleGame.Xp_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.Xp as Xp exposing (Xp)
-import Percent exposing (Percent)
+import IdleGame.Xp as Xp
+import Percent
 import Test exposing (..)
 
 

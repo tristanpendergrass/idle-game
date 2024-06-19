@@ -1,10 +1,7 @@
 module IdleGame.Resource exposing (..)
 
-import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Views.Icon as Icon exposing (Icon)
-import Quantity exposing (Quantity(..))
 
 
 type alias Diff =

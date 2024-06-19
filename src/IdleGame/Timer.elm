@@ -8,7 +8,7 @@ module IdleGame.Timer exposing
 
 import Duration exposing (Duration)
 import Percent exposing (Percent)
-import Quantity exposing (Quantity)
+import Quantity
 
 
 type Timer

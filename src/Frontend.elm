@@ -2,7 +2,7 @@ module Frontend exposing (app)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Dom
-import Browser.Events exposing (onVisibilityChange)
+import Browser.Events
 import Browser.Navigation as Nav
 import Config
 import Duration exposing (Duration)
@@ -10,16 +10,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
-import IdleGame.Activity as Activity
-import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (EffectType)
-import IdleGame.EffectErr as EffectErr exposing (EffectErr)
+import IdleGame.Coin as Coin
+import IdleGame.EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
-import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -31,19 +27,16 @@ import IdleGame.Views.DetailViewContent
 import IdleGame.Views.DetailViewWrapper
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
-import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Icon as Icon
 import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.ShopResourceModal
 import IdleGame.Views.SyllabusModal
 import IdleGame.Views.TimePasses
 import IdleGame.Views.Utils as ViewUtils
-import Json.Decode as D
-import Json.Decode.Pipeline exposing (..)
 import Lamdera
 import Process
-import Quantity exposing (Quantity)
-import Random
+import Quantity
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -76,17 +69,6 @@ init _ key =
         activityExpanded =
             -- Note: this value is overriden by HandleGetViewportResult immediately after the page loads to the value here doesn't matter so much
             False
-
-        defaultModal : Maybe Modal
-        defaultModal =
-            if Config.flags.debugTimePasses then
-                Just IdleGame.Mocks.timePassesModal
-
-            else
-                Nothing
-
-        topicsFoo =
-            Debug.log "foobar" topics
     in
     -- { key : Key -- used by Browser.Navigation for things like pushUrl
     -- , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
@@ -249,16 +231,6 @@ setSaveGameTimer timer model =
 sleepTime : Float
 sleepTime =
     1
-
-
-getFastForwardPoint : Posix -> Posix
-getFastForwardPoint =
-    let
-        amountOfTimeToFastForward : Duration
-        amountOfTimeToFastForward =
-            Duration.hours 1
-    in
-    Time.Extra.add Time.Extra.Millisecond (floor (Duration.inMilliseconds amountOfTimeToFastForward)) Time.utc
 
 
 {-| A standard tick for using to progress the game in an animation frame.
@@ -614,12 +586,7 @@ update msg model =
             ( model
                 |> setPreview (Just (Preview activity))
                 |> setActivityExpanded
-                    (if clickingActiveActivity then
-                        True
-
-                     else
-                        False
-                    )
+                    clickingActiveActivity
             , Cmd.none
             )
 
@@ -988,17 +955,9 @@ update msg model =
                 screenSupportsRightRail =
                     -- Hardcode the value that we use to determine if right rail is shown. -- It originates from Tailwind's breakpoints
                     screenWidth >= 1280
-
-                expandedValue : Bool
-                expandedValue =
-                    if screenSupportsRightRail then
-                        True
-
-                    else
-                        False
             in
             ( model
-                |> setActivityExpanded expandedValue
+                |> setActivityExpanded screenSupportsRightRail
             , Cmd.none
             )
 
@@ -1281,96 +1240,3 @@ view model =
                     ]
         ]
     }
-
-
-sample : String
-sample =
-    """[
-  {
-    "Name": "Cellular Function",
-    "Level": 1,
-    "Duration": 5,
-    "Knowledge": 1,
-    "Knowledge/s": 0.2
-  },
-  {
-    "Name": "Cardiovascular System",
-    "Level": 5,
-    "Duration": 5,
-    "Knowledge": 3,
-    "Knowledge/s": 0.6
-  },
-  {
-    "Name": "Respiratory System",
-    "Level": 15,
-    "Duration": 5,
-    "Knowledge": 5,
-    "Knowledge/s": 1
-  },
-  {
-    "Name": "Renal Function",
-    "Level": 25,
-    "Duration": 5,
-    "Knowledge": 10,
-    "Knowledge/s": 2
-  },
-  {
-    "Name": "Digestive System",
-    "Level": 40,
-    "Duration": 5,
-    "Knowledge": 12,
-    "Knowledge/s": 2.4
-  },
-  {
-    "Name": "Nervous System",
-    "Level": 50,
-    "Duration": 5,
-    "Knowledge": 15,
-    "Knowledge/s": 3
-  },
-  {
-    "Name": "Endocrine System",
-    "Level": 65,
-    "Duration": 5,
-    "Knowledge": 20,
-    "Knowledge/s": 4
-  },
-  {
-    "Name": "Reproductive System",
-    "Level": 75,
-    "Duration": 5,
-    "Knowledge": 22,
-    "Knowledge/s": 4.4
-  },
-  {
-    "Name": "Immune Response",
-    "Level": 90,
-    "Duration": 5,
-    "Knowledge": 25,
-    "Knowledge/s": 5
-  }
-]"""
-
-
-type alias Topic =
-    { name : String, level : Int, duration : Duration, knowledge : Int, knowledgePerSecond : Float }
-
-
-durationDecoder : D.Decoder Duration
-durationDecoder =
-    D.map Duration.seconds D.float
-
-
-topicDecoder : D.Decoder Topic
-topicDecoder =
-    D.map5 Topic
-        (D.field "Name" D.string)
-        (D.field "Level" D.int)
-        (D.field "Duration" durationDecoder)
-        (D.field "Knowledge" D.int)
-        (D.field "Knowledge/s" D.float)
-
-
-topics : Result D.Error (List Topic)
-topics =
-    D.decodeString (D.list topicDecoder) sample
