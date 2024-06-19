@@ -901,72 +901,171 @@ getActivityStats kind =
 
 type Resource
     = AnatomyK
+    | AnatomyPK
+    | AnatomyFlashcard
     | BiochemistryK
+    | BiochemistryPK
+    | BiochemistryFlashcard
     | PhysiologyK
+    | PhysiologyPK
+    | PhysiologyFlashcard
     | PharmacologyK
+    | PharmacologyPK
+    | PharmacologyFlashcard
     | MicrobiologyK
+    | MicrobiologyPK
+    | MicrobiologyFlashcard
     | PathologyK
+    | PathologyPK
+    | PathologyFlashcard
     | MedicalEthicsK
+    | MedicalEthicsPK
+    | MedicalEthicsFlashcard
 
 
 allResources : List Resource
 allResources =
     [ AnatomyK
+    , AnatomyPK
+    , AnatomyFlashcard
     , BiochemistryK
+    , BiochemistryPK
+    , BiochemistryFlashcard
     , PhysiologyK
+    , PhysiologyPK
+    , PhysiologyFlashcard
     , PharmacologyK
+    , PharmacologyPK
+    , PharmacologyFlashcard
     , MicrobiologyK
+    , MicrobiologyPK
+    , MicrobiologyFlashcard
     , PathologyK
+    , PathologyPK
+    , PathologyFlashcard
     , MedicalEthicsK
+    , MedicalEthicsPK
+    , MedicalEthicsFlashcard
     ]
 
 
 type alias ResourceRecord a =
     { anatomyK : a
+    , anatomyPK : a
+    , anatomyFlashcard : a
     , biochemistryK : a
+    , biochemistryPK : a
+    , biochemistryFlashcard : a
     , physiologyK : a
+    , physiologyPK : a
+    , physiologyFlashcard : a
     , pharmacologyK : a
+    , pharmacologyPK : a
+    , pharmacologyFlashcard : a
     , microbiologyK : a
+    , microbiologyPK : a
+    , microbiologyFlashcard : a
     , pathologyK : a
+    , pathologyPK : a
+    , pathologyFlashcard : a
     , medicalEthicsK : a
+    , medicalEthicsPK : a
+    , medicalEthicsFlashcard : a
     }
 
 
 resourceRecord : a -> ResourceRecord a
 resourceRecord a =
     { anatomyK = a
+    , anatomyPK = a
+    , anatomyFlashcard = a
     , biochemistryK = a
+    , biochemistryPK = a
+    , biochemistryFlashcard = a
     , physiologyK = a
+    , physiologyPK = a
+    , physiologyFlashcard = a
     , pharmacologyK = a
+    , pharmacologyPK = a
+    , pharmacologyFlashcard = a
     , microbiologyK = a
+    , microbiologyPK = a
+    , microbiologyFlashcard = a
     , pathologyK = a
+    , pathologyPK = a
+    , pathologyFlashcard = a
     , medicalEthicsK = a
+    , medicalEthicsPK = a
+    , medicalEthicsFlashcard = a
     }
 
 
-getByResource : Resource -> ResourceRecord medicalEthicsK -> medicalEthicsK
+getByResource :
+    Resource -> ResourceRecord medicalEthicsFlashcard -> medicalEthicsFlashcard
 getByResource kind data =
     case kind of
         AnatomyK ->
             data.anatomyK
 
+        AnatomyPK ->
+            data.anatomyPK
+
+        AnatomyFlashcard ->
+            data.anatomyFlashcard
+
         BiochemistryK ->
             data.biochemistryK
+
+        BiochemistryPK ->
+            data.biochemistryPK
+
+        BiochemistryFlashcard ->
+            data.biochemistryFlashcard
 
         PhysiologyK ->
             data.physiologyK
 
+        PhysiologyPK ->
+            data.physiologyPK
+
+        PhysiologyFlashcard ->
+            data.physiologyFlashcard
+
         PharmacologyK ->
             data.pharmacologyK
+
+        PharmacologyPK ->
+            data.pharmacologyPK
+
+        PharmacologyFlashcard ->
+            data.pharmacologyFlashcard
 
         MicrobiologyK ->
             data.microbiologyK
 
+        MicrobiologyPK ->
+            data.microbiologyPK
+
+        MicrobiologyFlashcard ->
+            data.microbiologyFlashcard
+
         PathologyK ->
             data.pathologyK
 
+        PathologyPK ->
+            data.pathologyPK
+
+        PathologyFlashcard ->
+            data.pathologyFlashcard
+
         MedicalEthicsK ->
             data.medicalEthicsK
+
+        MedicalEthicsPK ->
+            data.medicalEthicsPK
+
+        MedicalEthicsFlashcard ->
+            data.medicalEthicsFlashcard
 
 
 setByResource :
@@ -976,23 +1075,65 @@ setByResource kind value data =
         AnatomyK ->
             { data | anatomyK = value }
 
+        AnatomyPK ->
+            { data | anatomyPK = value }
+
+        AnatomyFlashcard ->
+            { data | anatomyFlashcard = value }
+
         BiochemistryK ->
             { data | biochemistryK = value }
+
+        BiochemistryPK ->
+            { data | biochemistryPK = value }
+
+        BiochemistryFlashcard ->
+            { data | biochemistryFlashcard = value }
 
         PhysiologyK ->
             { data | physiologyK = value }
 
+        PhysiologyPK ->
+            { data | physiologyPK = value }
+
+        PhysiologyFlashcard ->
+            { data | physiologyFlashcard = value }
+
         PharmacologyK ->
             { data | pharmacologyK = value }
+
+        PharmacologyPK ->
+            { data | pharmacologyPK = value }
+
+        PharmacologyFlashcard ->
+            { data | pharmacologyFlashcard = value }
 
         MicrobiologyK ->
             { data | microbiologyK = value }
 
+        MicrobiologyPK ->
+            { data | microbiologyPK = value }
+
+        MicrobiologyFlashcard ->
+            { data | microbiologyFlashcard = value }
+
         PathologyK ->
             { data | pathologyK = value }
 
+        PathologyPK ->
+            { data | pathologyPK = value }
+
+        PathologyFlashcard ->
+            { data | pathologyFlashcard = value }
+
         MedicalEthicsK ->
             { data | medicalEthicsK = value }
+
+        MedicalEthicsPK ->
+            { data | medicalEthicsPK = value }
+
+        MedicalEthicsFlashcard ->
+            { data | medicalEthicsFlashcard = value }
 
 
 type alias ResourceStats =
@@ -1007,10 +1148,32 @@ resourceStats =
     { anatomyK =
         { title = "Knowledge (Anatomy)"
         , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
-        , price = Just (IdleGame.Coin.int 10)
+        , price = Nothing
+        }
+    , anatomyPK =
+        { title = "Practical Knowledge (Anatomy)"
+        , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
+        , price = Nothing
+        }
+    , anatomyFlashcard =
+        { title = "Flashcard (Anatomy)"
+        , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
+        , price = Nothing
         }
     , biochemistryK =
         { title = "Knowledge (Biochemistry)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
+        , price = Nothing
+        }
+    , biochemistryPK =
+        { title = "Practical Knowledge (Biochemistry)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
+        , price = Nothing
+        }
+    , biochemistryFlashcard =
+        { title = "Flashcard (Biochemistry)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
         , price = Nothing
@@ -1021,8 +1184,32 @@ resourceStats =
             IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
         , price = Nothing
         }
+    , physiologyPK =
+        { title = "Practical Knowledge (Physiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
+        , price = Nothing
+        }
+    , physiologyFlashcard =
+        { title = "Flashcard (Physiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
+        , price = Nothing
+        }
     , pharmacologyK =
         { title = "Knowledge (Pharmacology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
+        , price = Nothing
+        }
+    , pharmacologyPK =
+        { title = "Practical Knowledge (Pharmacology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
+        , price = Nothing
+        }
+    , pharmacologyFlashcard =
+        { title = "Flashcard (Pharmacology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
         , price = Nothing
@@ -1033,14 +1220,52 @@ resourceStats =
             IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
         , price = Nothing
         }
+    , microbiologyPK =
+        { title = "Practical Knowledge (Microbiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
+        , price = Nothing
+        }
+    , microbiologyFlashcard =
+        { title = "Flashcard (Microbiology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
+        , price = Nothing
+        }
     , pathologyK =
         { title = "Knowledge (Pathology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
         , price = Nothing
         }
+    , pathologyPK =
+        { title = "Practical Knowledge (Pathology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
+        , price = Nothing
+        }
+    , pathologyFlashcard =
+        { title = "Flashcard (Pathology)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
+        , price = Nothing
+        }
     , medicalEthicsK =
         { title = "Knowledge (Medical Ethics)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/medical_ethics_k.png"
+        , price = Nothing
+        }
+    , medicalEthicsPK =
+        { title = "Practical Knowledge (Medical Ethics)"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/medical_ethics_k.png"
+        , price = Nothing
+        }
+    , medicalEthicsFlashcard =
+        { title = "Flashcard (Medical Ethics)"
         , icon =
             IdleGame.Views.Icon.createIconPublic
                 "/resources/medical_ethics_k.png"
