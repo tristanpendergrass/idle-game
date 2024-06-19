@@ -367,13 +367,13 @@ update msg model =
             noOp
 
         InitializeGameHelp serverSnapshot now ->
-            let
-                adjustedServerSnapshot : Snapshot Game
-                adjustedServerSnapshot =
-                    Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
-            in
             case model.gameState of
                 Initializing ->
+                    let
+                        adjustedServerSnapshot : Snapshot Game
+                        adjustedServerSnapshot =
+                            Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
+                    in
                     ( model
                         |> setGameState
                             (FastForward
@@ -465,21 +465,23 @@ update msg model =
                             timeLeft
                                 |> Quantity.greaterThan (Duration.days 1)
 
-                        isLongerThanHour : Bool
-                        isLongerThanHour =
-                            timeLeft
-                                |> Quantity.greaterThan (Duration.hours 1)
-
                         timeToAdd : Duration
                         timeToAdd =
                             if isLongerThanDay then
                                 Duration.days 1
 
-                            else if isLongerThanHour then
-                                Duration.hours 1
-
                             else
-                                Duration.minutes 1
+                                let
+                                    isLongerThanHour : Bool
+                                    isLongerThanHour =
+                                        timeLeft
+                                            |> Quantity.greaterThan (Duration.hours 1)
+                                in
+                                if isLongerThanHour then
+                                    Duration.hours 1
+
+                                else
+                                    Duration.minutes 1
 
                         nextInterval : Posix
                         nextInterval =
@@ -1015,10 +1017,6 @@ toastToHtml notification =
         errClass : Html.Attribute msg
         errClass =
             class "bg-error text-error-content"
-
-        warningClass : Html.Attribute msg
-        warningClass =
-            class "bg-warning text-warning-content"
     in
     case notification of
         GainedCoin amount ->
@@ -1074,6 +1072,11 @@ toastToHtml notification =
                 ]
 
         NegativeAmountErr ->
+            let
+                warningClass : Html.Attribute msg
+                warningClass =
+                    class "bg-warning text-warning-content"
+            in
             div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
 

@@ -118,13 +118,13 @@ type alias ActivityStatus =
 toggleActivity : Activity -> Game -> Game
 toggleActivity kind game =
     let
-        stats : ActivityStats
-        stats =
-            getActivityStats kind
-
         canToggle : Bool
         canToggle =
             let
+                stats : ActivityStats
+                stats =
+                    getActivityStats kind
+
                 currentLevel : Int
                 currentLevel =
                     getBySkill stats.skill game.xp
@@ -219,10 +219,6 @@ tick delta game =
 
                 Just ( activityKind, timer ) ->
                     let
-                        effectStats : Activity.EffectStats
-                        effectStats =
-                            Activity.getEffectStats activityKind
-
                         activityDuration : Duration
                         activityDuration =
                             getModdedDuration game activityKind
@@ -234,6 +230,11 @@ tick delta game =
                         maybeEvent : Maybe Event
                         maybeEvent =
                             if completions >= 1 then
+                                let
+                                    effectStats : Activity.EffectStats
+                                    effectStats =
+                                        Activity.getEffectStats activityKind
+                                in
                                 Just { effects = effectStats.effects, count = completions }
 
                             else
@@ -709,17 +710,18 @@ getMasteryIntervalMods game =
                             effectStats : Activity.EffectStats
                             effectStats =
                                 Activity.getEffectStats activity
-
-                            mxp : Xp
-                            mxp =
-                                getByActivity activity game.mxp
-
-                            masteryLevel : Int
-                            masteryLevel =
-                                Xp.level Xp.defaultSchedule mxp
                         in
                         case effectStats.mastery of
                             Just mastery ->
+                                let
+                                    mxp : Xp
+                                    mxp =
+                                        getByActivity activity game.mxp
+
+                                    masteryLevel : Int
+                                    masteryLevel =
+                                        Xp.level Xp.defaultSchedule mxp
+                                in
                                 mastery
                                     |> List.filterMap
                                         (\( level, reward ) ->
@@ -756,17 +758,18 @@ getMasteryRewards game activity =
         effectStats : Activity.EffectStats
         effectStats =
             Activity.getEffectStats activity
-
-        mxp : Xp
-        mxp =
-            getByActivity activity game.mxp
-
-        masteryLevel : Int
-        masteryLevel =
-            Xp.level Xp.defaultSchedule mxp
     in
     case effectStats.mastery of
         Just mastery ->
+            let
+                mxp : Xp
+                mxp =
+                    getByActivity activity game.mxp
+
+                masteryLevel : Int
+                masteryLevel =
+                    Xp.level Xp.defaultSchedule mxp
+            in
             mastery
                 |> List.filterMap
                     (\( level, reward ) ->
