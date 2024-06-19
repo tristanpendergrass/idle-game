@@ -735,21 +735,17 @@ getMasteryIntervalMods game =
                             Nothing ->
                                 []
                     )
-
-        mods : List IntervalMod
-        mods =
-            masteryRewards
-                |> List.filterMap
-                    (\reward ->
-                        case reward of
-                            Activity.IntervalMod mod ->
-                                Just mod
-
-                            _ ->
-                                Nothing
-                    )
     in
-    mods
+    masteryRewards
+        |> List.filterMap
+            (\reward ->
+                case reward of
+                    Activity.IntervalMod mod ->
+                        Just mod
+
+                    _ ->
+                        Nothing
+            )
 
 
 getMasteryRewards : Game -> Activity -> List Activity.MasteryReward

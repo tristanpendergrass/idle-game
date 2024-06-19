@@ -753,15 +753,10 @@ update msg model =
                                 not <| getByShopUpgrade kind game.ownedShopUpgrades
                         in
                         if canAfford && dontOwnItemYet then
-                            let
-                                newGame : Game
-                                newGame =
-                                    { game
-                                        | coin = Quantity.difference game.coin stats.price
-                                        , ownedShopUpgrades = setByShopUpgrade kind True game.ownedShopUpgrades
-                                    }
-                            in
-                            newGame
+                            { game
+                                | coin = Quantity.difference game.coin stats.price
+                                , ownedShopUpgrades = setByShopUpgrade kind True game.ownedShopUpgrades
+                            }
 
                         else
                             game
