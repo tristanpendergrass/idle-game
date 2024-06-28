@@ -3,8 +3,6 @@ module IdleGame.Mod exposing (..)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Resource as Resource
-import IdleGame.Skill as Skill
 import Percent exposing (Percent)
 import Quantity
 
@@ -325,7 +323,7 @@ resourceBaseTransformer buff repetitions taggedEffect =
 resourcePreservationTransformer : Percent -> Transformer
 resourcePreservationTransformer buff repetitions taggedEffect =
     case Effect.getEffect taggedEffect of
-        Effect.SpendResource { base, preservationChance, resource } ->
+        Effect.SpendResource params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
@@ -333,14 +331,13 @@ resourcePreservationTransformer buff repetitions taggedEffect =
 
                 buffedChance : Percent
                 buffedChance =
-                    Quantity.plus preservationChance adjustedBuff
+                    Quantity.plus params.preservationChance adjustedBuff
             in
             taggedEffect
                 |> Effect.setEffect
                     (Effect.SpendResource
-                        { base = base
-                        , preservationChance = buffedChance
-                        , resource = resource
+                        { params
+                            | preservationChance = buffedChance
                         }
                     )
                 |> ChangeEffect

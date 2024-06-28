@@ -44,3 +44,8 @@ capAtHundred (Quantity p) =
 increaseByPercent : Percent -> Float -> Float
 increaseByPercent (Quantity p) value =
     value + (value * (p / 100))
+
+
+reduceIntByPercent : Percent -> Int -> Int
+reduceIntByPercent (Quantity p) value =
+    floor ((1 - p) * Basics.toFloat value)

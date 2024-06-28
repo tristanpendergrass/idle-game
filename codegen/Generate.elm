@@ -5,10 +5,12 @@ module Generate exposing (main)
 import Elm
 import Elm.Annotation as Type
 import Elm.Case
+import Elm.Let
 import Gen.CodeGen.Generate as Generate
 import Gen.Duration
 import Gen.IdleGame.Coin
 import Gen.IdleGame.Views.Icon
+import Gen.List
 import Json.Decode
 
 
@@ -62,6 +64,20 @@ capitalize s =
             String.toUpper (String.left 1 s) ++ String.dropLeft 1 s
 
 
+decodeMaybeString : Json.Decode.Decoder (Maybe String)
+decodeMaybeString =
+    let
+        strToMaybe : String -> Maybe String
+        strToMaybe s =
+            if s == "" then
+                Nothing
+
+            else
+                Just s
+    in
+    Json.Decode.map strToMaybe Json.Decode.string
+
+
 getDeclarations : String -> String -> List String -> List Elm.Declaration
 getDeclarations category categoryPlural names =
     let
@@ -111,6 +127,33 @@ getDeclarations category categoryPlural names =
                             )
                     )
                 )
+
+        mapKind : Elm.Expression
+        mapKind =
+            Elm.withType
+                (Type.function
+                    [ Type.function [ Type.var "a" ] (Type.var "a")
+                    , Type.namedWith [] (category ++ "Record") [ Type.var "a" ]
+                    ]
+                    (Type.namedWith [] (category ++ "Record") [ Type.var "a" ])
+                )
+                (Elm.fn2 ( "fn", Nothing )
+                    ( "record", Nothing )
+                    (\fn record ->
+                        Elm.Let.letIn
+                            (\foldFn -> Gen.List.call_.foldl foldFn record (Elm.val ("all" ++ categoryPlural)))
+                            |> Elm.Let.value "foldFn"
+                                (Elm.fn2 ( "el", Nothing )
+                                    ( "accum", Nothing )
+                                    (\el accum ->
+                                        -- Elm.apply (Elm.val ("setBy" ++ category)) [ el, Elm.apply fn [ Elm.apply (Elm.val ("getBy" ++ category)) [ el, accum ] ], accum ]
+                                        Elm.apply (Elm.val ("setBy" ++ category)) [ el, Elm.apply fn [ Elm.apply (Elm.val ("getBy" ++ category)) [ el, accum ] ], accum ]
+                                     -- Elm.apply (Elm.val ("setBy" ++ category)) [ el, el, accum ]
+                                    )
+                                )
+                            |> Elm.Let.toExpression
+                    )
+                )
     in
     [ Elm.customType category (List.map Elm.variant names)
     , Elm.declaration ("all" ++ categoryPlural) <|
@@ -127,6 +170,7 @@ getDeclarations category categoryPlural names =
             )
     , Elm.declaration ("getBy" ++ category) getByKind
     , Elm.declaration ("setBy" ++ category) setByKind
+    , Elm.declaration ("map" ++ categoryPlural) mapKind
     ]
 
 
@@ -225,6 +269,9 @@ resourceStats resourceConfigObjects =
                 [ ( "title", Elm.string resourceConfig.title )
                 , ( "icon", Gen.IdleGame.Views.Icon.call_.createIconPublic (Elm.string resourceConfig.icon) )
                 , ( "price", Elm.maybe (Maybe.map Gen.IdleGame.Coin.int resourceConfig.price) )
+
+                -- , ( "reducedBy", Elm.maybe (Maybe.map Elm.val (Maybe.map capitalize resourceConfig.reducedBy)) )
+                , ( "reducedBy", Elm.maybe (Maybe.map (capitalize >> Elm.val) resourceConfig.reducedBy) )
                 ]
     in
     getStats "Resource"
@@ -232,6 +279,7 @@ resourceStats resourceConfigObjects =
             [ ( "title", Type.string )
             , ( "icon", Gen.IdleGame.Views.Icon.annotation_.icon )
             , ( "price", Type.maybe Gen.IdleGame.Coin.annotation_.coin )
+            , ( "reducedBy", Type.maybe (Type.named [] "Resource") )
             ]
         )
         (\resourceConfig -> ( resourceConfig.id, toExpression resourceConfig ))
@@ -266,6 +314,7 @@ type alias ResourceConfigObject =
     , title : String
     , icon : String
     , price : Maybe Int
+    , reducedBy : Maybe String
     }
 
 
@@ -307,8 +356,9 @@ activityConfigDecoder =
 
 resourceConfigDecoder : Json.Decode.Decoder ResourceConfigObject
 resourceConfigDecoder =
-    Json.Decode.map4 ResourceConfigObject
+    Json.Decode.map5 ResourceConfigObject
         (Json.Decode.field "id" Json.Decode.string)
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "icon" Json.Decode.string)
         (Json.Decode.maybe (Json.Decode.field "price" Json.Decode.int))
+        (Json.Decode.field "reducedBy" decodeMaybeString)

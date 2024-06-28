@@ -48,7 +48,12 @@ type alias GainResourceParams =
 
 
 type alias SpendResourceParams =
-    { base : Int, resource : Resource, preservationChance : Percent }
+    { base : Int, resource : Resource, preservationChance : Percent, reducedBy : Maybe ReducedBy }
+
+
+type ReducedBy
+    = ReducedByFlat Resource
+    | ReducedByPercent Resource Percent -- The Percent is the % per resource. E.g. if you have 2 resources * 5 Percent = 10% reduction
 
 
 type EffectType
@@ -100,21 +105,33 @@ gainResource quantity kind =
 
 spendResource : Int -> Resource -> Effect
 spendResource quantity kind =
-    { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind }
+    { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind, reducedBy = Nothing }
     , tags = []
     }
 
 
-withPreservationChance : Percent -> Effect -> Effect
-withPreservationChance preservationChance taggedEffect =
-    case taggedEffect.effect of
+withReducedBy : ReducedBy -> Effect -> Effect
+withReducedBy reducedBy effect =
+    case effect.effect of
         SpendResource spendResourceParams ->
-            { taggedEffect
-                | effect = SpendResource { base = spendResourceParams.base, resource = spendResourceParams.resource, preservationChance = preservationChance }
+            { effect
+                | effect = SpendResource { spendResourceParams | reducedBy = Just reducedBy }
             }
 
         _ ->
-            taggedEffect
+            effect
+
+
+withPreservationChance : Percent -> Effect -> Effect
+withPreservationChance preservationChance effect =
+    case effect.effect of
+        SpendResource spendResourceParams ->
+            { effect
+                | effect = SpendResource { spendResourceParams | preservationChance = preservationChance }
+            }
+
+        _ ->
+            effect
 
 
 gainResourceWithDoubling : Int -> Resource -> Percent -> Effect

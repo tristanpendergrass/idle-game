@@ -62,11 +62,18 @@ $ npx elm-codegen install
 
 # Todos
 
+## V0.1
 [ ] Support mail
 [ ] Support Testing Center tab
 [ ] Support Labs skill
+  [ ] Grant K and PK and coin with some probability
+[ ] Reduce costs by 1 per PK
 [ ] Support Practical Knowledge and Labs in Anatomy
 [ ] Change DaisyUI theme
+
+## V0.2
+
+## Done
 [x] Remove code references to old version
 [x] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
 [x] Add anatomy topics

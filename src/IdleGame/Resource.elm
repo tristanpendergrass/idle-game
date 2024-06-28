@@ -4,6 +4,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import List
 import Quantity exposing (Quantity(..))
 
 
@@ -32,15 +33,12 @@ add resource amount resources =
 
 getDiff : { original : ResourceRecord Int, current : ResourceRecord Int } -> Diff
 getDiff { original, current } =
-    -- TODO: improvements definitely possible here. Make Diff a List with only elements that were different present? Automate so we dont have to modify this function when adding new Kinds of resources?
-    { anatomyK = getByResource AnatomyK current - getByResource AnatomyK original
-    , biochemistryK = getByResource BiochemistryK current - getByResource BiochemistryK original
-    , physiologyK = getByResource PhysiologyK current - getByResource PhysiologyK original
-    , pharmacologyK = getByResource PharmacologyK current - getByResource PharmacologyK original
-    , microbiologyK = getByResource MicrobiologyK current - getByResource MicrobiologyK original
-    , pathologyK = getByResource PathologyK current - getByResource PathologyK original
-    , medicalEthicsK = getByResource MedicalEthicsK current - getByResource MedicalEthicsK original
-    }
+    let
+        foldFn : Resource -> ResourceRecord Int -> ResourceRecord Int
+        foldFn resource acc =
+            setByResource resource (getByResource resource current - getByResource resource original) acc
+    in
+    List.foldl foldFn (resourceRecord 0) allResources
 
 
 mapDiff : (Int -> Resource -> a) -> ResourceRecord Int -> List a

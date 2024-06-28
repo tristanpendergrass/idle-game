@@ -116,6 +116,18 @@ setBySkill kind value data =
             { data | labs = value }
 
 
+mapSkills :
+    (getBySkill -> getBySkill)
+    -> SkillRecord getBySkill
+    -> SkillRecord getBySkill
+mapSkills fn record =
+    let
+        foldFn el accum =
+            setBySkill el (fn (getBySkill el accum)) accum
+    in
+    List.foldl foldFn record allSkills
+
+
 type alias SkillStats =
     { title : String, icon : IdleGame.Views.Icon.Icon }
 
@@ -131,7 +143,7 @@ skillStats =
         { title = "Pharmacology", icon = IdleGame.Views.Icon.medication }
     , microbiology =
         { title = "Microbiology", icon = IdleGame.Views.Icon.biotech }
-    , pathology = { title = "Pathology", icon = IdleGame.Views.Icon.summarize }
+    , pathology = { title = "Pathology", icon = IdleGame.Views.Icon.biotech }
     , medicalEthics =
         { title = "Medical Ethics", icon = IdleGame.Views.Icon.policy }
     , labs = { title = "Labs", icon = IdleGame.Views.Icon.workspaces }
@@ -540,6 +552,18 @@ setByActivity kind value data =
 
         Lab3 ->
             { data | lab3 = value }
+
+
+mapActivities :
+    (getByActivity -> getByActivity)
+    -> ActivityRecord getByActivity
+    -> ActivityRecord getByActivity
+mapActivities fn record =
+    let
+        foldFn el accum =
+            setByActivity el (fn (getByActivity el accum)) accum
+    in
+    List.foldl foldFn record allActivities
 
 
 type alias ActivityStats =
@@ -1136,10 +1160,23 @@ setByResource kind value data =
             { data | medicalEthicsFlashcard = value }
 
 
+mapResources :
+    (getByResource -> getByResource)
+    -> ResourceRecord getByResource
+    -> ResourceRecord getByResource
+mapResources fn record =
+    let
+        foldFn el accum =
+            setByResource el (fn (getByResource el accum)) accum
+    in
+    List.foldl foldFn record allResources
+
+
 type alias ResourceStats =
     { title : String
     , icon : IdleGame.Views.Icon.Icon
     , price : Maybe IdleGame.Coin.Coin
+    , reducedBy : Maybe Resource
     }
 
 
@@ -1149,106 +1186,124 @@ resourceStats =
         { title = "Knowledge (Anatomy)"
         , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
         , price = Nothing
+        , reducedBy = Just AnatomyPK
         }
     , anatomyPK =
         { title = "Practical Knowledge (Anatomy)"
         , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , anatomyFlashcard =
         { title = "Flashcard (Anatomy)"
         , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , biochemistryK =
         { title = "Knowledge (Biochemistry)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
         , price = Nothing
+        , reducedBy = Just BiochemistryPK
         }
     , biochemistryPK =
         { title = "Practical Knowledge (Biochemistry)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , biochemistryFlashcard =
         { title = "Flashcard (Biochemistry)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , physiologyK =
         { title = "Knowledge (Physiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
         , price = Nothing
+        , reducedBy = Just PhysiologyPK
         }
     , physiologyPK =
         { title = "Practical Knowledge (Physiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , physiologyFlashcard =
         { title = "Flashcard (Physiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , pharmacologyK =
         { title = "Knowledge (Pharmacology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
         , price = Nothing
+        , reducedBy = Just PharmacologyPK
         }
     , pharmacologyPK =
         { title = "Practical Knowledge (Pharmacology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , pharmacologyFlashcard =
         { title = "Flashcard (Pharmacology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , microbiologyK =
         { title = "Knowledge (Microbiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
         , price = Nothing
+        , reducedBy = Just MicrobiologyPK
         }
     , microbiologyPK =
         { title = "Practical Knowledge (Microbiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , microbiologyFlashcard =
         { title = "Flashcard (Microbiology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , pathologyK =
         { title = "Knowledge (Pathology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
         , price = Nothing
+        , reducedBy = Just PathologyPK
         }
     , pathologyPK =
         { title = "Practical Knowledge (Pathology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , pathologyFlashcard =
         { title = "Flashcard (Pathology)"
         , icon =
             IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , medicalEthicsK =
         { title = "Knowledge (Medical Ethics)"
@@ -1256,6 +1311,7 @@ resourceStats =
             IdleGame.Views.Icon.createIconPublic
                 "/resources/medical_ethics_k.png"
         , price = Nothing
+        , reducedBy = Just MedicalEthicsPK
         }
     , medicalEthicsPK =
         { title = "Practical Knowledge (Medical Ethics)"
@@ -1263,6 +1319,7 @@ resourceStats =
             IdleGame.Views.Icon.createIconPublic
                 "/resources/medical_ethics_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     , medicalEthicsFlashcard =
         { title = "Flashcard (Medical Ethics)"
@@ -1270,6 +1327,7 @@ resourceStats =
             IdleGame.Views.Icon.createIconPublic
                 "/resources/medical_ethics_k.png"
         , price = Nothing
+        , reducedBy = Nothing
         }
     }
 
@@ -1313,3 +1371,15 @@ setByShopUpgrade kind value data =
     case kind of
         Glasses ->
             { data | glasses = value }
+
+
+mapShopUpgrades :
+    (getByShopUpgrade -> getByShopUpgrade)
+    -> ShopUpgradeRecord getByShopUpgrade
+    -> ShopUpgradeRecord getByShopUpgrade
+mapShopUpgrades fn record =
+    let
+        foldFn el accum =
+            setByShopUpgrade el (fn (getByShopUpgrade el accum)) accum
+    in
+    List.foldl foldFn record allShopUpgrades

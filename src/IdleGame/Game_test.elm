@@ -185,6 +185,72 @@ applyEffectsTest =
                 , check = expectErr (Expect.equal EffectErr.NegativeAmount)
                 }
             ]
+        , describe "GainResource"
+            [ testEffects "can gain a resource"
+                { initialGame = defaultGame
+                , effects =
+                    [ Effect.gainResource 5 AnatomyK
+                    ]
+                , count = 1
+                , check = expectOk (expectResource 5 AnatomyK)
+                }
+            ]
+        , describe "SpendResource"
+            [ testEffects "can spend a resource"
+                { initialGame = defaultGame
+                , effects =
+                    [ Effect.gainResource 5 AnatomyK
+                    , Effect.spendResource 3 AnatomyK
+                    ]
+                , count = 1
+                , check = expectOk (expectResource 2 AnatomyK)
+                }
+            , testEffects "can't go below 0 of a resource"
+                { initialGame = defaultGame
+                , effects =
+                    [ Effect.gainResource 5 AnatomyK
+                    , Effect.spendResource 8 AnatomyK
+                    ]
+                , count = 1
+                , check = expectErr (Expect.equal EffectErr.NegativeAmount)
+                }
+            , testEffects "it can be reduced by a flat amount"
+                { initialGame = defaultGame
+                , effects =
+                    -- We have 5 K
+                    [ Effect.gainResource 5 AnatomyK
+
+                    -- And 1 PK
+                    , Effect.gainResource 1 AnatomyPK
+
+                    -- So when we spend 3
+                    , Effect.spendResource 3 AnatomyK
+                        |> Effect.withReducedBy (Effect.ReducedByFlat AnatomyPK)
+                    ]
+
+                -- We should have 2
+                , check = expectOk (expectResource 3 AnatomyK)
+                , count = 1
+                }
+            , testEffects "it can be reduced by a percent amount"
+                { initialGame = defaultGame
+                , effects =
+                    -- We have 100 K
+                    [ Effect.gainResource 100 AnatomyK
+
+                    -- And 2 PK
+                    , Effect.gainResource 2 AnatomyPK
+
+                    -- So when we spend 100 K, reduced by 5% per PK
+                    , Effect.spendResource 100 AnatomyK
+                        |> Effect.withReducedBy (Effect.ReducedByPercent AnatomyPK (Percent.float 0.05))
+                    ]
+
+                -- We should have a 10% reduction in spend and have 10 K left over
+                , check = expectOk (expectResource 10 AnatomyK)
+                , count = 1
+                }
+            ]
 
         -- , describe "GainXp"
         --     [ testEffects "can get Xp for Anatomy"

@@ -498,15 +498,40 @@ applyEffect effect count game =
                         adjustResource resource result game
                     )
 
-        Effect.SpendResource { base, resource, preservationChance } ->
+        Effect.SpendResource { base, resource, preservationChance, reducedBy } ->
             probabilityGenerator preservationChance
                 |> Random.map
                     (\preserved ->
+                        let
+                            handleReducedBy : Int -> Int
+                            handleReducedBy amount =
+                                case reducedBy of
+                                    Nothing ->
+                                        amount
+
+                                    Just (Effect.ReducedByFlat reductionResource) ->
+                                        amount - getByResource reductionResource game.resources
+
+                                    Just (Effect.ReducedByPercent reductionResource percentReduction) ->
+                                        let
+                                            reductionResourceAmount : Float
+                                            reductionResourceAmount =
+                                                toFloat (getByResource reductionResource game.resources)
+                                        in
+                                        Percent.reduceIntByPercent (Quantity.multiplyBy reductionResourceAmount percentReduction) amount
+
+                            adjustedAmount : Int
+                            adjustedAmount =
+                                base
+                                    |> handleReducedBy
+                                    -- Player can't "spend" a negative amount of resources
+                                    |> max 0
+                        in
                         if preserved then
                             adjustResource resource 0 game
 
                         else
-                            adjustResource resource (-1 * base * count) game
+                            adjustResource resource (-1 * adjustedAmount * count) game
                     )
 
         Effect.GainXp { base, percentIncrease, skill } ->

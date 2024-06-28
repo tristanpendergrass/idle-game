@@ -1094,7 +1094,7 @@ toastToHtml notification =
 
                 plusOrMinus : String
                 plusOrMinus =
-                    if amount >= 0 then
+                    if amount > 0 then
                         "+"
 
                     else

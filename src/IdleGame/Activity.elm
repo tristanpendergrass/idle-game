@@ -80,6 +80,21 @@ getEffectStats activity =
         stats =
             getActivityStats activity
 
+        tempEffects : List Effect
+        tempEffects =
+            case activity of
+                MetabolicPathways ->
+                    [ Effect.spendResource 1 AnatomyK
+                        |> Effect.withReducedBy (Effect.ReducedByFlat AnatomyPK)
+                    ]
+
+                UpperLimb ->
+                    [ Effect.gainResource 1 AnatomyPK
+                    ]
+
+                _ ->
+                    []
+
         knowledgeEffects : List Effect
         knowledgeEffects =
             case ( knowledgeResource stats.skill, stats.knowledge ) of
@@ -96,7 +111,7 @@ getEffectStats activity =
             --         []
             []
     in
-    { effects = List.concat [ knowledgeEffects, labEffects ]
+    { effects = List.concat [ tempEffects, knowledgeEffects, labEffects ]
     , mastery = Nothing
     }
 
