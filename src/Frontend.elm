@@ -105,11 +105,9 @@ init _ key =
       , showDebugPanel = False
       , tray = Toast.tray
       , isDrawerOpen = False
-      , skillingState =
-            { activeTab = Config.flags.defaultTab
-            , preview = Nothing
-            , activityExpanded = activityExpanded
-            }
+      , activeTab = Config.flags.defaultTab
+      , preview = Nothing
+      , activityExpanded = activityExpanded
       , isVisible = True
       , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
       , saveGameTimer = Timer.create
@@ -207,16 +205,7 @@ createTimePassesModal duration oldSnap newSnap =
 
 setTab : Tab -> FrontendModel -> FrontendModel
 setTab tab model =
-    let
-        skillingState : ModeState
-        skillingState =
-            model.skillingState
-
-        newSkillingState : ModeState
-        newSkillingState =
-            { skillingState | activeTab = tab }
-    in
-    { model | skillingState = newSkillingState }
+    { model | activeTab = tab }
 
 
 setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
@@ -294,30 +283,12 @@ tickForDuration duration =
 
 setPreview : Maybe Preview -> FrontendModel -> FrontendModel
 setPreview maybePreview model =
-    let
-        skillingState : ModeState
-        skillingState =
-            model.skillingState
-
-        newSkillingState : ModeState
-        newSkillingState =
-            { skillingState | preview = maybePreview }
-    in
-    { model | skillingState = newSkillingState }
+    { model | preview = maybePreview }
 
 
 setActivityExpanded : Bool -> FrontendModel -> FrontendModel
 setActivityExpanded activityExpanded model =
-    let
-        skillingState : ModeState
-        skillingState =
-            model.skillingState
-
-        newSkillingState : ModeState
-        newSkillingState =
-            { skillingState | activityExpanded = activityExpanded }
-    in
-    { model | skillingState = newSkillingState }
+    { model | activityExpanded = activityExpanded }
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
@@ -1171,7 +1142,7 @@ renderBottomRightItems model =
           else
             []
          )
-            ++ (case model.skillingState.activeTab of
+            ++ (case model.activeTab of
                     Tab.SkillTab _ ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
@@ -1208,7 +1179,7 @@ view model =
 
                     detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
                     detailViewState =
-                        getDetailViewState game.activity model.skillingState.preview model.skillingState.activityExpanded
+                        getDetailViewState game.activity model.preview model.activityExpanded
 
                     extraBottomPadding : Bool
                     extraBottomPadding =
@@ -1233,7 +1204,7 @@ view model =
 
                     activeTab : Tab
                     activeTab =
-                        model.skillingState.activeTab
+                        model.activeTab
 
                     detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
                     detailViewWrapperProps =

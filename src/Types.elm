@@ -88,13 +88,6 @@ type alias PointerState =
     }
 
 
-type alias ModeState =
-    { activeTab : Tab
-    , preview : Maybe Preview
-    , activityExpanded : Bool
-    }
-
-
 type LocationFilter
     = LocationAll
     | LocationMonsters
@@ -107,7 +100,9 @@ type alias FrontendModel =
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
     , isDrawerOpen : Bool
-    , skillingState : ModeState
+    , activeTab : Tab
+    , preview : Maybe Preview
+    , activityExpanded : Bool
     , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer

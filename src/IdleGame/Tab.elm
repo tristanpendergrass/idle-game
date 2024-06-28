@@ -8,7 +8,7 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 type Tab
     = Backpack
     | Shop
-      -- | TestingCenter
+    | TestingCenter
     | SkillTab Skill
 
 
@@ -29,6 +29,11 @@ getConfig tab =
         Shop ->
             { title = "Shop"
             , icon = Icon.fromString "S"
+            }
+
+        TestingCenter ->
+            { title = "Testing Center"
+            , icon = Icon.fromString "TC"
             }
 
         SkillTab skill ->

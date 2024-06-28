@@ -62,16 +62,17 @@ $ npx elm-codegen install
 
 # Todos
 
-## V0.1
+## v0.1
 [ ] Support mail
 [ ] Support Testing Center tab
 [ ] Support Labs skill
   [ ] Grant K and PK and coin with some probability
-[ ] Reduce costs by 1 per PK
+[x] Reduce costs by 1 per PK
 [ ] Support Practical Knowledge and Labs in Anatomy
 [ ] Change DaisyUI theme
 
-## V0.2
+## v0.2
+[ ] Music
 
 ## Done
 [x] Remove code references to old version
