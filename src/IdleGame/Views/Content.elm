@@ -60,7 +60,7 @@ renderContent model game activeTab =
                 IdleGame.Views.Bag.render game
 
             Tab.TestingCenter ->
-                IdleGame.Views.TestingCenter.render game
+                IdleGame.Views.TestingCenter.render model game
 
             Tab.SkillTab subject ->
                 IdleGame.Views.SubjectViews.renderSubject subject game

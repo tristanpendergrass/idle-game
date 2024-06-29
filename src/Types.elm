@@ -94,6 +94,12 @@ type LocationFilter
     | LocationQuests
 
 
+type TestingCenterTab
+    = Quizzes
+    | ShelfExams
+    | UsmleStep1
+
+
 type alias FrontendModel =
     { key : Key -- used by Browser.Navigation for things like pushUrl
     , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
@@ -108,6 +114,7 @@ type alias FrontendModel =
     , saveGameTimer : Timer
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
+    , testingCenterActiveTab : TestingCenterTab
     }
 
 
@@ -162,6 +169,8 @@ type FrontendMsg
     | HandleMaxButtonClick
     | HandleShopResourceQuantityChange String
     | HandleShopResourceBuyClick
+      -- Testing Center
+    | HandleTestingCenterTabClick TestingCenterTab
       -- Other
     | ToastMsg Toast.Msg
     | AddToast Toast

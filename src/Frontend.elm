@@ -113,6 +113,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
+      , testingCenterActiveTab = Quizzes
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -291,6 +292,11 @@ setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
+setTestingCenterTab : TestingCenterTab -> FrontendModel -> FrontendModel
+setTestingCenterTab testingCenterTab model =
+    { model | testingCenterActiveTab = testingCenterTab }
+
+
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
@@ -437,6 +443,12 @@ update msg model =
                 |> Toast.withExitTransition 900
                 |> Toast.add model.tray
                 |> Toast.tuple ToastMsg model
+
+        HandleTestingCenterTabClick testingCenterTab ->
+            ( model
+                |> setTestingCenterTab testingCenterTab
+            , Cmd.none
+            )
 
         ToastMsg tmsg ->
             let

@@ -70,6 +70,7 @@ $ npx elm-codegen install
 [x] Reduce costs by 1 per PK
 [ ] Support Practical Knowledge and Labs in Anatomy
 [ ] Change DaisyUI theme
+[ ] Figure out how to show PK in a satisfying way
 
 ## v0.2
 [ ] Music
