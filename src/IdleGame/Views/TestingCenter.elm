@@ -10,7 +10,7 @@ import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
-import IdleGame.Test as Test exposing (Test)
+import IdleGame.TestExtras as Test
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
@@ -31,6 +31,10 @@ renderTestingCenterTabButton { activeTab, label, tab } =
 renderTest : Game -> List Mod -> Test -> Html FrontendMsg
 renderTest game mods test =
     let
+        stats : TestStats
+        stats =
+            getTestStats test
+
         renderCost : Effect -> Html FrontendMsg
         renderCost cost =
             EffectView.render { effect = cost, game = game, mods = mods, renderType = EffectView.Card }
@@ -38,10 +42,10 @@ renderTest game mods test =
     div [ class "card shadow w-80 bg-base-200 card-compact lg:card-normal" ]
         [ div [ class "card-body" ]
             (List.concat
-                [ [ h2 [ class "card-title flex items-center justify-between" ] [ text test.label, button [ class "btn btn-sm btn-primary" ] [ text "Complete" ] ] ]
-                , List.map renderCost test.costs
+                [ [ h2 [ class "card-title flex items-center justify-between" ] [ text stats.title, button [ class "btn btn-sm btn-primary" ] [ text "Complete" ] ] ]
+                , List.map renderCost (Test.getCostEffects test)
                 , [ div [] [ text "Rewards" ] ]
-                , List.map renderCost test.gains
+                , [ renderCost (Test.getRewardEffect test) ]
                 ]
             )
         ]
@@ -54,53 +58,9 @@ render model game =
         allMods =
             Game.getAllMods game
 
-        quizzesTests : List Test
-        quizzesTests =
-            [ { label = "Quiz 1"
-              , costs =
-                    [ Effect.spendResource 50 AnatomyK
-                    ]
-              , gains =
-                    [ Effect.gainResource 1 AnatomyPK
-                    ]
-              }
-            ]
-
-        shelfExamsTests : List Test
-        shelfExamsTests =
-            [ { label = "Shelf exam 1"
-              , costs =
-                    [ Effect.spendResource 50 AnatomyK
-                    ]
-              , gains =
-                    [ Effect.gainResource 1 AnatomyPK
-                    ]
-              }
-            ]
-
-        usmleStep1Tests : List Test
-        usmleStep1Tests =
-            [ { label = "USMLE Step 1"
-              , costs =
-                    [ Effect.spendResource 50 AnatomyK
-                    ]
-              , gains =
-                    [ Effect.gainResource 1 AnatomyPK
-                    ]
-              }
-            ]
-
         tests : List Test
         tests =
-            case model.activeTestCategory of
-                Quiz ->
-                    quizzesTests
-
-                ShelfExam ->
-                    shelfExamsTests
-
-                UsmleStep1 ->
-                    usmleStep1Tests
+            List.filter (\test -> (getTestStats test).category == model.activeTestCategory) allTests
     in
     div [ class "t-column items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ attribute "role" "tablist", class "tabs tabs-lifted" ]

@@ -1425,14 +1425,21 @@ testStats =
         , category = ShelfExam
         , rewardCoin = IdleGame.Coin.int 10
         , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs = []
+        , costs =
+            [ { resource = AnatomyK, amount = 50 }
+            , { resource = PhysiologyK, amount = 50 }
+            ]
         }
     , usmleStep1Test =
         { title = "USMLE Step 1 Exam"
         , category = UsmleStep1
         , rewardCoin = IdleGame.Coin.int 10
         , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs = []
+        , costs =
+            [ { resource = AnatomyK, amount = 1000 }
+            , { resource = PhysiologyK, amount = 1000 }
+            , { resource = PharmacologyK, amount = 500 }
+            ]
         }
     }
 
