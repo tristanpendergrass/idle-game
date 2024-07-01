@@ -1418,7 +1418,7 @@ testStats =
         , category = Quiz
         , rewardCoin = IdleGame.Coin.int 10
         , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs = [ { resource = AnatomyK, amount = 100 } ]
+        , costs = [ { resource = AnatomyK, amount = 1 } ]
         }
     , shelfExam1 =
         { title = "Shelf Exam 1"

@@ -19,10 +19,12 @@ import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
+import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
+import IdleGame.TestExtras as Test
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity
 import IdleGame.Views.Content
@@ -44,6 +46,7 @@ import Lamdera
 import Process
 import Quantity exposing (Quantity)
 import Random
+import Result.Extra
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -450,6 +453,48 @@ update msg model =
             , Cmd.none
             )
 
+        HandleTestCompletionClick test ->
+            case model.gameState of
+                Playing snapshot ->
+                    let
+                        game : Game
+                        game =
+                            Snapshot.getValue snapshot
+
+                        mods : List Mod
+                        mods =
+                            Game.getAllMods game
+
+                        ( applyEffectsResult, newSeed ) =
+                            Random.step (Game.applyEffects mods (Test.getAllEffects test) 1 game) game.seed
+                    in
+                    case applyEffectsResult of
+                        Err _ ->
+                            noOp
+
+                        Ok applyEffectValue ->
+                            let
+                                testAlreadyCompleted : Bool
+                                testAlreadyCompleted =
+                                    getByTest test game.testCompletions
+
+                                newGame : Game
+                                newGame =
+                                    applyEffectValue.game
+                                        |> Game.setTestCompleted test
+                                        |> Game.setSeed newSeed
+                            in
+                            if testAlreadyCompleted then
+                                noOp
+
+                            else
+                                ( { model | gameState = Playing (Snapshot.setValue newGame snapshot) }
+                                , Cmd.batch (List.map (AddToast >> delay 0) applyEffectValue.toasts)
+                                )
+
+                _ ->
+                    noOp
+
         ToastMsg tmsg ->
             let
                 ( tray, newTmesg ) =
@@ -697,7 +742,7 @@ update msg model =
                         ( { model
                             | gameState = Playing newGameState
                           }
-                        , Cmd.batch <| notificationCmds
+                        , Cmd.batch notificationCmds
                         )
 
         HandleVisibilityChange visibility ->

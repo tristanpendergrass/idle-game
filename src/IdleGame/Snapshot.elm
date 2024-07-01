@@ -8,6 +8,7 @@ module IdleGame.Snapshot exposing
     , getTimeDifference
     , getValue
     , map
+    , setValue
     , tickUntil
     )
 
@@ -39,6 +40,11 @@ fromTuple ( now, initialState ) =
 map : (t -> a) -> Snapshot t -> Snapshot a
 map fn (Snapshot ( time, state )) =
     Snapshot ( time, fn state )
+
+
+setValue : t -> Snapshot t -> Snapshot t
+setValue value (Snapshot ( time, _ )) =
+    Snapshot ( time, value )
 
 
 getTime : Snapshot t -> Posix

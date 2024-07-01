@@ -55,6 +55,7 @@ type alias Game =
     , coin : Coin
     , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgradeRecord Bool
+    , testCompletions : TestRecord Bool
     }
 
 
@@ -165,6 +166,7 @@ type FrontendMsg
     | HandleShopResourceBuyClick
       -- Testing Center
     | HandleTestingCenterTabClick TestCategory
+    | HandleTestCompletionClick Test
       -- Other
     | ToastMsg Toast.Msg
     | AddToast Toast

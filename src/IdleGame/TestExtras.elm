@@ -14,11 +14,22 @@ getCostEffects test =
     List.map toEffect (getTestStats test).costs
 
 
-getRewardEffect : Test -> Effect
-getRewardEffect test =
+getRewardEffects : Test -> List Effect
+getRewardEffects test =
     let
+        stats : TestStats
+        stats =
+            getTestStats test
+
         toEffect : { resource : Resource, amount : Int } -> Effect
         toEffect { resource, amount } =
-            Effect.spendResource amount resource
+            Effect.gainResource amount resource
     in
-    toEffect (getTestStats test).rewardResource
+    [ toEffect stats.rewardResource
+    , Effect.gainCoin stats.rewardCoin
+    ]
+
+
+getAllEffects : Test -> List Effect
+getAllEffects test =
+    List.concat [ getCostEffects test, getRewardEffects test ]

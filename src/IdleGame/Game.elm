@@ -38,6 +38,7 @@ createProd seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
+    , testCompletions = testRecord False
     }
 
 
@@ -50,6 +51,7 @@ createDev seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
+    , testCompletions = testRecord False
     }
 
 
@@ -310,6 +312,11 @@ attemptPurchaseResource amount resource game =
 setSeed : Random.Seed -> Game -> Game
 setSeed seed game =
     { game | seed = seed }
+
+
+setTestCompleted : Test -> Game -> Game
+setTestCompleted test game =
+    { game | testCompletions = setByTest test True game.testCompletions }
 
 
 priceToPurchaseResource : Int -> ( Resource, Coin ) -> Game -> Coin
