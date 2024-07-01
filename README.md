@@ -64,7 +64,8 @@ $ npx elm-codegen install
 
 ## v0.1
 [ ] Support mail
-[ ] Support Testing Center tab
+[x] Support Testing Center tab
+[ ] Design Tests
 [ ] Support Labs skill
   [ ] Grant K and PK and coin with some probability
 [x] Reduce costs by 1 per PK
@@ -73,7 +74,8 @@ $ npx elm-codegen install
 [ ] Figure out how to show PK in a satisfying way
 
 ## v0.2
-[ ] Music
+[ ] Listen to music
+[ ] Better test completion UI with modal and animation
 
 ## Done
 [x] Remove code references to old version

@@ -26,7 +26,7 @@ renderContent model game activeTab =
         { title, icon } =
             Tab.getConfig activeTab
     in
-    div [ class "drawer-content t-column", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem", IdleGame.Views.Utils.zIndexes.drawerContent ]
+    div [ class "drawer-content t-column overflow-y-auto", attribute "style" "scroll-behavior:smooth; scroll-padding-top: 5rem", IdleGame.Views.Utils.zIndexes.drawerContent ]
         [ div [ class "sticky top-0 flex h-16 w-full justify-center bg-opacity-90 backdrop-blur transition-all duration-100 bg-base-100 text-base-content shadow-sm", IdleGame.Views.Utils.zIndexes.navbar ]
             -- TOP NAV
             [ nav [ class "navbar w-full bg-primary text-primary-content" ]

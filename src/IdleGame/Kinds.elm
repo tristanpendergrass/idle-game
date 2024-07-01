@@ -186,13 +186,39 @@ type Activity
     | EndocrineSystem
     | ReproductiveSystem
     | ImmuneResponse
+    | Pharmacokinetics
+    | Pharmacodynamics
+    | Toxicology
+    | DrugMetabolism
+    | PharmacologicalTherapeutics
+    | ClinicalPharmacology
+    | Neuropharmacology
+    | Chemotherapy
+    | CardiovascularPharmacology
+    | Bacteriology
+    | Virology
     | Mycology
+    | Parasitology
+    | Immunology
+    | MicrobialGenetics
+    | HostPathogenInteractions
+    | ClinicalMicrobiology
+    | AntimicrobialResistance
     | CellInjury
     | Inflammation
     | HemodynamicDisorders
-    | PrinciplesOfBiomedicalEthics
+    | Immunopathology
+    | GeneticDisorders
+    | Neoplasia
+    | InfectiousDiseases
+    | EnvironmentalPathology
+    | NutritionalDisorders
+    | PrinciplesOfBioethics
     | InformedConsent
     | ConfidentialityAndPrivacy
+    | EndOfLifeDecisionMaking
+    | MedicalProfessionalism
+    | ResearchEthics
     | Lab1
     | Lab2
     | Lab3
@@ -227,13 +253,39 @@ allActivities =
     , EndocrineSystem
     , ReproductiveSystem
     , ImmuneResponse
+    , Pharmacokinetics
+    , Pharmacodynamics
+    , Toxicology
+    , DrugMetabolism
+    , PharmacologicalTherapeutics
+    , ClinicalPharmacology
+    , Neuropharmacology
+    , Chemotherapy
+    , CardiovascularPharmacology
+    , Bacteriology
+    , Virology
     , Mycology
+    , Parasitology
+    , Immunology
+    , MicrobialGenetics
+    , HostPathogenInteractions
+    , ClinicalMicrobiology
+    , AntimicrobialResistance
     , CellInjury
     , Inflammation
     , HemodynamicDisorders
-    , PrinciplesOfBiomedicalEthics
+    , Immunopathology
+    , GeneticDisorders
+    , Neoplasia
+    , InfectiousDiseases
+    , EnvironmentalPathology
+    , NutritionalDisorders
+    , PrinciplesOfBioethics
     , InformedConsent
     , ConfidentialityAndPrivacy
+    , EndOfLifeDecisionMaking
+    , MedicalProfessionalism
+    , ResearchEthics
     , Lab1
     , Lab2
     , Lab3
@@ -268,13 +320,39 @@ type alias ActivityRecord a =
     , endocrineSystem : a
     , reproductiveSystem : a
     , immuneResponse : a
+    , pharmacokinetics : a
+    , pharmacodynamics : a
+    , toxicology : a
+    , drugMetabolism : a
+    , pharmacologicalTherapeutics : a
+    , clinicalPharmacology : a
+    , neuropharmacology : a
+    , chemotherapy : a
+    , cardiovascularPharmacology : a
+    , bacteriology : a
+    , virology : a
     , mycology : a
+    , parasitology : a
+    , immunology : a
+    , microbialGenetics : a
+    , hostPathogenInteractions : a
+    , clinicalMicrobiology : a
+    , antimicrobialResistance : a
     , cellInjury : a
     , inflammation : a
     , hemodynamicDisorders : a
-    , principlesOfBiomedicalEthics : a
+    , immunopathology : a
+    , geneticDisorders : a
+    , neoplasia : a
+    , infectiousDiseases : a
+    , environmentalPathology : a
+    , nutritionalDisorders : a
+    , principlesOfBioethics : a
     , informedConsent : a
     , confidentialityAndPrivacy : a
+    , endOfLifeDecisionMaking : a
+    , medicalProfessionalism : a
+    , researchEthics : a
     , lab1 : a
     , lab2 : a
     , lab3 : a
@@ -310,13 +388,39 @@ activityRecord a =
     , endocrineSystem = a
     , reproductiveSystem = a
     , immuneResponse = a
+    , pharmacokinetics = a
+    , pharmacodynamics = a
+    , toxicology = a
+    , drugMetabolism = a
+    , pharmacologicalTherapeutics = a
+    , clinicalPharmacology = a
+    , neuropharmacology = a
+    , chemotherapy = a
+    , cardiovascularPharmacology = a
+    , bacteriology = a
+    , virology = a
     , mycology = a
+    , parasitology = a
+    , immunology = a
+    , microbialGenetics = a
+    , hostPathogenInteractions = a
+    , clinicalMicrobiology = a
+    , antimicrobialResistance = a
     , cellInjury = a
     , inflammation = a
     , hemodynamicDisorders = a
-    , principlesOfBiomedicalEthics = a
+    , immunopathology = a
+    , geneticDisorders = a
+    , neoplasia = a
+    , infectiousDiseases = a
+    , environmentalPathology = a
+    , nutritionalDisorders = a
+    , principlesOfBioethics = a
     , informedConsent = a
     , confidentialityAndPrivacy = a
+    , endOfLifeDecisionMaking = a
+    , medicalProfessionalism = a
+    , researchEthics = a
     , lab1 = a
     , lab2 = a
     , lab3 = a
@@ -407,8 +511,59 @@ getByActivity kind data =
         ImmuneResponse ->
             data.immuneResponse
 
+        Pharmacokinetics ->
+            data.pharmacokinetics
+
+        Pharmacodynamics ->
+            data.pharmacodynamics
+
+        Toxicology ->
+            data.toxicology
+
+        DrugMetabolism ->
+            data.drugMetabolism
+
+        PharmacologicalTherapeutics ->
+            data.pharmacologicalTherapeutics
+
+        ClinicalPharmacology ->
+            data.clinicalPharmacology
+
+        Neuropharmacology ->
+            data.neuropharmacology
+
+        Chemotherapy ->
+            data.chemotherapy
+
+        CardiovascularPharmacology ->
+            data.cardiovascularPharmacology
+
+        Bacteriology ->
+            data.bacteriology
+
+        Virology ->
+            data.virology
+
         Mycology ->
             data.mycology
+
+        Parasitology ->
+            data.parasitology
+
+        Immunology ->
+            data.immunology
+
+        MicrobialGenetics ->
+            data.microbialGenetics
+
+        HostPathogenInteractions ->
+            data.hostPathogenInteractions
+
+        ClinicalMicrobiology ->
+            data.clinicalMicrobiology
+
+        AntimicrobialResistance ->
+            data.antimicrobialResistance
 
         CellInjury ->
             data.cellInjury
@@ -419,14 +574,41 @@ getByActivity kind data =
         HemodynamicDisorders ->
             data.hemodynamicDisorders
 
-        PrinciplesOfBiomedicalEthics ->
-            data.principlesOfBiomedicalEthics
+        Immunopathology ->
+            data.immunopathology
+
+        GeneticDisorders ->
+            data.geneticDisorders
+
+        Neoplasia ->
+            data.neoplasia
+
+        InfectiousDiseases ->
+            data.infectiousDiseases
+
+        EnvironmentalPathology ->
+            data.environmentalPathology
+
+        NutritionalDisorders ->
+            data.nutritionalDisorders
+
+        PrinciplesOfBioethics ->
+            data.principlesOfBioethics
 
         InformedConsent ->
             data.informedConsent
 
         ConfidentialityAndPrivacy ->
             data.confidentialityAndPrivacy
+
+        EndOfLifeDecisionMaking ->
+            data.endOfLifeDecisionMaking
+
+        MedicalProfessionalism ->
+            data.medicalProfessionalism
+
+        ResearchEthics ->
+            data.researchEthics
 
         Lab1 ->
             data.lab1
@@ -523,8 +705,59 @@ setByActivity kind value data =
         ImmuneResponse ->
             { data | immuneResponse = value }
 
+        Pharmacokinetics ->
+            { data | pharmacokinetics = value }
+
+        Pharmacodynamics ->
+            { data | pharmacodynamics = value }
+
+        Toxicology ->
+            { data | toxicology = value }
+
+        DrugMetabolism ->
+            { data | drugMetabolism = value }
+
+        PharmacologicalTherapeutics ->
+            { data | pharmacologicalTherapeutics = value }
+
+        ClinicalPharmacology ->
+            { data | clinicalPharmacology = value }
+
+        Neuropharmacology ->
+            { data | neuropharmacology = value }
+
+        Chemotherapy ->
+            { data | chemotherapy = value }
+
+        CardiovascularPharmacology ->
+            { data | cardiovascularPharmacology = value }
+
+        Bacteriology ->
+            { data | bacteriology = value }
+
+        Virology ->
+            { data | virology = value }
+
         Mycology ->
             { data | mycology = value }
+
+        Parasitology ->
+            { data | parasitology = value }
+
+        Immunology ->
+            { data | immunology = value }
+
+        MicrobialGenetics ->
+            { data | microbialGenetics = value }
+
+        HostPathogenInteractions ->
+            { data | hostPathogenInteractions = value }
+
+        ClinicalMicrobiology ->
+            { data | clinicalMicrobiology = value }
+
+        AntimicrobialResistance ->
+            { data | antimicrobialResistance = value }
 
         CellInjury ->
             { data | cellInjury = value }
@@ -535,14 +768,41 @@ setByActivity kind value data =
         HemodynamicDisorders ->
             { data | hemodynamicDisorders = value }
 
-        PrinciplesOfBiomedicalEthics ->
-            { data | principlesOfBiomedicalEthics = value }
+        Immunopathology ->
+            { data | immunopathology = value }
+
+        GeneticDisorders ->
+            { data | geneticDisorders = value }
+
+        Neoplasia ->
+            { data | neoplasia = value }
+
+        InfectiousDiseases ->
+            { data | infectiousDiseases = value }
+
+        EnvironmentalPathology ->
+            { data | environmentalPathology = value }
+
+        NutritionalDisorders ->
+            { data | nutritionalDisorders = value }
+
+        PrinciplesOfBioethics ->
+            { data | principlesOfBioethics = value }
 
         InformedConsent ->
             { data | informedConsent = value }
 
         ConfidentialityAndPrivacy ->
             { data | confidentialityAndPrivacy = value }
+
+        EndOfLifeDecisionMaking ->
+            { data | endOfLifeDecisionMaking = value }
+
+        MedicalProfessionalism ->
+            { data | medicalProfessionalism = value }
+
+        ResearchEthics ->
+            { data | researchEthics = value }
 
         Lab1 ->
             { data | lab1 = value }
@@ -822,19 +1082,172 @@ activityStats =
         , knowledge = Just 9
         , type_ = "Study"
         }
+    , pharmacokinetics =
+        { skill = Pharmacology
+        , title = "Pharmacokinetics"
+        , image = "/activities/pharmacology/pharmacokinetics.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , pharmacodynamics =
+        { skill = Pharmacology
+        , title = "Pharmacodynamics"
+        , image = "/activities/pharmacology/pharmacodynamics.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = Just 2
+        , type_ = "Study"
+        }
+    , toxicology =
+        { skill = Pharmacology
+        , title = "Toxicology"
+        , image = "/activities/pharmacology/toxicology.webp"
+        , level = 12
+        , duration = Duration.seconds 5
+        , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , drugMetabolism =
+        { skill = Pharmacology
+        , title = "Drug Metabolism"
+        , image = "/activities/pharmacology/drugMetabolism.webp"
+        , level = 20
+        , duration = Duration.seconds 5
+        , knowledge = Just 4
+        , type_ = "Study"
+        }
+    , pharmacologicalTherapeutics =
+        { skill = Pharmacology
+        , title = "Pharmacological Therapeutics"
+        , image = "/activities/pharmacology/pharmacologicalTherapeutics.webp"
+        , level = 30
+        , duration = Duration.seconds 5
+        , knowledge = Just 5
+        , type_ = "Study"
+        }
+    , clinicalPharmacology =
+        { skill = Pharmacology
+        , title = "Clinical Pharmacology"
+        , image = "/activities/pharmacology/clinicalPharmacology.webp"
+        , level = 40
+        , duration = Duration.seconds 5
+        , knowledge = Just 6
+        , type_ = "Study"
+        }
+    , neuropharmacology =
+        { skill = Pharmacology
+        , title = "Neuropharmacology"
+        , image = "/activities/pharmacology/neuropharmacology.webp"
+        , level = 50
+        , duration = Duration.seconds 5
+        , knowledge = Just 7
+        , type_ = "Study"
+        }
+    , chemotherapy =
+        { skill = Pharmacology
+        , title = "Chemotherapy"
+        , image = "/activities/pharmacology/chemotherapy.webp"
+        , level = 60
+        , duration = Duration.seconds 5
+        , knowledge = Just 8
+        , type_ = "Study"
+        }
+    , cardiovascularPharmacology =
+        { skill = Pharmacology
+        , title = "Cariovascular Pharmacology"
+        , image = "/activities/pharmacology/cardiovascularPharmacology.webp"
+        , level = 70
+        , duration = Duration.seconds 5
+        , knowledge = Just 9
+        , type_ = "Study"
+        }
+    , bacteriology =
+        { skill = Microbiology
+        , title = "Bacteriology"
+        , image = "/activities/microbiology/bacteriology.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Study"
+        }
+    , virology =
+        { skill = Microbiology
+        , title = "Virology"
+        , image = "/activities/microbiology/virology.webp"
+        , level = 5
+        , duration = Duration.seconds 5
+        , knowledge = Just 2
+        , type_ = "Study"
+        }
     , mycology =
         { skill = Microbiology
         , title = "Mycology"
-        , image = "/activities/backAndSpine.webp"
-        , level = 10
+        , image = "/activities/microbiology/mycology.webp"
+        , level = 12
         , duration = Duration.seconds 5
         , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , parasitology =
+        { skill = Microbiology
+        , title = "Parasitology"
+        , image = "/activities/microbiology/parasitology.webp"
+        , level = 20
+        , duration = Duration.seconds 5
+        , knowledge = Just 4
+        , type_ = "Study"
+        }
+    , immunology =
+        { skill = Microbiology
+        , title = "Immunology"
+        , image = "/activities/microbiology/immunology.webp"
+        , level = 30
+        , duration = Duration.seconds 5
+        , knowledge = Just 5
+        , type_ = "Study"
+        }
+    , microbialGenetics =
+        { skill = Microbiology
+        , title = "Microbial Genetics"
+        , image = "/activities/microbiology/microbialGenetics.webp"
+        , level = 40
+        , duration = Duration.seconds 5
+        , knowledge = Just 6
+        , type_ = "Study"
+        }
+    , hostPathogenInteractions =
+        { skill = Microbiology
+        , title = "Host-Pathogen Interactions"
+        , image = "/activities/microbiology/hostPathogenInteractions.webp"
+        , level = 50
+        , duration = Duration.seconds 5
+        , knowledge = Just 7
+        , type_ = "Study"
+        }
+    , clinicalMicrobiology =
+        { skill = Microbiology
+        , title = "Clinical Microbiology"
+        , image = "/activities/microbiology/clinicalMicrobiology.webp"
+        , level = 60
+        , duration = Duration.seconds 5
+        , knowledge = Just 8
+        , type_ = "Study"
+        }
+    , antimicrobialResistance =
+        { skill = Microbiology
+        , title = "Antimicrobial Resistance"
+        , image = "/activities/microbiology/antimicrobialResistance.webp"
+        , level = 70
+        , duration = Duration.seconds 5
+        , knowledge = Just 9
         , type_ = "Study"
         }
     , cellInjury =
         { skill = Pathology
         , title = "Cell Injury and Adaptation"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/pathology/cellInjury.webp"
         , level = 1
         , duration = Duration.seconds 5
         , knowledge = Just 1
@@ -843,7 +1256,7 @@ activityStats =
     , inflammation =
         { skill = Pathology
         , title = "Inflammation and Repair"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/pathology/inflammation.webp"
         , level = 5
         , duration = Duration.seconds 5
         , knowledge = Just 2
@@ -852,16 +1265,70 @@ activityStats =
     , hemodynamicDisorders =
         { skill = Pathology
         , title = "Hemodynamic Disorders"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/pathology/hemodynamicDisorders.webp"
         , level = 10
         , duration = Duration.seconds 5
         , knowledge = Just 3
         , type_ = "Study"
         }
-    , principlesOfBiomedicalEthics =
+    , immunopathology =
+        { skill = Pathology
+        , title = "Immunopathology"
+        , image = "/activities/pathology/immunopathology.webp"
+        , level = 20
+        , duration = Duration.seconds 5
+        , knowledge = Just 4
+        , type_ = "Study"
+        }
+    , geneticDisorders =
+        { skill = Pathology
+        , title = "Genetic Disorders"
+        , image = "/activities/pathology/geneticDisorders.webp"
+        , level = 30
+        , duration = Duration.seconds 5
+        , knowledge = Just 5
+        , type_ = "Study"
+        }
+    , neoplasia =
+        { skill = Pathology
+        , title = "Neoplasia"
+        , image = "/activities/pathology/neoplasia.webp"
+        , level = 45
+        , duration = Duration.seconds 5
+        , knowledge = Just 6
+        , type_ = "Study"
+        }
+    , infectiousDiseases =
+        { skill = Pathology
+        , title = "Infectious Diseases"
+        , image = "/activities/pathology/infectiousDiseases.webp"
+        , level = 55
+        , duration = Duration.seconds 5
+        , knowledge = Just 7
+        , type_ = "Study"
+        }
+    , environmentalPathology =
+        { skill = Pathology
+        , title = "Environmental Pathology"
+        , image = "/activities/pathology/environmentalPathology.webp"
+        , level = 70
+        , duration = Duration.seconds 5
+        , knowledge = Just 8
+        , type_ = "Study"
+        }
+    , nutritionalDisorders =
+        { skill = Pathology
+        , title = "Nutritional Disorders"
+        , image = "/activities/pathology/nutritionalDisorders.webp"
+        , level = 75
+        , duration = Duration.seconds 5
+        , knowledge = Just 9
+        , type_ = "Study"
+        }
+    , principlesOfBioethics =
         { skill = MedicalEthics
-        , title = "Principles of Biomedical Ethics"
-        , image = "/activities/backAndSpine.webp"
+        , title = "Principles of Bioethics"
+        , image = "/activities/medicalEthics/principlesOfBioethics.webp"
         , level = 1
         , duration = Duration.seconds 5
         , knowledge = Just 1
@@ -870,7 +1337,7 @@ activityStats =
     , informedConsent =
         { skill = MedicalEthics
         , title = "InformedConsent"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/medicalEthics/informedConsent.webp"
         , level = 5
         , duration = Duration.seconds 5
         , knowledge = Just 2
@@ -879,10 +1346,37 @@ activityStats =
     , confidentialityAndPrivacy =
         { skill = MedicalEthics
         , title = "Confidentiality and Privacy"
-        , image = "/activities/backAndSpine.webp"
+        , image = "/activities/medicalEthics/confidentialityAndPrivacy.webp"
         , level = 10
         , duration = Duration.seconds 5
         , knowledge = Just 3
+        , type_ = "Study"
+        }
+    , endOfLifeDecisionMaking =
+        { skill = MedicalEthics
+        , title = "End-of-Life Decision Making"
+        , image = "/activities/medicalEthics/endOfLifeDecisionMaking.webp"
+        , level = 20
+        , duration = Duration.seconds 5
+        , knowledge = Just 4
+        , type_ = "Study"
+        }
+    , medicalProfessionalism =
+        { skill = MedicalEthics
+        , title = "Medical Professionalism"
+        , image = "/activities/medicalEthics/medicalProfessionalism.webp"
+        , level = 30
+        , duration = Duration.seconds 5
+        , knowledge = Just 5
+        , type_ = "Study"
+        }
+    , researchEthics =
+        { skill = MedicalEthics
+        , title = "Research Ethics"
+        , image = "/activities/medicalEthics/researchEthics.webp"
+        , level = 45
+        , duration = Duration.seconds 5
+        , knowledge = Just 6
         , type_ = "Study"
         }
     , lab1 =
@@ -1347,49 +1841,63 @@ type TestCategory
 
 
 type Test
-    = Quiz1
-    | ShelfExam1
-    | UsmleStep1Test
+    = Anatomy1
+    | Anatomy2
+    | Anatomy3
+    | Anatomy4
+    | Anatomy5
 
 
 allTests : List Test
 allTests =
-    [ Quiz1, ShelfExam1, UsmleStep1Test ]
+    [ Anatomy1, Anatomy2, Anatomy3, Anatomy4, Anatomy5 ]
 
 
 type alias TestRecord a =
-    { quiz1 : a, shelfExam1 : a, usmleStep1Test : a }
+    { anatomy1 : a, anatomy2 : a, anatomy3 : a, anatomy4 : a, anatomy5 : a }
 
 
 testRecord : a -> TestRecord a
 testRecord a =
-    { quiz1 = a, shelfExam1 = a, usmleStep1Test = a }
+    { anatomy1 = a, anatomy2 = a, anatomy3 = a, anatomy4 = a, anatomy5 = a }
 
 
-getByTest : Test -> TestRecord usmleStep1Test -> usmleStep1Test
+getByTest : Test -> TestRecord anatomy5 -> anatomy5
 getByTest kind data =
     case kind of
-        Quiz1 ->
-            data.quiz1
+        Anatomy1 ->
+            data.anatomy1
 
-        ShelfExam1 ->
-            data.shelfExam1
+        Anatomy2 ->
+            data.anatomy2
 
-        UsmleStep1Test ->
-            data.usmleStep1Test
+        Anatomy3 ->
+            data.anatomy3
+
+        Anatomy4 ->
+            data.anatomy4
+
+        Anatomy5 ->
+            data.anatomy5
 
 
 setByTest : Test -> value -> TestRecord value -> TestRecord value
 setByTest kind value data =
     case kind of
-        Quiz1 ->
-            { data | quiz1 = value }
+        Anatomy1 ->
+            { data | anatomy1 = value }
 
-        ShelfExam1 ->
-            { data | shelfExam1 = value }
+        Anatomy2 ->
+            { data | anatomy2 = value }
 
-        UsmleStep1Test ->
-            { data | usmleStep1Test = value }
+        Anatomy3 ->
+            { data | anatomy3 = value }
+
+        Anatomy4 ->
+            { data | anatomy4 = value }
+
+        Anatomy5 ->
+            { data | anatomy5 = value }
 
 
 mapTests :
@@ -1405,41 +1913,48 @@ mapTests fn record =
 type alias TestStats =
     { title : String
     , category : TestCategory
-    , rewardCoin : IdleGame.Coin.Coin
-    , rewardResource : { resource : Resource, amount : Int }
+    , rewardCoin : Maybe IdleGame.Coin.Coin
+    , rewardResource : Maybe { resource : Resource, amount : Int }
     , costs : List { resource : Resource, amount : Int }
     }
 
 
 testStats : TestRecord TestStats
 testStats =
-    { quiz1 =
-        { title = "Quiz 1"
+    { anatomy1 =
+        { title = "Anatomy I"
         , category = Quiz
-        , rewardCoin = IdleGame.Coin.int 10
-        , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs = [ { resource = AnatomyK, amount = 1 } ]
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 100 } ]
         }
-    , shelfExam1 =
-        { title = "Shelf Exam 1"
-        , category = ShelfExam
-        , rewardCoin = IdleGame.Coin.int 10
-        , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs =
-            [ { resource = AnatomyK, amount = 50 }
-            , { resource = PhysiologyK, amount = 50 }
-            ]
+    , anatomy2 =
+        { title = "Anatomy II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 500 } ]
         }
-    , usmleStep1Test =
-        { title = "USMLE Step 1 Exam"
-        , category = UsmleStep1
-        , rewardCoin = IdleGame.Coin.int 10
-        , rewardResource = { resource = AnatomyPK, amount = 1 }
-        , costs =
-            [ { resource = AnatomyK, amount = 1000 }
-            , { resource = PhysiologyK, amount = 1000 }
-            , { resource = PharmacologyK, amount = 500 }
-            ]
+    , anatomy3 =
+        { title = "Anatomy III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 1000 } ]
+        }
+    , anatomy4 =
+        { title = "Anatomy IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 2000 } ]
+        }
+    , anatomy5 =
+        { title = "Anatomy V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 3000 } ]
         }
     }
 

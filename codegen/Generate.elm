@@ -82,6 +82,14 @@ decodeMaybeString =
     Json.Decode.map strToMaybe Json.Decode.string
 
 
+decodeMaybeInt : Json.Decode.Decoder (Maybe Int)
+decodeMaybeInt =
+    Json.Decode.oneOf
+        [ Json.Decode.map Just Json.Decode.int
+        , Json.Decode.succeed Nothing
+        ]
+
+
 getDeclarations : String -> String -> List String -> List Elm.Declaration
 getDeclarations category categoryPlural names =
     let
@@ -303,12 +311,18 @@ testStats testConfigObjects =
             Elm.record
                 [ ( "title", Elm.string testConfig.title )
                 , ( "category", testConfig.category )
-                , ( "rewardCoin", Gen.IdleGame.Coin.int testConfig.rewardCoin )
+                , ( "rewardCoin", Elm.maybe (Maybe.map Gen.IdleGame.Coin.int testConfig.rewardCoin) )
                 , ( "rewardResource"
-                  , Elm.record
-                        [ ( "resource", Elm.val (capitalize testConfig.rewardResource.resource) )
-                        , ( "amount", Elm.int testConfig.rewardResource.amount )
-                        ]
+                  , Elm.maybe
+                        (Maybe.map
+                            (\rewardResource ->
+                                Elm.record
+                                    [ ( "resource", Elm.val (capitalize rewardResource.resource) )
+                                    , ( "amount", Elm.int rewardResource.amount )
+                                    ]
+                            )
+                            testConfig.rewardResource
+                        )
                   )
                 , ( "costs"
                   , Elm.list
@@ -328,12 +342,14 @@ testStats testConfigObjects =
         (Type.record
             [ ( "title", Type.string )
             , ( "category", Type.named [] "TestCategory" )
-            , ( "rewardCoin", Gen.IdleGame.Coin.annotation_.coin )
+            , ( "rewardCoin", Type.maybe Gen.IdleGame.Coin.annotation_.coin )
             , ( "rewardResource"
-              , Type.record
-                    [ ( "resource", Type.named [] "Resource" )
-                    , ( "amount", Type.int )
-                    ]
+              , Type.maybe
+                    (Type.record
+                        [ ( "resource", Type.named [] "Resource" )
+                        , ( "amount", Type.int )
+                        ]
+                    )
               )
             , ( "costs"
               , Type.list
@@ -391,8 +407,8 @@ type alias TestConfigObject =
     { id : String
     , title : String
     , category : Elm.Expression
-    , rewardCoin : Int
-    , rewardResource : ResourceAndAmount
+    , rewardCoin : Maybe Int
+    , rewardResource : Maybe ResourceAndAmount
     , costs : List ResourceAndAmount
     }
 
@@ -499,6 +515,6 @@ testConfigDecoder =
         (Json.Decode.field "id" Json.Decode.string)
         (Json.Decode.field "title" Json.Decode.string)
         (Json.Decode.field "category" testCategoryDecoder)
-        (Json.Decode.field "rewardCoin" Json.Decode.int)
-        (Json.Decode.field "rewardResource" resourceAndAmountDecoder)
+        (Json.Decode.field "rewardCoin" decodeMaybeInt)
+        (Json.Decode.maybe (Json.Decode.field "rewardResource" resourceAndAmountDecoder))
         testCostsDecoder

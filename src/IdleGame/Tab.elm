@@ -28,12 +28,12 @@ getConfig tab =
 
         Shop ->
             { title = "Shop"
-            , icon = Icon.fromString "S"
+            , icon = Icon.shop
             }
 
         TestingCenter ->
             { title = "Testing Center"
-            , icon = Icon.fromString "TC"
+            , icon = Icon.testingCenter
             }
 
         SkillTab skill ->

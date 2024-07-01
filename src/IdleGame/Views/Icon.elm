@@ -33,6 +33,7 @@ type
     | MaterialSummarize
     | MaterialPolicy
     | MaterialWorkspaces
+    | MaterialQuiz
 
 
 myMaterialIconToHtml : MyMaterialIcon -> Material.Icons.Types.Icon msg
@@ -61,6 +62,9 @@ myMaterialIconToHtml icon =
 
         MaterialWorkspaces ->
             Material.Icons.workspaces
+
+        MaterialQuiz ->
+            Material.Icons.quiz
 
 
 type Icon
@@ -579,3 +583,8 @@ policy =
 workspaces : Icon
 workspaces =
     createIconMaterial MaterialWorkspaces
+
+
+testingCenter : Icon
+testingCenter =
+    createIconMaterial MaterialQuiz

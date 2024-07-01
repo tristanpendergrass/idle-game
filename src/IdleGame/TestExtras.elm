@@ -24,10 +24,16 @@ getRewardEffects test =
         toEffect : { resource : Resource, amount : Int } -> Effect
         toEffect { resource, amount } =
             Effect.gainResource amount resource
+
+        rewardResourceEffect : Maybe Effect
+        rewardResourceEffect =
+            Maybe.map toEffect stats.rewardResource
+
+        rewardCoinEffect : Maybe Effect
+        rewardCoinEffect =
+            Maybe.map Effect.gainCoin stats.rewardCoin
     in
-    [ toEffect stats.rewardResource
-    , Effect.gainCoin stats.rewardCoin
-    ]
+    List.filterMap identity [ rewardResourceEffect, rewardCoinEffect ]
 
 
 getAllEffects : Test -> List Effect
