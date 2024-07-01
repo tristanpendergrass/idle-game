@@ -12,6 +12,7 @@ type Toast
     = GainedCoin Coin
     | GainedResource Int Resource
     | NegativeAmountErr
+    | TestAlreadyCompleted
 
 
 type IntervalModLabel

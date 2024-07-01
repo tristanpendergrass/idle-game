@@ -6,3 +6,4 @@ module IdleGame.EffectErr exposing (..)
 
 type EffectErr
     = NegativeAmount -- Tried to subtract something and it went negative
+    | TestAlreadyCompleted -- Tried to complete a test that had already been done

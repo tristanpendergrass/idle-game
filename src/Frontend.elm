@@ -460,37 +460,15 @@ update msg model =
                         game : Game
                         game =
                             Snapshot.getValue snapshot
-
-                        mods : List Mod
-                        mods =
-                            Game.getAllMods game
-
-                        ( applyEffectsResult, newSeed ) =
-                            Random.step (Game.applyEffects mods (Test.getAllEffects test) 1 game) game.seed
                     in
-                    case applyEffectsResult of
+                    case Game.attemptCompleteTest test game of
                         Err _ ->
                             noOp
 
-                        Ok applyEffectValue ->
-                            let
-                                testAlreadyCompleted : Bool
-                                testAlreadyCompleted =
-                                    getByTest test game.testCompletions
-
-                                newGame : Game
-                                newGame =
-                                    applyEffectValue.game
-                                        |> Game.setTestCompleted test
-                                        |> Game.setSeed newSeed
-                            in
-                            if testAlreadyCompleted then
-                                noOp
-
-                            else
-                                ( { model | gameState = Playing (Snapshot.setValue newGame snapshot) }
-                                , Cmd.batch (List.map (AddToast >> delay 0) applyEffectValue.toasts)
-                                )
+                        Ok applyEffectsValue ->
+                            ( { model | gameState = Playing (Snapshot.setValue applyEffectsValue.game snapshot) }
+                            , Cmd.batch (List.map (AddToast >> delay 0) applyEffectsValue.toasts)
+                            )
 
                 _ ->
                     noOp
@@ -1145,6 +1123,10 @@ toastToHtml notification =
         NegativeAmountErr ->
             div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
+
+        TestAlreadyCompleted ->
+            div [ baseClass, warningClass ]
+                [ text "Test already completed" ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg

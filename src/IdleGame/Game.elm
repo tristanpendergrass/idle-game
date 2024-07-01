@@ -12,6 +12,7 @@ import IdleGame.Mod as Mod exposing (Mod)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
+import IdleGame.TestExtras as Test
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -282,6 +283,38 @@ getPurchaseEffects amount resource =
             []
 
 
+attemptCompleteTest : Test -> Game -> Result EffectErr ApplyEffectsValue
+attemptCompleteTest test game =
+    let
+        mods : List Mod
+        mods =
+            getAllMods game
+
+        ( applyEffectsResult, newSeed ) =
+            Random.step (applyEffects mods (Test.getAllEffects test) 1 game) game.seed
+    in
+    applyEffectsResult
+        |> Result.andThen
+            (\applyEffectsValue ->
+                let
+                    testAlreadyCompleted : Bool
+                    testAlreadyCompleted =
+                        getByTest test game.testCompletions
+
+                    newGame : Game
+                    newGame =
+                        applyEffectsValue.game
+                            |> setTestCompleted test
+                            |> setSeed newSeed
+                in
+                if testAlreadyCompleted then
+                    Err EffectErr.TestAlreadyCompleted
+
+                else
+                    Ok { game = newGame, toasts = applyEffectsValue.toasts }
+            )
+
+
 attemptPurchaseResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
 attemptPurchaseResource amount resource game =
     let
@@ -353,6 +386,9 @@ getToastForErr err =
     case err of
         EffectErr.NegativeAmount ->
             NegativeAmountErr
+
+        EffectErr.TestAlreadyCompleted ->
+            TestAlreadyCompleted
 
 
 type alias ApplyEffectsValue =
