@@ -57,7 +57,8 @@ make_ :
         { title : Elm.Expression, icon : Elm.Expression } -> Elm.Expression
     , backpack : Elm.Expression
     , shop : Elm.Expression
-    , subjectTab : Elm.Expression -> Elm.Expression
+    , testingCenter : Elm.Expression
+    , skillTab : Elm.Expression -> Elm.Expression
     }
 make_ =
     { tabConfig =
@@ -95,12 +96,18 @@ make_ =
             , name = "Shop"
             , annotation = Just (Type.namedWith [] "Tab" [])
             }
-    , subjectTab =
+    , testingCenter =
+        Elm.value
+            { importFrom = [ "IdleGame", "Tab" ]
+            , name = "TestingCenter"
+            , annotation = Just (Type.namedWith [] "Tab" [])
+            }
+    , skillTab =
         \ar0 ->
             Elm.apply
                 (Elm.value
                      { importFrom = [ "IdleGame", "Tab" ]
-                     , name = "SubjectTab"
+                     , name = "SkillTab"
                      , annotation = Just (Type.namedWith [] "Tab" [])
                      }
                 )
@@ -114,7 +121,8 @@ caseOf_ :
         -> { tabTags_0_0
             | backpack : Elm.Expression
             , shop : Elm.Expression
-            , subjectTab : Elm.Expression -> Elm.Expression
+            , testingCenter : Elm.Expression
+            , skillTab : Elm.Expression -> Elm.Expression
         }
         -> Elm.Expression
     }
@@ -126,12 +134,13 @@ caseOf_ =
                 (Type.namedWith [ "IdleGame", "Tab" ] "Tab" [])
                 [ Elm.Case.branch0 "Backpack" tabTags.backpack
                 , Elm.Case.branch0 "Shop" tabTags.shop
+                , Elm.Case.branch0 "TestingCenter" tabTags.testingCenter
                 , Elm.Case.branch1
-                    "SubjectTab"
+                    "SkillTab"
                     ( "idleGameTabSkill"
                     , Type.namedWith [ "IdleGame", "Tab" ] "Skill" []
                     )
-                    tabTags.subjectTab
+                    tabTags.skillTab
                 ]
     }
 

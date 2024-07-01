@@ -1337,6 +1337,111 @@ getResourceStats kind =
     getByResource kind resourceStats
 
 
+{- Tests -}
+
+
+type TestCategory
+    = Quiz
+    | ShelfExam
+    | UsmleStep1
+
+
+type Test
+    = Quiz1
+    | ShelfExam1
+    | UsmleStep1Test
+
+
+allTests : List Test
+allTests =
+    [ Quiz1, ShelfExam1, UsmleStep1Test ]
+
+
+type alias TestRecord a =
+    { quiz1 : a, shelfExam1 : a, usmleStep1Test : a }
+
+
+testRecord : a -> TestRecord a
+testRecord a =
+    { quiz1 = a, shelfExam1 = a, usmleStep1Test = a }
+
+
+getByTest : Test -> TestRecord usmleStep1Test -> usmleStep1Test
+getByTest kind data =
+    case kind of
+        Quiz1 ->
+            data.quiz1
+
+        ShelfExam1 ->
+            data.shelfExam1
+
+        UsmleStep1Test ->
+            data.usmleStep1Test
+
+
+setByTest : Test -> value -> TestRecord value -> TestRecord value
+setByTest kind value data =
+    case kind of
+        Quiz1 ->
+            { data | quiz1 = value }
+
+        ShelfExam1 ->
+            { data | shelfExam1 = value }
+
+        UsmleStep1Test ->
+            { data | usmleStep1Test = value }
+
+
+mapTests :
+    (getByTest -> getByTest) -> TestRecord getByTest -> TestRecord getByTest
+mapTests fn record =
+    let
+        foldFn el accum =
+            setByTest el (fn (getByTest el accum)) accum
+    in
+    List.foldl foldFn record allTests
+
+
+type alias TestStats =
+    { title : String
+    , category : TestCategory
+    , rewardCoin : IdleGame.Coin.Coin
+    , rewardResource : { resource : Resource, amount : Int }
+    , costs : List { resource : Resource, amount : Int }
+    }
+
+
+testStats : TestRecord TestStats
+testStats =
+    { quiz1 =
+        { title = "Quiz 1"
+        , category = Quiz
+        , rewardCoin = IdleGame.Coin.int 10
+        , rewardResource = { resource = AnatomyPK, amount = 1 }
+        , costs = [ { resource = AnatomyK, amount = 100 } ]
+        }
+    , shelfExam1 =
+        { title = "Shelf Exam 1"
+        , category = ShelfExam
+        , rewardCoin = IdleGame.Coin.int 10
+        , rewardResource = { resource = AnatomyPK, amount = 1 }
+        , costs = []
+        }
+    , usmleStep1Test =
+        { title = "USMLE Step 1 Exam"
+        , category = UsmleStep1
+        , rewardCoin = IdleGame.Coin.int 10
+        , rewardResource = { resource = AnatomyPK, amount = 1 }
+        , costs = []
+        }
+    }
+
+
+getTestStats : Test -> TestStats
+getTestStats kind =
+    getByTest kind testStats
+
+
 {- Shop Upgrades -}
 
 

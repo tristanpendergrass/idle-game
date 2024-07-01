@@ -1,7 +1,7 @@
-module Gen.IdleGame.Views.Icon exposing (accessibility, adventuring, annotation_, bag, biotech, bloodtype, book, botany, call_, caseOf_, charmstone, checkboxEmpty, checkboxMarked, chevronDown, chevronLeft, chevronRight, chores, close, coin, conjuration, createIconFeather, createIconMaterial, createIconPublic, damage, debug, defaultParams, dropdown, ectoplasm, emptyBottle, enchantment, explore, eye, forbiddenKnowledge, fromString, getParams, go, goToMode, greenhouseDirt, hexes, iconMap, insufficientFunds, keyring, make_, manure, mapParams, medication, menu, mischief, moduleName_, monsterPower, myMaterialIconToHtml, oversizedBag, parchment, play, policy, potionmaking, quest, readingGlasses, science, scrap, scroll, shield, shop, shovel, silkling, sizeToPixel, sizeToRem, sizeToTailwindClass, soot, stalker, stop, studying, summarize, switch, toHtml, transmogrification, underConstruction, undiscoveredItem, undiscoveredMonster, undiscoveredQuest, unknownItem, values_, wards, washWater, weathermancing, withRounded, withSize, withVisibility)
+module Gen.IdleGame.Views.Icon exposing (accessibility, adventuring, annotation_, bag, biotech, bloodtype, book, botany, call_, caseOf_, charmstone, checkboxEmpty, checkboxMarked, chevronDown, chevronLeft, chevronRight, chores, close, coin, conjuration, createIconFeather, createIconMaterial, createIconPublic, damage, debug, defaultParams, dropdown, ectoplasm, emptyBottle, enchantment, explore, eye, forbiddenKnowledge, fromString, getParams, go, goToMode, greenhouseDirt, hexes, insufficientFunds, keyring, make_, manure, mapParams, medication, menu, mischief, moduleName_, monsterPower, myMaterialIconToHtml, oversizedBag, parchment, play, policy, potionmaking, quest, readingGlasses, science, scrap, scroll, shield, shop, shovel, silkling, sizeToPixel, sizeToRem, sizeToTailwindClass, soot, stalker, stop, studying, summarize, switch, toHtml, transmogrification, underConstruction, undiscoveredItem, undiscoveredMonster, undiscoveredQuest, unknownItem, values_, wards, washWater, weathermancing, withRounded, withSize, withVisibility, workspaces)
 
 {-| 
-@docs moduleName_, policy, summarize, biotech, medication, bloodtype, science, accessibility, scroll, checkboxEmpty, checkboxMarked, quest, undiscoveredQuest, undiscoveredMonster, undiscoveredItem, insufficientFunds, go, eye, stop, play, chevronRight, chevronLeft, chevronDown, dropdown, stalker, silkling, charmstone, unknownItem, oversizedBag, readingGlasses, keyring, book, shovel, parchment, ectoplasm, scrap, emptyBottle, washWater, greenhouseDirt, soot, manure, coin, underConstruction, forbiddenKnowledge, transmogrification, conjuration, enchantment, wards, weathermancing, hexes, potionmaking, botany, mischief, explore, chores, goToMode, monsterPower, adventuring, studying, shop, bag, menu, debug, shield, damage, switch, close, createIconMaterial, createIconPublic, createIconFeather, fromString, toHtml, getParams, sizeToTailwindClass, sizeToRem, sizeToPixel, withRounded, withVisibility, withSize, mapParams, defaultParams, myMaterialIconToHtml, iconMap, annotation_, make_, caseOf_, call_, values_
+@docs moduleName_, workspaces, policy, summarize, biotech, medication, bloodtype, science, accessibility, scroll, checkboxEmpty, checkboxMarked, quest, undiscoveredQuest, undiscoveredMonster, undiscoveredItem, insufficientFunds, go, eye, stop, play, chevronRight, chevronLeft, chevronDown, dropdown, stalker, silkling, charmstone, unknownItem, oversizedBag, readingGlasses, keyring, book, shovel, parchment, ectoplasm, scrap, emptyBottle, washWater, greenhouseDirt, soot, manure, coin, underConstruction, forbiddenKnowledge, transmogrification, conjuration, enchantment, wards, weathermancing, hexes, potionmaking, botany, mischief, explore, chores, goToMode, monsterPower, adventuring, studying, shop, bag, menu, debug, shield, damage, switch, close, createIconMaterial, createIconPublic, createIconFeather, fromString, toHtml, getParams, sizeToTailwindClass, sizeToRem, sizeToPixel, withRounded, withVisibility, withSize, mapParams, defaultParams, myMaterialIconToHtml, annotation_, make_, caseOf_, call_, values_
 -}
 
 
@@ -14,6 +14,17 @@ import Elm.Case
 moduleName_ : List String
 moduleName_ =
     [ "IdleGame", "Views", "Icon" ]
+
+
+{-| workspaces: IdleGame.Views.Icon.Icon -}
+workspaces : Elm.Expression
+workspaces =
+    Elm.value
+        { importFrom = [ "IdleGame", "Views", "Icon" ]
+        , name = "workspaces"
+        , annotation =
+            Just (Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" [])
+        }
 
 
 {-| policy: IdleGame.Views.Icon.Icon -}
@@ -1115,55 +1126,14 @@ myMaterialIconToHtml myMaterialIconToHtmlArg =
         [ myMaterialIconToHtmlArg ]
 
 
-{-| iconMap: IdleGame.Views.Icon.IconMap -}
-iconMap : Elm.Expression
-iconMap =
-    Elm.value
-        { importFrom = [ "IdleGame", "Views", "Icon" ]
-        , name = "iconMap"
-        , annotation =
-            Just (Type.namedWith [ "IdleGame", "Views", "Icon" ] "IconMap" [])
-        }
-
-
 annotation_ :
-    { iconMap : Type.Annotation
-    , params : Type.Annotation
+    { params : Type.Annotation
     , icon : Type.Annotation
     , myMaterialIcon : Type.Annotation
     , size : Type.Annotation
     }
 annotation_ =
-    { iconMap =
-        Type.alias
-            moduleName_
-            "IconMap"
-            []
-            (Type.record
-                 [ ( "accessibility"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "science"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "bloodtype"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "medication"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "biotech"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "summarize"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "policy"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 ]
-            )
-    , params =
+    { params =
         Type.alias
             moduleName_
             "Params"
@@ -1184,17 +1154,7 @@ annotation_ =
 
 
 make_ :
-    { iconMap :
-        { accessibility : Elm.Expression
-        , science : Elm.Expression
-        , bloodtype : Elm.Expression
-        , medication : Elm.Expression
-        , biotech : Elm.Expression
-        , summarize : Elm.Expression
-        , policy : Elm.Expression
-        }
-        -> Elm.Expression
-    , params :
+    { params :
         { size : Elm.Expression
         , isVisible : Elm.Expression
         , isRounded : Elm.Expression
@@ -1211,76 +1171,14 @@ make_ :
     , materialBiotech : Elm.Expression
     , materialSummarize : Elm.Expression
     , materialPolicy : Elm.Expression
+    , materialWorkspaces : Elm.Expression
     , small : Elm.Expression
     , medium : Elm.Expression
     , large : Elm.Expression
     , extraLarge : Elm.Expression
     }
 make_ =
-    { iconMap =
-        \iconMap_args ->
-            Elm.withType
-                (Type.alias
-                     [ "IdleGame", "Views", "Icon" ]
-                     "IconMap"
-                     []
-                     (Type.record
-                          [ ( "accessibility"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "science"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "bloodtype"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "medication"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "biotech"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "summarize"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "policy"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          ]
-                     )
-                )
-                (Elm.record
-                     [ Tuple.pair "accessibility" iconMap_args.accessibility
-                     , Tuple.pair "science" iconMap_args.science
-                     , Tuple.pair "bloodtype" iconMap_args.bloodtype
-                     , Tuple.pair "medication" iconMap_args.medication
-                     , Tuple.pair "biotech" iconMap_args.biotech
-                     , Tuple.pair "summarize" iconMap_args.summarize
-                     , Tuple.pair "policy" iconMap_args.policy
-                     ]
-                )
-    , params =
+    { params =
         \params_args ->
             Elm.withType
                 (Type.alias
@@ -1387,6 +1285,12 @@ make_ =
             , name = "MaterialPolicy"
             , annotation = Just (Type.namedWith [] "MyMaterialIcon" [])
             }
+    , materialWorkspaces =
+        Elm.value
+            { importFrom = [ "IdleGame", "Views", "Icon" ]
+            , name = "MaterialWorkspaces"
+            , annotation = Just (Type.namedWith [] "MyMaterialIcon" [])
+            }
     , small =
         Elm.value
             { importFrom = [ "IdleGame", "Views", "Icon" ]
@@ -1434,6 +1338,7 @@ caseOf_ :
             , materialBiotech : Elm.Expression
             , materialSummarize : Elm.Expression
             , materialPolicy : Elm.Expression
+            , materialWorkspaces : Elm.Expression
         }
         -> Elm.Expression
     , size :
@@ -1518,6 +1423,9 @@ caseOf_ =
                 , Elm.Case.branch0
                     "MaterialPolicy"
                     myMaterialIconTags.materialPolicy
+                , Elm.Case.branch0
+                    "MaterialWorkspaces"
+                    myMaterialIconTags.materialWorkspaces
                 ]
     , size =
         \sizeExpression sizeTags ->
@@ -1869,7 +1777,8 @@ call_ =
 
 
 values_ :
-    { policy : Elm.Expression
+    { workspaces : Elm.Expression
+    , policy : Elm.Expression
     , summarize : Elm.Expression
     , biotech : Elm.Expression
     , medication : Elm.Expression
@@ -1950,10 +1859,16 @@ values_ :
     , mapParams : Elm.Expression
     , defaultParams : Elm.Expression
     , myMaterialIconToHtml : Elm.Expression
-    , iconMap : Elm.Expression
     }
 values_ =
-    { policy =
+    { workspaces =
+        Elm.value
+            { importFrom = [ "IdleGame", "Views", "Icon" ]
+            , name = "workspaces"
+            , annotation =
+                Just (Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" [])
+            }
+    , policy =
         Elm.value
             { importFrom = [ "IdleGame", "Views", "Icon" ]
             , name = "policy"
@@ -2680,15 +2595,6 @@ values_ =
                               "Icon"
                               [ Type.var "msg" ]
                          )
-                    )
-            }
-    , iconMap =
-        Elm.value
-            { importFrom = [ "IdleGame", "Views", "Icon" ]
-            , name = "iconMap"
-            , annotation =
-                Just
-                    (Type.namedWith [ "IdleGame", "Views", "Icon" ] "IconMap" []
                     )
             }
     }

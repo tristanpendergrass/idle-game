@@ -10,13 +10,14 @@ import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
+import IdleGame.Test as Test exposing (Test)
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-renderTestingCenterTabButton : { activeTab : TestingCenterTab, label : String, tab : TestingCenterTab } -> Html FrontendMsg
+renderTestingCenterTabButton : { activeTab : TestCategory, label : String, tab : TestCategory } -> Html FrontendMsg
 renderTestingCenterTabButton { activeTab, label, tab } =
     div
         [ attribute "role" "tab"
@@ -25,13 +26,6 @@ renderTestingCenterTabButton { activeTab, label, tab } =
         , onClick (HandleTestingCenterTabClick tab)
         ]
         [ text label ]
-
-
-type alias Test =
-    { costs : List Effect
-    , gains : List Effect
-    , label : String
-    }
 
 
 renderTest : Game -> List Mod -> Test -> Html FrontendMsg
@@ -98,11 +92,11 @@ render model game =
 
         tests : List Test
         tests =
-            case model.testingCenterActiveTab of
-                Quizzes ->
+            case model.activeTestCategory of
+                Quiz ->
                     quizzesTests
 
-                ShelfExams ->
+                ShelfExam ->
                     shelfExamsTests
 
                 UsmleStep1 ->
@@ -111,17 +105,17 @@ render model game =
     div [ class "t-column items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ attribute "role" "tablist", class "tabs tabs-lifted" ]
             [ renderTestingCenterTabButton
-                { activeTab = model.testingCenterActiveTab
+                { activeTab = model.activeTestCategory
                 , label = "Quizzes"
-                , tab = Quizzes
+                , tab = Quiz
                 }
             , renderTestingCenterTabButton
-                { activeTab = model.testingCenterActiveTab
+                { activeTab = model.activeTestCategory
                 , label = "Shelf Exams"
-                , tab = ShelfExams
+                , tab = ShelfExam
                 }
             , renderTestingCenterTabButton
-                { activeTab = model.testingCenterActiveTab
+                { activeTab = model.activeTestCategory
                 , label = "USMLE Step 1"
                 , tab = UsmleStep1
                 }

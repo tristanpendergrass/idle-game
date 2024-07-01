@@ -1,30 +1,18 @@
-module Gen.IdleGame.Resource exposing (add, allStats, annotation_, call_, caseOf_, getDiff, getLabel, getStats, isEmptyDiff, knowledgeStats, make_, mapDiff, mapResources, moduleName_, toList, values_)
+module Gen.IdleGame.Resource exposing (add, annotation_, call_, getDiff, getLabel, isEmptyDiff, mapDiff, mapResources, moduleName_, toList, values_)
 
-{-|
-@docs moduleName_, knowledgeStats, getLabel, toList, mapResources, isEmptyDiff, mapDiff, getDiff, add, getStats, allStats, annotation_, make_, caseOf_, call_, values_
+{-| 
+@docs moduleName_, getLabel, toList, mapResources, isEmptyDiff, mapDiff, getDiff, add, annotation_, call_, values_
 -}
 
 
 import Elm
 import Elm.Annotation as Type
-import Elm.Case
 
 
 {-| The name of this module. -}
 moduleName_ : List String
 moduleName_ =
     [ "IdleGame", "Resource" ]
-
-
-{-| knowledgeStats: IdleGame.ResourceStats -}
-knowledgeStats : Elm.Expression
-knowledgeStats =
-    Elm.value
-        { importFrom = [ "IdleGame", "Resource" ]
-        , name = "knowledgeStats"
-        , annotation =
-            Just (Type.namedWith [ "IdleGame", "Resource" ] "Stats" [])
-        }
 
 
 {-| getLabel: IdleGame.Resource.Resource -> String -}
@@ -80,7 +68,7 @@ toList toListArg =
         [ toListArg ]
 
 
-{-| mapResources:
+{-| mapResources: 
     (Int -> IdleGame.Resource.Resource -> a)
     -> IdleGame.Resource.ResourceRecord Int
     -> List a
@@ -144,7 +132,7 @@ isEmptyDiff isEmptyDiffArg =
         [ isEmptyDiffArg ]
 
 
-{-| mapDiff:
+{-| mapDiff: 
     (Int -> IdleGame.Resource.Resource -> a)
     -> IdleGame.Resource.ResourceRecord Int
     -> List a
@@ -187,7 +175,7 @@ mapDiff mapDiffArg mapDiffArg0 =
         ]
 
 
-{-| getDiff:
+{-| getDiff: 
     { original : IdleGame.Resource.ResourceRecord Int
     , current : IdleGame.Resource.ResourceRecord Int
     }
@@ -229,7 +217,7 @@ getDiff getDiffArg =
         ]
 
 
-{-| add:
+{-| add: 
     IdleGame.Resource.Resource
     -> Int
     -> IdleGame.Resource.ResourceRecord Int
@@ -273,49 +261,7 @@ add addArg addArg0 addArg1 =
         [ addArg, Elm.int addArg0, addArg1 ]
 
 
-{-| getStats: IdleGame.Resource.Resource -> IdleGame.ResourceStats -}
-getStats : Elm.Expression -> Elm.Expression
-getStats getStatsArg =
-    Elm.apply
-        (Elm.value
-             { importFrom = [ "IdleGame", "Resource" ]
-             , name = "getStats"
-             , annotation =
-                 Just
-                     (Type.function
-                          [ Type.namedWith
-                              [ "IdleGame", "Resource" ]
-                              "Resource"
-                              []
-                          ]
-                          (Type.namedWith [ "IdleGame", "Resource" ] "Stats" [])
-                     )
-             }
-        )
-        [ getStatsArg ]
-
-
-{-| allStats: IdleGame.Resource.ResourceRecord IdleGame.ResourceStats -}
-allStats : Elm.Expression
-allStats =
-    Elm.value
-        { importFrom = [ "IdleGame", "Resource" ]
-        , name = "allStats"
-        , annotation =
-            Just
-                (Type.namedWith
-                     [ "IdleGame", "Resource" ]
-                     "ResourceRecord"
-                     [ Type.namedWith [ "IdleGame", "Resource" ] "Stats" [] ]
-                )
-        }
-
-
-annotation_ :
-    { diff : Type.Annotation
-    , stats : Type.Annotation
-    , purchasing : Type.Annotation
-    }
+annotation_ : { diff : Type.Annotation }
 annotation_ =
     { diff =
         Type.alias
@@ -327,110 +273,6 @@ annotation_ =
                  "ResourceRecord"
                  [ Type.int ]
             )
-    , stats =
-        Type.alias
-            moduleName_
-            "Stats"
-            []
-            (Type.record
-                 [ ( "title", Type.string )
-                 , ( "icon"
-                   , Type.namedWith [ "IdleGame", "Views", "Icon" ] "Icon" []
-                   )
-                 , ( "purchasing"
-                   , Type.namedWith [ "IdleGame", "Resource" ] "Purchasing" []
-                   )
-                 ]
-            )
-    , purchasing = Type.namedWith [ "IdleGame", "Resource" ] "Purchasing" []
-    }
-
-
-make_ :
-    { stats :
-        { title : Elm.Expression
-        , icon : Elm.Expression
-        , purchasing : Elm.Expression
-        }
-        -> Elm.Expression
-    , purchasable : Elm.Expression -> Elm.Expression
-    , notPurchasable : Elm.Expression
-    }
-make_ =
-    { stats =
-        \stats_args ->
-            Elm.withType
-                (Type.alias
-                     [ "IdleGame", "Resource" ]
-                     "Stats"
-                     []
-                     (Type.record
-                          [ ( "title", Type.string )
-                          , ( "icon"
-                            , Type.namedWith
-                                  [ "IdleGame", "Views", "Icon" ]
-                                  "Icon"
-                                  []
-                            )
-                          , ( "purchasing"
-                            , Type.namedWith
-                                  [ "IdleGame", "Resource" ]
-                                  "Purchasing"
-                                  []
-                            )
-                          ]
-                     )
-                )
-                (Elm.record
-                     [ Tuple.pair "title" stats_args.title
-                     , Tuple.pair "icon" stats_args.icon
-                     , Tuple.pair "purchasing" stats_args.purchasing
-                     ]
-                )
-    , purchasable =
-        \ar0 ->
-            Elm.apply
-                (Elm.value
-                     { importFrom = [ "IdleGame", "Resource" ]
-                     , name = "Purchasable"
-                     , annotation = Just (Type.namedWith [] "Purchasing" [])
-                     }
-                )
-                [ ar0 ]
-    , notPurchasable =
-        Elm.value
-            { importFrom = [ "IdleGame", "Resource" ]
-            , name = "NotPurchasable"
-            , annotation = Just (Type.namedWith [] "Purchasing" [])
-            }
-    }
-
-
-caseOf_ :
-    { purchasing :
-        Elm.Expression
-        -> { purchasingTags_0_0
-            | purchasable : Elm.Expression -> Elm.Expression
-            , notPurchasable : Elm.Expression
-        }
-        -> Elm.Expression
-    }
-caseOf_ =
-    { purchasing =
-        \purchasingExpression purchasingTags ->
-            Elm.Case.custom
-                purchasingExpression
-                (Type.namedWith [ "IdleGame", "Resource" ] "Purchasing" [])
-                [ Elm.Case.branch1
-                    "Purchasable"
-                    ( "idleGameCoinCoin"
-                    , Type.namedWith [ "IdleGame", "Coin" ] "Coin" []
-                    )
-                    purchasingTags.purchasable
-                , Elm.Case.branch0
-                    "NotPurchasable"
-                    purchasingTags.notPurchasable
-                ]
     }
 
 
@@ -442,7 +284,6 @@ call_ :
     , mapDiff : Elm.Expression -> Elm.Expression -> Elm.Expression
     , getDiff : Elm.Expression -> Elm.Expression
     , add : Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
-    , getStats : Elm.Expression -> Elm.Expression
     }
 call_ =
     { getLabel =
@@ -634,53 +475,20 @@ call_ =
                      }
                 )
                 [ addArg, addArg0, addArg1 ]
-    , getStats =
-        \getStatsArg ->
-            Elm.apply
-                (Elm.value
-                     { importFrom = [ "IdleGame", "Resource" ]
-                     , name = "getStats"
-                     , annotation =
-                         Just
-                             (Type.function
-                                  [ Type.namedWith
-                                      [ "IdleGame", "Resource" ]
-                                      "Resource"
-                                      []
-                                  ]
-                                  (Type.namedWith
-                                       [ "IdleGame", "Resource" ]
-                                       "Stats"
-                                       []
-                                  )
-                             )
-                     }
-                )
-                [ getStatsArg ]
     }
 
 
 values_ :
-    { knowledgeStats : Elm.Expression
-    , getLabel : Elm.Expression
+    { getLabel : Elm.Expression
     , toList : Elm.Expression
     , mapResources : Elm.Expression
     , isEmptyDiff : Elm.Expression
     , mapDiff : Elm.Expression
     , getDiff : Elm.Expression
     , add : Elm.Expression
-    , getStats : Elm.Expression
-    , allStats : Elm.Expression
     }
 values_ =
-    { knowledgeStats =
-        Elm.value
-            { importFrom = [ "IdleGame", "Resource" ]
-            , name = "knowledgeStats"
-            , annotation =
-                Just (Type.namedWith [ "IdleGame", "Resource" ] "Stats" [])
-            }
-    , getLabel =
+    { getLabel =
         Elm.value
             { importFrom = [ "IdleGame", "Resource" ]
             , name = "getLabel"
@@ -831,34 +639,6 @@ values_ =
                                   [ Type.int ]
                               ]
                          )
-                    )
-            }
-    , getStats =
-        Elm.value
-            { importFrom = [ "IdleGame", "Resource" ]
-            , name = "getStats"
-            , annotation =
-                Just
-                    (Type.function
-                         [ Type.namedWith
-                             [ "IdleGame", "Resource" ]
-                             "Resource"
-                             []
-                         ]
-                         (Type.namedWith [ "IdleGame", "Resource" ] "Stats" [])
-                    )
-            }
-    , allStats =
-        Elm.value
-            { importFrom = [ "IdleGame", "Resource" ]
-            , name = "allStats"
-            , annotation =
-                Just
-                    (Type.namedWith
-                         [ "IdleGame", "Resource" ]
-                         "ResourceRecord"
-                         [ Type.namedWith [ "IdleGame", "Resource" ] "Stats" []
-                         ]
                     )
             }
     }

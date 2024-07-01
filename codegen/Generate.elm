@@ -38,6 +38,10 @@ file flags =
             , [ Elm.comment "Resources" ]
             , getDeclarations "Resource" "Resources" (List.map (\configObject -> capitalize configObject.id) flags.resourceConfig)
             , resourceStats flags.resourceConfig
+            , [ Elm.comment "Tests" ]
+            , [ testCategoryDeclaration ]
+            , getDeclarations "Test" "Tests" (List.map (\configObject -> capitalize configObject.id) flags.testConfig)
+            , testStats flags.testConfig
             , [ Elm.comment "Shop Upgrades" ]
             , getDeclarations "ShopUpgrade" "ShopUpgrades" [ "Glasses" ]
             ]
@@ -286,6 +290,65 @@ resourceStats resourceConfigObjects =
         resourceConfigObjects
 
 
+testCategoryDeclaration : Elm.Declaration
+testCategoryDeclaration =
+    Elm.customType "TestCategory" [ Elm.variant "Quiz", Elm.variant "ShelfExam", Elm.variant "UsmleStep1" ]
+
+
+testStats : List TestConfigObject -> List Elm.Declaration
+testStats testConfigObjects =
+    let
+        toExpression : TestConfigObject -> Elm.Expression
+        toExpression testConfig =
+            Elm.record
+                [ ( "title", Elm.string testConfig.title )
+                , ( "category", testConfig.category )
+                , ( "rewardCoin", Gen.IdleGame.Coin.int testConfig.rewardCoin )
+                , ( "rewardResource"
+                  , Elm.record
+                        [ ( "resource", Elm.val (capitalize testConfig.rewardResource.resource) )
+                        , ( "amount", Elm.int testConfig.rewardResource.amount )
+                        ]
+                  )
+                , ( "costs"
+                  , Elm.list
+                        (List.map
+                            (\resourceAndAmount ->
+                                Elm.record
+                                    [ ( "resource", Elm.val (capitalize resourceAndAmount.resource) )
+                                    , ( "amount", Elm.int resourceAndAmount.amount )
+                                    ]
+                            )
+                            testConfig.costs
+                        )
+                  )
+                ]
+    in
+    getStats "Test"
+        (Type.record
+            [ ( "title", Type.string )
+            , ( "category", Type.named [] "TestCategory" )
+            , ( "rewardCoin", Gen.IdleGame.Coin.annotation_.coin )
+            , ( "rewardResource"
+              , Type.record
+                    [ ( "resource", Type.named [] "Resource" )
+                    , ( "amount", Type.int )
+                    ]
+              )
+            , ( "costs"
+              , Type.list
+                    (Type.record
+                        [ ( "resource", Type.named [] "Resource" )
+                        , ( "amount", Type.int )
+                        ]
+                    )
+              )
+            ]
+        )
+        (\testConfig -> ( testConfig.id, toExpression testConfig ))
+        testConfigObjects
+
+
 
 -- Decode flags
 
@@ -318,19 +381,37 @@ type alias ResourceConfigObject =
     }
 
 
+type alias ResourceAndAmount =
+    { resource : String
+    , amount : Int
+    }
+
+
+type alias TestConfigObject =
+    { id : String
+    , title : String
+    , category : Elm.Expression
+    , rewardCoin : Int
+    , rewardResource : ResourceAndAmount
+    , costs : List ResourceAndAmount
+    }
+
+
 type alias Flags =
     { skillConfig : List SkillConfigObject
     , activityConfig : List ActivityConfigObject
     , resourceConfig : List ResourceConfigObject
+    , testConfig : List TestConfigObject
     }
 
 
 flagsDecoder : Json.Decode.Decoder Flags
 flagsDecoder =
-    Json.Decode.map3 Flags
+    Json.Decode.map4 Flags
         (Json.Decode.field "skillConfig" (Json.Decode.list skillConfigDecoder))
         (Json.Decode.field "activityConfig" (Json.Decode.list activityConfigDecoder))
         (Json.Decode.field "resourceConfig" (Json.Decode.list resourceConfigDecoder))
+        (Json.Decode.field "testConfig" (Json.Decode.list testConfigDecoder))
 
 
 skillConfigDecoder : Json.Decode.Decoder SkillConfigObject
@@ -362,3 +443,62 @@ resourceConfigDecoder =
         (Json.Decode.field "icon" Json.Decode.string)
         (Json.Decode.maybe (Json.Decode.field "price" Json.Decode.int))
         (Json.Decode.field "reducedBy" decodeMaybeString)
+
+
+testConfigDecoder : Json.Decode.Decoder TestConfigObject
+testConfigDecoder =
+    let
+        resourceAndAmountDecoder : Json.Decode.Decoder ResourceAndAmount
+        resourceAndAmountDecoder =
+            Json.Decode.string
+                |> Json.Decode.andThen
+                    (\str ->
+                        case String.split ":" str of
+                            [ resourceId, amount ] ->
+                                case String.toInt amount of
+                                    Just amountInt ->
+                                        Json.Decode.succeed (ResourceAndAmount resourceId amountInt)
+
+                                    Nothing ->
+                                        Json.Decode.fail "Invalid resource and amount format"
+
+                            _ ->
+                                Json.Decode.fail "Invalid resource and amount format"
+                    )
+
+        testCostsDecoder : Json.Decode.Decoder (List ResourceAndAmount)
+        testCostsDecoder =
+            Json.Decode.map6 (\a b c d e f -> [ a, b, c, d, e, f ] |> List.filterMap identity)
+                (Json.Decode.maybe (Json.Decode.field "cost1" resourceAndAmountDecoder))
+                (Json.Decode.maybe (Json.Decode.field "cost2" resourceAndAmountDecoder))
+                (Json.Decode.maybe (Json.Decode.field "cost3" resourceAndAmountDecoder))
+                (Json.Decode.maybe (Json.Decode.field "cost4" resourceAndAmountDecoder))
+                (Json.Decode.maybe (Json.Decode.field "cost5" resourceAndAmountDecoder))
+                (Json.Decode.maybe (Json.Decode.field "cost6" resourceAndAmountDecoder))
+
+        testCategoryDecoder : Json.Decode.Decoder Elm.Expression
+        testCategoryDecoder =
+            Json.Decode.string
+                |> Json.Decode.andThen
+                    (\str ->
+                        case str of
+                            "quiz" ->
+                                Json.Decode.succeed (Elm.val "Quiz")
+
+                            "shelfExam" ->
+                                Json.Decode.succeed (Elm.val "ShelfExam")
+
+                            "usmleStep1" ->
+                                Json.Decode.succeed (Elm.val "UsmleStep1")
+
+                            _ ->
+                                Json.Decode.fail ("Invalid category: " ++ str)
+                    )
+    in
+    Json.Decode.map6 TestConfigObject
+        (Json.Decode.field "id" Json.Decode.string)
+        (Json.Decode.field "title" Json.Decode.string)
+        (Json.Decode.field "category" testCategoryDecoder)
+        (Json.Decode.field "rewardCoin" Json.Decode.int)
+        (Json.Decode.field "rewardResource" resourceAndAmountDecoder)
+        testCostsDecoder

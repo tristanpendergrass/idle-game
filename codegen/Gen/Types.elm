@@ -20,7 +20,6 @@ annotation_ :
     { backendModel : Type.Annotation
     , sessionGameMap : Type.Annotation
     , frontendModel : Type.Annotation
-    , modeState : Type.Annotation
     , pointerState : Type.Annotation
     , fastForwardState : Type.Annotation
     , game : Type.Annotation
@@ -33,6 +32,7 @@ annotation_ :
     , toBackend : Type.Annotation
     , frontendMsg : Type.Annotation
     , screenWidth : Type.Annotation
+    , testingCenterTab : Type.Annotation
     , locationFilter : Type.Annotation
     , preview : Type.Annotation
     , frontendGameState : Type.Annotation
@@ -86,9 +86,13 @@ annotation_ =
                          [ Type.namedWith [ "Types" ] "Toast" [] ]
                    )
                  , ( "isDrawerOpen", Type.bool )
-                 , ( "skillingState"
-                   , Type.namedWith [ "Types" ] "ModeState" []
+                 , ( "activeTab"
+                   , Type.namedWith [ "IdleGame", "Tab" ] "Tab" []
                    )
+                 , ( "preview"
+                   , Type.maybe (Type.namedWith [ "Types" ] "Preview" [])
+                   )
+                 , ( "activityExpanded", Type.bool )
                  , ( "isVisible", Type.bool )
                  , ( "activeModal"
                    , Type.maybe (Type.namedWith [ "Types" ] "Modal" [])
@@ -102,21 +106,9 @@ annotation_ =
                  , ( "pointerState"
                    , Type.maybe (Type.namedWith [ "Types" ] "PointerState" [])
                    )
-                 ]
-            )
-    , modeState =
-        Type.alias
-            moduleName_
-            "ModeState"
-            []
-            (Type.record
-                 [ ( "activeTab"
-                   , Type.namedWith [ "IdleGame", "Tab" ] "Tab" []
+                 , ( "testingCenterActiveTab"
+                   , Type.namedWith [ "Types" ] "TestingCenterTab" []
                    )
-                 , ( "preview"
-                   , Type.maybe (Type.namedWith [ "Types" ] "Preview" [])
-                   )
-                 , ( "activityExpanded", Type.bool )
                  ]
             )
     , pointerState =
@@ -244,6 +236,7 @@ annotation_ =
     , toBackend = Type.namedWith [ "Types" ] "ToBackend" []
     , frontendMsg = Type.namedWith [ "Types" ] "FrontendMsg" []
     , screenWidth = Type.namedWith [ "Types" ] "ScreenWidth" []
+    , testingCenterTab = Type.namedWith [ "Types" ] "TestingCenterTab" []
     , locationFilter = Type.namedWith [ "Types" ] "LocationFilter" []
     , preview = Type.namedWith [ "Types" ] "Preview" []
     , frontendGameState = Type.namedWith [ "Types" ] "FrontendGameState" []
@@ -261,18 +254,15 @@ make_ :
         , showDebugPanel : Elm.Expression
         , tray : Elm.Expression
         , isDrawerOpen : Elm.Expression
-        , skillingState : Elm.Expression
+        , activeTab : Elm.Expression
+        , preview : Elm.Expression
+        , activityExpanded : Elm.Expression
         , isVisible : Elm.Expression
         , activeModal : Elm.Expression
         , saveGameTimer : Elm.Expression
         , gameState : Elm.Expression
         , pointerState : Elm.Expression
-        }
-        -> Elm.Expression
-    , modeState :
-        { activeTab : Elm.Expression
-        , preview : Elm.Expression
-        , activityExpanded : Elm.Expression
+        , testingCenterActiveTab : Elm.Expression
         }
         -> Elm.Expression
     , pointerState :
@@ -342,6 +332,7 @@ make_ :
     , handleMaxButtonClick : Elm.Expression
     , handleShopResourceQuantityChange : Elm.Expression -> Elm.Expression
     , handleShopResourceBuyClick : Elm.Expression
+    , handleTestingCenterTabClick : Elm.Expression -> Elm.Expression
     , toastMsg : Elm.Expression -> Elm.Expression
     , addToast : Elm.Expression -> Elm.Expression
     , handleFastForward : Elm.Expression -> Elm.Expression
@@ -365,6 +356,9 @@ make_ :
     , screenLg : Elm.Expression
     , screenXl : Elm.Expression
     , screen2xl : Elm.Expression
+    , quizzes : Elm.Expression
+    , shelfExams : Elm.Expression
+    , usmleStep1 : Elm.Expression
     , locationAll : Elm.Expression
     , locationMonsters : Elm.Expression
     , locationQuests : Elm.Expression
@@ -428,9 +422,14 @@ make_ =
                                   [ Type.namedWith [ "Types" ] "Toast" [] ]
                             )
                           , ( "isDrawerOpen", Type.bool )
-                          , ( "skillingState"
-                            , Type.namedWith [ "Types" ] "ModeState" []
+                          , ( "activeTab"
+                            , Type.namedWith [ "IdleGame", "Tab" ] "Tab" []
                             )
+                          , ( "preview"
+                            , Type.maybe
+                                  (Type.namedWith [ "Types" ] "Preview" [])
+                            )
+                          , ( "activityExpanded", Type.bool )
                           , ( "isVisible", Type.bool )
                           , ( "activeModal"
                             , Type.maybe (Type.namedWith [ "Types" ] "Modal" [])
@@ -445,6 +444,9 @@ make_ =
                             , Type.maybe
                                   (Type.namedWith [ "Types" ] "PointerState" [])
                             )
+                          , ( "testingCenterActiveTab"
+                            , Type.namedWith [ "Types" ] "TestingCenterTab" []
+                            )
                           ]
                      )
                 )
@@ -458,9 +460,11 @@ make_ =
                          frontendModel_args.showDebugPanel
                      , Tuple.pair "tray" frontendModel_args.tray
                      , Tuple.pair "isDrawerOpen" frontendModel_args.isDrawerOpen
+                     , Tuple.pair "activeTab" frontendModel_args.activeTab
+                     , Tuple.pair "preview" frontendModel_args.preview
                      , Tuple.pair
-                         "skillingState"
-                         frontendModel_args.skillingState
+                         "activityExpanded"
+                         frontendModel_args.activityExpanded
                      , Tuple.pair "isVisible" frontendModel_args.isVisible
                      , Tuple.pair "activeModal" frontendModel_args.activeModal
                      , Tuple.pair
@@ -468,33 +472,9 @@ make_ =
                          frontendModel_args.saveGameTimer
                      , Tuple.pair "gameState" frontendModel_args.gameState
                      , Tuple.pair "pointerState" frontendModel_args.pointerState
-                     ]
-                )
-    , modeState =
-        \modeState_args ->
-            Elm.withType
-                (Type.alias
-                     [ "Types" ]
-                     "ModeState"
-                     []
-                     (Type.record
-                          [ ( "activeTab"
-                            , Type.namedWith [ "IdleGame", "Tab" ] "Tab" []
-                            )
-                          , ( "preview"
-                            , Type.maybe
-                                  (Type.namedWith [ "Types" ] "Preview" [])
-                            )
-                          , ( "activityExpanded", Type.bool )
-                          ]
-                     )
-                )
-                (Elm.record
-                     [ Tuple.pair "activeTab" modeState_args.activeTab
-                     , Tuple.pair "preview" modeState_args.preview
                      , Tuple.pair
-                         "activityExpanded"
-                         modeState_args.activityExpanded
+                         "testingCenterActiveTab"
+                         frontendModel_args.testingCenterActiveTab
                      ]
                 )
     , pointerState =
@@ -984,6 +964,16 @@ make_ =
             , name = "HandleShopResourceBuyClick"
             , annotation = Just (Type.namedWith [] "FrontendMsg" [])
             }
+    , handleTestingCenterTabClick =
+        \ar0 ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "Types" ]
+                     , name = "HandleTestingCenterTabClick"
+                     , annotation = Just (Type.namedWith [] "FrontendMsg" [])
+                     }
+                )
+                [ ar0 ]
     , toastMsg =
         \ar0 ->
             Elm.apply
@@ -1164,6 +1154,24 @@ make_ =
             , name = "Screen2xl"
             , annotation = Just (Type.namedWith [] "ScreenWidth" [])
             }
+    , quizzes =
+        Elm.value
+            { importFrom = [ "Types" ]
+            , name = "Quizzes"
+            , annotation = Just (Type.namedWith [] "TestingCenterTab" [])
+            }
+    , shelfExams =
+        Elm.value
+            { importFrom = [ "Types" ]
+            , name = "ShelfExams"
+            , annotation = Just (Type.namedWith [] "TestingCenterTab" [])
+            }
+    , usmleStep1 =
+        Elm.value
+            { importFrom = [ "Types" ]
+            , name = "UsmleStep1"
+            , annotation = Just (Type.namedWith [] "TestingCenterTab" [])
+            }
     , locationAll =
         Elm.value
             { importFrom = [ "Types" ]
@@ -1317,6 +1325,7 @@ caseOf_ :
             , handleShopResourceQuantityChange :
                 Elm.Expression -> Elm.Expression
             , handleShopResourceBuyClick : Elm.Expression
+            , handleTestingCenterTabClick : Elm.Expression -> Elm.Expression
             , toastMsg : Elm.Expression -> Elm.Expression
             , addToast : Elm.Expression -> Elm.Expression
             , handleFastForward : Elm.Expression -> Elm.Expression
@@ -1347,9 +1356,17 @@ caseOf_ :
             , screen2xl : Elm.Expression
         }
         -> Elm.Expression
+    , testingCenterTab :
+        Elm.Expression
+        -> { testingCenterTabTags_5_0
+            | quizzes : Elm.Expression
+            , shelfExams : Elm.Expression
+            , usmleStep1 : Elm.Expression
+        }
+        -> Elm.Expression
     , locationFilter :
         Elm.Expression
-        -> { locationFilterTags_5_0
+        -> { locationFilterTags_6_0
             | locationAll : Elm.Expression
             , locationMonsters : Elm.Expression
             , locationQuests : Elm.Expression
@@ -1357,11 +1374,11 @@ caseOf_ :
         -> Elm.Expression
     , preview :
         Elm.Expression
-        -> { previewTags_6_0 | preview : Elm.Expression -> Elm.Expression }
+        -> { previewTags_7_0 | preview : Elm.Expression -> Elm.Expression }
         -> Elm.Expression
     , frontendGameState :
         Elm.Expression
-        -> { frontendGameStateTags_7_0
+        -> { frontendGameStateTags_8_0
             | initializing : Elm.Expression
             , playing : Elm.Expression -> Elm.Expression
             , fastForward : Elm.Expression -> Elm.Expression
@@ -1369,7 +1386,7 @@ caseOf_ :
         -> Elm.Expression
     , modal :
         Elm.Expression
-        -> { modalTags_8_0
+        -> { modalTags_9_0
             | timePassesModal :
                 Elm.Expression
                 -> Elm.Expression
@@ -1565,6 +1582,12 @@ caseOf_ =
                     "HandleShopResourceBuyClick"
                     frontendMsgTags.handleShopResourceBuyClick
                 , Elm.Case.branch1
+                    "HandleTestingCenterTabClick"
+                    ( "typesTestingCenterTab"
+                    , Type.namedWith [ "Types" ] "TestingCenterTab" []
+                    )
+                    frontendMsgTags.handleTestingCenterTabClick
+                , Elm.Case.branch1
                     "ToastMsg"
                     ( "toastMsg", Type.namedWith [ "Toast" ] "Msg" [] )
                     frontendMsgTags.toastMsg
@@ -1647,6 +1670,15 @@ caseOf_ =
                 , Elm.Case.branch0 "ScreenLg" screenWidthTags.screenLg
                 , Elm.Case.branch0 "ScreenXl" screenWidthTags.screenXl
                 , Elm.Case.branch0 "Screen2xl" screenWidthTags.screen2xl
+                ]
+    , testingCenterTab =
+        \testingCenterTabExpression testingCenterTabTags ->
+            Elm.Case.custom
+                testingCenterTabExpression
+                (Type.namedWith [ "Types" ] "TestingCenterTab" [])
+                [ Elm.Case.branch0 "Quizzes" testingCenterTabTags.quizzes
+                , Elm.Case.branch0 "ShelfExams" testingCenterTabTags.shelfExams
+                , Elm.Case.branch0 "UsmleStep1" testingCenterTabTags.usmleStep1
                 ]
     , locationFilter =
         \locationFilterExpression locationFilterTags ->

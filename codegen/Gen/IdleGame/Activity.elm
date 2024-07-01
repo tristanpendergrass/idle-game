@@ -1,7 +1,7 @@
-module Gen.IdleGame.Activity exposing (allAnatomy, annotation_, call_, caseOf_, getAnatomyMastery, getBySkill, getEffectStats, make_, moduleName_, updateByKindActivity, values_)
+module Gen.IdleGame.Activity exposing (allAnatomy, annotation_, call_, caseOf_, getAnatomyMastery, getBySkill, getEffectStats, knowledgeResource, make_, moduleName_, updateByKindActivity, values_)
 
 {-| 
-@docs moduleName_, getAnatomyMastery, updateByKindActivity, getEffectStats, allAnatomy, getBySkill, annotation_, make_, caseOf_, call_, values_
+@docs moduleName_, getAnatomyMastery, updateByKindActivity, getEffectStats, knowledgeResource, allAnatomy, getBySkill, annotation_, make_, caseOf_, call_, values_
 -}
 
 
@@ -111,6 +111,31 @@ getEffectStats getEffectStatsArg =
              }
         )
         [ getEffectStatsArg ]
+
+
+{-| knowledgeResource: IdleGame.Activity.Skill -> Maybe IdleGame.Activity.Resource -}
+knowledgeResource : Elm.Expression -> Elm.Expression
+knowledgeResource knowledgeResourceArg =
+    Elm.apply
+        (Elm.value
+             { importFrom = [ "IdleGame", "Activity" ]
+             , name = "knowledgeResource"
+             , annotation =
+                 Just
+                     (Type.function
+                          [ Type.namedWith [ "IdleGame", "Activity" ] "Skill" []
+                          ]
+                          (Type.maybe
+                               (Type.namedWith
+                                    [ "IdleGame", "Activity" ]
+                                    "Resource"
+                                    []
+                               )
+                          )
+                     )
+             }
+        )
+        [ knowledgeResourceArg ]
 
 
 {-| allAnatomy: List IdleGame.Activity.Activity -}
@@ -293,6 +318,7 @@ call_ :
     , updateByKindActivity :
         Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
     , getEffectStats : Elm.Expression -> Elm.Expression
+    , knowledgeResource : Elm.Expression -> Elm.Expression
     , getBySkill : Elm.Expression -> Elm.Expression
     }
 call_ =
@@ -375,6 +401,31 @@ call_ =
                      }
                 )
                 [ getEffectStatsArg ]
+    , knowledgeResource =
+        \knowledgeResourceArg ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Activity" ]
+                     , name = "knowledgeResource"
+                     , annotation =
+                         Just
+                             (Type.function
+                                  [ Type.namedWith
+                                      [ "IdleGame", "Activity" ]
+                                      "Skill"
+                                      []
+                                  ]
+                                  (Type.maybe
+                                       (Type.namedWith
+                                            [ "IdleGame", "Activity" ]
+                                            "Resource"
+                                            []
+                                       )
+                                  )
+                             )
+                     }
+                )
+                [ knowledgeResourceArg ]
     , getBySkill =
         \getBySkillArg ->
             Elm.apply
@@ -407,6 +458,7 @@ values_ :
     { getAnatomyMastery : Elm.Expression
     , updateByKindActivity : Elm.Expression
     , getEffectStats : Elm.Expression
+    , knowledgeResource : Elm.Expression
     , allAnatomy : Elm.Expression
     , getBySkill : Elm.Expression
     }
@@ -467,6 +519,24 @@ values_ =
                               [ "IdleGame", "Activity" ]
                               "EffectStats"
                               []
+                         )
+                    )
+            }
+    , knowledgeResource =
+        Elm.value
+            { importFrom = [ "IdleGame", "Activity" ]
+            , name = "knowledgeResource"
+            , annotation =
+                Just
+                    (Type.function
+                         [ Type.namedWith [ "IdleGame", "Activity" ] "Skill" []
+                         ]
+                         (Type.maybe
+                              (Type.namedWith
+                                   [ "IdleGame", "Activity" ]
+                                   "Resource"
+                                   []
+                              )
                          )
                     )
             }

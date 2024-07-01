@@ -1,7 +1,7 @@
-module Gen.IdleGame.Effect exposing (annotation_, call_, caseOf_, gainCoin, gainMxp, gainResource, gainResourceWithDoubling, gainWithProbability, gainXp, getEffect, hasTags, make_, moduleName_, order, setEffect, spendResource, values_, withPreservationChance, withTags)
+module Gen.IdleGame.Effect exposing (annotation_, call_, caseOf_, gainCoin, gainMxp, gainResource, gainResourceWithDoubling, gainWithProbability, gainXp, getEffect, hasTags, make_, moduleName_, order, setEffect, spendResource, values_, withPreservationChance, withReducedBy, withTags)
 
 {-| 
-@docs moduleName_, hasTags, order, withTags, gainWithProbability, gainResourceWithDoubling, withPreservationChance, spendResource, gainResource, gainMxp, gainCoin, gainXp, setEffect, getEffect, annotation_, make_, caseOf_, call_, values_
+@docs moduleName_, hasTags, order, withTags, gainWithProbability, gainResourceWithDoubling, withPreservationChance, withReducedBy, spendResource, gainResource, gainMxp, gainCoin, gainXp, setEffect, getEffect, annotation_, make_, caseOf_, call_, values_
 -}
 
 
@@ -149,6 +149,29 @@ withPreservationChance withPreservationChanceArg withPreservationChanceArg0 =
              }
         )
         [ withPreservationChanceArg, withPreservationChanceArg0 ]
+
+
+{-| withReducedBy: IdleGame.Effect.ReducedBy -> IdleGame.Effect.Effect -> IdleGame.Effect.Effect -}
+withReducedBy : Elm.Expression -> Elm.Expression -> Elm.Expression
+withReducedBy withReducedByArg withReducedByArg0 =
+    Elm.apply
+        (Elm.value
+             { importFrom = [ "IdleGame", "Effect" ]
+             , name = "withReducedBy"
+             , annotation =
+                 Just
+                     (Type.function
+                          [ Type.namedWith
+                              [ "IdleGame", "Effect" ]
+                              "ReducedBy"
+                              []
+                          , Type.namedWith [ "IdleGame", "Effect" ] "Effect" []
+                          ]
+                          (Type.namedWith [ "IdleGame", "Effect" ] "Effect" [])
+                     )
+             }
+        )
+        [ withReducedByArg, withReducedByArg0 ]
 
 
 {-| spendResource: Int -> IdleGame.Effect.Resource -> IdleGame.Effect.Effect -}
@@ -311,6 +334,7 @@ annotation_ :
     , gainXpParams : Type.Annotation
     , effect : Type.Annotation
     , effectType : Type.Annotation
+    , reducedBy : Type.Annotation
     , tag : Type.Annotation
     }
 annotation_ =
@@ -326,6 +350,11 @@ annotation_ =
                    )
                  , ( "preservationChance"
                    , Type.namedWith [ "Percent" ] "Percent" []
+                   )
+                 , ( "reducedBy"
+                   , Type.maybe
+                         (Type.namedWith [ "IdleGame", "Effect" ] "ReducedBy" []
+                         )
                    )
                  ]
             )
@@ -401,6 +430,7 @@ annotation_ =
                  ]
             )
     , effectType = Type.namedWith [ "IdleGame", "Effect" ] "EffectType" []
+    , reducedBy = Type.namedWith [ "IdleGame", "Effect" ] "ReducedBy" []
     , tag = Type.namedWith [ "IdleGame", "Effect" ] "Tag" []
     }
 
@@ -410,6 +440,7 @@ make_ :
         { base : Elm.Expression
         , resource : Elm.Expression
         , preservationChance : Elm.Expression
+        , reducedBy : Elm.Expression
         }
         -> Elm.Expression
     , gainResourceParams :
@@ -438,6 +469,8 @@ make_ :
     , gainXp : Elm.Expression -> Elm.Expression
     , gainMxp : Elm.Expression -> Elm.Expression
     , gainCoin : Elm.Expression -> Elm.Expression
+    , reducedByFlat : Elm.Expression -> Elm.Expression
+    , reducedByPercent : Elm.Expression -> Elm.Expression -> Elm.Expression
     , skillTag : Elm.Expression -> Elm.Expression
     , xpTag : Elm.Expression
     , mxpTag : Elm.Expression
@@ -462,6 +495,14 @@ make_ =
                           , ( "preservationChance"
                             , Type.namedWith [ "Percent" ] "Percent" []
                             )
+                          , ( "reducedBy"
+                            , Type.maybe
+                                  (Type.namedWith
+                                       [ "IdleGame", "Effect" ]
+                                       "ReducedBy"
+                                       []
+                                  )
+                            )
                           ]
                      )
                 )
@@ -471,6 +512,7 @@ make_ =
                      , Tuple.pair
                          "preservationChance"
                          spendResourceParams_args.preservationChance
+                     , Tuple.pair "reducedBy" spendResourceParams_args.reducedBy
                      ]
                 )
     , gainResourceParams =
@@ -671,6 +713,26 @@ make_ =
                      }
                 )
                 [ ar0 ]
+    , reducedByFlat =
+        \ar0 ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Effect" ]
+                     , name = "ReducedByFlat"
+                     , annotation = Just (Type.namedWith [] "ReducedBy" [])
+                     }
+                )
+                [ ar0 ]
+    , reducedByPercent =
+        \ar0 ar1 ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Effect" ]
+                     , name = "ReducedByPercent"
+                     , annotation = Just (Type.namedWith [] "ReducedBy" [])
+                     }
+                )
+                [ ar0, ar1 ]
     , skillTag =
         \ar0 ->
             Elm.apply
@@ -718,9 +780,17 @@ caseOf_ :
             , gainCoin : Elm.Expression -> Elm.Expression
         }
         -> Elm.Expression
+    , reducedBy :
+        Elm.Expression
+        -> { reducedByTags_1_0
+            | reducedByFlat : Elm.Expression -> Elm.Expression
+            , reducedByPercent :
+                Elm.Expression -> Elm.Expression -> Elm.Expression
+        }
+        -> Elm.Expression
     , tag :
         Elm.Expression
-        -> { tagTags_1_0
+        -> { tagTags_2_0
             | skillTag : Elm.Expression -> Elm.Expression
             , xpTag : Elm.Expression
             , mxpTag : Elm.Expression
@@ -800,6 +870,27 @@ caseOf_ =
                     )
                     effectTypeTags.gainCoin
                 ]
+    , reducedBy =
+        \reducedByExpression reducedByTags ->
+            Elm.Case.custom
+                reducedByExpression
+                (Type.namedWith [ "IdleGame", "Effect" ] "ReducedBy" [])
+                [ Elm.Case.branch1
+                    "ReducedByFlat"
+                    ( "idleGameEffectResource"
+                    , Type.namedWith [ "IdleGame", "Effect" ] "Resource" []
+                    )
+                    reducedByTags.reducedByFlat
+                , Elm.Case.branch2
+                    "ReducedByPercent"
+                    ( "idleGameEffectResource"
+                    , Type.namedWith [ "IdleGame", "Effect" ] "Resource" []
+                    )
+                    ( "percentPercent"
+                    , Type.namedWith [ "Percent" ] "Percent" []
+                    )
+                    reducedByTags.reducedByPercent
+                ]
     , tag =
         \tagExpression tagTags ->
             Elm.Case.custom
@@ -832,6 +923,7 @@ call_ :
         Elm.Expression -> Elm.Expression -> Elm.Expression -> Elm.Expression
     , withPreservationChance :
         Elm.Expression -> Elm.Expression -> Elm.Expression
+    , withReducedBy : Elm.Expression -> Elm.Expression -> Elm.Expression
     , spendResource : Elm.Expression -> Elm.Expression -> Elm.Expression
     , gainResource : Elm.Expression -> Elm.Expression -> Elm.Expression
     , gainMxp : Elm.Expression -> Elm.Expression
@@ -996,6 +1088,33 @@ call_ =
                      }
                 )
                 [ withPreservationChanceArg, withPreservationChanceArg0 ]
+    , withReducedBy =
+        \withReducedByArg withReducedByArg0 ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "IdleGame", "Effect" ]
+                     , name = "withReducedBy"
+                     , annotation =
+                         Just
+                             (Type.function
+                                  [ Type.namedWith
+                                      [ "IdleGame", "Effect" ]
+                                      "ReducedBy"
+                                      []
+                                  , Type.namedWith
+                                      [ "IdleGame", "Effect" ]
+                                      "Effect"
+                                      []
+                                  ]
+                                  (Type.namedWith
+                                       [ "IdleGame", "Effect" ]
+                                       "Effect"
+                                       []
+                                  )
+                             )
+                     }
+                )
+                [ withReducedByArg, withReducedByArg0 ]
     , spendResource =
         \spendResourceArg spendResourceArg0 ->
             Elm.apply
@@ -1174,6 +1293,7 @@ values_ :
     , gainWithProbability : Elm.Expression
     , gainResourceWithDoubling : Elm.Expression
     , withPreservationChance : Elm.Expression
+    , withReducedBy : Elm.Expression
     , spendResource : Elm.Expression
     , gainResource : Elm.Expression
     , gainMxp : Elm.Expression
@@ -1264,6 +1384,22 @@ values_ =
                 Just
                     (Type.function
                          [ Type.namedWith [ "Percent" ] "Percent" []
+                         , Type.namedWith [ "IdleGame", "Effect" ] "Effect" []
+                         ]
+                         (Type.namedWith [ "IdleGame", "Effect" ] "Effect" [])
+                    )
+            }
+    , withReducedBy =
+        Elm.value
+            { importFrom = [ "IdleGame", "Effect" ]
+            , name = "withReducedBy"
+            , annotation =
+                Just
+                    (Type.function
+                         [ Type.namedWith
+                             [ "IdleGame", "Effect" ]
+                             "ReducedBy"
+                             []
                          , Type.namedWith [ "IdleGame", "Effect" ] "Effect" []
                          ]
                          (Type.namedWith [ "IdleGame", "Effect" ] "Effect" [])

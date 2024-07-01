@@ -113,7 +113,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
-      , testingCenterActiveTab = Quizzes
+      , activeTestCategory = Quiz
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -292,9 +292,9 @@ setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-setTestingCenterTab : TestingCenterTab -> FrontendModel -> FrontendModel
-setTestingCenterTab testingCenterTab model =
-    { model | testingCenterActiveTab = testingCenterTab }
+setActiveTestCategory : TestCategory -> FrontendModel -> FrontendModel
+setActiveTestCategory testCategory model =
+    { model | activeTestCategory = testCategory }
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
@@ -446,7 +446,7 @@ update msg model =
 
         HandleTestingCenterTabClick testingCenterTab ->
             ( model
-                |> setTestingCenterTab testingCenterTab
+                |> setActiveTestCategory testingCenterTab
             , Cmd.none
             )
 

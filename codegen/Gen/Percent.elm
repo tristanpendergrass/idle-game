@@ -1,7 +1,7 @@
-module Gen.Percent exposing (annotation_, call_, capAtHundred, caseOf_, float, increaseByPercent, make_, moduleName_, toFloat, toMultiplier, toPercentage, values_, zero)
+module Gen.Percent exposing (annotation_, call_, capAtHundred, caseOf_, float, increaseByPercent, make_, moduleName_, reduceIntByPercent, toFloat, toMultiplier, toPercentage, values_, zero)
 
 {-| 
-@docs moduleName_, increaseByPercent, capAtHundred, toMultiplier, toPercentage, toFloat, zero, float, annotation_, make_, caseOf_, call_, values_
+@docs moduleName_, reduceIntByPercent, increaseByPercent, capAtHundred, toMultiplier, toPercentage, toFloat, zero, float, annotation_, make_, caseOf_, call_, values_
 -}
 
 
@@ -14,6 +14,26 @@ import Elm.Case
 moduleName_ : List String
 moduleName_ =
     [ "Percent" ]
+
+
+{-| reduceIntByPercent: Percent.Percent -> Int -> Int -}
+reduceIntByPercent : Elm.Expression -> Int -> Elm.Expression
+reduceIntByPercent reduceIntByPercentArg reduceIntByPercentArg0 =
+    Elm.apply
+        (Elm.value
+             { importFrom = [ "Percent" ]
+             , name = "reduceIntByPercent"
+             , annotation =
+                 Just
+                     (Type.function
+                          [ Type.namedWith [ "Percent" ] "Percent" []
+                          , Type.int
+                          ]
+                          Type.int
+                     )
+             }
+        )
+        [ reduceIntByPercentArg, Elm.int reduceIntByPercentArg0 ]
 
 
 {-| increaseByPercent: Percent.Percent -> Float -> Float -}
@@ -180,7 +200,8 @@ caseOf_ =
 
 
 call_ :
-    { increaseByPercent : Elm.Expression -> Elm.Expression -> Elm.Expression
+    { reduceIntByPercent : Elm.Expression -> Elm.Expression -> Elm.Expression
+    , increaseByPercent : Elm.Expression -> Elm.Expression -> Elm.Expression
     , capAtHundred : Elm.Expression -> Elm.Expression
     , toMultiplier : Elm.Expression -> Elm.Expression
     , toPercentage : Elm.Expression -> Elm.Expression
@@ -188,7 +209,24 @@ call_ :
     , float : Elm.Expression -> Elm.Expression
     }
 call_ =
-    { increaseByPercent =
+    { reduceIntByPercent =
+        \reduceIntByPercentArg reduceIntByPercentArg0 ->
+            Elm.apply
+                (Elm.value
+                     { importFrom = [ "Percent" ]
+                     , name = "reduceIntByPercent"
+                     , annotation =
+                         Just
+                             (Type.function
+                                  [ Type.namedWith [ "Percent" ] "Percent" []
+                                  , Type.int
+                                  ]
+                                  Type.int
+                             )
+                     }
+                )
+                [ reduceIntByPercentArg, reduceIntByPercentArg0 ]
+    , increaseByPercent =
         \increaseByPercentArg increaseByPercentArg0 ->
             Elm.apply
                 (Elm.value
@@ -284,7 +322,8 @@ call_ =
 
 
 values_ :
-    { increaseByPercent : Elm.Expression
+    { reduceIntByPercent : Elm.Expression
+    , increaseByPercent : Elm.Expression
     , capAtHundred : Elm.Expression
     , toMultiplier : Elm.Expression
     , toPercentage : Elm.Expression
@@ -293,7 +332,18 @@ values_ :
     , float : Elm.Expression
     }
 values_ =
-    { increaseByPercent =
+    { reduceIntByPercent =
+        Elm.value
+            { importFrom = [ "Percent" ]
+            , name = "reduceIntByPercent"
+            , annotation =
+                Just
+                    (Type.function
+                         [ Type.namedWith [ "Percent" ] "Percent" [], Type.int ]
+                         Type.int
+                    )
+            }
+    , increaseByPercent =
         Elm.value
             { importFrom = [ "Percent" ]
             , name = "increaseByPercent"
