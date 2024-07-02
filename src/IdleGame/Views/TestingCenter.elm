@@ -92,7 +92,7 @@ render model game =
                 , tab = UsmleStep1
                 }
             ]
-        , div [ class "w-full grid" ]
+        , div [ class "w-full flex flex-wrap gap-2" ]
             (List.map (renderTest game allMods) tests)
         , div [ class "w-full", classList [ ( "hidden", not (List.isEmpty tests) ) ] ]
             [ text "Completed all" ]

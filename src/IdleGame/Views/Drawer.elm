@@ -52,16 +52,16 @@ renderDrawer isDrawerOpen activeTab =
         , aside [ class "bg-base-200 w-80 h-full" ]
             -- title row
             [ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
-                [ div [ class "flex-1 flex items-center gap-2" ]
+                [ div [ class "flex-1 flex items-end justify-between gap-2 px-4" ]
                     [ div [ class "flex-0 px-2" ]
-                        [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl" ]
-                            [ span [ class "text-primary text-sm" ] [ text "medSchool" ]
-                            , span [ class "uppercase text-base-content" ] [ text "idle" ]
+                        [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl flex gap-1 items-center rounded-t-xl overflow-hidden p-1 border border-primary border-b-4" ]
+                            [ div [ class "text-primary text-sm font-bold t-column gap-0 leading-xs bg-base-300 text-primary" ] [ span [] [ text "Med" ], span [] [ text "School" ] ]
+                            , span [ class "uppercase text-base-content text-base-300 bg-primary leading-none px-1" ] [ text "idle" ]
                             ]
                         ]
                     , a [ href "/", class "link link-hover font-mono text-xs text-opacity-50 " ]
                         [ div [ class "tooltip tooltip-bottom", attribute "data-tip" "Patch notes" ]
-                            [ text Config.version ]
+                            [ text ("v" ++ Config.version) ]
                         ]
                     ]
 
@@ -76,11 +76,17 @@ renderDrawer isDrawerOpen activeTab =
                 [ li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter, underConstruction = False } ]
+                , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
+                    [ renderTab { tab = Tab.SkillTab Labs, underConstruction = False } ]
                 ]
             , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
                 (li [] []
-                    :: (allSkills
-                            |> List.map (\skill -> li [ onClick (HandleTabClick (Tab.SkillTab skill)) ] [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ])
+                    :: (List.filter ((/=) Labs) allSkills
+                            |> List.map
+                                (\skill ->
+                                    li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
+                                        [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ]
+                                )
                        )
                 )
             ]
