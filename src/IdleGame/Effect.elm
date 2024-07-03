@@ -4,6 +4,7 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Xp as Xp exposing (Xp)
@@ -21,6 +22,7 @@ type Tag
 type alias Effect =
     { effect : EffectType
     , tags : List Tag
+    , oneTimeStatus : OneTimeStatus
     }
 
 
@@ -79,6 +81,7 @@ gainXp : Xp -> Skill -> Effect
 gainXp quantity skill =
     { effect = GainXp { base = quantity, percentIncrease = Percent.zero, skill = skill }
     , tags = [ XpTag, SkillTag skill ]
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 
@@ -86,6 +89,7 @@ gainCoin : Coin -> Effect
 gainCoin quantity =
     { effect = GainCoin { base = quantity, percentIncrease = Percent.zero }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 
@@ -93,6 +97,7 @@ gainMxp : Activity -> Effect
 gainMxp activity =
     { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 
@@ -100,6 +105,7 @@ gainResource : Int -> Resource -> Effect
 gainResource quantity kind =
     { effect = GainResource { base = quantity, doublingChance = Percent.zero, resource = kind }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 
@@ -107,7 +113,13 @@ spendResource : Int -> Resource -> Effect
 spendResource quantity kind =
     { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind, reducedBy = Nothing }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
+
+
+withOneTime : OneTimeStatus.OneTimeId -> Effect -> Effect
+withOneTime oneTimeId taggedEffect =
+    { taggedEffect | oneTimeStatus = OneTimeStatus.OneTime oneTimeId }
 
 
 withReducedBy : ReducedBy -> Effect -> Effect
@@ -138,6 +150,7 @@ gainResourceWithDoubling : Int -> Resource -> Percent -> Effect
 gainResourceWithDoubling quantity kind doubling =
     { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 
@@ -145,6 +158,7 @@ gainWithProbability : Percent -> List Effect -> Effect
 gainWithProbability probability successEffects =
     { effect = VariableSuccess { successProbability = probability, successEffects = successEffects, failureEffects = [] }
     , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
     }
 
 

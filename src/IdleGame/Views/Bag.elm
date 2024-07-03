@@ -43,7 +43,7 @@ render game =
                 ]
             ]
         , div [ class "divider" ] []
-        , ul [ class "w-full grid gap-x-8 gap-y-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" ]
+        , ul [ class "w-full flex flex-wrap gap-4 lg:gap-8" ]
             (game.resources
                 |> Resource.toList
                 |> List.filter (\( _, amount ) -> amount > 0)

@@ -1831,16 +1831,16 @@ getResourceStats kind =
     getByResource kind resourceStats
 
 
-{- Tests -}
+{- AcademicTests -}
 
 
-type TestCategory
+type AcademicTestCategory
     = Quiz
     | ShelfExam
     | UsmleStep1
 
 
-type Test
+type AcademicTest
     = Anatomy1
     | Anatomy2
     | Anatomy3
@@ -1848,22 +1848,22 @@ type Test
     | Anatomy5
 
 
-allTests : List Test
-allTests =
+allAcademicTests : List AcademicTest
+allAcademicTests =
     [ Anatomy1, Anatomy2, Anatomy3, Anatomy4, Anatomy5 ]
 
 
-type alias TestRecord a =
+type alias AcademicTestRecord a =
     { anatomy1 : a, anatomy2 : a, anatomy3 : a, anatomy4 : a, anatomy5 : a }
 
 
-testRecord : a -> TestRecord a
-testRecord a =
+academicTestRecord : a -> AcademicTestRecord a
+academicTestRecord a =
     { anatomy1 = a, anatomy2 = a, anatomy3 = a, anatomy4 = a, anatomy5 = a }
 
 
-getByTest : Test -> TestRecord anatomy5 -> anatomy5
-getByTest kind data =
+getByAcademicTest : AcademicTest -> AcademicTestRecord anatomy5 -> anatomy5
+getByAcademicTest kind data =
     case kind of
         Anatomy1 ->
             data.anatomy1
@@ -1881,8 +1881,12 @@ getByTest kind data =
             data.anatomy5
 
 
-setByTest : Test -> value -> TestRecord value -> TestRecord value
-setByTest kind value data =
+setByAcademicTest :
+    AcademicTest
+    -> value
+    -> AcademicTestRecord value
+    -> AcademicTestRecord value
+setByAcademicTest kind value data =
     case kind of
         Anatomy1 ->
             { data | anatomy1 = value }
@@ -1900,33 +1904,37 @@ setByTest kind value data =
             { data | anatomy5 = value }
 
 
-mapTests :
-    (getByTest -> getByTest) -> TestRecord getByTest -> TestRecord getByTest
-mapTests fn record =
+mapAcademicTests :
+    (getByAcademicTest -> getByAcademicTest)
+    -> AcademicTestRecord getByAcademicTest
+    -> AcademicTestRecord getByAcademicTest
+mapAcademicTests fn record =
     let
         foldFn el accum =
-            setByTest el (fn (getByTest el accum)) accum
+            setByAcademicTest el (fn (getByAcademicTest el accum)) accum
     in
-    List.foldl foldFn record allTests
+    List.foldl foldFn record allAcademicTests
 
 
-type alias TestStats =
+type alias AcademicTestStats =
     { title : String
-    , category : TestCategory
+    , category : AcademicTestCategory
     , rewardCoin : Maybe IdleGame.Coin.Coin
     , rewardResource : Maybe { resource : Resource, amount : Int }
     , costs : List { resource : Resource, amount : Int }
+    , lockedBy : Maybe AcademicTest
     }
 
 
-testStats : TestRecord TestStats
-testStats =
+academicTestStats : AcademicTestRecord AcademicTestStats
+academicTestStats =
     { anatomy1 =
         { title = "Anatomy I"
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 10)
         , rewardResource = Nothing
         , costs = [ { resource = AnatomyK, amount = 100 } ]
+        , lockedBy = Nothing
         }
     , anatomy2 =
         { title = "Anatomy II"
@@ -1934,6 +1942,7 @@ testStats =
         , rewardCoin = Just (IdleGame.Coin.int 50)
         , rewardResource = Nothing
         , costs = [ { resource = AnatomyK, amount = 500 } ]
+        , lockedBy = Just Anatomy1
         }
     , anatomy3 =
         { title = "Anatomy III"
@@ -1941,6 +1950,7 @@ testStats =
         , rewardCoin = Just (IdleGame.Coin.int 100)
         , rewardResource = Nothing
         , costs = [ { resource = AnatomyK, amount = 1000 } ]
+        , lockedBy = Just Anatomy2
         }
     , anatomy4 =
         { title = "Anatomy IV"
@@ -1948,6 +1958,7 @@ testStats =
         , rewardCoin = Just (IdleGame.Coin.int 250)
         , rewardResource = Nothing
         , costs = [ { resource = AnatomyK, amount = 2000 } ]
+        , lockedBy = Just Anatomy4
         }
     , anatomy5 =
         { title = "Anatomy V"
@@ -1955,13 +1966,14 @@ testStats =
         , rewardCoin = Just (IdleGame.Coin.int 500)
         , rewardResource = Nothing
         , costs = [ { resource = AnatomyK, amount = 3000 } ]
+        , lockedBy = Just Anatomy4
         }
     }
 
 
-getTestStats : Test -> TestStats
-getTestStats kind =
-    getByTest kind testStats
+getAcademicTestStats : AcademicTest -> AcademicTestStats
+getAcademicTestStats kind =
+    getByAcademicTest kind academicTestStats
 
 
 {- Shop Upgrades -}

@@ -3,18 +3,18 @@ module IdleGame.Views.TestingCenter exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.AcademicTest as AcademicTest
 import IdleGame.Effect as Effect exposing (Effect)
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
-import IdleGame.TestExtras as Test
 import IdleGame.Views.Effect as EffectView
 import Random
 import Result.Extra
 import Types exposing (..)
 
 
-renderTestingCenterTabButton : { activeTab : TestCategory, label : String, tab : TestCategory } -> Html FrontendMsg
+renderTestingCenterTabButton : { activeTab : AcademicTestCategory, label : String, tab : AcademicTestCategory } -> Html FrontendMsg
 renderTestingCenterTabButton { activeTab, label, tab } =
     div
         [ attribute "role" "tab"
@@ -25,12 +25,12 @@ renderTestingCenterTabButton { activeTab, label, tab } =
         [ text label ]
 
 
-renderTest : Game -> List Mod -> Test -> Html FrontendMsg
+renderTest : Game -> List Mod -> AcademicTest -> Html FrontendMsg
 renderTest game mods test =
     let
-        stats : TestStats
+        stats : AcademicTestStats
         stats =
-            getTestStats test
+            getAcademicTestStats test
 
         renderCost : Effect -> Html FrontendMsg
         renderCost cost =
@@ -38,7 +38,7 @@ renderTest game mods test =
 
         canAfford : Bool
         canAfford =
-            Game.applyEffects mods (Test.getAllEffects test) 1 game
+            Game.applyEffects mods (AcademicTest.getAllEffects test) 1 game
                 |> (\g -> Random.step g game.seed)
                 |> Tuple.first
                 |> Result.Extra.isOk
@@ -51,9 +51,9 @@ renderTest game mods test =
                         , button [ class "btn btn-sm btn-primary", disabled (not canAfford), onClick (HandleTestCompletionClick test) ] [ text "Complete" ]
                         ]
                   ]
-                , List.map renderCost (Test.getCostEffects test)
+                , List.map renderCost (AcademicTest.getCostEffects test)
                 , [ div [] [ text "Rewards" ] ]
-                , List.map renderCost (Test.getRewardEffects test)
+                , List.map renderCost (AcademicTest.getRewardEffects test)
                 ]
             )
         ]
@@ -66,28 +66,30 @@ render model game =
         allMods =
             Game.getAllMods game
 
-        showTest : Test -> Bool
+        showTest : AcademicTest -> Bool
         showTest test =
-            ((getTestStats test).category == model.activeTestCategory) && not (getByTest test game.testCompletions)
+            ((getAcademicTestStats test).category == model.activeAcademicTestCategory)
+                && not (getByAcademicTest test game.testCompletions)
+                && Game.testIsUnlocked test game
 
-        tests : List Test
+        tests : List AcademicTest
         tests =
-            List.filter showTest allTests
+            List.filter showTest allAcademicTests
     in
     div [ class "t-column items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ attribute "role" "tablist", class "tabs tabs-lifted" ]
             [ renderTestingCenterTabButton
-                { activeTab = model.activeTestCategory
+                { activeTab = model.activeAcademicTestCategory
                 , label = "Quizzes"
                 , tab = Quiz
                 }
             , renderTestingCenterTabButton
-                { activeTab = model.activeTestCategory
+                { activeTab = model.activeAcademicTestCategory
                 , label = "Shelf Exams"
                 , tab = ShelfExam
                 }
             , renderTestingCenterTabButton
-                { activeTab = model.activeTestCategory
+                { activeTab = model.activeAcademicTestCategory
                 , label = "USMLE Step 1"
                 , tab = UsmleStep1
                 }

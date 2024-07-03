@@ -1,8 +1,9 @@
 module IdleGame.Views.Utils_test exposing (..)
 
 import Expect exposing (..)
-import IdleGame.TestExtras exposing (..)
+import IdleGame.AcademicTest exposing (..)
 import IdleGame.Views.Utils exposing (floatToString, getDurationString)
+import Test exposing (..)
 
 
 getDurationStringSuite : Test

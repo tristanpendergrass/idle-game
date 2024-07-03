@@ -70,8 +70,11 @@ $ npx elm-codegen install
   [ ] Grant K and PK and coin with some probability
 [x] Reduce costs by 1 per PK
 [ ] Support Practical Knowledge and Labs in Anatomy
-[ ] Change DaisyUI theme
 [ ] Figure out how to show PK in a satisfying way
+[ ] Add masteries
+  [ ] Design
+  [ ] Implement
+[ ] Change DaisyUI theme
 
 ## v0.2
 [ ] Listen to music

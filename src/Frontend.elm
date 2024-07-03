@@ -10,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
+import IdleGame.AcademicTest as Test
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
@@ -20,11 +21,11 @@ import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
 import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.OneTime exposing (OneTimeStatus(..))
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
-import IdleGame.TestExtras as Test
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity
 import IdleGame.Views.Content
@@ -116,7 +117,7 @@ init _ key =
       , saveGameTimer = Timer.create
       , gameState = Initializing
       , pointerState = Nothing
-      , activeTestCategory = Quiz
+      , activeAcademicTestCategory = Quiz
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -295,9 +296,9 @@ setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-setActiveTestCategory : TestCategory -> FrontendModel -> FrontendModel
-setActiveTestCategory testCategory model =
-    { model | activeTestCategory = testCategory }
+setActiveAcademicTestCategory : AcademicTestCategory -> FrontendModel -> FrontendModel
+setActiveAcademicTestCategory testCategory model =
+    { model | activeAcademicTestCategory = testCategory }
 
 
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
@@ -449,7 +450,7 @@ update msg model =
 
         HandleTestingCenterTabClick testingCenterTab ->
             ( model
-                |> setActiveTestCategory testingCenterTab
+                |> setActiveAcademicTestCategory testingCenterTab
             , Cmd.none
             )
 
@@ -1127,6 +1128,14 @@ toastToHtml notification =
         TestAlreadyCompleted ->
             div [ baseClass, warningClass ]
                 [ text "Test already completed" ]
+
+        OneTimeEffectAlreadyApplied ->
+            div [ baseClass, warningClass ]
+                [ text "One-time effect already applied" ]
+
+        TestNotUnlocked ->
+            div [ baseClass, warningClass ]
+                [ text "Test locked" ]
 
 
 renderModal : Maybe Modal -> Game -> Html FrontendMsg

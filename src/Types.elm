@@ -9,6 +9,7 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
+import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -55,7 +56,8 @@ type alias Game =
     , coin : Coin
     , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgradeRecord Bool
-    , testCompletions : TestRecord Bool
+    , testCompletions : AcademicTestRecord Bool
+    , oneTimeStatuses : OneTime.OneTimeRecord Bool
     }
 
 
@@ -109,7 +111,7 @@ type alias FrontendModel =
     , saveGameTimer : Timer
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
-    , activeTestCategory : TestCategory
+    , activeAcademicTestCategory : AcademicTestCategory
     }
 
 
@@ -165,8 +167,8 @@ type FrontendMsg
     | HandleShopResourceQuantityChange String
     | HandleShopResourceBuyClick
       -- Testing Center
-    | HandleTestingCenterTabClick TestCategory
-    | HandleTestCompletionClick Test
+    | HandleTestingCenterTabClick AcademicTestCategory
+    | HandleTestCompletionClick AcademicTest
       -- Other
     | ToastMsg Toast.Msg
     | AddToast Toast

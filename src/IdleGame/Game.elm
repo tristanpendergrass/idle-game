@@ -1,6 +1,7 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
+import IdleGame.AcademicTest as Test
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
@@ -9,10 +10,10 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
-import IdleGame.TestExtras as Test
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -39,7 +40,8 @@ createProd seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , testCompletions = testRecord False
+    , testCompletions = academicTestRecord False
+    , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     }
 
 
@@ -52,7 +54,8 @@ createDev seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , testCompletions = testRecord False
+    , testCompletions = academicTestRecord False
+    , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     }
 
 
@@ -283,7 +286,22 @@ getPurchaseEffects amount resource =
             []
 
 
-attemptCompleteTest : Test -> Game -> Result EffectErr ApplyEffectsValue
+testIsUnlocked : AcademicTest -> Game -> Bool
+testIsUnlocked test game =
+    let
+        stats : AcademicTestStats
+        stats =
+            getAcademicTestStats test
+    in
+    case stats.lockedBy of
+        Nothing ->
+            True
+
+        Just unlockTest ->
+            getByAcademicTest unlockTest game.testCompletions
+
+
+attemptCompleteTest : AcademicTest -> Game -> Result EffectErr ApplyEffectsValue
 attemptCompleteTest test game =
     let
         mods : List Mod
@@ -299,7 +317,7 @@ attemptCompleteTest test game =
                 let
                     testAlreadyCompleted : Bool
                     testAlreadyCompleted =
-                        getByTest test game.testCompletions
+                        getByAcademicTest test game.testCompletions
 
                     newGame : Game
                     newGame =
@@ -309,6 +327,9 @@ attemptCompleteTest test game =
                 in
                 if testAlreadyCompleted then
                     Err EffectErr.TestAlreadyCompleted
+
+                else if not (testIsUnlocked test game) then
+                    Err EffectErr.TestNotUnlocked
 
                 else
                     Ok { game = newGame, toasts = applyEffectsValue.toasts }
@@ -347,9 +368,9 @@ setSeed seed game =
     { game | seed = seed }
 
 
-setTestCompleted : Test -> Game -> Game
+setTestCompleted : AcademicTest -> Game -> Game
 setTestCompleted test game =
-    { game | testCompletions = setByTest test True game.testCompletions }
+    { game | testCompletions = setByAcademicTest test True game.testCompletions }
 
 
 priceToPurchaseResource : Int -> ( Resource, Coin ) -> Game -> Coin
@@ -389,6 +410,12 @@ getToastForErr err =
 
         EffectErr.TestAlreadyCompleted ->
             TestAlreadyCompleted
+
+        EffectErr.OneTimeEffectAlreadyApplied ->
+            OneTimeEffectAlreadyApplied
+
+        EffectErr.TestNotUnlocked ->
+            TestNotUnlocked
 
 
 type alias ApplyEffectsValue =
@@ -498,6 +525,25 @@ type alias ApplyEffectResultGenerator =
 
 applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
 applyEffect effect count game =
+    case effect.oneTimeStatus of
+        OneTimeStatus.OneTime oneTimeId ->
+            if OneTimeStatus.getByOneTimeId oneTimeId game.oneTimeStatuses || count > 1 then
+                Random.constant (Err EffectErr.OneTimeEffectAlreadyApplied)
+
+            else
+                let
+                    newGame : Game
+                    newGame =
+                        { game | oneTimeStatuses = OneTimeStatus.claimOneTime oneTimeId game.oneTimeStatuses }
+                in
+                effectReducer effect count newGame
+
+        OneTimeStatus.NotOneTime ->
+            effectReducer effect count game
+
+
+effectReducer : Effect -> Int -> Game -> ApplyEffectResultGenerator
+effectReducer effect count game =
     case Effect.getEffect effect of
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             probabilityGenerator successProbability

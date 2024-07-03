@@ -12,6 +12,7 @@ import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Event exposing (..)
+import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
@@ -57,7 +58,7 @@ expectErr check result =
             check err
 
         Ok _ ->
-            Expect.fail "applyEffect was expected to return Err"
+            Expect.fail "expected an Err"
 
 
 hasErr : (EffectErr -> Bool) -> Result EffectErr Game.ApplyEffectsValue -> Bool
@@ -249,6 +250,37 @@ applyEffectsTest =
                 -- We should have a 10% reduction in spend and have 10 K left over
                 , check = expectOk (expectResource 10 AnatomyK)
                 , count = 1
+                }
+            ]
+        , describe "one time effects"
+            [ let
+                oneTimeEffect : Effect
+                oneTimeEffect =
+                    Effect.gainResource 5 AnatomyK
+                        |> Effect.withOneTime OneTime.Lab1
+              in
+              testEffects "only happen once"
+                { initialGame = defaultGame
+                , effects =
+                    [ oneTimeEffect
+                    , oneTimeEffect
+                    ]
+                , count = 1
+                , check = expectErr (Expect.equal EffectErr.OneTimeEffectAlreadyApplied)
+                }
+            , let
+                oneTimeEffect : Effect
+                oneTimeEffect =
+                    Effect.gainResource 5 AnatomyK
+                        |> Effect.withOneTime OneTime.Lab1
+              in
+              testEffects "only happen once even when applied using count greater than 1"
+                { initialGame = defaultGame
+                , effects =
+                    [ oneTimeEffect
+                    ]
+                , count = 3
+                , check = expectErr (Expect.equal EffectErr.OneTimeEffectAlreadyApplied)
                 }
             ]
 

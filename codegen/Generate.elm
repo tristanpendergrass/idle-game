@@ -38,10 +38,10 @@ file flags =
             , [ Elm.comment "Resources" ]
             , getDeclarations "Resource" "Resources" (List.map (\configObject -> capitalize configObject.id) flags.resourceConfig)
             , resourceStats flags.resourceConfig
-            , [ Elm.comment "Tests" ]
-            , [ testCategoryDeclaration ]
-            , getDeclarations "Test" "Tests" (List.map (\configObject -> capitalize configObject.id) flags.testConfig)
-            , testStats flags.testConfig
+            , [ Elm.comment "AcademicTests" ]
+            , [ academicTestCategoryDeclaration ]
+            , getDeclarations "AcademicTest" "AcademicTests" (List.map (\configObject -> capitalize configObject.id) flags.academicTestConfig)
+            , academicTestStats flags.academicTestConfig
             , [ Elm.comment "Shop Upgrades" ]
             , getDeclarations "ShopUpgrade" "ShopUpgrades" [ "Glasses" ]
             ]
@@ -298,20 +298,20 @@ resourceStats resourceConfigObjects =
         resourceConfigObjects
 
 
-testCategoryDeclaration : Elm.Declaration
-testCategoryDeclaration =
-    Elm.customType "TestCategory" [ Elm.variant "Quiz", Elm.variant "ShelfExam", Elm.variant "UsmleStep1" ]
+academicTestCategoryDeclaration : Elm.Declaration
+academicTestCategoryDeclaration =
+    Elm.customType "AcademicTestCategory" [ Elm.variant "Quiz", Elm.variant "ShelfExam", Elm.variant "UsmleStep1" ]
 
 
-testStats : List TestConfigObject -> List Elm.Declaration
-testStats testConfigObjects =
+academicTestStats : List AcademicTestConfigObject -> List Elm.Declaration
+academicTestStats academicTestConfigObjects =
     let
-        toExpression : TestConfigObject -> Elm.Expression
-        toExpression testConfig =
+        toExpression : AcademicTestConfigObject -> Elm.Expression
+        toExpression academicTestConfig =
             Elm.record
-                [ ( "title", Elm.string testConfig.title )
-                , ( "category", testConfig.category )
-                , ( "rewardCoin", Elm.maybe (Maybe.map Gen.IdleGame.Coin.int testConfig.rewardCoin) )
+                [ ( "title", Elm.string academicTestConfig.title )
+                , ( "category", academicTestConfig.category )
+                , ( "rewardCoin", Elm.maybe (Maybe.map Gen.IdleGame.Coin.int academicTestConfig.rewardCoin) )
                 , ( "rewardResource"
                   , Elm.maybe
                         (Maybe.map
@@ -321,7 +321,7 @@ testStats testConfigObjects =
                                     , ( "amount", Elm.int rewardResource.amount )
                                     ]
                             )
-                            testConfig.rewardResource
+                            academicTestConfig.rewardResource
                         )
                   )
                 , ( "costs"
@@ -333,15 +333,22 @@ testStats testConfigObjects =
                                     , ( "amount", Elm.int resourceAndAmount.amount )
                                     ]
                             )
-                            testConfig.costs
+                            academicTestConfig.costs
+                        )
+                  )
+                , ( "lockedBy"
+                  , Elm.maybe
+                        (Maybe.map
+                            (\lockedBy -> Elm.val (capitalize lockedBy))
+                            academicTestConfig.lockedBy
                         )
                   )
                 ]
     in
-    getStats "Test"
+    getStats "AcademicTest"
         (Type.record
             [ ( "title", Type.string )
-            , ( "category", Type.named [] "TestCategory" )
+            , ( "category", Type.named [] "AcademicTestCategory" )
             , ( "rewardCoin", Type.maybe Gen.IdleGame.Coin.annotation_.coin )
             , ( "rewardResource"
               , Type.maybe
@@ -359,10 +366,11 @@ testStats testConfigObjects =
                         ]
                     )
               )
+            , ( "lockedBy", Type.maybe (Type.named [] "AcademicTest") )
             ]
         )
-        (\testConfig -> ( testConfig.id, toExpression testConfig ))
-        testConfigObjects
+        (\academicTestConfig -> ( academicTestConfig.id, toExpression academicTestConfig ))
+        academicTestConfigObjects
 
 
 
@@ -403,13 +411,14 @@ type alias ResourceAndAmount =
     }
 
 
-type alias TestConfigObject =
+type alias AcademicTestConfigObject =
     { id : String
     , title : String
     , category : Elm.Expression
     , rewardCoin : Maybe Int
     , rewardResource : Maybe ResourceAndAmount
     , costs : List ResourceAndAmount
+    , lockedBy : Maybe String
     }
 
 
@@ -417,7 +426,7 @@ type alias Flags =
     { skillConfig : List SkillConfigObject
     , activityConfig : List ActivityConfigObject
     , resourceConfig : List ResourceConfigObject
-    , testConfig : List TestConfigObject
+    , academicTestConfig : List AcademicTestConfigObject
     }
 
 
@@ -427,7 +436,7 @@ flagsDecoder =
         (Json.Decode.field "skillConfig" (Json.Decode.list skillConfigDecoder))
         (Json.Decode.field "activityConfig" (Json.Decode.list activityConfigDecoder))
         (Json.Decode.field "resourceConfig" (Json.Decode.list resourceConfigDecoder))
-        (Json.Decode.field "testConfig" (Json.Decode.list testConfigDecoder))
+        (Json.Decode.field "academicTestConfig" (Json.Decode.list academicTestConfigDecoder))
 
 
 skillConfigDecoder : Json.Decode.Decoder SkillConfigObject
@@ -461,8 +470,8 @@ resourceConfigDecoder =
         (Json.Decode.field "reducedBy" decodeMaybeString)
 
 
-testConfigDecoder : Json.Decode.Decoder TestConfigObject
-testConfigDecoder =
+academicTestConfigDecoder : Json.Decode.Decoder AcademicTestConfigObject
+academicTestConfigDecoder =
     let
         resourceAndAmountDecoder : Json.Decode.Decoder ResourceAndAmount
         resourceAndAmountDecoder =
@@ -482,8 +491,8 @@ testConfigDecoder =
                                 Json.Decode.fail "Invalid resource and amount format"
                     )
 
-        testCostsDecoder : Json.Decode.Decoder (List ResourceAndAmount)
-        testCostsDecoder =
+        academicTestCostsDecoder : Json.Decode.Decoder (List ResourceAndAmount)
+        academicTestCostsDecoder =
             Json.Decode.map6 (\a b c d e f -> [ a, b, c, d, e, f ] |> List.filterMap identity)
                 (Json.Decode.maybe (Json.Decode.field "cost1" resourceAndAmountDecoder))
                 (Json.Decode.maybe (Json.Decode.field "cost2" resourceAndAmountDecoder))
@@ -492,8 +501,8 @@ testConfigDecoder =
                 (Json.Decode.maybe (Json.Decode.field "cost5" resourceAndAmountDecoder))
                 (Json.Decode.maybe (Json.Decode.field "cost6" resourceAndAmountDecoder))
 
-        testCategoryDecoder : Json.Decode.Decoder Elm.Expression
-        testCategoryDecoder =
+        academicTestCategoryDecoder : Json.Decode.Decoder Elm.Expression
+        academicTestCategoryDecoder =
             Json.Decode.string
                 |> Json.Decode.andThen
                     (\str ->
@@ -511,10 +520,11 @@ testConfigDecoder =
                                 Json.Decode.fail ("Invalid category: " ++ str)
                     )
     in
-    Json.Decode.map6 TestConfigObject
+    Json.Decode.map7 AcademicTestConfigObject
         (Json.Decode.field "id" Json.Decode.string)
         (Json.Decode.field "title" Json.Decode.string)
-        (Json.Decode.field "category" testCategoryDecoder)
+        (Json.Decode.field "category" academicTestCategoryDecoder)
         (Json.Decode.field "rewardCoin" decodeMaybeInt)
         (Json.Decode.maybe (Json.Decode.field "rewardResource" resourceAndAmountDecoder))
-        testCostsDecoder
+        academicTestCostsDecoder
+        (Json.Decode.field "lockedBy" decodeMaybeString)

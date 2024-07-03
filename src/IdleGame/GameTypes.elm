@@ -2,6 +2,7 @@ module IdleGame.GameTypes exposing (..)
 
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.EffectErr exposing (EffectErr(..))
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -13,6 +14,8 @@ type Toast
     | GainedResource Int Resource
     | NegativeAmountErr
     | TestAlreadyCompleted
+    | OneTimeEffectAlreadyApplied
+    | TestNotUnlocked
 
 
 type IntervalModLabel

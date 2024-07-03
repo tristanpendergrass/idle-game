@@ -72,22 +72,25 @@ renderDrawer isDrawerOpen activeTab =
                     ]
                 ]
             , div [ class "h-4" ] []
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
+            , ul [ class "menu flex flex-col p-0 px-4" ]
                 [ li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter, underConstruction = False } ]
                 , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
                     [ renderTab { tab = Tab.SkillTab Labs, underConstruction = False } ]
                 ]
-            , ul [ class "menu menu-compact flex flex-col p-0 px-4" ]
-                (li [] []
-                    :: (List.filter ((/=) Labs) allSkills
-                            |> List.map
-                                (\skill ->
-                                    li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
-                                        [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ]
-                                )
-                       )
+            , ul [ class "menu flex flex-col p-0 px-4" ]
+                (List.concat
+                    [ [ li [] []
+                      , li [ class "menu-title" ] [ text "Study" ]
+                      ]
+                    , List.filter ((/=) Labs) allSkills
+                        |> List.map
+                            (\skill ->
+                                li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
+                                    [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ]
+                            )
+                    ]
                 )
             ]
         ]
