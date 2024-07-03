@@ -1129,10 +1129,6 @@ toastToHtml notification =
             div [ baseClass, warningClass ]
                 [ text "Test already completed" ]
 
-        OneTimeEffectAlreadyApplied ->
-            div [ baseClass, warningClass ]
-                [ text "One-time effect already applied" ]
-
         TestNotUnlocked ->
             div [ baseClass, warningClass ]
                 [ text "Test locked" ]

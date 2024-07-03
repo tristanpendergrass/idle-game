@@ -14,7 +14,6 @@ type Toast
     | GainedResource Int Resource
     | NegativeAmountErr
     | TestAlreadyCompleted
-    | OneTimeEffectAlreadyApplied
     | TestNotUnlocked
 
 

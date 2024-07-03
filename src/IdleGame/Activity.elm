@@ -7,6 +7,7 @@ import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -106,10 +107,19 @@ getEffectStats activity =
 
         labEffects : List Effect
         labEffects =
-            -- case activity of
-            --     Lab1 ->
-            --         []
-            []
+            case activity of
+                Lab1 ->
+                    [ Effect.gainWithProbability (Percent.float 0.5)
+                        [ Effect.gainCoin (Coin.int 5)
+                        , Effect.gainWithProbability (Percent.float 0.01)
+                            [ Effect.gainResource 1 AnatomyPK
+                                |> Effect.withOneTime OneTime.Lab1
+                            ]
+                        ]
+                    ]
+
+                _ ->
+                    []
     in
     { effects = List.concat [ tempEffects, knowledgeEffects, labEffects ]
     , mastery = Nothing

@@ -411,9 +411,6 @@ getToastForErr err =
         EffectErr.TestAlreadyCompleted ->
             TestAlreadyCompleted
 
-        EffectErr.OneTimeEffectAlreadyApplied ->
-            OneTimeEffectAlreadyApplied
-
         EffectErr.TestNotUnlocked ->
             TestNotUnlocked
 
@@ -528,7 +525,7 @@ applyEffect effect count game =
     case effect.oneTimeStatus of
         OneTimeStatus.OneTime oneTimeId ->
             if OneTimeStatus.getByOneTimeId oneTimeId game.oneTimeStatuses || count > 1 then
-                Random.constant (Err EffectErr.OneTimeEffectAlreadyApplied)
+                Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
             else
                 let
