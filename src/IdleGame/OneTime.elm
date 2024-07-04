@@ -57,3 +57,23 @@ updateByOneTimeId id f record =
 claimOneTime : OneTimeId -> OneTimeRecord Bool -> OneTimeRecord Bool
 claimOneTime id record =
     setByOneTimeId id True record
+
+
+isAvailable : OneTimeRecord Bool -> OneTimeStatus -> Bool
+isAvailable record status =
+    case status of
+        NotOneTime ->
+            True
+
+        OneTime id ->
+            not (getByOneTimeId id record)
+
+
+isOneTime : OneTimeStatus -> Bool
+isOneTime status =
+    case status of
+        NotOneTime ->
+            False
+
+        OneTime _ ->
+            True

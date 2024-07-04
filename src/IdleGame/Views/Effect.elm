@@ -10,6 +10,7 @@ import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
@@ -35,34 +36,52 @@ render { game, mods, effect, renderType } =
 
 renderModdedEffect : RenderType -> Game -> Effect -> Html msg
 renderModdedEffect renderType game effect =
-    case Effect.getEffect effect of
-        Effect.GainCoin coin ->
-            renderCoin coin
+    let
+        effectContent : Html msg
+        effectContent =
+            case Effect.getEffect effect of
+                Effect.GainCoin coin ->
+                    renderCoin coin
 
-        Effect.GainResource params ->
-            renderResource game params.resource params.base
+                Effect.GainResource params ->
+                    renderResource game params.resource params.base
 
-        Effect.SpendResource params ->
-            renderResource game params.resource (-1 * params.base)
+                Effect.SpendResource params ->
+                    renderResource game params.resource (-1 * params.base)
 
-        Effect.GainXp params ->
-            renderXp params
+                Effect.GainXp params ->
+                    renderXp params
 
-        Effect.GainMxp params ->
-            renderMxp game params
+                Effect.GainMxp params ->
+                    renderMxp game params
 
-        Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
-            case successEffects of
-                [ e ] ->
-                    case Effect.getEffect e of
-                        Effect.GainResource { resource } ->
-                            renderVariableResource successProbability resource
-
-                        _ ->
+                Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+                    case successEffects of
+                        [] ->
                             div [] []
 
-                _ ->
-                    div [] []
+                        effects ->
+                            div [ class "flex border border-content rounded overflow-hidden relative" ]
+                                [ div [ class "border-r border-base-300" ]
+                                    [ div [ class "h-full flex items-center bg-info text-info-content p-2" ]
+                                        [ text (Utils.percentToString successProbability)
+                                        ]
+                                    ]
+                                , div [ class "p-2" ]
+                                    [ div [ class "t-column gap-2" ] (List.map (renderModdedEffect renderType game) effects)
+                                    ]
+                                ]
+    in
+    if OneTime.isAvailable game.oneTimeStatuses effect.oneTimeStatus then
+        div
+            [ class "t-column gap-0"
+            ]
+            [ effectContent
+            , div [ class "text-xs font-bold", classList [ ( "hidden", not (OneTime.isOneTime effect.oneTimeStatus) ) ] ] [ text "Unique" ]
+            ]
+
+    else
+        div [] []
 
 
 renderCoin : { base : Coin, percentIncrease : Percent } -> Html msg

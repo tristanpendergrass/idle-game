@@ -366,6 +366,11 @@ modToString mod =
             "+" ++ intToString buff ++ " Combat Power"
 
 
+percentToString : Percent -> String
+percentToString percent =
+    floatToString 2 (Percent.toPercentage percent) ++ "%"
+
+
 priceLabel : { price : Coin, isError : Bool } -> Html msg
 priceLabel { price, isError } =
     div [ class "flex items-center gap-1 " ]

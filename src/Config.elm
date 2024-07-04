@@ -47,7 +47,9 @@ devFlags =
     , showDebugPanel = True
 
     -- , defaultTab = Tab.SkillTab Anatomy
-    , defaultTab = Tab.TestingCenter
+    , defaultTab = Tab.SkillTab Labs
+
+    -- , defaultTab = Tab.TestingCenter
     , maxOutSkillXp = True
     }
 
