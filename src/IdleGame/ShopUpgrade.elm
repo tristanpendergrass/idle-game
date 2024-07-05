@@ -30,7 +30,7 @@ type alias Stats =
 
 intervalMod : Activity -> Percent -> IntervalMod
 intervalMod kind percentChange =
-    { kind = kind, percentChange = percentChange, label = IntervalModLabel percentChange }
+    { kind = kind, percentChange = percentChange, label = IntervalModLabel percentChange, count = 1 }
 
 
 getStats : ShopUpgrade -> Stats

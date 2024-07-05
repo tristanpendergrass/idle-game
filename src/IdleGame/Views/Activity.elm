@@ -125,7 +125,7 @@ renderActivityCard activity game screenWidth =
 
         showMastery : Bool
         showMastery =
-            Maybe.Extra.isJust (Activity.getEffectStats activity).mastery
+            Activity.hasMasteryMods (Activity.getEffectStats activity).mastery
 
         activityStats : ActivityStats
         activityStats =
@@ -149,7 +149,7 @@ renderActivityCard activity game screenWidth =
             , div [ Utils.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
                 [ div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
-                , div [ class "t-column" ]
+                , div [ class "t-column gap-0" ]
                     [ h2 [ Utils.card.title ] [ text (getActivityStats activity).title ]
                     , div [] [ activityDuration duration ]
 

@@ -25,6 +25,7 @@ type alias IntervalMod =
     { kind : Activity
     , percentChange : Percent -- e.g. 0.25 -> 25% faster
     , label : IntervalModLabel
+    , count : Int -- How many times to apply this mod
     }
 
 

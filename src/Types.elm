@@ -63,7 +63,6 @@ type alias Game =
 
 type Modal
     = TimePassesModal Duration Posix TimePassesData
-    | ChoreItemUnlocksModal
     | ShopResourceModal Int Resource Coin
     | SyllabusModal Skill
 
@@ -179,7 +178,6 @@ type FrontendMsg
     | HandleVisibilityChangeHelp Browser.Events.Visibility Posix
     | HandleVisibilityChange Browser.Events.Visibility
     | CloseModal
-    | OpenMasteryUnlocksModal
     | HandleTabClick Tab
     | HandleShopUpgradeClick ShopUpgrade
     | HandlePointerDown PointerState

@@ -61,13 +61,13 @@ renderModdedEffect renderType game effect =
                             div [] []
 
                         effects ->
-                            div [ class "flex border border-content rounded overflow-hidden relative" ]
-                                [ div [ class "border-r border-base-300" ]
-                                    [ div [ class "h-full flex items-center bg-info text-info-content p-2" ]
+                            div [ class "flex rounded overflow-hidden relative" ]
+                                [ div []
+                                    [ div [ class "h-full flex items-center bg-info text-info-content p-2 border-2 border-r-0 border-info" ]
                                         [ text (Utils.percentToString successProbability)
                                         ]
                                     ]
-                                , div [ class "p-2" ]
+                                , div [ class "p-2 border border-content border-dashed border-l-0 border-tr-rounded border-br-rounded" ]
                                     [ div [ class "t-column gap-2" ] (List.map (renderModdedEffect renderType game) effects)
                                     ]
                                 ]

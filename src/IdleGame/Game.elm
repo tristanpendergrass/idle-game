@@ -816,57 +816,36 @@ getShopItemIntervalMods game =
 getMasteryIntervalMods : Game -> List IntervalMod
 getMasteryIntervalMods game =
     let
-        masteryRewards : List Activity.MasteryReward
-        masteryRewards =
-            allActivities
-                |> List.concatMap
-                    (\activity ->
-                        let
-                            effectStats : Activity.EffectStats
-                            effectStats =
-                                Activity.getEffectStats activity
+        getFromActivity : Activity -> List IntervalMod
+        getFromActivity activity =
+            let
+                effectStats : Activity.EffectStats
+                effectStats =
+                    Activity.getEffectStats activity
 
-                            mxp : Xp
-                            mxp =
-                                getByActivity activity game.mxp
+                mxp : Xp
+                mxp =
+                    getByActivity activity game.mxp
 
-                            masteryLevel : Int
-                            masteryLevel =
-                                Xp.level Xp.defaultSchedule mxp
-                        in
-                        case effectStats.mastery of
-                            Just mastery ->
-                                mastery
-                                    |> List.filterMap
-                                        (\( level, reward ) ->
-                                            if masteryLevel >= level then
-                                                Just reward
-
-                                            else
-                                                Nothing
-                                        )
-
-                            Nothing ->
-                                []
-                    )
-
-        mods : List IntervalMod
-        mods =
-            masteryRewards
+                masteryLevel : Int
+                masteryLevel =
+                    Xp.level Xp.defaultSchedule mxp
+            in
+            Activity.masteryModsAtLevel masteryLevel effectStats.mastery
                 |> List.filterMap
-                    (\reward ->
-                        case reward of
-                            Activity.IntervalMod mod ->
-                                Just mod
+                    (\mod ->
+                        case mod of
+                            Activity.IntervalMod intervalMod ->
+                                Just intervalMod
 
                             _ ->
                                 Nothing
                     )
     in
-    mods
+    List.concatMap getFromActivity allActivities
 
 
-getMasteryRewards : Game -> Activity -> List Activity.MasteryReward
+getMasteryRewards : Game -> Activity -> List Activity.MasteryMod
 getMasteryRewards game activity =
     let
         effectStats : Activity.EffectStats
@@ -881,26 +860,13 @@ getMasteryRewards game activity =
         masteryLevel =
             Xp.level Xp.defaultSchedule mxp
     in
-    case effectStats.mastery of
-        Just mastery ->
-            mastery
-                |> List.filterMap
-                    (\( level, reward ) ->
-                        if masteryLevel >= level then
-                            Just reward
-
-                        else
-                            Nothing
-                    )
-
-        Nothing ->
-            []
+    Activity.masteryModsAtLevel masteryLevel effectStats.mastery
 
 
 getActivityMods : Game -> List Mod
 getActivityMods game =
     let
-        getGameMod : Activity.MasteryReward -> Maybe Mod
+        getGameMod : Activity.MasteryMod -> Maybe Mod
         getGameMod reward =
             case reward of
                 Activity.GameMod mod ->

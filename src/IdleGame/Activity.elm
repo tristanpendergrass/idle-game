@@ -31,18 +31,66 @@ allAnatomy =
     getBySkill Anatomy
 
 
-type MasteryReward
+updateModCount : (Int -> Int) -> MasteryMod -> MasteryMod
+updateModCount fn mod =
+    case mod of
+        IntervalMod intervalMod ->
+            IntervalMod { intervalMod | count = fn intervalMod.count }
+
+        GameMod gameMod ->
+            GameMod { gameMod | count = fn gameMod.count }
+
+
+masteryModsAtLevel : Int -> Mastery -> List MasteryMod
+masteryModsAtLevel level mastery =
+    let
+        perLevelModCount : Int -> Int
+        perLevelModCount modInterval =
+            level // modInterval
+
+        perLevel : ( Int, MasteryMod ) -> Maybe MasteryMod
+        perLevel ( modInterval, mod ) =
+            case perLevelModCount modInterval of
+                0 ->
+                    Nothing
+
+                n ->
+                    Just (updateModCount (\count -> count * n) mod)
+
+        atLevelMods : List MasteryMod
+        atLevelMods =
+            mastery.atLevel
+                |> List.filterMap
+                    (\( requiredLevel, mod ) ->
+                        if level >= requiredLevel then
+                            Just mod
+
+                        else
+                            Nothing
+                    )
+    in
+    List.concat [ List.filterMap perLevel mastery.perLevel, atLevelMods ]
+
+
+hasMasteryMods : Mastery -> Bool
+hasMasteryMods mastery =
+    not (List.isEmpty mastery.atLevel && List.isEmpty mastery.perLevel)
+
+
+type alias Mastery =
+    { perLevel : List ( Int, MasteryMod ) -- The Int is the number of levels you gain to get an instance of the mod
+    , atLevel : List ( Int, MasteryMod )
+    }
+
+
+type MasteryMod
     = IntervalMod IntervalMod -- Activity interval decreased by this much
     | GameMod Mod -- Apply mod to game
 
 
-type alias Mastery =
-    List ( Int, MasteryReward )
-
-
 type alias EffectStats =
     { effects : List Effect
-    , mastery : Maybe Mastery
+    , mastery : Mastery
     }
 
 
@@ -120,42 +168,40 @@ getEffectStats activity =
 
                 _ ->
                     []
+
+        mastery : Mastery
+        mastery =
+            case activity of
+                BackAndSpine ->
+                    { perLevel = [ ( 1, GameMod (Mod.resourceBaseBuff 1) ) ]
+
+                    -- { kind : Activity
+                    -- , percentChange : Percent -- e.g. 0.25 -> 25% faster
+                    -- , label : IntervalModLabel
+                    -- , count : Int -- How many times to apply this mod
+                    -- }
+                    , atLevel =
+                        [ ( 5
+                          , IntervalMod
+                                { kind = BackAndSpine
+                                , percentChange = Percent.float 0.25
+                                , label = IntervalModLabel (Percent.float 0.25)
+                                , count = 1
+                                }
+                          )
+                        ]
+                    }
+
+                _ ->
+                    { perLevel = []
+                    , atLevel = []
+                    }
     in
     { effects = List.concat [ tempEffects, knowledgeEffects, labEffects ]
-    , mastery = Nothing
+    , mastery = mastery
     }
 
 
 updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a
 updateByKindActivity activity fn record =
     setByActivity activity (fn (getByActivity activity record)) record
-
-
-getAnatomyMastery : Activity -> Mastery
-getAnatomyMastery activity =
-    [ ( 25
-      , GameMod
-            (Mod.coinBuff (Percent.float 0.1)
-                |> Mod.withTags [ Effect.ActivityTag activity ]
-            )
-      )
-    , ( 50
-      , GameMod
-            (Mod.activityXpBuff activity (Percent.float 0.25)
-                |> Mod.withTags [ Effect.ActivityTag activity ]
-            )
-      )
-    , ( 75
-      , IntervalMod
-            { kind = activity
-            , percentChange = Percent.float 0.1
-            , label = IntervalModLabel (Percent.float 0.1)
-            }
-      )
-    , ( 100
-      , GameMod
-            (Mod.skillXpBuff Anatomy (Percent.float 0.05)
-                |> Mod.withTags [ Effect.SkillTag Anatomy ]
-            )
-      )
-    ]

@@ -16,7 +16,7 @@ type alias Mod =
     { tags : List Effect.Tag
     , label : Label
     , transformer : Transformer
-    , repetitions : Int
+    , count : Int -- How many times to apply this mod
     , source : ModSource
     }
 
@@ -119,7 +119,7 @@ useSimpleTransformer =
 
 
 useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
-useSimpleTransformerHelp depth transformFn repetitions taggedEffect =
+useSimpleTransformerHelp depth transformFn count taggedEffect =
     let
         newEffectType =
             transformFn (Effect.getEffect taggedEffect)
@@ -128,10 +128,10 @@ useSimpleTransformerHelp depth transformFn repetitions taggedEffect =
             taggedEffect
                 |> Effect.setEffect newEffectType
     in
-    if repetitions > 1 && depth < 20 then
-        useSimpleTransformerHelp (depth + 1) transformFn (repetitions - 1) newEffect
+    if count > 1 && depth < 20 then
+        useSimpleTransformerHelp (depth + 1) transformFn (count - 1) newEffect
 
-    else if repetitions == 0 then
+    else if count == 0 then
         NoChange
 
     else
@@ -141,7 +141,7 @@ useSimpleTransformerHelp depth transformFn repetitions taggedEffect =
 applyModToEffect : Mod -> ( Effect, List Effect ) -> ( Effect, List Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if Effect.hasTags mod.tags effectAccum then
-        case mod.transformer mod.repetitions effectAccum of
+        case mod.transformer mod.count effectAccum of
             NoChange ->
                 ( effectAccum, furtherEffectsAccum )
 
@@ -206,8 +206,8 @@ applyModsToEffectHelp depth mods effect =
 
 
 withHowManyTimesToApplyMod : Int -> Mod -> Mod
-withHowManyTimesToApplyMod repetitions mod =
-    { mod | repetitions = repetitions }
+withHowManyTimesToApplyMod count mod =
+    { mod | count = count }
 
 
 withSource : ModSource -> Mod -> Mod
@@ -226,13 +226,13 @@ withLabel label mod =
 
 
 xpTransformer : Percent -> Transformer
-xpTransformer buff repetitions effect =
+xpTransformer buff count effect =
     case Effect.getEffect effect of
         Effect.GainXp params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
-                    Quantity.multiplyBy (toFloat repetitions) buff
+                    Quantity.multiplyBy (toFloat count) buff
 
                 newParams : Effect.GainXpParams
                 newParams =
@@ -247,13 +247,13 @@ xpTransformer buff repetitions effect =
 
 
 coinTransformer : Percent -> Transformer
-coinTransformer buff repetitions taggedEffect =
+coinTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainCoin quantity ->
             let
                 adjustedMultiplicable : Effect.GainCoinParams
                 adjustedMultiplicable =
-                    { quantity | percentIncrease = Quantity.plus quantity.percentIncrease (Quantity.multiplyBy (toFloat repetitions) buff) }
+                    { quantity | percentIncrease = Quantity.plus quantity.percentIncrease (Quantity.multiplyBy (toFloat count) buff) }
             in
             taggedEffect
                 |> Effect.setEffect (Effect.GainCoin adjustedMultiplicable)
@@ -264,13 +264,13 @@ coinTransformer buff repetitions taggedEffect =
 
 
 mxpTransformer : Percent -> Transformer
-mxpTransformer buff repetitions taggedEffect =
+mxpTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainMxp params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
-                    Quantity.multiplyBy (toFloat repetitions) buff
+                    Quantity.multiplyBy (toFloat count) buff
 
                 newParams : Effect.GainMxpParams
                 newParams =
@@ -285,14 +285,14 @@ mxpTransformer buff repetitions taggedEffect =
 
 
 resourceDoublingTransformer : Percent -> Transformer
-resourceDoublingTransformer buff repetitions taggedEffect =
+resourceDoublingTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
                     (Effect.GainResource
                         { base = base
-                        , doublingChance = Quantity.plus doublingChance (Quantity.multiplyBy (toFloat repetitions) buff)
+                        , doublingChance = Quantity.plus doublingChance (Quantity.multiplyBy (toFloat count) buff)
                         , resource = resource
                         }
                     )
@@ -303,13 +303,13 @@ resourceDoublingTransformer buff repetitions taggedEffect =
 
 
 resourceBaseTransformer : Int -> Transformer
-resourceBaseTransformer buff repetitions taggedEffect =
+resourceBaseTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
                     (Effect.GainResource
-                        { base = base + (buff * repetitions)
+                        { base = base + (buff * count)
                         , doublingChance = doublingChance
                         , resource = resource
                         }
@@ -321,13 +321,13 @@ resourceBaseTransformer buff repetitions taggedEffect =
 
 
 resourcePreservationTransformer : Percent -> Transformer
-resourcePreservationTransformer buff repetitions taggedEffect =
+resourcePreservationTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.SpendResource params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
-                    Quantity.multiplyBy (toFloat repetitions) buff
+                    Quantity.multiplyBy (toFloat count) buff
 
                 buffedChance : Percent
                 buffedChance =
@@ -347,12 +347,12 @@ resourcePreservationTransformer buff repetitions taggedEffect =
 
 
 increaseSuccessTransformer : Percent -> Transformer
-increaseSuccessTransformer buff repetitions taggedEffect =
+increaseSuccessTransformer buff count taggedEffect =
     case Effect.getEffect taggedEffect of
         Effect.VariableSuccess params ->
             let
                 newSuccessProbability =
-                    Quantity.plus params.successProbability (Quantity.multiplyBy (toFloat repetitions) buff)
+                    Quantity.plus params.successProbability (Quantity.multiplyBy (toFloat count) buff)
                         |> Quantity.min (Percent.float 1.0)
 
                 newEffect =
@@ -365,8 +365,8 @@ increaseSuccessTransformer buff repetitions taggedEffect =
 
 
 addEffectsTransformer : List Effect -> Transformer
-addEffectsTransformer effects repetitions taggedEffect =
-    ChangeAndAddEffects taggedEffect (List.concat (List.repeat repetitions effects))
+addEffectsTransformer effects count taggedEffect =
+    ChangeAndAddEffects taggedEffect (List.concat (List.repeat count effects))
 
 
 activityXpBuff : Activity -> Percent -> Mod
@@ -375,7 +375,7 @@ activityXpBuff activity amount =
     , label = XpActivityLabel amount
     , transformer = xpTransformer amount
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -385,7 +385,7 @@ xpBuff amount =
     , label = XpActivityLabel amount
     , transformer = xpTransformer amount
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -402,7 +402,7 @@ anatomyXpBuff buff =
     , label = XpActivityLabel buff
     , transformer = xpTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -412,7 +412,7 @@ coinBuff buff =
     , label = CoinLabel buff
     , transformer = coinTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -422,7 +422,7 @@ mxpBuff buff =
     , label = MxpModLabel buff
     , transformer = mxpTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -432,7 +432,7 @@ resourceBuff buff =
     , label = ResourceDoublingLabel buff
     , transformer = resourceDoublingTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -442,7 +442,7 @@ resourceBaseBuff buff =
     , label = ResourceBaseLabel buff
     , transformer = resourceBaseTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -452,7 +452,7 @@ resourcePreservationBuff buff =
     , label = ResourcePreservationLabel buff
     , transformer = resourcePreservationTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -462,7 +462,7 @@ successBuff buff =
     , label = SuccessLabel buff
     , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 
@@ -472,7 +472,7 @@ addEffects effects =
     , label = NullLabel
     , transformer = addEffectsTransformer effects
     , source = AdminCrimes
-    , repetitions = 1
+    , count = 1
     }
 
 

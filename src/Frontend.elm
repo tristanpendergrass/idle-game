@@ -35,7 +35,6 @@ import IdleGame.Views.DetailViewWrapper
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.MasteryUnlocks
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.ShopResourceModal
 import IdleGame.Views.SyllabusModal
@@ -761,12 +760,6 @@ update msg model =
             , Cmd.none
             )
 
-        OpenMasteryUnlocksModal ->
-            ( model
-                |> setActiveModal (Just ChoreItemUnlocksModal)
-            , Cmd.none
-            )
-
         HandleTabClick tab ->
             ( model
                 |> setTab tab
@@ -1147,15 +1140,6 @@ renderModal activeModal game =
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
-                |> IdleGame.Views.ModalWrapper.render
-
-        Just ChoreItemUnlocksModal ->
-            let
-                children =
-                    IdleGame.Views.MasteryUnlocks.render
-            in
-            IdleGame.Views.ModalWrapper.create children
-                |> IdleGame.Views.ModalWrapper.withBorderColor "border-secondary"
                 |> IdleGame.Views.ModalWrapper.render
 
         Just (ShopResourceModal amount resource price) ->

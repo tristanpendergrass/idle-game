@@ -202,7 +202,7 @@ renderContent obj extraBottomPadding game =
         , div [ class "divider" ] []
 
         -- The current mastery level
-        , if effectStats.mastery /= Nothing then
+        , if Activity.hasMasteryMods effectStats.mastery then
             mxpSection mxp
 
           else
@@ -210,12 +210,7 @@ renderContent obj extraBottomPadding game =
             div [] []
 
         -- The mastery rewards for this activity
-        , case effectStats.mastery of
-            Just mastery ->
-                masterySection mxp mastery
-
-            Nothing ->
-                div [] []
+        , masterySection mxp effectStats.mastery
         ]
 
 
@@ -229,8 +224,37 @@ intervalModLabelToString modLabel =
 masterySection : Xp -> Activity.Mastery -> Html msg
 masterySection mxp mastery =
     let
-        renderMasteryReward : ( Int, Activity.MasteryReward ) -> Html msg
-        renderMasteryReward ( level, reward ) =
+        renderPerLevelMastery : ( Int, Activity.MasteryMod ) -> Html msg
+        renderPerLevelMastery ( modInterval, mod ) =
+            let
+                modText : String
+                modText =
+                    case mod of
+                        Activity.GameMod gameMod ->
+                            Utils.modToString gameMod
+
+                        Activity.IntervalMod intervalMod ->
+                            intervalModLabelToString intervalMod.label
+
+                modCount : Int
+                modCount =
+                    case mod of
+                        Activity.GameMod gameMod ->
+                            gameMod.count
+
+                        Activity.IntervalMod intervalMod ->
+                            intervalMod.count
+            in
+            div [ class "flex justify-between w-full" ]
+                [ span [ class "flex items-center gap-4" ]
+                    [ text (Utils.intToString modInterval ++ " levels: ")
+                    , text modText
+                    ]
+                , text (Utils.intToString modCount)
+                ]
+
+        renderAtLevelMastery : ( Int, Activity.MasteryMod ) -> Html msg
+        renderAtLevelMastery ( level, reward ) =
             let
                 rewardText : String
                 rewardText =
@@ -272,8 +296,10 @@ masterySection mxp mastery =
                 ]
     in
     div [ class "t-column w-full" ]
-        (mastery
-            |> List.map renderMasteryReward
+        (List.concat
+            [ List.map renderPerLevelMastery mastery.perLevel
+            , List.map renderAtLevelMastery mastery.atLevel
+            ]
         )
 
 

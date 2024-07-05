@@ -390,7 +390,7 @@ card =
     , containerClickable = class "cursor-pointer bubble-pop select-none"
     , activityTypeBadge = class "badge badge-neutral badge-xs"
     , imageContainer = class "min-h-[6rem] h-24 relative"
-    , body = class "relative h-full card-body t-column gap-2 justify-between w-full"
+    , body = class "relative h-full card-body t-column gap-0 justify-between w-full"
     , title = class "text-sm  md:text-lg text-center flex items-center gap-2"
     }
 
