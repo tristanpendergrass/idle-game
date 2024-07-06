@@ -530,16 +530,6 @@ quest =
     createIconFeather FeatherIcons.trello
 
 
-checkboxMarked : Icon
-checkboxMarked =
-    createIconFeather FeatherIcons.checkSquare
-
-
-checkboxEmpty : Icon
-checkboxEmpty =
-    createIconFeather FeatherIcons.square
-
-
 scroll : Icon
 scroll =
     createIconFeather FeatherIcons.mail

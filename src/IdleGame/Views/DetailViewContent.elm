@@ -3,6 +3,7 @@ module IdleGame.Views.DetailViewContent exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Events.Extra exposing (onClickPreventDefault)
 import IdleGame.Activity as Activity
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
@@ -221,14 +222,14 @@ intervalModLabelToString modLabel =
             "+" ++ Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
 
 
-masterySection : Xp -> Activity.Mastery -> Html msg
+masterySection : Xp -> Activity.Mastery -> Html FrontendMsg
 masterySection mxp mastery =
     let
-        renderPerLevelMastery : ( Int, Activity.MasteryMod ) -> Html msg
+        renderPerLevelMastery : ( Int, Activity.MasteryMod ) -> Html FrontendMsg
         renderPerLevelMastery ( modInterval, mod ) =
             let
-                modText : String
-                modText =
+                rewardText : String
+                rewardText =
                     case mod of
                         Activity.GameMod gameMod ->
                             Utils.modToString gameMod
@@ -236,71 +237,84 @@ masterySection mxp mastery =
                         Activity.IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
 
-                modCount : Int
-                modCount =
-                    case mod of
-                        Activity.GameMod gameMod ->
-                            gameMod.count
+                rowText : String
+                rowText =
+                    if modInterval == 1 then
+                        "Every level gives " ++ rewardText
 
-                        Activity.IntervalMod intervalMod ->
-                            intervalMod.count
+                    else
+                        "Every " ++ Utils.intToString modInterval ++ " levels gives " ++ rewardText
+
+                mxpLevel : Int
+                mxpLevel =
+                    Xp.level Xp.defaultSchedule mxp
+
+                atLeastOneBonus : Bool
+                atLeastOneBonus =
+                    Activity.perLevelModCount { modInterval = modInterval, mxpLevel = mxpLevel } >= 1
+
+                atMaxMasteryLevel : Bool
+                atMaxMasteryLevel =
+                    mxpLevel >= 99
             in
-            div [ class "flex justify-between w-full" ]
-                [ span [ class "flex items-center gap-4" ]
-                    [ text (Utils.intToString modInterval ++ " levels: ")
-                    , text modText
+            tr []
+                [ th []
+                    [ div [ class "h-full flex items-center" ]
+                        [ input
+                            [ type_ "checkbox"
+                            , class "checkbox checkbox-secondary checkbox-xs rounded-md cursor-default inline-block"
+                            , onClickPreventDefault NoOp
+                            , checked atMaxMasteryLevel
+                            , Utils.indeterminate (atLeastOneBonus && not atMaxMasteryLevel)
+                            ]
+                            []
+                        ]
                     ]
-                , text (Utils.intToString modCount)
+                , td [] [ text (Utils.intToString modInterval) ]
+                , td [ class "w-full" ] [ text rowText ]
                 ]
 
-        renderAtLevelMastery : ( Int, Activity.MasteryMod ) -> Html msg
-        renderAtLevelMastery ( level, reward ) =
+        renderAtLevelMastery : ( Int, Activity.MasteryMod ) -> Html FrontendMsg
+        renderAtLevelMastery ( level, mod ) =
             let
                 rewardText : String
                 rewardText =
-                    case reward of
-                        Activity.GameMod mod ->
-                            Utils.modToString mod
+                    case mod of
+                        Activity.GameMod gameMod ->
+                            Utils.modToString gameMod
 
-                        Activity.IntervalMod mod ->
-                            intervalModLabelToString mod.label
+                        Activity.IntervalMod intervalMod ->
+                            intervalModLabelToString intervalMod.label
 
                 isAchieved : Bool
                 isAchieved =
                     Xp.level Xp.defaultSchedule mxp >= level
-
-                textColor : String
-                textColor =
-                    if isAchieved then
-                        "text-success"
-
-                    else
-                        ""
-
-                checkIcon : Icon
-                checkIcon =
-                    if isAchieved then
-                        Icon.checkboxMarked
-
-                    else
-                        Icon.checkboxEmpty
             in
-            div [ class "flex justify-between w-full" ]
-                [ span [ class "flex items-center gap-4" ]
-                    [ checkIcon
-                        |> Icon.withSize Icon.Medium
-                        |> Icon.toHtml
-                    , span [] [ text (Utils.intToString level) ]
+            tr []
+                [ th []
+                    [ div [ class "h-full flex items-center" ]
+                        [ input [ type_ "checkbox", checked isAchieved, class "checkbox checkbox-secondary checkbox-xs rounded-md cursor-default" ] []
+                        ]
                     ]
-                , span [ class textColor ] [ text rewardText ]
+                , td [] [ text (Utils.intToString level) ]
+                , td [ class "w-full" ] [ text rewardText ]
                 ]
     in
-    div [ class "t-column w-full" ]
-        (List.concat
-            [ List.map renderPerLevelMastery mastery.perLevel
-            , List.map renderAtLevelMastery mastery.atLevel
+    table [ class "table table-xs" ]
+        [ thead []
+            [ tr []
+                [ th [] []
+                , th [] [ text "Level" ]
+                , th [] [ text "Reward" ]
+                ]
             ]
-        )
+        , tbody []
+            (List.concat
+                [ List.map renderPerLevelMastery mastery.perLevel
+                , List.map renderAtLevelMastery mastery.atLevel
+                ]
+            )
+        ]
 
 
 mxpSection : Xp -> Html msg
@@ -323,7 +337,7 @@ mxpSection mxp =
                 { progressText = Utils.intToString skillLevel
                 , percent = skillPercent
                 , primaryOrSecondary = Utils.Secondary
-                , size = Utils.ProgressBarLarge
+                , size = Utils.ProgressBarSmall
                 }
             ]
         ]

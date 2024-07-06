@@ -13,6 +13,7 @@ import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
+import Json.Encode
 import Percent exposing (Percent)
 import Types exposing (..)
 
@@ -412,3 +413,8 @@ cardImage image =
                     |> Icon.withSize Icon.Large
                     |> Icon.toHtml
                 ]
+
+
+indeterminate : Bool -> Attribute msg
+indeterminate isIndeterminate =
+    property "indeterminate" (Json.Encode.bool isIndeterminate)

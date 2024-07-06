@@ -77,7 +77,7 @@ render model game =
             List.filter showTest allAcademicTests
     in
     div [ class "t-column items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
-        [ div [ attribute "role" "tablist", class "tabs tabs-lifted" ]
+        [ div [ attribute "role" "tablist", class "tabs tabs-bordered" ]
             [ renderTestingCenterTabButton
                 { activeTab = model.activeAcademicTestCategory
                 , label = "Quizzes"

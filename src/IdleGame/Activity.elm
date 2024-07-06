@@ -41,16 +41,17 @@ updateModCount fn mod =
             GameMod { gameMod | count = fn gameMod.count }
 
 
+perLevelModCount : { modInterval : Int, mxpLevel : Int } -> Int
+perLevelModCount { modInterval, mxpLevel } =
+    mxpLevel // modInterval
+
+
 masteryModsAtLevel : Int -> Mastery -> List MasteryMod
 masteryModsAtLevel level mastery =
     let
-        perLevelModCount : Int -> Int
-        perLevelModCount modInterval =
-            level // modInterval
-
         perLevel : ( Int, MasteryMod ) -> Maybe MasteryMod
         perLevel ( modInterval, mod ) =
-            case perLevelModCount modInterval of
+            case perLevelModCount { modInterval = modInterval, mxpLevel = level } of
                 0 ->
                     Nothing
 
