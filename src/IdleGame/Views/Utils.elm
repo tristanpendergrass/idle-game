@@ -302,15 +302,15 @@ screenSupportsRighRail screenWidth =
 resourceAndQuantity : { resource : Resource, quantity : Int, iconSize : Icon.Size } -> Html msg
 resourceAndQuantity params =
     div [ class "relative" ]
-        [ resource { resource = params.resource, iconSize = params.iconSize }
+        [ renderResource { resource = params.resource, iconSize = params.iconSize }
         , div [ class "t-absolute-center-x -bottom-3" ]
             [ resourceQuantity { quantity = params.quantity }
             ]
         ]
 
 
-resource : { resource : Resource, iconSize : Icon.Size } -> Html msg
-resource params =
+renderResource : { resource : Resource, iconSize : Icon.Size } -> Html msg
+renderResource params =
     let
         stats : ResourceStats
         stats =
@@ -330,11 +330,17 @@ resourceQuantity { quantity } =
         ]
 
 
-modToString : Mod -> String
-modToString mod =
-    case mod.label of
+modLabelToString : Mod.Label -> String
+modLabelToString label =
+    case label of
         Mod.NullLabel ->
             ""
+
+        Mod.CustomLabel str ->
+            str
+
+        Mod.WithProbabilityLabel probability innerLabel ->
+            "+" ++ percentToString probability ++ "% chance to " ++ modLabelToString innerLabel
 
         Mod.XpActivityLabel buff ->
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% XP"
@@ -350,6 +356,9 @@ modToString mod =
 
         Mod.ResourceBaseLabel buff ->
             "+" ++ intToString buff ++ " item"
+
+        Mod.GainResourceLabel amount resource ->
+            "gain " ++ intToString amount ++ " " ++ (getResourceStats resource).title
 
         Mod.ResourcePreservationLabel buff ->
             "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to preserve items"

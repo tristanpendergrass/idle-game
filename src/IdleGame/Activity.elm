@@ -123,12 +123,51 @@ knowledgeResource skill =
             Nothing
 
 
+getMicriobiologyActivityBonus : Activity -> Resource
+getMicriobiologyActivityBonus activity =
+    -- This mapping is for the mastery bonus in microbiology where you get a certain type of K as a bonus
+    case activity of
+        Bacteriology ->
+            PharmacologyK
+
+        Virology ->
+            PathologyK
+
+        Mycology ->
+            PhysiologyK
+
+        Parasitology ->
+            PathologyK
+
+        Immunology ->
+            BiochemistryK
+
+        MicrobialGenetics ->
+            BiochemistryK
+
+        HostPathogenInteractions ->
+            PhysiologyK
+
+        ClinicalMicrobiology ->
+            AnatomyK
+
+        AntimicrobialResistance ->
+            MedicalEthicsK
+
+        _ ->
+            AnatomyK
+
+
 getEffectStats : Activity -> EffectStats
 getEffectStats activity =
     let
         stats : ActivityStats
         stats =
             getActivityStats activity
+
+        tagsForThisActivity : List Effect.Tag
+        tagsForThisActivity =
+            [ Effect.ActivityTag activity, Effect.SkillTag stats.skill ]
 
         tempEffects : List Effect
         tempEffects =
@@ -149,7 +188,9 @@ getEffectStats activity =
         knowledgeEffects =
             case ( knowledgeResource stats.skill, stats.knowledge ) of
                 ( Just resource, Just amount ) ->
-                    [ Effect.gainResource amount resource ]
+                    [ Effect.gainResource amount resource
+                        |> Effect.withTags tagsForThisActivity
+                    ]
 
                 _ ->
                     []
@@ -160,45 +201,79 @@ getEffectStats activity =
                 Lab1 ->
                     [ Effect.gainWithProbability (Percent.float 0.5)
                         [ Effect.gainCoin (Coin.int 5)
+                            |> Effect.withTags tagsForThisActivity
                         , Effect.gainWithProbability (Percent.float 0.01)
                             [ Effect.gainResource 1 AnatomyPK
                                 |> Effect.withOneTime OneTime.Lab1
                             ]
+                            |> Effect.withTags tagsForThisActivity
                         ]
                     ]
 
                 _ ->
                     []
 
+        gainMxpEffects : List Effect
+        gainMxpEffects =
+            [ Effect.gainMxp activity
+                |> Effect.withTags tagsForThisActivity
+            ]
+
+        gainXpEffects : List Effect
+        gainXpEffects =
+            [ Effect.gainXp (Xp.int 5) stats.skill
+                |> Effect.withTags tagsForThisActivity
+            ]
+
         mastery : Mastery
         mastery =
-            case activity of
-                BackAndSpine ->
-                    { perLevel = [ ( 1, GameMod (Mod.resourceBaseBuff 1) ) ]
-
-                    -- { kind : Activity
-                    -- , percentChange : Percent -- e.g. 0.25 -> 25% faster
-                    -- , label : IntervalModLabel
-                    -- , count : Int -- How many times to apply this mod
-                    -- }
+            case (getActivityStats activity).skill of
+                Anatomy ->
+                    { perLevel =
+                        [ ( 10
+                          , GameMod
+                                (Mod.resourceDoublingBuff (Percent.float 0.05)
+                                    |> Mod.withTags [ Effect.ActivityTag activity ]
+                                )
+                          )
+                        ]
                     , atLevel =
+                        [ ( 25
+                          , GameMod
+                                (Mod.gainResourceWithProbability (Percent.float 0.01) AnatomyK
+                                    |> Mod.withTags [ Effect.ActivityTag activity ]
+                                )
+                          )
+                        ]
+                    }
+
+                Microbiology ->
+                    { perLevel =
                         [ ( 5
-                          , IntervalMod
-                                { kind = BackAndSpine
-                                , percentChange = Percent.float 0.25
-                                , label = IntervalModLabel (Percent.float 0.25)
-                                , count = 1
-                                }
+                          , GameMod
+                                (Mod.gainResourceWithProbability (Percent.float 0.01) (getMicriobiologyActivityBonus activity)
+                                    |> Mod.withTags [ Effect.ActivityTag activity ]
+                                )
+                          )
+                        ]
+                    , atLevel =
+                        [ ( 50
+                          , GameMod (Mod.resourceDoublingBuff (Percent.float 0.1))
+                          )
+                        , ( 99
+                            -- ISSUE FOUND with this: the mod is adding the extra resource to each effect. So we get more than one per micriobiology completion (one for the K, one for the mxp reward, one for xp, etc)
+                          , GameMod
+                                (Mod.gainResource 1 (getMicriobiologyActivityBonus activity)
+                                    |> Mod.withTags [ Effect.ActivityTag activity ]
+                                )
                           )
                         ]
                     }
 
                 _ ->
-                    { perLevel = []
-                    , atLevel = []
-                    }
+                    { perLevel = [], atLevel = [] }
     in
-    { effects = List.concat [ tempEffects, knowledgeEffects, labEffects ]
+    { effects = List.concat [ tempEffects, knowledgeEffects, labEffects, gainMxpEffects, gainXpEffects ]
     , mastery = mastery
     }
 

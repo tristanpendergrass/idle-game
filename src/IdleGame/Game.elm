@@ -35,7 +35,7 @@ createProd : Random.Seed -> Game
 createProd seed =
     { seed = seed
     , xp = skillRecord (Xp.int 0)
-    , mxp = activityRecord (Xp.int 99999999)
+    , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0
     , resources = resourceRecord 0
@@ -49,7 +49,7 @@ createDev : Random.Seed -> Game
 createDev seed =
     { seed = seed
     , xp = skillRecord (Xp.int 9999999)
-    , mxp = activityRecord (Xp.int 99999999)
+    , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0
     , resources = resourceRecord 0
@@ -524,7 +524,7 @@ applyEffect : Effect -> Int -> Game -> ApplyEffectResultGenerator
 applyEffect effect count game =
     case effect.oneTimeStatus of
         OneTimeStatus.OneTime oneTimeId ->
-            if OneTimeStatus.getByOneTimeId oneTimeId game.oneTimeStatuses || count > 1 then
+            if OneTimeStatus.getByOneTimeId oneTimeId game.oneTimeStatuses then
                 Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
             else
@@ -533,7 +533,8 @@ applyEffect effect count game =
                     newGame =
                         { game | oneTimeStatuses = OneTimeStatus.claimOneTime oneTimeId game.oneTimeStatuses }
                 in
-                effectReducer effect count newGame
+                -- NOTE we are passing `1` instead of `count` here since we're in the branch of a one-time effect.
+                effectReducer effect 1 newGame
 
         OneTimeStatus.NotOneTime ->
             effectReducer effect count game

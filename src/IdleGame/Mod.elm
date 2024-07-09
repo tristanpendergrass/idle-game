@@ -172,7 +172,7 @@ applyModsToEffectHelp depth mods effect =
             List.foldl
                 (\mod accum ->
                     if Effect.hasTags mod.tags effect then
-                        applyModToEffect mod accum
+                        applyModToEffect (Debug.log "relevant mod" mod) accum
 
                     else
                         accum
@@ -190,19 +190,6 @@ applyModsToEffectHelp depth mods effect =
       else
         []
     )
-
-
-
--- applyMods : List Mod -> Event -> ModdedEvent
--- applyMods mods (Event eventData) =
---     ModdedEvent
---         { eventData
---           -- | effects = List.concatMap (applyTransformersToEffect 0 transformers) eventData.effects
---             | effects = List.concatMap (applyModsToEffect mods) eventData.effects
---         }
--- withMods : List Mod -> Event -> ModdedEvent
--- withMods mods event =
---     applyMods mods event
 
 
 withHowManyTimesToApplyMod : Int -> Mod -> Mod
@@ -426,8 +413,8 @@ mxpBuff buff =
     }
 
 
-resourceBuff : Percent -> Mod
-resourceBuff buff =
+resourceDoublingBuff : Percent -> Mod
+resourceDoublingBuff buff =
     { tags = []
     , label = ResourceDoublingLabel buff
     , transformer = resourceDoublingTransformer buff
@@ -476,14 +463,35 @@ addEffects effects =
     }
 
 
+gainResourceWithProbability : Percent -> Resource -> Mod
+gainResourceWithProbability probability resource =
+    let
+        label : Label
+        label =
+            GainResourceLabel 1 resource
+                |> WithProbabilityLabel probability
+    in
+    addEffects [ Effect.gainWithProbability probability [ Effect.gainResource 1 resource ] ]
+        |> withLabel label
+
+
+gainResource : Int -> Resource -> Mod
+gainResource amount resource =
+    addEffects [ Effect.gainResource amount resource ]
+        |> withLabel (GainResourceLabel amount resource)
+
+
 type Label
     = NullLabel -- for mods that don't make sense to label
+    | CustomLabel String
+    | WithProbabilityLabel Percent Label
     | XpActivityLabel Percent
     | XpSkillLabel Percent Skill
     | MxpModLabel Percent
     | ResourceDoublingLabel Percent
     | ResourcePreservationLabel Percent
     | ResourceBaseLabel Int
+    | GainResourceLabel Int Resource
     | MoreManure
     | SuccessLabel Percent
     | CoinLabel Percent

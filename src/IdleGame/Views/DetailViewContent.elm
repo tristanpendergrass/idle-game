@@ -232,7 +232,7 @@ masterySection mxp mastery =
                 rewardText =
                     case mod of
                         Activity.GameMod gameMod ->
-                            Utils.modToString gameMod
+                            Utils.modLabelToString gameMod.label
 
                         Activity.IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
@@ -281,7 +281,7 @@ masterySection mxp mastery =
                 rewardText =
                     case mod of
                         Activity.GameMod gameMod ->
-                            Utils.modToString gameMod
+                            Utils.modLabelToString gameMod.label
 
                         Activity.IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
