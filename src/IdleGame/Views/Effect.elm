@@ -39,7 +39,21 @@ renderModdedEffect renderType game effect =
     let
         effectContent : Html msg
         effectContent =
-            case Effect.getEffect effect of
+            case Effect.getEffectType effect of
+                Effect.NoOp ->
+                    div [] []
+
+                Effect.OneOf firstEffect restEffects ->
+                    let
+                        effects : List Effect
+                        effects =
+                            firstEffect :: restEffects
+                    in
+                    div [ class "t-column gap-2" ]
+                        (div [] [ text "one of" ]
+                            :: List.map (renderModdedEffect renderType game) effects
+                        )
+
                 Effect.GainCoin coin ->
                     renderCoin coin
 

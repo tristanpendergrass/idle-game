@@ -225,25 +225,25 @@ intervalModLabelToString modLabel =
 masterySection : Xp -> Activity.Mastery -> Html FrontendMsg
 masterySection mxp mastery =
     let
-        renderPerLevelMastery : ( Int, Activity.MasteryMod ) -> Html FrontendMsg
-        renderPerLevelMastery ( modInterval, mod ) =
+        renderPerLevelMastery : { interval : Int, mod : Activity.MasteryMod } -> Html FrontendMsg
+        renderPerLevelMastery { interval, mod } =
             let
                 rewardText : String
                 rewardText =
                     case mod of
                         Activity.GameMod gameMod ->
-                            Utils.modLabelToString gameMod.label
+                            gameMod.label
 
                         Activity.IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
 
                 rowText : String
                 rowText =
-                    if modInterval == 1 then
+                    if interval == 1 then
                         "Every level gives " ++ rewardText
 
                     else
-                        "Every " ++ Utils.intToString modInterval ++ " levels gives " ++ rewardText
+                        "Every " ++ Utils.intToString interval ++ " levels gives " ++ rewardText
 
                 mxpLevel : Int
                 mxpLevel =
@@ -251,7 +251,7 @@ masterySection mxp mastery =
 
                 atLeastOneBonus : Bool
                 atLeastOneBonus =
-                    Activity.perLevelModCount { modInterval = modInterval, mxpLevel = mxpLevel } >= 1
+                    Activity.perLevelModCount { modInterval = interval, mxpLevel = mxpLevel } >= 1
 
                 atMaxMasteryLevel : Bool
                 atMaxMasteryLevel =
@@ -270,18 +270,18 @@ masterySection mxp mastery =
                             []
                         ]
                     ]
-                , td [] [ text (Utils.intToString modInterval) ]
+                , td [] [ text (Utils.intToString interval) ]
                 , td [ class "w-full" ] [ text rowText ]
                 ]
 
-        renderAtLevelMastery : ( Int, Activity.MasteryMod ) -> Html FrontendMsg
-        renderAtLevelMastery ( level, mod ) =
+        renderAtLevelMastery : { level : Int, mod : Activity.MasteryMod } -> Html FrontendMsg
+        renderAtLevelMastery { level, mod } =
             let
                 rewardText : String
                 rewardText =
                     case mod of
                         Activity.GameMod gameMod ->
-                            Utils.modLabelToString gameMod.label
+                            gameMod.label
 
                         Activity.IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label

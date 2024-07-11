@@ -330,52 +330,6 @@ resourceQuantity { quantity } =
         ]
 
 
-modLabelToString : Mod.Label -> String
-modLabelToString label =
-    case label of
-        Mod.NullLabel ->
-            ""
-
-        Mod.CustomLabel str ->
-            str
-
-        Mod.WithProbabilityLabel probability innerLabel ->
-            "+" ++ percentToString probability ++ "% chance to " ++ modLabelToString innerLabel
-
-        Mod.XpActivityLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% XP"
-
-        Mod.XpSkillLabel buff skill ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% " ++ (getSkillStats skill).title ++ " XP"
-
-        Mod.MxpModLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Mastery XP"
-
-        Mod.ResourceDoublingLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to double items"
-
-        Mod.ResourceBaseLabel buff ->
-            "+" ++ intToString buff ++ " item"
-
-        Mod.GainResourceLabel amount resource ->
-            "gain " ++ intToString amount ++ " " ++ (getResourceStats resource).title
-
-        Mod.ResourcePreservationLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to preserve items"
-
-        Mod.MoreManure ->
-            "More manure"
-
-        Mod.SuccessLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% chance to gain an item"
-
-        Mod.CoinLabel buff ->
-            "+" ++ intToString (floor (Percent.toPercentage buff)) ++ "% Coin"
-
-        Mod.PowerLabel buff ->
-            "+" ++ intToString buff ++ " Combat Power"
-
-
 percentToString : Percent -> String
 percentToString percent =
     floatToString 2 (Percent.toPercentage percent) ++ "%"

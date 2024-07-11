@@ -542,10 +542,13 @@ applyEffect effect count game =
 
 effectReducer : Effect -> Int -> Game -> ApplyEffectResultGenerator
 effectReducer effect count game =
-    case Effect.getEffect effect of
+    case Effect.getEffectType effect of
+        Effect.NoOp ->
+            Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
+
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
             probabilityGenerator successProbability
-                |> Random.andThen
+                |> Random.map
                     (\succeeded ->
                         let
                             chosenEffects =
@@ -555,7 +558,14 @@ effectReducer effect count game =
                                 else
                                     failureEffects
                         in
-                        Random.constant (Ok (ApplyEffectValue game [] chosenEffects []))
+                        Ok (ApplyEffectValue game [] chosenEffects [])
+                    )
+
+        Effect.OneOf firstEffect restEffects ->
+            Random.uniform firstEffect restEffects
+                |> Random.map
+                    (\chosenEffect ->
+                        Ok (ApplyEffectValue game [] [ chosenEffect ] [])
                     )
 
         Effect.GainCoin { base, percentIncrease } ->

@@ -14,7 +14,7 @@ type ModSource
 
 type alias Mod =
     { tags : List Effect.Tag
-    , label : Label
+    , label : String
     , transformer : Transformer
     , count : Int -- How many times to apply this mod
     , source : ModSource
@@ -122,7 +122,7 @@ useSimpleTransformerHelp : Int -> SimpleTransformer -> Transformer
 useSimpleTransformerHelp depth transformFn count taggedEffect =
     let
         newEffectType =
-            transformFn (Effect.getEffect taggedEffect)
+            transformFn (Effect.getEffectType taggedEffect)
 
         newEffect =
             taggedEffect
@@ -207,14 +207,48 @@ withTags tags mod =
     { mod | tags = mod.tags ++ tags }
 
 
-withLabel : Label -> Mod -> Mod
+withLabel : String -> Mod -> Mod
 withLabel label mod =
     { mod | label = label }
 
 
+composeTransformer : List Transformer -> Transformer
+composeTransformer transformers count originalEffect =
+    case transformers of
+        [] ->
+            NoChange
+
+        transformer :: rest ->
+            case transformer count originalEffect of
+                NoChange ->
+                    composeTransformer rest count originalEffect
+
+                ChangeEffect changedEffect ->
+                    case composeTransformer rest count changedEffect of
+                        NoChange ->
+                            ChangeEffect changedEffect
+
+                        ChangeEffect changedEffect2 ->
+                            ChangeEffect changedEffect2
+
+                        ChangeAndAddEffects changedEffect2 additionalEffects2 ->
+                            ChangeAndAddEffects changedEffect2 additionalEffects2
+
+                ChangeAndAddEffects changedEffect additionalEffects ->
+                    case composeTransformer rest count changedEffect of
+                        NoChange ->
+                            ChangeAndAddEffects changedEffect additionalEffects
+
+                        ChangeEffect changedEffect2 ->
+                            ChangeAndAddEffects changedEffect2 additionalEffects
+
+                        ChangeAndAddEffects changedEffect2 additionalEffects2 ->
+                            ChangeAndAddEffects changedEffect2 (additionalEffects ++ additionalEffects2)
+
+
 xpTransformer : Percent -> Transformer
 xpTransformer buff count effect =
-    case Effect.getEffect effect of
+    case Effect.getEffectType effect of
         Effect.GainXp params ->
             let
                 adjustedBuff : Percent
@@ -235,7 +269,7 @@ xpTransformer buff count effect =
 
 coinTransformer : Percent -> Transformer
 coinTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.GainCoin quantity ->
             let
                 adjustedMultiplicable : Effect.GainCoinParams
@@ -252,7 +286,7 @@ coinTransformer buff count taggedEffect =
 
 mxpTransformer : Percent -> Transformer
 mxpTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.GainMxp params ->
             let
                 adjustedBuff : Percent
@@ -273,7 +307,7 @@ mxpTransformer buff count taggedEffect =
 
 resourceDoublingTransformer : Percent -> Transformer
 resourceDoublingTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
@@ -291,7 +325,7 @@ resourceDoublingTransformer buff count taggedEffect =
 
 resourceBaseTransformer : Int -> Transformer
 resourceBaseTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
@@ -309,7 +343,7 @@ resourceBaseTransformer buff count taggedEffect =
 
 resourcePreservationTransformer : Percent -> Transformer
 resourcePreservationTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.SpendResource params ->
             let
                 adjustedBuff : Percent
@@ -333,9 +367,26 @@ resourcePreservationTransformer buff count taggedEffect =
             NoChange
 
 
+resourceSpendTransformer : Int -> Transformer
+resourceSpendTransformer buff count taggedEffect =
+    case Effect.getEffectType taggedEffect of
+        Effect.SpendResource params ->
+            taggedEffect
+                |> Effect.setEffect
+                    (Effect.SpendResource
+                        { params
+                            | base = Basics.max 0 (params.base + (buff * count))
+                        }
+                    )
+                |> ChangeEffect
+
+        _ ->
+            NoChange
+
+
 increaseSuccessTransformer : Percent -> Transformer
 increaseSuccessTransformer buff count taggedEffect =
-    case Effect.getEffect taggedEffect of
+    case Effect.getEffectType taggedEffect of
         Effect.VariableSuccess params ->
             let
                 newSuccessProbability =
@@ -356,10 +407,20 @@ addEffectsTransformer effects count taggedEffect =
     ChangeAndAddEffects taggedEffect (List.concat (List.repeat count effects))
 
 
+xpAndMxpBuff : Percent -> Mod
+xpAndMxpBuff buff =
+    { tags = []
+    , label = "Xp and Mxp Buff"
+    , transformer = composeTransformer [ xpTransformer buff, mxpTransformer buff ]
+    , source = AdminCrimes
+    , count = 1
+    }
+
+
 activityXpBuff : Activity -> Percent -> Mod
 activityXpBuff activity amount =
-    { tags = [ Effect.XpTag, Effect.ActivityTag activity ]
-    , label = XpActivityLabel amount
+    { tags = [ Effect.ActivityTag activity ]
+    , label = "Activity Xp Buff"
     , transformer = xpTransformer amount
     , source = AdminCrimes
     , count = 1
@@ -368,9 +429,20 @@ activityXpBuff activity amount =
 
 xpBuff : Percent -> Mod
 xpBuff amount =
-    { tags = [ Effect.XpTag ]
-    , label = XpActivityLabel amount
+    { tags = []
+    , label = "Xp Buff"
     , transformer = xpTransformer amount
+    , source = AdminCrimes
+    , count = 1
+    }
+
+
+resourceSpendDecreaseBuff : Int -> Mod
+resourceSpendDecreaseBuff buff =
+    -- Decrease the amount of resources spent by amount passed in
+    { tags = []
+    , label = "Resource Spend Decrease Buff"
+    , transformer = resourceSpendTransformer (-1 * buff)
     , source = AdminCrimes
     , count = 1
     }
@@ -380,13 +452,13 @@ skillXpBuff : Skill -> Percent -> Mod
 skillXpBuff skill amount =
     xpBuff amount
         |> withTags [ Effect.SkillTag skill ]
-        |> withLabel (XpSkillLabel amount skill)
+        |> withLabel "Skill Xp Buff"
 
 
 anatomyXpBuff : Percent -> Mod
 anatomyXpBuff buff =
-    { tags = [ Effect.SkillTag Anatomy, Effect.XpTag ]
-    , label = XpActivityLabel buff
+    { tags = [ Effect.SkillTag Anatomy ]
+    , label = "Anatomy Xp Buff"
     , transformer = xpTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -396,7 +468,7 @@ anatomyXpBuff buff =
 coinBuff : Percent -> Mod
 coinBuff buff =
     { tags = []
-    , label = CoinLabel buff
+    , label = "Coin Buff"
     , transformer = coinTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -405,8 +477,8 @@ coinBuff buff =
 
 mxpBuff : Percent -> Mod
 mxpBuff buff =
-    { tags = [ Effect.MxpTag ]
-    , label = MxpModLabel buff
+    { tags = []
+    , label = "Mxp Buff"
     , transformer = mxpTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -416,7 +488,7 @@ mxpBuff buff =
 resourceDoublingBuff : Percent -> Mod
 resourceDoublingBuff buff =
     { tags = []
-    , label = ResourceDoublingLabel buff
+    , label = "Resource Doubling Buff"
     , transformer = resourceDoublingTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -426,7 +498,7 @@ resourceDoublingBuff buff =
 resourceBaseBuff : Int -> Mod
 resourceBaseBuff buff =
     { tags = []
-    , label = ResourceBaseLabel buff
+    , label = "Resource Base Buff"
     , transformer = resourceBaseTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -436,7 +508,7 @@ resourceBaseBuff buff =
 resourcePreservationBuff : Percent -> Mod
 resourcePreservationBuff buff =
     { tags = []
-    , label = ResourcePreservationLabel buff
+    , label = "Resource Preservation Buff"
     , transformer = resourcePreservationTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -446,7 +518,7 @@ resourcePreservationBuff buff =
 successBuff : Percent -> Mod
 successBuff buff =
     { tags = []
-    , label = SuccessLabel buff
+    , label = "Success Buff"
     , transformer = increaseSuccessTransformer buff
     , source = AdminCrimes
     , count = 1
@@ -456,7 +528,7 @@ successBuff buff =
 addEffects : List Effect -> Mod
 addEffects effects =
     { tags = []
-    , label = NullLabel
+    , label = "Add Effects"
     , transformer = addEffectsTransformer effects
     , source = AdminCrimes
     , count = 1
@@ -465,34 +537,11 @@ addEffects effects =
 
 gainResourceWithProbability : Percent -> Resource -> Mod
 gainResourceWithProbability probability resource =
-    let
-        label : Label
-        label =
-            GainResourceLabel 1 resource
-                |> WithProbabilityLabel probability
-    in
     addEffects [ Effect.gainWithProbability probability [ Effect.gainResource 1 resource ] ]
-        |> withLabel label
+        |> withLabel "Gain Resource With Probability"
 
 
 gainResource : Int -> Resource -> Mod
 gainResource amount resource =
     addEffects [ Effect.gainResource amount resource ]
-        |> withLabel (GainResourceLabel amount resource)
-
-
-type Label
-    = NullLabel -- for mods that don't make sense to label
-    | CustomLabel String
-    | WithProbabilityLabel Percent Label
-    | XpActivityLabel Percent
-    | XpSkillLabel Percent Skill
-    | MxpModLabel Percent
-    | ResourceDoublingLabel Percent
-    | ResourcePreservationLabel Percent
-    | ResourceBaseLabel Int
-    | GainResourceLabel Int Resource
-    | MoreManure
-    | SuccessLabel Percent
-    | CoinLabel Percent
-    | PowerLabel Int
+        |> withLabel "Gain Resource"

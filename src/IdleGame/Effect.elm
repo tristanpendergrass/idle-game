@@ -13,10 +13,9 @@ import Task exposing (fail)
 
 
 type Tag
-    = SkillTag Skill
-    | XpTag
-    | MxpTag
-    | ActivityTag Activity
+    = SkillTag Skill -- This effect is associated with the given skill
+    | ActivityTag Activity -- This effect is associated with the given activity
+    | ActivityCompleteTag -- This effect represents the completion of an activity
 
 
 type alias Effect =
@@ -59,7 +58,9 @@ type ReducedBy
 
 
 type EffectType
-    = VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
+    = NoOp -- Something happened that's not going to affect anything on its own. But tags may be attached to the NoOp effect and mods may change it.
+    | VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
+    | OneOf Effect (List Effect) -- One of the effects in the list will be chosen at random
     | GainResource GainResourceParams
     | SpendResource SpendResourceParams
     | GainXp GainXpParams
@@ -67,9 +68,9 @@ type EffectType
     | GainCoin GainCoinParams
 
 
-getEffect : Effect -> EffectType
-getEffect { effect } =
-    effect
+getEffectType : Effect -> EffectType
+getEffectType e =
+    e.effect
 
 
 setEffect : EffectType -> Effect -> Effect
@@ -77,44 +78,49 @@ setEffect newEffect taggedEffect =
     { taggedEffect | effect = newEffect }
 
 
-gainXp : Xp -> Skill -> Effect
-gainXp quantity skill =
-    { effect = GainXp { base = quantity, percentIncrease = Percent.zero, skill = skill }
-    , tags = [ XpTag, SkillTag skill ]
+effect : EffectType -> Effect
+effect type_ =
+    { effect = type_
+    , tags = []
     , oneTimeStatus = OneTimeStatus.NotOneTime
     }
+
+
+noOp : Effect
+noOp =
+    effect NoOp
 
 
 gainCoin : Coin -> Effect
 gainCoin quantity =
-    { effect = GainCoin { base = quantity, percentIncrease = Percent.zero }
-    , tags = []
-    , oneTimeStatus = OneTimeStatus.NotOneTime
-    }
+    effect (GainCoin { base = quantity, percentIncrease = Percent.zero })
+
+
+gainXp : Xp -> Skill -> Effect
+gainXp xp skill =
+    effect (GainXp { base = xp, percentIncrease = Percent.zero, skill = skill })
 
 
 gainMxp : Activity -> Effect
 gainMxp activity =
-    { effect = GainMxp { percentIncrease = Percent.zero, activity = activity }
-    , tags = []
-    , oneTimeStatus = OneTimeStatus.NotOneTime
-    }
+    effect (GainMxp { percentIncrease = Percent.zero, activity = activity })
 
 
 gainResource : Int -> Resource -> Effect
 gainResource quantity kind =
-    { effect = GainResource { base = quantity, doublingChance = Percent.zero, resource = kind }
-    , tags = []
-    , oneTimeStatus = OneTimeStatus.NotOneTime
-    }
+    effect (GainResource { base = quantity, doublingChance = Percent.zero, resource = kind })
 
 
 spendResource : Int -> Resource -> Effect
 spendResource quantity kind =
-    { effect = SpendResource { base = quantity, preservationChance = Percent.zero, resource = kind, reducedBy = Nothing }
-    , tags = []
-    , oneTimeStatus = OneTimeStatus.NotOneTime
-    }
+    effect
+        (SpendResource
+            { base = quantity
+            , preservationChance = Percent.zero
+            , resource = kind
+            , reducedBy = Nothing
+            }
+        )
 
 
 withOneTime : OneTimeStatus.OneTimeId -> Effect -> Effect
@@ -123,32 +129,40 @@ withOneTime oneTimeId taggedEffect =
 
 
 withReducedBy : ReducedBy -> Effect -> Effect
-withReducedBy reducedBy effect =
-    case effect.effect of
+withReducedBy reducedBy e =
+    case e.effect of
         SpendResource spendResourceParams ->
-            { effect
+            { e
                 | effect = SpendResource { spendResourceParams | reducedBy = Just reducedBy }
             }
 
         _ ->
-            effect
+            e
 
 
 withPreservationChance : Percent -> Effect -> Effect
-withPreservationChance preservationChance effect =
-    case effect.effect of
+withPreservationChance preservationChance e =
+    case e.effect of
         SpendResource spendResourceParams ->
-            { effect
+            { e
                 | effect = SpendResource { spendResourceParams | preservationChance = preservationChance }
             }
 
         _ ->
-            effect
+            e
 
 
 gainResourceWithDoubling : Int -> Resource -> Percent -> Effect
 gainResourceWithDoubling quantity kind doubling =
     { effect = GainResource { base = quantity, doublingChance = doubling, resource = kind }
+    , tags = []
+    , oneTimeStatus = OneTimeStatus.NotOneTime
+    }
+
+
+oneOf : Effect -> List Effect -> Effect
+oneOf effect1 effect2s =
+    { effect = OneOf effect1 effect2s
     , tags = []
     , oneTimeStatus = OneTimeStatus.NotOneTime
     }
@@ -172,7 +186,7 @@ withTags newTags taggedEffect =
 
 order : Effect -> Effect -> Order
 order effect1 effect2 =
-    case ( getEffect effect1, getEffect effect2 ) of
+    case ( getEffectType effect1, getEffectType effect2 ) of
         -- Coin comes at front
         ( GainCoin _, _ ) ->
             LT

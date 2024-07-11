@@ -62,6 +62,6 @@ glassesStats =
     , price = Coin.int 50
     , reward =
         ShopItemMod
-            [ Mod.coinBuff (Percent.float 0.1) ]
+            []
     , description = "+10% coin from all sources"
     }
