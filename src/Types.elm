@@ -7,6 +7,7 @@ import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
+import IdleGame.Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.OneTime as OneTime
@@ -76,7 +77,7 @@ type alias FastForwardState =
 
 type FrontendGameState
     = Initializing
-    | Playing (Snapshot Game)
+    | Playing (Snapshot Game) (ActivityRecord (List Effect))
     | FastForward FastForwardState
 
 
@@ -111,6 +112,7 @@ type alias FrontendModel =
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
     , activeAcademicTestCategory : AcademicTestCategory
+    , cache : Cache
     }
 
 
@@ -200,3 +202,11 @@ type BackendMsg
 type ToFrontend
     = NoOpToFrontend
     | InitializeGame (Snapshot Game)
+
+
+
+-- Cache stuff
+
+
+type alias Cache =
+    ActivityRecord (List Effect)

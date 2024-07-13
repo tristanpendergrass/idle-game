@@ -27,11 +27,9 @@ type RenderType
     | DetailView
 
 
-render : { game : Game, mods : List Mod, effect : Effect, renderType : RenderType } -> Html FrontendMsg
-render { game, mods, effect, renderType } =
-    Mod.applyModsToEffect mods effect
-        |> Tuple.first
-        |> renderModdedEffect renderType game
+render : { game : Game, effect : Effect, renderType : RenderType } -> Html FrontendMsg
+render { game, effect, renderType } =
+    renderModdedEffect renderType game effect
 
 
 renderModdedEffect : RenderType -> Game -> Effect -> Html msg

@@ -79,17 +79,6 @@ init _ key =
         activityExpanded =
             -- Note: this value is overriden by HandleGetViewportResult immediately after the page loads to the value here doesn't matter so much
             False
-
-        defaultModal : Maybe Modal
-        defaultModal =
-            if Config.flags.debugTimePasses then
-                Just IdleGame.Mocks.timePassesModal
-
-            else
-                Nothing
-
-        topicsFoo =
-            Debug.log "foobar" topics
     in
     -- { key : Key -- used by Browser.Navigation for things like pushUrl
     -- , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
@@ -117,6 +106,7 @@ init _ key =
       , gameState = Initializing
       , pointerState = Nothing
       , activeAcademicTestCategory = Quiz
+      , cache = Nothing
       }
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
     )
@@ -225,10 +215,10 @@ setGameState gameState model =
 mapGame : (Game -> Game) -> FrontendModel -> FrontendModel
 mapGame fn model =
     case model.gameState of
-        Playing snapshot ->
+        Playing snapshot cachedActivityEffects ->
             snapshot
                 |> Snapshot.map fn
-                |> (\newSnapshot -> { model | gameState = Playing newSnapshot })
+                |> (\newSnapshot -> { model | gameState = Playing newSnapshot cachedActivityEffects })
 
         _ ->
             model
@@ -303,7 +293,7 @@ setActiveAcademicTestCategory testCategory model =
 getActivity : FrontendModel -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
-        Playing snapshot ->
+        Playing snapshot _ ->
             (Snapshot.getValue snapshot).activity
 
         _ ->
@@ -347,6 +337,16 @@ updatePointer delta model =
                           }
                         , Cmd.none
                         )
+
+
+setGameState : FrontendGameState -> FrontendModel -> FrontendModel
+setGameState gameState model =
+    { model | gameState = gameState }
+
+
+setCache : Cache -> FrontendModel -> FrontendModel
+setCache cache model =
+    { model | cache = cache }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
@@ -455,7 +455,7 @@ update msg model =
 
         HandleTestCompletionClick test ->
             case model.gameState of
-                Playing snapshot ->
+                Playing snapshot _ ->
                     let
                         game : Game
                         game =
@@ -466,7 +466,17 @@ update msg model =
                             noOp
 
                         Ok applyEffectsValue ->
-                            ( { model | gameState = Playing (Snapshot.setValue applyEffectsValue.game snapshot) }
+                            let
+                                newCache : Cache
+                                newCache =
+                                    getCache game
+
+                                newModel : FrontendModel
+                                newModel =
+                                    model
+                                        |> setGameState (Playing (Snapshot.setValue applyEffectsValue.game snapshot) newCache)
+                            in
+                            ( newModel
                             , Cmd.batch (List.map (AddToast >> delay 0) applyEffectsValue.toasts)
                             )
 
@@ -1373,3 +1383,16 @@ topicDecoder =
 topics : Result D.Error (List Topic)
 topics =
     D.decodeString (D.list topicDecoder) sample
+
+
+getCache : Game -> Cache
+getCache game =
+    let
+        mods : List Mod
+        mods =
+            Game.getAllMods game
+    in
+    createRecordFn
+        (\activity ->
+            Game.getEffects
+        )

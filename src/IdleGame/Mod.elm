@@ -172,7 +172,7 @@ applyModsToEffectHelp depth mods effect =
             List.foldl
                 (\mod accum ->
                     if Effect.hasTags mod.tags effect then
-                        applyModToEffect (Debug.log "relevant mod" mod) accum
+                        applyModToEffect mod accum
 
                     else
                         accum

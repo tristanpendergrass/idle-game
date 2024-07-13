@@ -5,6 +5,7 @@ module IdleGame.Views.Content exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Effect exposing (Effect)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -20,8 +21,8 @@ import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-renderContent : FrontendModel -> Game -> Tab -> Html FrontendMsg
-renderContent model game activeTab =
+renderContent : FrontendModel -> Game -> ActivityRecord (List Effect) -> Tab -> Html FrontendMsg
+renderContent model game cachedActivityEffects activeTab =
     let
         { title, icon } =
             Tab.getConfig activeTab
@@ -63,5 +64,5 @@ renderContent model game activeTab =
                 IdleGame.Views.TestingCenter.render model game
 
             Tab.SkillTab subject ->
-                IdleGame.Views.SubjectViews.renderSubject subject game
+                IdleGame.Views.SubjectViews.renderSubject subject game cachedActivityEffects
         ]

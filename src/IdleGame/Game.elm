@@ -61,11 +61,11 @@ createDev seed =
 
 type ActivityListItem
     = LockedActivity ( Skill, Int )
-    | ActivityListItem Activity
+    | ActivityListItem ( Activity, List Effect )
 
 
-getActivityListItems : Skill -> Game -> List ActivityListItem
-getActivityListItems skill game =
+getActivityListItems : Skill -> Game -> ActivityRecord (List Effect) -> List ActivityListItem
+getActivityListItems skill game cachedActivityEffects =
     let
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
@@ -80,7 +80,7 @@ getActivityListItems skill game =
                         |> Xp.level Xp.defaultSchedule
             in
             if currentLevel >= stats.level then
-                ActivityListItem kind
+                ActivityListItem ( kind, getByActivity kind cachedActivityEffects )
 
             else
                 LockedActivity ( stats.skill, stats.level )
@@ -223,7 +223,7 @@ type alias Event =
 tick : Duration -> Game -> ( Game, List Toast )
 tick delta game =
     let
-        ( newActivity, eventSkilling ) =
+        ( newActivity, event ) =
             case game.activity of
                 Nothing ->
                     ( game.activity, Nothing )
@@ -262,7 +262,7 @@ tick delta game =
         gameGenerator =
             game
                 |> setActivity newActivity
-                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ eventSkilling ]))
+                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ event ]))
 
         ( ( newGame, notifications ), newSeed ) =
             Random.step gameGenerator game.seed

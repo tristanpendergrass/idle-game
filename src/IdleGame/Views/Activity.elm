@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect exposing (Effect, EffectType, effect)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -75,8 +75,8 @@ notMasteryXpEffect taggedEffect =
             True
 
 
-renderActivityCard : Activity -> Game -> ScreenWidth -> Html FrontendMsg
-renderActivityCard activity game screenWidth =
+renderActivityCard : ( Activity, List Effect ) -> Game -> ScreenWidth -> Html FrontendMsg
+renderActivityCard ( activity, moddedEffects ) game screenWidth =
     let
         maybeTimer : Maybe Timer
         maybeTimer =
@@ -86,17 +86,14 @@ renderActivityCard activity game screenWidth =
         stats =
             getActivityStats activity
 
-        effects : List Effect
-        effects =
-            (Activity.getEffectStats activity).effects
-
         mods : List Mod
         mods =
             Game.getAllMods game
 
         orderedAndFilteredEffects : List Effect
         orderedAndFilteredEffects =
-            List.sortWith Effect.order effects
+            moddedEffects
+                |> List.sortWith Effect.order
                 |> List.filter notMasteryXpEffect
 
         duration : Duration
@@ -156,11 +153,10 @@ renderActivityCard activity game screenWidth =
                     -- The effects of the activity
                     , div [ class "t-column relative" ]
                         (List.map
-                            (\taggedEffect ->
+                            (\moddedEffect ->
                                 EffectView.render
                                     { game = game
-                                    , mods = mods
-                                    , effect = taggedEffect
+                                    , effect = moddedEffect
                                     , renderType = EffectView.DetailView
                                     }
                             )

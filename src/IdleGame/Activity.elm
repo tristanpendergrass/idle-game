@@ -466,3 +466,19 @@ getEffectStats activity =
 updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a
 updateByKindActivity activity fn record =
     setByActivity activity (fn (getByActivity activity record)) record
+
+
+createRecordByFn : (Activity -> a) -> ActivityRecord a
+createRecordByFn fn =
+    let
+        emptyRecord : ActivityRecord a
+        emptyRecord =
+            -- Note: it doesn't matter what activity we put here, it will be overwritten
+            activityRecord (fn BackAndSpine)
+    in
+    List.foldl
+        (\activity record ->
+            setByActivity activity (fn activity) record
+        )
+        emptyRecord
+        allActivities

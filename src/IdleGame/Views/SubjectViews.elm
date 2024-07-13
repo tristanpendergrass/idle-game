@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
+import IdleGame.Effect exposing (Effect)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
@@ -23,10 +24,10 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-renderSubject : Skill -> Game -> Html FrontendMsg
-renderSubject skill game =
+renderSubject : Skill -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
+renderSubject skill game cachedActivityEffects =
     div [ Utils.skills.wrapper ]
         [ Utils.classTopNav { xp = getBySkill skill game.xp, skill = skill }
         , div [ Utils.skills.grid ]
-            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems skill game))
+            (List.map (ActivityView.renderActivityListItem game) (Game.getActivityListItems skill game cachedActivityEffects))
         ]
