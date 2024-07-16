@@ -86,10 +86,6 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
         stats =
             getActivityStats activity
 
-        mods : List Mod
-        mods =
-            Game.getAllMods game
-
         orderedAndFilteredEffects : List Effect
         orderedAndFilteredEffects =
             moddedEffects

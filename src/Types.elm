@@ -77,7 +77,7 @@ type alias FastForwardState =
 
 type FrontendGameState
     = Initializing
-    | Playing (Snapshot Game) (ActivityRecord (List Effect))
+    | Playing (Snapshot Game) Cache
     | FastForward FastForwardState
 
 
@@ -112,7 +112,6 @@ type alias FrontendModel =
     , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
     , activeAcademicTestCategory : AcademicTestCategory
-    , cache : Cache
     }
 
 

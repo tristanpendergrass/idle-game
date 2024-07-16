@@ -34,7 +34,7 @@ renderTest game mods test =
 
         renderCost : Effect -> Html FrontendMsg
         renderCost cost =
-            EffectView.render { effect = cost, game = game, mods = mods, renderType = EffectView.Card }
+            EffectView.render { effect = cost, game = game, renderType = EffectView.Card }
 
         canAfford : Bool
         canAfford =

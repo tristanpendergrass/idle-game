@@ -192,7 +192,6 @@ renderContent obj extraBottomPadding game =
                 (\taggedEffect ->
                     EffectView.render
                         { game = game
-                        , mods = mods
                         , effect = taggedEffect
                         , renderType = EffectView.DetailView
                         }

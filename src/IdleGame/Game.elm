@@ -220,10 +220,14 @@ type alias Event =
     { effects : List Effect, count : Int }
 
 
-tick : Duration -> Game -> ( Game, List Toast )
+type alias TickResolution =
+    { game : Game, toasts : List Toast, bustCache : Bool }
+
+
+tick : Duration -> Game -> TickResolution
 tick delta game =
     let
-        ( newActivity, event ) =
+        ( newActivity, maybeEvent ) =
             case game.activity of
                 Nothing ->
                     ( game.activity, Nothing )
@@ -242,8 +246,8 @@ tick delta game =
                             timer
                                 |> Timer.increment activityDuration delta
 
-                        maybeEvent : Maybe Event
-                        maybeEvent =
+                        event : Maybe Event
+                        event =
                             if completions >= 1 then
                                 Just { effects = effectStats.effects, count = completions }
 
@@ -251,23 +255,39 @@ tick delta game =
                                 Nothing
                     in
                     ( Just ( activityKind, newTimer )
-                    , maybeEvent
+                    , event
                     )
 
-        mods : List Mod
-        mods =
-            getAllMods game
+        gameAfterApplyingEvent : { game : Game, toasts : List Toast, bustCache : Bool }
+        gameAfterApplyingEvent =
+            case maybeEvent of
+                Nothing ->
+                    { game = game, toasts = [], bustCache = False }
 
-        gameGenerator : Generator ( Game, List Toast )
-        gameGenerator =
-            game
-                |> setActivity newActivity
-                |> (\g -> List.foldl (applyEvent mods) (Random.constant ( g, [] )) (List.filterMap identity [ event ]))
+                Just event ->
+                    let
+                        mods : List Mod
+                        mods =
+                            getAllMods game
 
-        ( ( newGame, notifications ), newSeed ) =
-            Random.step gameGenerator game.seed
+                        gameGenerator : Generator ( Game, List Toast )
+                        gameGenerator =
+                            game
+                                |> (\g ->
+                                        List.foldl (applyEvent mods) (Random.constant ( g, [] )) [ event ]
+                                   )
+
+                        ( ( newGame, notifications ), newSeed ) =
+                            Random.step gameGenerator game.seed
+                    in
+                    { game = { newGame | seed = newSeed }, toasts = notifications, bustCache = True }
     in
-    ( { newGame | seed = newSeed }, notifications )
+    { game =
+        gameAfterApplyingEvent.game
+            |> setActivity newActivity
+    , toasts = gameAfterApplyingEvent.toasts
+    , bustCache = gameAfterApplyingEvent.bustCache
+    }
 
 
 getPurchaseEffects : Int -> Resource -> List Effect
