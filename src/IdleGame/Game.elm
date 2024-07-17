@@ -581,22 +581,43 @@ type alias EffectWithCount =
     { count : Int, effect : Effect }
 
 
+splitListHelp : Int -> List (List a) -> List a -> List (List a)
+splitListHelp max soFar list =
+    case list of
+        [] ->
+            soFar
 
--- splitList : Int -> List a -> List (List a)
--- splitList max list =
---     List.concat
---         [ [ List.take max list ]
---         , splitList max (List.drop max list)
---         ]
---         |> List.filter (List.isEmpty >> not)
--- combineLarge : List (Generator a) -> Generator (List a)
--- combineLarge generators =
---     let
---         generatorLists : List (List (Generator a))
---         generatorLists =
---             splitList 1000 generators
---     in
---     Debug.todo ""
+        _ ->
+            let
+                chunk : List a
+                chunk =
+                    List.take max list
+
+                newSoFar : List (List a)
+                newSoFar =
+                    soFar ++ [ chunk ]
+            in
+            splitListHelp max newSoFar (List.drop max list)
+
+
+splitList : Int -> List a -> List (List a)
+splitList max list =
+    splitListHelp max [] list
+
+
+combineLarge : List (Generator a) -> Generator (List a)
+combineLarge generators =
+    let
+        generatorLists : List (List (Generator a))
+        generatorLists =
+            splitList 100 generators
+
+        combinedGenerators : List (Generator (List a))
+        combinedGenerators =
+            List.map Random.Extra.combine generatorLists
+    in
+    Random.Extra.combine combinedGenerators
+        |> Random.map List.concat
 
 
 combine : List (Random.Generator a) -> Random.Generator (List a)
@@ -620,7 +641,7 @@ effectReducer effect count game =
                 Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
             Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
-                combine (List.repeat count (probabilityGenerator successProbability))
+                combineLarge (List.repeat count (probabilityGenerator successProbability))
                     |> Random.map
                         (\results ->
                             let

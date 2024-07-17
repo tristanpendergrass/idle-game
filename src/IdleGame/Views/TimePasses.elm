@@ -59,13 +59,14 @@ render timeToFastForward timePassed timePassesData =
         { xpGains, coinGains, resourcesDiff } =
             timePassesData
 
-        timeStr =
-            Utils.intToString (floor (Duration.inMilliseconds timeToFastForward))
+        -- timeStr =
+        --     Utils.intToString (floor (Duration.inMilliseconds timeToFastForward))
     in
     div [ class "t-column gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
         , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
-        , span [ classList [ ( "hidden", not Config.flags.showTimePasses ) ] ] [ text timeStr ]
+
+        -- , span [ classList [ ( "hidden", not Config.flags.showTimePasses ) ] ] [ text timeStr ]
         , div [ classList [ ( "hidden", not (hasGains timePassesData) ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []
