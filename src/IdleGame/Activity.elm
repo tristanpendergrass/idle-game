@@ -202,6 +202,17 @@ getEffectStats activity =
                 _ ->
                     []
 
+        coinEffects : List Effect
+        coinEffects =
+            case stats.coin of
+                Nothing ->
+                    []
+
+                Just amount ->
+                    [ Effect.gainCoin (Coin.int amount)
+                        |> Effect.withTags tagsForThisActivity
+                    ]
+
         knowledgeEffects : List Effect
         knowledgeEffects =
             case ( knowledgeResource stats.skill, stats.knowledge ) of
@@ -456,6 +467,7 @@ getEffectStats activity =
             , tempEffects
             , knowledgeEffects
             , labEffects
+            , coinEffects
             , gainMxpEffects
             , gainXpEffects
             ]

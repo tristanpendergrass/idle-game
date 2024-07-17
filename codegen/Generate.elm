@@ -12,6 +12,7 @@ import Gen.IdleGame.Coin
 import Gen.IdleGame.Views.Icon
 import Gen.List
 import Json.Decode
+import Json.Decode.Extra
 
 
 main : Program Json.Decode.Value () ()
@@ -248,6 +249,8 @@ activityStats activityConfigObjects =
                 , ( "duration", Gen.Duration.annotation_.duration )
                 , ( "knowledge", Type.maybe Type.int )
                 , ( "type_", Type.string )
+                , ( "coin", Type.maybe Type.int )
+                , ( "uniqueReward", Type.maybe (Type.named [] "Resource") )
                 ]
 
         toExpression : ActivityConfigObject -> Elm.Expression
@@ -264,6 +267,16 @@ activityStats activityConfigObjects =
                         |> Elm.maybe
                   )
                 , ( "type_", Elm.string activityConfig.type_ )
+                , ( "coin"
+                  , activityConfig.coin
+                        |> Maybe.map Elm.int
+                        |> Elm.maybe
+                  )
+                , ( "uniqueReward"
+                  , activityConfig.uniqueReward
+                        |> Maybe.map (capitalize >> Elm.val)
+                        |> Elm.maybe
+                  )
                 ]
     in
     getStats "Activity"
@@ -393,6 +406,8 @@ type alias ActivityConfigObject =
     , duration : Int
     , knowledge : Maybe Int
     , type_ : String
+    , coin : Maybe Int
+    , uniqueReward : Maybe String
     }
 
 
@@ -449,15 +464,17 @@ skillConfigDecoder =
 
 activityConfigDecoder : Json.Decode.Decoder ActivityConfigObject
 activityConfigDecoder =
-    Json.Decode.map8 ActivityConfigObject
-        (Json.Decode.field "id" Json.Decode.string)
-        (Json.Decode.field "skill" Json.Decode.string)
-        (Json.Decode.field "title" Json.Decode.string)
-        (Json.Decode.field "image" Json.Decode.string)
-        (Json.Decode.field "level" Json.Decode.int)
-        (Json.Decode.field "duration" Json.Decode.int)
-        (Json.Decode.field "knowledge" (Json.Decode.maybe Json.Decode.int))
-        (Json.Decode.field "type" Json.Decode.string)
+    Json.Decode.succeed ActivityConfigObject
+        |> Json.Decode.Extra.andMap (Json.Decode.field "id" Json.Decode.string)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "skill" Json.Decode.string)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "title" Json.Decode.string)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "image" Json.Decode.string)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "level" Json.Decode.int)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "duration" Json.Decode.int)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "knowledge" decodeMaybeInt)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "type" Json.Decode.string)
+        |> Json.Decode.Extra.andMap (Json.Decode.field "coin" (Json.Decode.maybe Json.Decode.int))
+        |> Json.Decode.Extra.andMap (Json.Decode.field "uniqueReward" decodeMaybeString)
 
 
 resourceConfigDecoder : Json.Decode.Decoder ResourceConfigObject

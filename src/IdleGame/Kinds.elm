@@ -222,6 +222,9 @@ type Activity
     | Lab1
     | Lab2
     | Lab3
+    | Lab4
+    | Lab5
+    | Lab6
 
 
 allActivities : List Activity
@@ -289,6 +292,9 @@ allActivities =
     , Lab1
     , Lab2
     , Lab3
+    , Lab4
+    , Lab5
+    , Lab6
     ]
 
 
@@ -356,6 +362,9 @@ type alias ActivityRecord a =
     , lab1 : a
     , lab2 : a
     , lab3 : a
+    , lab4 : a
+    , lab5 : a
+    , lab6 : a
     }
 
 
@@ -424,10 +433,13 @@ activityRecord a =
     , lab1 = a
     , lab2 = a
     , lab3 = a
+    , lab4 = a
+    , lab5 = a
+    , lab6 = a
     }
 
 
-getByActivity : Activity -> ActivityRecord lab3 -> lab3
+getByActivity : Activity -> ActivityRecord lab6 -> lab6
 getByActivity kind data =
     case kind of
         BackAndSpine ->
@@ -618,6 +630,15 @@ getByActivity kind data =
 
         Lab3 ->
             data.lab3
+
+        Lab4 ->
+            data.lab4
+
+        Lab5 ->
+            data.lab5
+
+        Lab6 ->
+            data.lab6
 
 
 setByActivity :
@@ -813,6 +834,15 @@ setByActivity kind value data =
         Lab3 ->
             { data | lab3 = value }
 
+        Lab4 ->
+            { data | lab4 = value }
+
+        Lab5 ->
+            { data | lab5 = value }
+
+        Lab6 ->
+            { data | lab6 = value }
+
 
 mapActivities :
     (getByActivity -> getByActivity)
@@ -834,6 +864,8 @@ type alias ActivityStats =
     , duration : Duration.Duration
     , knowledge : Maybe Int
     , type_ : String
+    , coin : Maybe Int
+    , uniqueReward : Maybe Resource
     }
 
 
@@ -844,9 +876,11 @@ activityStats =
         , title = "Back and Spine"
         , image = "/activities/anatomy/backAndSpine.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , upperLimb =
         { skill = Anatomy
@@ -854,557 +888,714 @@ activityStats =
         , image = "/activities/anatomy/upperLimb.webp"
         , level = 5
         , duration = Duration.seconds 6
-        , knowledge = Just 2
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , lowerLimb =
         { skill = Anatomy
         , title = "Lower Limb"
         , image = "/activities/anatomy/lowerLimb.webp"
         , level = 10
-        , duration = Duration.seconds 7
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , thorax =
         { skill = Anatomy
         , title = "Thorax"
         , image = "/activities/anatomy/thorax.webp"
         , level = 20
-        , duration = Duration.seconds 8
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , abdomen =
         { skill = Anatomy
         , title = "Abdomen"
         , image = "/activities/anatomy/abdomen.webp"
         , level = 30
-        , duration = Duration.seconds 9
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , pelvisAndPerineum =
         { skill = Anatomy
         , title = "Pelvis and Perineum"
         , image = "/activities/anatomy/pelvisAndPerineum.webp"
         , level = 45
-        , duration = Duration.seconds 10
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , headAndNeck =
         { skill = Anatomy
         , title = "Head and Neck"
         , image = "/activities/anatomy/headAndNeck.webp"
         , level = 55
-        , duration = Duration.seconds 11
+        , duration = Duration.seconds 6
         , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , integumentarySystem =
         { skill = Anatomy
         , title = "Integumentary System"
         , image = "/activities/anatomy/integumentarySystem.webp"
         , level = 70
-        , duration = Duration.seconds 12
+        , duration = Duration.seconds 6
         , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , lymphaticAndImmuneSystem =
         { skill = Anatomy
         , title = "Lymphatic And Immune System"
         , image = "/activities/anatomy/lymphaticAndImmuneSystem.webp"
         , level = 75
-        , duration = Duration.seconds 13
+        , duration = Duration.seconds 6
         , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , metabolicPathways =
         { skill = Biochemistry
         , title = "Metabolic Pathways"
         , image = "/activities/biochemistry/metabolicPathways.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , enzymology =
         { skill = Biochemistry
         , title = "Enzymology"
         , image = "/activities/biochemistry/enzymology.webp"
         , level = 5
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , molecularBiology =
         { skill = Biochemistry
         , title = "Molecular Biology"
         , image = "/activities/biochemistry/molecularBiology.webp"
         , level = 10
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , lipidMetabolism =
         { skill = Biochemistry
         , title = "Lipid Metabolism"
         , image = "/activities/biochemistry/lipidMetabolism.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , carbohydrateMetabolism =
         { skill = Biochemistry
         , title = "Carbohydrate Metabolism"
         , image = "/activities/biochemistry/carbohydrateMetabolism.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , proteinSynthesis =
         { skill = Biochemistry
         , title = "Protein Synthesis"
         , image = "/activities/biochemistry/proteinSynthesis.webp"
         , level = 45
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , nucleicAcidMetabolism =
         { skill = Biochemistry
         , title = "Nucleic Acid Metabolism"
         , image = "/activities/biochemistry/nucleicAcidMetabolism.webp"
         , level = 55
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , biochemicalSignaling =
         { skill = Biochemistry
         , title = "Biochemical Signaling"
         , image = "/activities/biochemistry/biochemicalSignaling.webp"
         , level = 70
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , vitaminsAndCoenzymes =
         { skill = Biochemistry
         , title = "Vitamins and Coenzymes"
         , image = "/activities/biochemistry/vitaminsAndCoenzymes.webp"
         , level = 75
-        , duration = Duration.seconds 5
-        , knowledge = Just 1
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , cellularFunction =
         { skill = Physiology
         , title = "Cellular Function"
         , image = "/activities/physiology/cellularFunction.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , cardiovascularSystem =
         { skill = Physiology
         , title = "Cardiovascular System"
         , image = "/activities/physiology/cardiovascularSystem.webp"
         , level = 5
-        , duration = Duration.seconds 5
-        , knowledge = Just 2
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , respiratorySystem =
         { skill = Physiology
         , title = "Respiratory System"
         , image = "/activities/physiology/respiratorySystem.webp"
         , level = 12
-        , duration = Duration.seconds 5
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , renalFunction =
         { skill = Physiology
         , title = "Renal Function"
         , image = "/activities/physiology/renalFunction.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 4
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , digestiveSystem =
         { skill = Physiology
         , title = "Digestive System"
         , image = "/activities/physiology/digestiveSystem.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 5
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , nervousSystem =
         { skill = Physiology
         , title = "Nervous System"
         , image = "/activities/physiology/nervousSystem.webp"
         , level = 40
-        , duration = Duration.seconds 5
-        , knowledge = Just 6
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , endocrineSystem =
         { skill = Physiology
         , title = "Endocrine System"
         , image = "/activities/physiology/endocrineSystem.webp"
         , level = 50
-        , duration = Duration.seconds 5
-        , knowledge = Just 7
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , reproductiveSystem =
         { skill = Physiology
         , title = "Reproductive System"
         , image = "/activities/physiology/reproductiveSystem.webp"
         , level = 60
-        , duration = Duration.seconds 5
-        , knowledge = Just 8
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , immuneResponse =
         { skill = Physiology
         , title = "Immune Response"
         , image = "/activities/physiology/immuneResponse.webp"
         , level = 70
-        , duration = Duration.seconds 5
-        , knowledge = Just 9
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , pharmacokinetics =
         { skill = Pharmacology
         , title = "Pharmacokinetics"
         , image = "/activities/pharmacology/pharmacokinetics.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , pharmacodynamics =
         { skill = Pharmacology
         , title = "Pharmacodynamics"
         , image = "/activities/pharmacology/pharmacodynamics.webp"
         , level = 5
-        , duration = Duration.seconds 5
-        , knowledge = Just 2
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , toxicology =
         { skill = Pharmacology
         , title = "Toxicology"
         , image = "/activities/pharmacology/toxicology.webp"
         , level = 12
-        , duration = Duration.seconds 5
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , drugMetabolism =
         { skill = Pharmacology
         , title = "Drug Metabolism"
         , image = "/activities/pharmacology/drugMetabolism.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 4
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , pharmacologicalTherapeutics =
         { skill = Pharmacology
         , title = "Pharmacological Therapeutics"
         , image = "/activities/pharmacology/pharmacologicalTherapeutics.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 5
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , clinicalPharmacology =
         { skill = Pharmacology
         , title = "Clinical Pharmacology"
         , image = "/activities/pharmacology/clinicalPharmacology.webp"
         , level = 40
-        , duration = Duration.seconds 5
-        , knowledge = Just 6
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , neuropharmacology =
         { skill = Pharmacology
         , title = "Neuropharmacology"
         , image = "/activities/pharmacology/neuropharmacology.webp"
         , level = 50
-        , duration = Duration.seconds 5
-        , knowledge = Just 7
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , chemotherapy =
         { skill = Pharmacology
         , title = "Chemotherapy"
         , image = "/activities/pharmacology/chemotherapy.webp"
         , level = 60
-        , duration = Duration.seconds 5
-        , knowledge = Just 8
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , cardiovascularPharmacology =
         { skill = Pharmacology
         , title = "Cariovascular Pharmacology"
         , image = "/activities/pharmacology/cardiovascularPharmacology.webp"
         , level = 70
-        , duration = Duration.seconds 5
-        , knowledge = Just 9
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , bacteriology =
         { skill = Microbiology
         , title = "Bacteriology"
         , image = "/activities/microbiology/bacteriology.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , virology =
         { skill = Microbiology
         , title = "Virology"
         , image = "/activities/microbiology/virology.webp"
         , level = 5
-        , duration = Duration.seconds 5
-        , knowledge = Just 2
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , mycology =
         { skill = Microbiology
         , title = "Mycology"
         , image = "/activities/microbiology/mycology.webp"
         , level = 12
-        , duration = Duration.seconds 5
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , parasitology =
         { skill = Microbiology
         , title = "Parasitology"
         , image = "/activities/microbiology/parasitology.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 4
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , immunology =
         { skill = Microbiology
         , title = "Immunology"
         , image = "/activities/microbiology/immunology.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 5
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , microbialGenetics =
         { skill = Microbiology
         , title = "Microbial Genetics"
         , image = "/activities/microbiology/microbialGenetics.webp"
         , level = 40
-        , duration = Duration.seconds 5
-        , knowledge = Just 6
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , hostPathogenInteractions =
         { skill = Microbiology
         , title = "Host-Pathogen Interactions"
         , image = "/activities/microbiology/hostPathogenInteractions.webp"
         , level = 50
-        , duration = Duration.seconds 5
-        , knowledge = Just 7
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , clinicalMicrobiology =
         { skill = Microbiology
         , title = "Clinical Microbiology"
         , image = "/activities/microbiology/clinicalMicrobiology.webp"
         , level = 60
-        , duration = Duration.seconds 5
-        , knowledge = Just 8
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , antimicrobialResistance =
         { skill = Microbiology
         , title = "Antimicrobial Resistance"
         , image = "/activities/microbiology/antimicrobialResistance.webp"
         , level = 70
-        , duration = Duration.seconds 5
-        , knowledge = Just 9
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , cellInjury =
         { skill = Pathology
         , title = "Cell Injury and Adaptation"
         , image = "/activities/pathology/cellInjury.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , inflammation =
         { skill = Pathology
         , title = "Inflammation and Repair"
         , image = "/activities/pathology/inflammation.webp"
         , level = 5
-        , duration = Duration.seconds 5
-        , knowledge = Just 2
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , hemodynamicDisorders =
         { skill = Pathology
         , title = "Hemodynamic Disorders"
         , image = "/activities/pathology/hemodynamicDisorders.webp"
         , level = 10
-        , duration = Duration.seconds 5
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , immunopathology =
         { skill = Pathology
         , title = "Immunopathology"
         , image = "/activities/pathology/immunopathology.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 4
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , geneticDisorders =
         { skill = Pathology
         , title = "Genetic Disorders"
         , image = "/activities/pathology/geneticDisorders.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 5
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , neoplasia =
         { skill = Pathology
         , title = "Neoplasia"
         , image = "/activities/pathology/neoplasia.webp"
         , level = 45
-        , duration = Duration.seconds 5
-        , knowledge = Just 6
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , infectiousDiseases =
         { skill = Pathology
         , title = "Infectious Diseases"
         , image = "/activities/pathology/infectiousDiseases.webp"
         , level = 55
-        , duration = Duration.seconds 5
-        , knowledge = Just 7
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , environmentalPathology =
         { skill = Pathology
         , title = "Environmental Pathology"
         , image = "/activities/pathology/environmentalPathology.webp"
         , level = 70
-        , duration = Duration.seconds 5
-        , knowledge = Just 8
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , nutritionalDisorders =
         { skill = Pathology
         , title = "Nutritional Disorders"
         , image = "/activities/pathology/nutritionalDisorders.webp"
         , level = 75
-        , duration = Duration.seconds 5
-        , knowledge = Just 9
+        , duration = Duration.seconds 6
+        , knowledge = Just 3
         , type_ = "Study"
+        , coin = Nothing
+        , uniqueReward = Nothing
         }
     , principlesOfBioethics =
         { skill = MedicalEthics
         , title = "Principles of Bioethics"
         , image = "/activities/medicalEthics/principlesOfBioethics.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 6
         , knowledge = Just 1
         , type_ = "Study"
+        , coin = Just 5
+        , uniqueReward = Nothing
         }
     , informedConsent =
         { skill = MedicalEthics
         , title = "InformedConsent"
         , image = "/activities/medicalEthics/informedConsent.webp"
         , level = 5
-        , duration = Duration.seconds 5
-        , knowledge = Just 2
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Just 7
+        , uniqueReward = Nothing
         }
     , confidentialityAndPrivacy =
         { skill = MedicalEthics
         , title = "Confidentiality and Privacy"
         , image = "/activities/medicalEthics/confidentialityAndPrivacy.webp"
         , level = 10
-        , duration = Duration.seconds 5
-        , knowledge = Just 3
+        , duration = Duration.seconds 6
+        , knowledge = Just 1
         , type_ = "Study"
+        , coin = Just 12
+        , uniqueReward = Nothing
         }
     , endOfLifeDecisionMaking =
         { skill = MedicalEthics
         , title = "End-of-Life Decision Making"
         , image = "/activities/medicalEthics/endOfLifeDecisionMaking.webp"
         , level = 20
-        , duration = Duration.seconds 5
-        , knowledge = Just 4
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Just 14
+        , uniqueReward = Nothing
         }
     , medicalProfessionalism =
         { skill = MedicalEthics
         , title = "Medical Professionalism"
         , image = "/activities/medicalEthics/medicalProfessionalism.webp"
         , level = 30
-        , duration = Duration.seconds 5
-        , knowledge = Just 5
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Just 16
+        , uniqueReward = Nothing
         }
     , researchEthics =
         { skill = MedicalEthics
         , title = "Research Ethics"
         , image = "/activities/medicalEthics/researchEthics.webp"
         , level = 45
-        , duration = Duration.seconds 5
-        , knowledge = Just 6
+        , duration = Duration.seconds 6
+        , knowledge = Just 2
         , type_ = "Study"
+        , coin = Just 30
+        , uniqueReward = Nothing
         }
     , lab1 =
         { skill = Labs
-        , title = "Lab 1"
-        , image = "/activities/anatomy/backAndSpine.webp"
+        , title = "Anatomy Lab"
+        , image = "/activities/labs/lab.webp"
         , level = 1
-        , duration = Duration.seconds 5
+        , duration = Duration.seconds 12
         , knowledge = Nothing
         , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just AnatomyPK
         }
     , lab2 =
         { skill = Labs
-        , title = "Lab 2"
-        , image = "/activities/anatomy/backAndSpine.webp"
-        , level = 2
-        , duration = Duration.seconds 5
+        , title = "Biochemistry Lab"
+        , image = "/activities/labs/lab.webp"
+        , level = 5
+        , duration = Duration.seconds 12
         , knowledge = Nothing
         , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just BiochemistryPK
         }
     , lab3 =
         { skill = Labs
-        , title = "Lab 3"
-        , image = "/activities/anatomy/backAndSpine.webp"
-        , level = 3
-        , duration = Duration.seconds 5
+        , title = "Physiology Lab"
+        , image = "/activities/labs/lab.webp"
+        , level = 10
+        , duration = Duration.seconds 12
         , knowledge = Nothing
         , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just PhysiologyPK
+        }
+    , lab4 =
+        { skill = Labs
+        , title = "Pharmacology Lab"
+        , image = "/activities/labs/lab.webp"
+        , level = 20
+        , duration = Duration.seconds 12
+        , knowledge = Nothing
+        , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just PharmacologyPK
+        }
+    , lab5 =
+        { skill = Labs
+        , title = "Microbiology Lab"
+        , image = "/activities/labs/lab.webp"
+        , level = 30
+        , duration = Duration.seconds 12
+        , knowledge = Nothing
+        , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just MicrobiologyPK
+        }
+    , lab6 =
+        { skill = Labs
+        , title = "Pathology Lab"
+        , image = "/activities/labs/lab.webp"
+        , level = 45
+        , duration = Duration.seconds 12
+        , knowledge = Nothing
+        , type_ = "Lab"
+        , coin = Just 10
+        , uniqueReward = Just PathologyPK
         }
     }
 

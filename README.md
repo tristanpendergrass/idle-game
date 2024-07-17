@@ -67,6 +67,10 @@ $ npx elm-codegen install
 [x] New icon for PK
 [ ] Final design for XP for all activities
 [ ] Final design for costs and rewards for all activities
+[ ] Labs
+  [ ] Design them
+    [ ] XP
+  [ ] Create one art for all
 [x] Support Testing Center tab
 [x] Design Tests
 [x] Support Labs skill
