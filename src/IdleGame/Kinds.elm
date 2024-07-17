@@ -1684,7 +1684,8 @@ resourceStats =
         }
     , anatomyPK =
         { title = "Practical Knowledge (Anatomy)"
-        , icon = IdleGame.Views.Icon.createIconPublic "/resources/anatomy_k.png"
+        , icon =
+            IdleGame.Views.Icon.createIconPublic "/resources/anatomy_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1704,7 +1705,8 @@ resourceStats =
     , biochemistryPK =
         { title = "Practical Knowledge (Biochemistry)"
         , icon =
-            IdleGame.Views.Icon.createIconPublic "/resources/biochemistry_k.png"
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/biochemistry_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1725,7 +1727,7 @@ resourceStats =
     , physiologyPK =
         { title = "Practical Knowledge (Physiology)"
         , icon =
-            IdleGame.Views.Icon.createIconPublic "/resources/physiology_k.png"
+            IdleGame.Views.Icon.createIconPublic "/resources/physiology_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1746,7 +1748,8 @@ resourceStats =
     , pharmacologyPK =
         { title = "Practical Knowledge (Pharmacology)"
         , icon =
-            IdleGame.Views.Icon.createIconPublic "/resources/pharmacology_k.png"
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/pharmacology_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1767,7 +1770,8 @@ resourceStats =
     , microbiologyPK =
         { title = "Practical Knowledge (Microbiology)"
         , icon =
-            IdleGame.Views.Icon.createIconPublic "/resources/microbiology_k.png"
+            IdleGame.Views.Icon.createIconPublic
+                "/resources/microbiology_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1788,7 +1792,7 @@ resourceStats =
     , pathologyPK =
         { title = "Practical Knowledge (Pathology)"
         , icon =
-            IdleGame.Views.Icon.createIconPublic "/resources/pathology_k.png"
+            IdleGame.Views.Icon.createIconPublic "/resources/pathology_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }
@@ -1811,7 +1815,7 @@ resourceStats =
         { title = "Practical Knowledge (Medical Ethics)"
         , icon =
             IdleGame.Views.Icon.createIconPublic
-                "/resources/medical_ethics_k.png"
+                "/resources/medical_ethics_pk.png"
         , price = Nothing
         , reducedBy = Nothing
         }

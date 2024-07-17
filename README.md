@@ -64,7 +64,7 @@ $ npx elm-codegen install
 
 ## v0.1
 [x] Fix issue with probabilistic awards not being granted on large time step
-[ ] New icon for PK
+[x] New icon for PK
 [ ] Final design for XP for all activities
 [ ] Final design for costs and rewards for all activities
 [x] Support Testing Center tab
