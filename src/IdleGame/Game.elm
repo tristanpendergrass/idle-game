@@ -22,6 +22,7 @@ import Maybe.Extra
 import Percent exposing (Percent)
 import Quantity
 import Random exposing (Generator)
+import Random.Extra
 import Svg.Attributes exposing (preserveAlpha)
 import Tuple
 import Types exposing (..)
@@ -329,7 +330,7 @@ attemptCompleteTest test game =
             getAllMods game
 
         ( applyEffectsResult, newSeed ) =
-            Random.step (applyEffects mods (Test.getAllEffects test) 1 game) game.seed
+            Random.step (applyEffects mods (List.map (\effect -> { effect = effect, count = 1 }) (Test.getAllEffects test)) game) game.seed
     in
     applyEffectsResult
         |> Result.andThen
@@ -369,7 +370,7 @@ attemptPurchaseResource amount resource game =
 
         gen : ApplyEffectsResultGenerator
         gen =
-            applyEffects mods effects 1 game
+            applyEffects mods (List.map (\effect -> { effect = effect, count = 1 }) effects) game
 
         ( result, newSeed ) =
             Random.step gen game.seed
@@ -404,7 +405,7 @@ applyEvent mods { effects, count } =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
         (\( game, toasts ) ->
-            applyEffects mods effects count game
+            applyEffects mods (List.map (\effect -> { effect = effect, count = count }) effects) game
                 |> Random.andThen
                     (\res ->
                         case res of
@@ -443,13 +444,13 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Mod -> List Effect -> Int -> Game -> ApplyEffectsResultGenerator
-applyEffects mods effects count game =
+applyEffects : List Mod -> List { effect : Effect, count : Int } -> Game -> ApplyEffectsResultGenerator
+applyEffects mods effects game =
     case effects of
         [] ->
             Random.constant (Ok { game = game, toasts = [] })
 
-        effect :: rest ->
+        { effect, count } :: rest ->
             let
                 ( moddedEffect, additionalEffectsFromMod ) =
                     Mod.applyModsToEffect mods effect
@@ -471,11 +472,19 @@ applyEffects mods effects count game =
                                     toasts =
                                         applyEffectVal.toasts
 
-                                    additionalEffects : List Effect
-                                    additionalEffects =
+                                    additionalEffectsFromEffect : List { effect : Effect, count : Int }
+                                    additionalEffectsFromEffect =
                                         applyEffectVal.additionalEffects
+
+                                    allAdditionalEffects : List { effect : Effect, count : Int }
+                                    allAdditionalEffects =
+                                        List.concat
+                                            [ rest
+                                            , List.map (\additionalEffect -> { effect = additionalEffect, count = count }) additionalEffectsFromMod
+                                            , additionalEffectsFromEffect
+                                            ]
                                 in
-                                applyEffects mods (rest ++ additionalEffectsFromMod ++ additionalEffects) count g
+                                applyEffects mods allAdditionalEffects g
                                     |> Random.andThen
                                         (\res2 ->
                                             case res2 of
@@ -510,6 +519,14 @@ probabilityGenerator probability =
             )
 
 
+
+-- probabilityGeneratorMulti : Int -> Percent -> Generator Int
+-- probabilityGeneratorMulti count probability =
+--     List.repeat count (probabilityGenerator probability)
+--         |> Random.Extra.combine
+--         |> Random.map (List.filter identity >> List.length)
+
+
 calculateActivityMxp : Activity -> Game -> Xp
 calculateActivityMxp kind game =
     let
@@ -533,7 +550,7 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List Effect, additionalMods : List Mod }
+    { game : Game, toasts : List Toast, additionalEffects : List { effect : Effect, count : Int }, additionalMods : List Mod }
 
 
 type alias ApplyEffectResultGenerator =
@@ -560,6 +577,38 @@ applyEffect effect count game =
             effectReducer effect count game
 
 
+type alias EffectWithCount =
+    { count : Int, effect : Effect }
+
+
+
+-- splitList : Int -> List a -> List (List a)
+-- splitList max list =
+--     List.concat
+--         [ [ List.take max list ]
+--         , splitList max (List.drop max list)
+--         ]
+--         |> List.filter (List.isEmpty >> not)
+-- combineLarge : List (Generator a) -> Generator (List a)
+-- combineLarge generators =
+--     let
+--         generatorLists : List (List (Generator a))
+--         generatorLists =
+--             splitList 1000 generators
+--     in
+--     Debug.todo ""
+
+
+combine : List (Random.Generator a) -> Random.Generator (List a)
+combine generators =
+    generators
+        |> List.foldr
+            (\generator generatorSoFar ->
+                Random.map2 (::) generator generatorSoFar
+            )
+            (Random.constant [])
+
+
 effectReducer : Effect -> Int -> Game -> ApplyEffectResultGenerator
 effectReducer effect count game =
     case Effect.getEffectType effect of
@@ -567,25 +616,40 @@ effectReducer effect count game =
             Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
         Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
-            probabilityGenerator successProbability
+            combine (List.repeat count (probabilityGenerator successProbability))
                 |> Random.map
-                    (\succeeded ->
+                    (\results ->
                         let
-                            chosenEffects =
-                                if succeeded then
-                                    successEffects
+                            numSuccesses : Int
+                            numSuccesses =
+                                List.length <| List.filter identity results
 
-                                else
-                                    failureEffects
+                            numFailures : Int
+                            numFailures =
+                                count - numSuccesses
+
+                            effects : List { effect : Effect, count : Int }
+                            effects =
+                                List.concat
+                                    [ List.map (\successEffect -> { effect = successEffect, count = numSuccesses }) successEffects
+                                    , List.map (\failureEffect -> { effect = failureEffect, count = numFailures }) failureEffects
+                                    ]
                         in
-                        Ok (ApplyEffectValue game [] chosenEffects [])
+                        Ok (ApplyEffectValue game [] effects [])
                     )
 
         Effect.OneOf firstEffect restEffects ->
-            Random.uniform firstEffect restEffects
+            combine (List.repeat count (Random.uniform firstEffect restEffects))
                 |> Random.map
-                    (\chosenEffect ->
-                        Ok (ApplyEffectValue game [] [ chosenEffect ] [])
+                    (\results ->
+                        let
+                            effectCounts : List { effect : Effect, count : Int }
+                            effectCounts =
+                                results
+                                    |> List.Extra.gatherEquals
+                                    |> List.map (\( e, rest ) -> { effect = e, count = 1 + List.length rest })
+                        in
+                        Ok (ApplyEffectValue game [] effectCounts [])
                     )
 
         Effect.GainCoin { base, percentIncrease } ->

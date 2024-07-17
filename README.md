@@ -63,22 +63,26 @@ $ npx elm-codegen install
 # Todos
 
 ## v0.1
-[ ] Support mail
+[ ] Fix issue with probabilistic awards not being granted on large time step
+[ ] New icon for PK
+[ ] Final design for XP for all activities
+[ ] Final design for costs and rewards for all activities
 [x] Support Testing Center tab
-[ ] Design Tests
-[ ] Support Labs skill
-  [ ] Grant K and PK and coin with some probability
+[x] Design Tests
+[x] Support Labs skill
+  [x] Grant K and PK and coin with some probability
 [x] Reduce costs by 1 per PK
-[ ] Support Practical Knowledge and Labs in Anatomy
-[ ] Figure out how to show PK in a satisfying way
-[ ] Add masteries
-  [ ] Design
-  [ ] Implement
-[ ] Change DaisyUI theme
+[x] Support Practical Knowledge and Labs in Anatomy
+[x] Add masteries
+  [x] Design
+  [x] Implement
 
 ## v0.2
-[ ] Listen to music
-[ ] Better test completion UI with modal and animation
+[ ] Add changelog
+[ ] Add shop items
+[ ] Add mail system
+[ ] Listen to music for bonuses
+[ ] Better test logic
 
 ## Done
 [x] Remove code references to old version

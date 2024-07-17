@@ -30,70 +30,106 @@ type RenderType
 render : { game : Game, effect : Effect, renderType : RenderType } -> Html FrontendMsg
 render { game, effect, renderType } =
     renderModdedEffect renderType game effect
+        |> Maybe.withDefault (div [] [])
 
 
-renderModdedEffect : RenderType -> Game -> Effect -> Html msg
+renderModdedEffect : RenderType -> Game -> Effect -> Maybe (Html msg)
 renderModdedEffect renderType game effect =
     let
-        effectContent : Html msg
-        effectContent =
+        maybeEffectContent : Maybe (Html msg)
+        maybeEffectContent =
             case Effect.getEffectType effect of
                 Effect.NoOp ->
-                    div [] []
+                    Nothing
 
                 Effect.OneOf firstEffect restEffects ->
                     let
                         effects : List Effect
                         effects =
                             firstEffect :: restEffects
+
+                        renderedEffects : List (Html msg)
+                        renderedEffects =
+                            List.filterMap (renderModdedEffect renderType game) effects
                     in
-                    div [ class "t-column gap-2" ]
-                        (div [] [ text "one of" ]
-                            :: List.map (renderModdedEffect renderType game) effects
-                        )
+                    if List.isEmpty renderedEffects then
+                        Nothing
+
+                    else
+                        Just
+                            (div [ class "t-column gap-2" ]
+                                (div [] [ text "one of" ]
+                                    :: renderedEffects
+                                )
+                            )
 
                 Effect.GainCoin coin ->
-                    renderCoin coin
+                    Just (renderCoin coin)
 
                 Effect.GainResource params ->
-                    renderResource game params.resource params.base
+                    Just (renderResource game params.resource params.base)
 
                 Effect.SpendResource params ->
-                    renderResource game params.resource (-1 * params.base)
+                    Just (renderResource game params.resource (-1 * params.base))
 
                 Effect.GainXp params ->
-                    renderXp params
+                    Just (renderXp params)
 
                 Effect.GainMxp params ->
-                    renderMxp game params
+                    Just (renderMxp game params)
 
                 Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
                     case successEffects of
                         [] ->
-                            div [] []
+                            Nothing
 
                         effects ->
-                            div [ class "flex rounded overflow-hidden relative" ]
-                                [ div []
-                                    [ div [ class "h-full flex items-center bg-info text-info-content p-2 border-2 border-r-0 border-info" ]
-                                        [ text (Utils.percentToString successProbability)
-                                        ]
-                                    ]
-                                , div [ class "p-2 border border-content border-dashed border-l-0 border-tr-rounded border-br-rounded" ]
-                                    [ div [ class "t-column gap-2" ] (List.map (renderModdedEffect renderType game) effects)
-                                    ]
-                                ]
+                            let
+                                effectsToDisplay : List Effect
+                                effectsToDisplay =
+                                    List.filter (\e -> OneTime.isAvailable game.oneTimeStatuses e.oneTimeStatus) effects
+                            in
+                            case effectsToDisplay of
+                                [] ->
+                                    Nothing
+
+                                nonEmptyEffects ->
+                                    let
+                                        renderedEffects : List (Html msg)
+                                        renderedEffects =
+                                            List.filterMap (renderModdedEffect renderType game) nonEmptyEffects
+                                    in
+                                    if List.isEmpty renderedEffects then
+                                        Nothing
+
+                                    else
+                                        Just
+                                            (div [ class "flex rounded overflow-hidden relative" ]
+                                                [ div []
+                                                    [ div [ class "h-full flex items-center bg-info text-info-content p-2 border-2 border-r-0 border-info" ]
+                                                        [ text (Utils.percentToString successProbability)
+                                                        ]
+                                                    ]
+                                                , div [ class "p-2 border border-content border-dashed border-l-0 border-tr-rounded border-br-rounded" ]
+                                                    [ div [ class "t-column gap-2" ] renderedEffects
+                                                    ]
+                                                ]
+                                            )
     in
     if OneTime.isAvailable game.oneTimeStatuses effect.oneTimeStatus then
-        div
-            [ class "t-column gap-0"
-            ]
-            [ effectContent
-            , div [ class "text-xs font-bold", classList [ ( "hidden", not (OneTime.isOneTime effect.oneTimeStatus) ) ] ] [ text "Unique" ]
-            ]
+        maybeEffectContent
+            |> Maybe.map
+                (\effectContent ->
+                    div
+                        [ class "t-column gap-0"
+                        ]
+                        [ effectContent
+                        , div [ class "text-xs font-bold", classList [ ( "hidden", not (OneTime.isOneTime effect.oneTimeStatus) ) ] ] [ text "[Unique]" ]
+                        ]
+                )
 
     else
-        div [] []
+        Nothing
 
 
 renderCoin : { base : Coin, percentIncrease : Percent } -> Html msg

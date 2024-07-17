@@ -38,7 +38,7 @@ renderTest game mods test =
 
         canAfford : Bool
         canAfford =
-            Game.applyEffects mods (AcademicTest.getAllEffects test) 1 game
+            Game.applyEffects mods (List.map (Game.EffectWithCount 1) (AcademicTest.getAllEffects test)) game
                 |> (\g -> Random.step g game.seed)
                 |> Tuple.first
                 |> Result.Extra.isOk

@@ -101,6 +101,20 @@ hasResource amount kind =
     .resources >> getByResource kind >> (==) amount
 
 
+hasResourceBetween : ( Int, Int ) -> Resource -> (Game -> Bool)
+hasResourceBetween ( min, max ) kind game =
+    let
+        resourceCounts : ResourceRecord Int
+        resourceCounts =
+            game.resources
+
+        myResourceCount : Int
+        myResourceCount =
+            getByResource kind resourceCounts
+    in
+    myResourceCount >= min && myResourceCount <= max
+
+
 expectXp : Xp -> Skill -> (Game -> Expectation)
 expectXp amount skill =
     .xp >> getBySkill skill >> Expect.equal amount
@@ -114,42 +128,6 @@ hasXp amount skill =
 defaultGame : Game
 defaultGame =
     Game.createProd (Random.initialSeed 0)
-
-
-testEffects :
-    String
-    ->
-        { initialGame : Game
-        , effects : List Effect
-        , count : Int
-        , check : Result EffectErr { game : Game, toasts : List Toast } -> Expectation
-        , mods : List Mod
-        }
-    -> Test
-testEffects name { initialGame, effects, count, check, mods } =
-    Test.Random.check
-        name
-        (Game.applyEffects mods effects count initialGame)
-        check
-
-
-testEffectsDistribution :
-    String
-    ->
-        { initialGame : Game
-        , effects : List Effect
-        , count : Int
-        , distribution : Distribution (Result EffectErr Game.ApplyEffectsValue)
-        }
-    -> Test
-testEffectsDistribution name { initialGame, effects, count, distribution } =
-    Test.fuzzWith
-        { runs = 100
-        , distribution = distribution
-        }
-        (Fuzz.fromGenerator (Game.applyEffects (Game.getAllMods initialGame) effects count initialGame))
-        name
-        (\_ -> Expect.pass)
 
 
 type ApplyEffectsTestConfig
@@ -181,7 +159,7 @@ runTest : Check -> ApplyEffectsTestConfig -> Test
 runTest checkFn (ApplyEffectsTestConfig config) =
     Test.Random.check
         config.name
-        (Game.applyEffects config.mods config.effects config.count config.game)
+        (Game.applyEffects config.mods (List.map (Game.EffectWithCount config.count) config.effects) config.game)
         checkFn
 
 
@@ -191,7 +169,7 @@ runTestDistribution distribution (ApplyEffectsTestConfig config) =
         { runs = 100
         , distribution = distribution
         }
-        (Fuzz.fromGenerator (Game.applyEffects config.mods config.effects config.count config.game))
+        (Fuzz.fromGenerator (Game.applyEffects config.mods (List.map (Game.EffectWithCount config.count) config.effects) config.game))
         config.name
         (\_ -> Expect.pass)
 
@@ -357,7 +335,7 @@ applyEffectsTest =
                         ]
                     )
             ]
-        , describe "variable effects"
+        , describe "VariableSuccess"
             [ testApplyEffect "can have a 50% chance to gain a resource"
                 |> withEffects
                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
@@ -379,6 +357,95 @@ applyEffectsTest =
                                     [ hasResource 0 AnatomyK
                                     , hasResource 1 AnatomyK
                                     ]
+                                )
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on count > 1"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 100
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 42 and 58"
+                          , hasOk (hasResourceBetween ( 42, 58 ) AnatomyK)
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on very high count"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 1000
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 4200 and 5800"
+                          , hasOk (hasResourceBetween ( 420, 580 ) AnatomyK)
+                          )
+                        ]
+                    )
+            ]
+        , describe "OneOf effect"
+            [ testApplyEffect "can choose between two effects"
+                |> withEffects
+                    [ Effect.oneOf
+                        (Effect.gainResource 1 AnatomyK)
+                        [ Effect.gainResource 1 MicrobiologyK
+                        ]
+                    ]
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 1 AnatomyK"
+                          , hasOk
+                                (hasResource 1 AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 1 MicrobiologyK"
+                          , hasOk
+                                (hasResource 1 MicrobiologyK)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 1 AnatomyK
+                                    , hasResource 1 MicrobiologyK
+                                    ]
+                                )
+                          )
+                        ]
+                    )
+            , testApplyEffect "can choose between two effects many times"
+                |> withEffects
+                    [ Effect.oneOf
+                        (Effect.gainResource 1 AnatomyK)
+                        [ Effect.gainResource 1 MicrobiologyK
+                        ]
+                    ]
+                |> withCount 100
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "has the expected number of AnatomyK"
+                          , hasOk
+                                (hasResourceBetween ( 42, 58 ) AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 99
+                          , "was given something each time"
+                          , hasOk
+                                (\game ->
+                                    let
+                                        anatomyK =
+                                            getByResource AnatomyK game.resources
+
+                                        microbiologyK =
+                                            getByResource MicrobiologyK game.resources
+                                    in
+                                    anatomyK + microbiologyK == 100
                                 )
                           )
                         ]
