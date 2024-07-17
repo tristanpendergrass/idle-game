@@ -332,7 +332,7 @@ resourceQuantity { quantity } =
 
 percentToString : Percent -> String
 percentToString percent =
-    floatToString 2 (Percent.toPercentage percent) ++ "%"
+    floatToString 4 (Percent.toPercentage percent) ++ "%"
 
 
 priceLabel : { price : Coin, isError : Bool } -> Html msg

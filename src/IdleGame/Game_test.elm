@@ -194,6 +194,25 @@ withCount count (ApplyEffectsTestConfig config) =
     ApplyEffectsTestConfig { config | count = count }
 
 
+
+-- temp =
+--     describe "temp"
+--         [ testApplyEffect "chance to gain a resource works correctly on very high count"
+--             |> withEffects
+--                 [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+--                 ]
+--             |> withCount 10000
+--             |> runTestDistribution
+--                 (Test.expectDistribution
+--                     [ ( Test.Distribution.atLeast 90
+--                       , "is between 42000 and 58000"
+--                       , hasOk (hasResourceBetween ( 4200, 5800 ) AnatomyK)
+--                       )
+--                     ]
+--                 )
+--         ]
+
+
 applyEffectsTest =
     -- TODO: test tail call optimization in applyEffects
     describe "applyEffects"
@@ -374,7 +393,7 @@ applyEffectsTest =
                           )
                         ]
                     )
-            , testApplyEffect "chance to gain a resource works correctly on very high count"
+            , testApplyEffect "chance to gain a resource works correctly on high count"
                 |> withEffects
                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
                     ]
@@ -384,6 +403,19 @@ applyEffectsTest =
                         [ ( Test.Distribution.atLeast 90
                           , "is between 4200 and 5800"
                           , hasOk (hasResourceBetween ( 420, 580 ) AnatomyK)
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on very high count"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 10000
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 42000 and 58000"
+                          , hasOk (hasResourceBetween ( 4200, 5800 ) AnatomyK)
                           )
                         ]
                     )

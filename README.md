@@ -63,7 +63,7 @@ $ npx elm-codegen install
 # Todos
 
 ## v0.1
-[ ] Fix issue with probabilistic awards not being granted on large time step
+[x] Fix issue with probabilistic awards not being granted on large time step
 [ ] New icon for PK
 [ ] Final design for XP for all activities
 [ ] Final design for costs and rewards for all activities
@@ -77,7 +77,12 @@ $ npx elm-codegen install
   [x] Design
   [x] Implement
 
+## Bugs
+[ ] When doing lab with 50% success rate I see "+0 coin" when failure happens
+[ ] Left side nav has horizontal scroll bar
+
 ## v0.2
+[ ] Remember tab you were on by storing in backend model
 [ ] Add changelog
 [ ] Add shop items
 [ ] Add mail system

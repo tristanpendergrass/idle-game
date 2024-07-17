@@ -611,142 +611,154 @@ combine generators =
 
 effectReducer : Effect -> Int -> Game -> ApplyEffectResultGenerator
 effectReducer effect count game =
-    case Effect.getEffectType effect of
-        Effect.NoOp ->
-            Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
+    if count == 0 then
+        Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
-        Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
-            combine (List.repeat count (probabilityGenerator successProbability))
-                |> Random.map
-                    (\results ->
-                        let
-                            numSuccesses : Int
-                            numSuccesses =
-                                List.length <| List.filter identity results
+    else
+        case Effect.getEffectType effect of
+            Effect.NoOp ->
+                Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
-                            numFailures : Int
-                            numFailures =
-                                count - numSuccesses
+            Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+                combine (List.repeat count (probabilityGenerator successProbability))
+                    |> Random.map
+                        (\results ->
+                            let
+                                numSuccesses : Int
+                                numSuccesses =
+                                    List.length <| List.filter identity results
 
-                            effects : List { effect : Effect, count : Int }
-                            effects =
-                                List.concat
-                                    [ List.map (\successEffect -> { effect = successEffect, count = numSuccesses }) successEffects
-                                    , List.map (\failureEffect -> { effect = failureEffect, count = numFailures }) failureEffects
-                                    ]
-                        in
-                        Ok (ApplyEffectValue game [] effects [])
-                    )
+                                numFailures : Int
+                                numFailures =
+                                    count - numSuccesses
 
-        Effect.OneOf firstEffect restEffects ->
-            combine (List.repeat count (Random.uniform firstEffect restEffects))
-                |> Random.map
-                    (\results ->
-                        let
-                            effectCounts : List { effect : Effect, count : Int }
-                            effectCounts =
-                                results
-                                    |> List.Extra.gatherEquals
-                                    |> List.map (\( e, rest ) -> { effect = e, count = 1 + List.length rest })
-                        in
-                        Ok (ApplyEffectValue game [] effectCounts [])
-                    )
+                                effects : List { effect : Effect, count : Int }
+                                effects =
+                                    List.concat
+                                        [ if numSuccesses > 0 then
+                                            List.map (\successEffect -> { effect = successEffect, count = numSuccesses }) successEffects
 
-        Effect.GainCoin { base, percentIncrease } ->
-            let
-                product : Coin
-                product =
-                    base
-                        |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
-                        |> Quantity.multiplyBy (toFloat count)
-            in
-            addCoin product game
-                |> Random.constant
+                                          else
+                                            []
+                                        , if numFailures > 0 then
+                                            List.map (\failureEffect -> { effect = failureEffect, count = numFailures }) failureEffects
 
-        Effect.GainResource { base, resource, doublingChance } ->
-            probabilityGenerator doublingChance
-                |> Random.map
-                    (\doubled ->
-                        let
-                            result : Int
-                            result =
-                                if doubled then
-                                    2 * base * count
+                                          else
+                                            []
+                                        ]
+                            in
+                            Ok (ApplyEffectValue game [] effects [])
+                        )
 
-                                else
-                                    base * count
-                        in
-                        adjustResource resource result game
-                    )
+            Effect.OneOf firstEffect restEffects ->
+                combine (List.repeat count (Random.uniform firstEffect restEffects))
+                    |> Random.map
+                        (\results ->
+                            let
+                                effectCounts : List { effect : Effect, count : Int }
+                                effectCounts =
+                                    results
+                                        |> List.Extra.gatherEquals
+                                        |> List.map (\( e, rest ) -> { effect = e, count = 1 + List.length rest })
+                            in
+                            Ok (ApplyEffectValue game [] effectCounts [])
+                        )
 
-        Effect.SpendResource { base, resource, preservationChance, reducedBy } ->
-            probabilityGenerator preservationChance
-                |> Random.map
-                    (\preserved ->
-                        let
-                            handleReducedBy : Int -> Int
-                            handleReducedBy amount =
-                                case reducedBy of
-                                    Nothing ->
-                                        amount
+            Effect.GainCoin { base, percentIncrease } ->
+                let
+                    product : Coin
+                    product =
+                        base
+                            |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
+                            |> Quantity.multiplyBy (toFloat count)
+                in
+                addCoin product game
+                    |> Random.constant
 
-                                    Just (Effect.ReducedByFlat reductionResource) ->
-                                        amount - getByResource reductionResource game.resources
+            Effect.GainResource { base, resource, doublingChance } ->
+                probabilityGenerator doublingChance
+                    |> Random.map
+                        (\doubled ->
+                            let
+                                result : Int
+                                result =
+                                    if doubled then
+                                        2 * base * count
 
-                                    Just (Effect.ReducedByPercent reductionResource percentReduction) ->
-                                        let
-                                            reductionResourceAmount : Float
-                                            reductionResourceAmount =
-                                                toFloat (getByResource reductionResource game.resources)
-                                        in
-                                        Percent.reduceIntByPercent (Quantity.multiplyBy reductionResourceAmount percentReduction) amount
+                                    else
+                                        base * count
+                            in
+                            adjustResource resource result game
+                        )
 
-                            adjustedAmount : Int
-                            adjustedAmount =
-                                base
-                                    |> handleReducedBy
-                                    -- Player can't "spend" a negative amount of resources
-                                    |> max 0
-                        in
-                        if preserved then
-                            adjustResource resource 0 game
+            Effect.SpendResource { base, resource, preservationChance, reducedBy } ->
+                probabilityGenerator preservationChance
+                    |> Random.map
+                        (\preserved ->
+                            let
+                                handleReducedBy : Int -> Int
+                                handleReducedBy amount =
+                                    case reducedBy of
+                                        Nothing ->
+                                            amount
 
-                        else
-                            adjustResource resource (-1 * adjustedAmount * count) game
-                    )
+                                        Just (Effect.ReducedByFlat reductionResource) ->
+                                            amount - getByResource reductionResource game.resources
 
-        Effect.GainXp { base, percentIncrease, skill } ->
-            let
-                xp : Xp
-                xp =
-                    base
-                        |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
-                        |> Quantity.multiplyBy (toFloat count)
-            in
-            { game = addXp skill xp game
-            , toasts = []
-            , additionalEffects = []
-            , additionalMods = []
-            }
-                |> Random.constant
-                |> Random.map Ok
+                                        Just (Effect.ReducedByPercent reductionResource percentReduction) ->
+                                            let
+                                                reductionResourceAmount : Float
+                                                reductionResourceAmount =
+                                                    toFloat (getByResource reductionResource game.resources)
+                                            in
+                                            Percent.reduceIntByPercent (Quantity.multiplyBy reductionResourceAmount percentReduction) amount
 
-        Effect.GainMxp params ->
-            let
-                base : Xp
-                base =
-                    calculateActivityMxp params.activity game
+                                adjustedAmount : Int
+                                adjustedAmount =
+                                    base
+                                        |> handleReducedBy
+                                        -- Player can't "spend" a negative amount of resources
+                                        |> max 0
+                            in
+                            if preserved then
+                                adjustResource resource 0 game
 
-                mxp : Xp
-                mxp =
-                    base
-                        |> Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease)
-                        |> Quantity.multiplyBy (toFloat count)
-            in
-            game
-                |> addMxp params.activity mxp
-                |> (\newGame -> Random.constant (ApplyEffectValue newGame [] [] []))
-                |> Random.map Ok
+                            else
+                                adjustResource resource (-1 * adjustedAmount * count) game
+                        )
+
+            Effect.GainXp { base, percentIncrease, skill } ->
+                let
+                    xp : Xp
+                    xp =
+                        base
+                            |> Quantity.multiplyBy (Percent.toMultiplier percentIncrease)
+                            |> Quantity.multiplyBy (toFloat count)
+                in
+                { game = addXp skill xp game
+                , toasts = []
+                , additionalEffects = []
+                , additionalMods = []
+                }
+                    |> Random.constant
+                    |> Random.map Ok
+
+            Effect.GainMxp params ->
+                let
+                    base : Xp
+                    base =
+                        calculateActivityMxp params.activity game
+
+                    mxp : Xp
+                    mxp =
+                        base
+                            |> Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease)
+                            |> Quantity.multiplyBy (toFloat count)
+                in
+                game
+                    |> addMxp params.activity mxp
+                    |> (\newGame -> Random.constant (ApplyEffectValue newGame [] [] []))
+                    |> Random.map Ok
 
 
 addXp : Skill -> Xp -> Game -> Game

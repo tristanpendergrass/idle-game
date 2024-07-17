@@ -220,7 +220,7 @@ getEffectStats activity =
                     [ Effect.gainWithProbability (Percent.float 0.5)
                         [ Effect.gainCoin (Coin.int 5)
                             |> Effect.withTags tagsForThisActivity
-                        , Effect.gainWithProbability (Percent.float 0.01)
+                        , Effect.gainWithProbability (Percent.float 0.00001)
                             [ Effect.gainResource 1 AnatomyPK
                                 |> Effect.withOneTime OneTime.Lab1
                             ]
