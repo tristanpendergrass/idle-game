@@ -67,10 +67,10 @@ renderModdedEffect renderType game effect =
                     Just (renderCoin coin)
 
                 Effect.GainResource params ->
-                    Just (renderResource game params.resource params.base)
+                    Just (renderResource game params.resource params.base { showTitle = renderType == DetailView, showTooltip = renderType == Card })
 
                 Effect.SpendResource params ->
-                    Just (renderResource game params.resource (-1 * params.base))
+                    Just (renderResource game params.resource (-1 * params.base) { showTitle = renderType == DetailView, showTooltip = renderType == Card })
 
                 Effect.GainXp params ->
                     Just (renderXp params)
@@ -155,8 +155,8 @@ renderCoin { base, percentIncrease } =
         ]
 
 
-renderResource : Game -> Resource -> Int -> Html msg
-renderResource game resource base =
+renderResource : Game -> Resource -> Int -> { showTitle : Bool, showTooltip : Bool } -> Html msg
+renderResource game resource base { showTitle, showTooltip } =
     let
         owned : Int
         owned =
@@ -166,15 +166,38 @@ renderResource game resource base =
         isNegativeAmount =
             base < 0
 
-        icon : Html msg
-        icon =
-            (getResourceStats resource).icon
+        stats : ResourceStats
+        stats =
+            getResourceStats resource
+
+        iconLg : Html msg
+        iconLg =
+            stats.icon
                 |> Icon.withSize Icon.Large
                 |> Icon.toHtml
+
+        iconSm : Html msg
+        iconSm =
+            stats.icon
+                |> Icon.withSize Icon.Medium
+                |> Icon.toHtml
+
+        iconWrapper : List (Attribute msg)
+        iconWrapper =
+            List.concat
+                [ [ class "flex items-center" ]
+                , if showTooltip then
+                    [ class "tooltip", attribute "data-tip" stats.title ]
+
+                  else
+                    []
+                ]
     in
     div [ class "flex items-center gap-1" ]
         [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (Utils.intToString base) ]
-        , icon
+        , div (iconWrapper ++ [ class "md:hidden" ]) [ iconSm ]
+        , div (iconWrapper ++ [ class "hidden md:inline-block" ]) [ iconLg ]
+        , div [ classList [ ( "hidden", not showTitle ) ] ] [ text stats.title ]
         , div [ classList [ ( "hidden", not isNegativeAmount || owned >= abs base ) ] ]
             [ text <| "(Owned: " ++ Utils.intToString owned ++ ")" ]
         ]

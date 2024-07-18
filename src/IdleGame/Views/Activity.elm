@@ -144,8 +144,8 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                 [ div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
                 , div [ class "t-column gap-0" ]
                     [ h2 [ Utils.card.title ] [ text (getActivityStats activity).title ]
-                    , div [] [ activityDuration duration ]
 
+                    -- , div [] [ activityDuration duration ]
                     -- The effects of the activity
                     , div [ class "t-column relative" ]
                         (List.map
@@ -153,7 +153,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                                 EffectView.render
                                     { game = game
                                     , effect = moddedEffect
-                                    , renderType = EffectView.DetailView
+                                    , renderType = EffectView.Card
                                     }
                             )
                             orderedAndFilteredEffects

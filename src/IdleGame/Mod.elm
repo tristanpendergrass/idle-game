@@ -396,7 +396,7 @@ increaseSuccessTransformer buff count taggedEffect =
                 newEffect =
                     Effect.VariableSuccess { params | successProbability = newSuccessProbability }
             in
-            ChangeEffect (Effect.setEffect newEffect taggedEffect)
+            ChangeEffect (Debug.log "newEffect" (Effect.setEffect newEffect taggedEffect))
 
         _ ->
             NoChange

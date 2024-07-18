@@ -49,6 +49,7 @@ devFlags =
     -- , defaultTab = Tab.SkillTab Anatomy
     , defaultTab = Tab.SkillTab Labs
 
+    -- , defaultTab = Tab.SkillTab Pathology
     -- , defaultTab = Tab.TestingCenter
     , maxOutSkillXp = True
     }
@@ -61,7 +62,7 @@ prodFlags =
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
-    , showDebugPanel = True -- Setting to True for now so play testers can enjoy
+    , showDebugPanel = False -- Setting to True for now so play testers can enjoy
     , defaultTab = Tab.SkillTab Anatomy
     , debugTimePasses = False
     , maxOutSkillXp = False

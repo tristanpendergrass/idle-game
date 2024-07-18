@@ -4873,6 +4873,10 @@ body {
     display: block;
   }
 
+  .md\:inline-block {
+    display: inline-block;
+  }
+
   .md\:hidden {
     display: none;
   }

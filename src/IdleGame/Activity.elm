@@ -184,20 +184,37 @@ getEffectStats activity =
         tempEffects : List Effect
         tempEffects =
             case activity of
-                MetabolicPathways ->
+                _ ->
+                    []
+
+        costs : List Effect
+        costs =
+            case stats.skill of
+                Physiology ->
                     [ Effect.spendResource 1 AnatomyK
-                        |> Effect.withReducedBy (Effect.ReducedByFlat AnatomyPK)
+                    , Effect.spendResource 1 BiochemistryK
                     ]
+                        |> List.map (Effect.withTags tagsForThisActivity)
 
-                UpperLimb ->
-                    [ Effect.gainResource 1 AnatomyPK
+                Pharmacology ->
+                    [ Effect.spendResource 1 BiochemistryK
+                    , Effect.spendResource 1 PhysiologyK
                     ]
+                        |> List.map (Effect.withTags tagsForThisActivity)
 
-                Inflammation ->
-                    [ Effect.spendResource 5 PathologyK
-                        |> Effect.withReducedBy (Effect.ReducedByFlat PathologyPK)
-                        |> Effect.withTags tagsForThisActivity
+                Microbiology ->
+                    [ Effect.spendResource 1 BiochemistryK
+                    , Effect.spendResource 1 PhysiologyK
                     ]
+                        |> List.map (Effect.withTags tagsForThisActivity)
+
+                Pathology ->
+                    [ AnatomyK, BiochemistryK, PhysiologyK, PharmacologyK, MicrobiologyK, MedicalEthicsK ]
+                        |> List.map
+                            (\resource ->
+                                Effect.spendResource 2 resource
+                                    |> Effect.withTags tagsForThisActivity
+                            )
 
                 _ ->
                     []
@@ -209,9 +226,13 @@ getEffectStats activity =
                     []
 
                 Just amount ->
-                    [ Effect.gainCoin (Coin.int amount)
-                        |> Effect.withTags tagsForThisActivity
-                    ]
+                    if stats.skill == Labs then
+                        []
+
+                    else
+                        [ Effect.gainCoin (Coin.int amount)
+                            |> Effect.withTags tagsForThisActivity
+                        ]
 
         knowledgeEffects : List Effect
         knowledgeEffects =
@@ -226,24 +247,92 @@ getEffectStats activity =
 
         labEffects : List Effect
         labEffects =
-            case activity of
-                Lab1 ->
-                    [ Effect.gainWithProbability (Percent.float 0.5)
-                        [ Effect.gainCoin (Coin.int 5)
-                            |> Effect.withTags tagsForThisActivity
-                        , Effect.gainWithProbability (Percent.float 0.00001)
-                            [ Effect.gainResource 1 AnatomyPK
-                                |> Effect.withOneTime OneTime.Lab1
-                            ]
-                            |> Effect.withTags tagsForThisActivity
+            let
+                oneTimeRewardId : Maybe OneTime.OneTimeId
+                oneTimeRewardId =
+                    case activity of
+                        Lab1 ->
+                            Just OneTime.Lab1
+
+                        Lab2 ->
+                            Just OneTime.Lab2
+
+                        Lab3 ->
+                            Just OneTime.Lab3
+
+                        Lab4 ->
+                            Just OneTime.Lab4
+
+                        Lab5 ->
+                            Just OneTime.Lab5
+
+                        Lab6 ->
+                            Just OneTime.Lab6
+
+                        _ ->
+                            Nothing
+
+                isLab : Bool
+                isLab =
+                    List.member activity [ Lab1, Lab2, Lab3, Lab4, Lab5, Lab6 ]
+
+                resourceToSpend : Resource
+                resourceToSpend =
+                    case activity of
+                        Lab1 ->
+                            AnatomyK
+
+                        Lab2 ->
+                            BiochemistryK
+
+                        Lab3 ->
+                            PhysiologyK
+
+                        Lab4 ->
+                            PharmacologyK
+
+                        Lab5 ->
+                            MicrobiologyK
+
+                        Lab6 ->
+                            PathologyK
+
+                        _ ->
+                            AnatomyK
+            in
+            if isLab then
+                [ Effect.spendResource 1 resourceToSpend
+                , Effect.gainWithProbability (Percent.float 0.245)
+                    (List.concat
+                        [ case stats.coin of
+                            Just amount ->
+                                [ Effect.gainCoin (Coin.int amount)
+                                    |> Effect.withTags tagsForThisActivity
+                                ]
+
+                            Nothing ->
+                                []
+                        , case ( stats.uniqueReward, oneTimeRewardId ) of
+                            ( Just reward, Just rewardId ) ->
+                                [ Effect.gainWithProbability (Percent.float 0.00001)
+                                    [ Effect.gainResource 1 reward
+                                        |> Effect.withOneTime rewardId
+                                        |> Effect.withTags tagsForThisActivity
+                                    ]
+                                ]
+
+                            _ ->
+                                []
                         ]
-                    ]
+                    )
+                ]
+                    |> List.map (Effect.withTags tagsForThisActivity)
 
-                _ ->
-                    []
+            else
+                []
 
-        otherEffects : List Effect
-        otherEffects =
+        activityCompletedEffect : List Effect
+        activityCompletedEffect =
             [ Effect.noOp
                 |> Effect.withTags
                     (List.concat
@@ -410,16 +499,6 @@ getEffectStats activity =
                         ]
                     }
 
-                -- * Pathology
-                -- 	* Overview: Requires a diverse array of subject knowledge, and more of it. An "advanced" subject. Perhaps one or two simpler topics as well.
-                -- 	* Costs: All K
-                -- 	* Rewards: PathologyK
-                -- 	* Masteries:
-                -- 		* Each level grants +1% to gain an additional knowledge other than Pathology
-                -- 		* 25: +10% Pathology XP
-                -- 		* 50: -1 Knowledge cost of each type
-                -- 		* 75: +10% Pathology MXP
-                -- 		* 99: +0.25% Global Mastery XP
                 Pathology ->
                     { perLevel =
                         [ { interval = 1
@@ -458,18 +537,33 @@ getEffectStats activity =
                         ]
                     }
 
+                Labs ->
+                    { perLevel =
+                        [ { interval = 1
+                          , mod =
+                                GameMod
+                                    (Mod.successBuff (Percent.float 0.005)
+                                        |> Mod.withLabel "+0.5% chance of success"
+                                        |> Mod.withTags tagsForThisActivity
+                                    )
+                          }
+                        ]
+                    , atLevel = []
+                    }
+
                 _ ->
                     { perLevel = [], atLevel = [] }
     in
     { effects =
         List.concat
-            [ otherEffects
-            , tempEffects
+            [ costs
             , knowledgeEffects
             , labEffects
             , coinEffects
             , gainMxpEffects
             , gainXpEffects
+            , tempEffects
+            , activityCompletedEffect
             ]
     , mastery = mastery
     }

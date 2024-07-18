@@ -62,7 +62,7 @@ renderStatusBar ( activity, timer ) =
             [ image
             ]
         , div [ class "grow overflow-hidden h-full flex flex-col items-start justify-center" ]
-            [ div [ class "font-bold text-sm leading-tight" ] [ text stats.title ]
+            [ div [ class "font-bold text-sm text-base-content leading-tight" ] [ text stats.title ]
             , div [ class "text-xs text-base-content/70 leading-tight" ] [ text belongsLabel ]
             ]
         , div [ class "absolute bottom-0 left-0 w-full h-[2px]" ]
