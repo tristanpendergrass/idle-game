@@ -195,292 +195,274 @@ withCount count (ApplyEffectsTestConfig config) =
     ApplyEffectsTestConfig { config | count = count }
 
 
-temp =
-    describe "temp"
-        [ testApplyEffect "chance to gain a resource works correctly on very high count"
-            |> withEffects
-                [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
-                ]
-            |> withCount 10000
-            |> runTestDistribution
-                (Test.expectDistribution
-                    [ ( Test.Distribution.atLeast 90
-                      , "is between 42000 and 58000"
-                      , hasOk (hasResourceBetween ( 4200, 5800 ) AnatomyK)
-                      )
+applyEffectsTest =
+    -- TODO: test tail call optimization in applyEffects
+    describe "applyEffects"
+        [ describe "GainCoin"
+            [ testApplyEffect "can get a coin"
+                |> withEffects [ Effect.gainCoin (Coin.int 5) ]
+                |> runTest (expectOk (expectCoin (Coin.int 5)))
+            , testApplyEffect "can get a coin with count of 5"
+                |> withEffects [ Effect.gainCoin (Coin.int 5) ]
+                |> withCount 5
+                |> runTest (expectOk (expectCoin (Coin.int 25)))
+            , testApplyEffect "can add and remove coin"
+                |> withEffects
+                    [ Effect.gainCoin (Coin.int 5)
+                    , Effect.gainCoin (Coin.int -4)
                     ]
-                )
+                |> runTest (expectOk (expectCoin (Coin.int 1)))
+            , testApplyEffect "cannot go below zero coin"
+                |> withEffects [ Effect.gainCoin (Coin.int -5) ]
+                |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
+            , testApplyEffect "cannot go below zero coin and order matters"
+                |> withEffects
+                    [ Effect.gainCoin (Coin.int 5)
+                    , Effect.gainCoin (Coin.int -6)
+                    , Effect.gainCoin (Coin.int 2)
+                    ]
+                |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
+            ]
+        , describe "SpendResource"
+            [ testApplyEffect "can spend a resource"
+                |> withEffects
+                    [ Effect.gainResource 5 AnatomyK
+                    , Effect.spendResource 3 AnatomyK
+                    ]
+                |> runTest (expectOk (expectResource 2 AnatomyK))
+            , testApplyEffect "can't go below 0 of a resource"
+                |> withEffects
+                    [ Effect.gainResource 5 AnatomyK
+                    , Effect.spendResource 8 AnatomyK
+                    ]
+                |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
+            , testApplyEffect "it can be reduced by a flat amount"
+                |> withEffects
+                    [ Effect.gainResource 5 AnatomyK
+                    , Effect.gainResource 1 AnatomyPK
+                    , Effect.spendResource 3 AnatomyK
+                        |> Effect.withReducedBy (Effect.ReducedByFlat AnatomyPK)
+                    ]
+                |> runTest (expectOk (expectResource 3 AnatomyK))
+            , testApplyEffect "it can be reduced by a percent amount"
+                |> withEffects
+                    [ Effect.gainResource 100 AnatomyK
+                    , Effect.gainResource 2 AnatomyPK
+                    , Effect.spendResource 100 AnatomyK
+                        |> Effect.withReducedBy (Effect.ReducedByPercent AnatomyPK (Percent.float 0.05))
+                    ]
+                |> runTest (expectOk (expectResource 10 AnatomyK))
+            ]
+        , describe "one time effects"
+            [ let
+                oneTimeEffect : Effect
+                oneTimeEffect =
+                    Effect.gainResource 5 AnatomyK
+                        |> Effect.withOneTime OneTime.Lab1
+              in
+              testApplyEffect "only happen once"
+                |> withEffects
+                    [ oneTimeEffect
+                    , oneTimeEffect
+                    ]
+                |> runTest (expectOk (expectResource 5 AnatomyK))
+            , let
+                oneTimeEffect : Effect
+                oneTimeEffect =
+                    Effect.gainResource 5 AnatomyK
+                        |> Effect.withOneTime OneTime.Lab1
+              in
+              testApplyEffect "only happen once even when applied using count greater than 1"
+                |> withEffects [ oneTimeEffect ]
+                |> withCount 3
+                |> runTest (expectOk (expectResource 5 AnatomyK))
+            ]
+        , describe "GainResource"
+            [ testApplyEffect "can get resources"
+                |> withEffects [ Effect.gainResource 1 AnatomyK ]
+                |> runTest (expectOk (expectResource 1 AnatomyK))
+            , testApplyEffect "can get resources with count of 5"
+                |> withEffects [ Effect.gainResource 1 AnatomyK ]
+                |> withCount 5
+                |> runTest (expectOk (expectResource 5 AnatomyK))
+            , testApplyEffect "cannot go below 0 of a resource"
+                |> withEffects [ Effect.spendResource 1 AnatomyK ]
+                |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
+            , testApplyEffect "doubling chance of 50% works"
+                |> withEffects [ Effect.gainResourceWithDoubling 1 AnatomyK (Percent.float 0.5) ]
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 1 of resource"
+                          , hasOk (hasResource 1 AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 2 of resource"
+                          , hasOk (hasResource 2 AnatomyK)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 1 AnatomyK
+                                    , hasResource 2 AnatomyK
+                                    ]
+                                )
+                          )
+                        ]
+                    )
+            , testApplyEffect "doubling chance of 50% works with count of 5"
+                |> withEffects [ Effect.gainResourceWithDoubling 1 AnatomyK (Percent.float 0.5) ]
+                |> withCount 5
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 5 of resource"
+                          , hasOk (hasResource 5 AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 10 of resource"
+                          , hasOk (hasResource 10 AnatomyK)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 5 AnatomyK
+                                    , hasResource 10 AnatomyK
+                                    ]
+                                )
+                          )
+                        ]
+                    )
+            ]
+        , describe "VariableSuccess"
+            [ testApplyEffect "can have a 50% chance to gain a resource"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 1 of resource"
+                          , hasOk (hasResource 1 AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 0 of resource"
+                          , hasOk (hasResource 0 AnatomyK)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has more than 1 reasource"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 0 AnatomyK
+                                    , hasResource 1 AnatomyK
+                                    ]
+                                )
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on count > 1"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 100
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 42 and 58"
+                          , hasOk (hasResourceBetween ( 42, 58 ) AnatomyK)
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on high count"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 1000
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 4200 and 5800"
+                          , hasOk (hasResourceBetween ( 420, 580 ) AnatomyK)
+                          )
+                        ]
+                    )
+            , testApplyEffect "chance to gain a resource works correctly on very high count"
+                |> withEffects
+                    [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
+                    ]
+                |> withCount 10000
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "is between 42000 and 58000"
+                          , hasOk (hasResourceBetween ( 4200, 5800 ) AnatomyK)
+                          )
+                        ]
+                    )
+            ]
+        , describe "OneOf effect"
+            [ testApplyEffect "can choose between two effects"
+                |> withEffects
+                    [ Effect.oneOf
+                        (Effect.gainResource 1 AnatomyK)
+                        [ Effect.gainResource 1 MicrobiologyK
+                        ]
+                    ]
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 45
+                          , "has 1 AnatomyK"
+                          , hasOk
+                                (hasResource 1 AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 45
+                          , "has 1 MicrobiologyK"
+                          , hasOk
+                                (hasResource 1 MicrobiologyK)
+                          )
+                        , ( Test.Distribution.zero
+                          , "has something else"
+                          , hasOk
+                                (hasNoneOf
+                                    [ hasResource 1 AnatomyK
+                                    , hasResource 1 MicrobiologyK
+                                    ]
+                                )
+                          )
+                        ]
+                    )
+            , testApplyEffect "can choose between two effects many times"
+                |> withEffects
+                    [ Effect.oneOf
+                        (Effect.gainResource 1 AnatomyK)
+                        [ Effect.gainResource 1 MicrobiologyK
+                        ]
+                    ]
+                |> withCount 100
+                |> runTestDistribution
+                    (Test.expectDistribution
+                        [ ( Test.Distribution.atLeast 90
+                          , "has the expected number of AnatomyK"
+                          , hasOk
+                                (hasResourceBetween ( 42, 58 ) AnatomyK)
+                          )
+                        , ( Test.Distribution.atLeast 99
+                          , "was given something each time"
+                          , hasOk
+                                (\game ->
+                                    let
+                                        anatomyK =
+                                            getByResource AnatomyK game.resources
+
+                                        microbiologyK =
+                                            getByResource MicrobiologyK game.resources
+                                    in
+                                    anatomyK + microbiologyK == 100
+                                )
+                          )
+                        ]
+                    )
+            ]
         ]
-
-
-
--- applyEffectsTest =
---     -- TODO: test tail call optimization in applyEffects
---     describe "applyEffects"
---         [ describe "GainCoin"
---             [ testApplyEffect "can get a coin"
---                 |> withEffects [ Effect.gainCoin (Coin.int 5) ]
---                 |> runTest (expectOk (expectCoin (Coin.int 5)))
---             , testApplyEffect "can get a coin with count of 5"
---                 |> withEffects [ Effect.gainCoin (Coin.int 5) ]
---                 |> withCount 5
---                 |> runTest (expectOk (expectCoin (Coin.int 25)))
---             , testApplyEffect "can add and remove coin"
---                 |> withEffects
---                     [ Effect.gainCoin (Coin.int 5)
---                     , Effect.gainCoin (Coin.int -4)
---                     ]
---                 |> runTest (expectOk (expectCoin (Coin.int 1)))
---             , testApplyEffect "cannot go below zero coin"
---                 |> withEffects [ Effect.gainCoin (Coin.int -5) ]
---                 |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
---             , testApplyEffect "cannot go below zero coin and order matters"
---                 |> withEffects
---                     [ Effect.gainCoin (Coin.int 5)
---                     , Effect.gainCoin (Coin.int -6)
---                     , Effect.gainCoin (Coin.int 2)
---                     ]
---                 |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
---             ]
---         , describe "SpendResource"
---             [ testApplyEffect "can spend a resource"
---                 |> withEffects
---                     [ Effect.gainResource 5 AnatomyK
---                     , Effect.spendResource 3 AnatomyK
---                     ]
---                 |> runTest (expectOk (expectResource 2 AnatomyK))
---             , testApplyEffect "can't go below 0 of a resource"
---                 |> withEffects
---                     [ Effect.gainResource 5 AnatomyK
---                     , Effect.spendResource 8 AnatomyK
---                     ]
---                 |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
---             , testApplyEffect "it can be reduced by a flat amount"
---                 |> withEffects
---                     [ Effect.gainResource 5 AnatomyK
---                     , Effect.gainResource 1 AnatomyPK
---                     , Effect.spendResource 3 AnatomyK
---                         |> Effect.withReducedBy (Effect.ReducedByFlat AnatomyPK)
---                     ]
---                 |> runTest (expectOk (expectResource 3 AnatomyK))
---             , testApplyEffect "it can be reduced by a percent amount"
---                 |> withEffects
---                     [ Effect.gainResource 100 AnatomyK
---                     , Effect.gainResource 2 AnatomyPK
---                     , Effect.spendResource 100 AnatomyK
---                         |> Effect.withReducedBy (Effect.ReducedByPercent AnatomyPK (Percent.float 0.05))
---                     ]
---                 |> runTest (expectOk (expectResource 10 AnatomyK))
---             ]
---         , describe "one time effects"
---             [ let
---                 oneTimeEffect : Effect
---                 oneTimeEffect =
---                     Effect.gainResource 5 AnatomyK
---                         |> Effect.withOneTime OneTime.Lab1
---               in
---               testApplyEffect "only happen once"
---                 |> withEffects
---                     [ oneTimeEffect
---                     , oneTimeEffect
---                     ]
---                 |> runTest (expectOk (expectResource 5 AnatomyK))
---             , let
---                 oneTimeEffect : Effect
---                 oneTimeEffect =
---                     Effect.gainResource 5 AnatomyK
---                         |> Effect.withOneTime OneTime.Lab1
---               in
---               testApplyEffect "only happen once even when applied using count greater than 1"
---                 |> withEffects [ oneTimeEffect ]
---                 |> withCount 3
---                 |> runTest (expectOk (expectResource 5 AnatomyK))
---             ]
---         , describe "GainResource"
---             [ testApplyEffect "can get resources"
---                 |> withEffects [ Effect.gainResource 1 AnatomyK ]
---                 |> runTest (expectOk (expectResource 1 AnatomyK))
---             , testApplyEffect "can get resources with count of 5"
---                 |> withEffects [ Effect.gainResource 1 AnatomyK ]
---                 |> withCount 5
---                 |> runTest (expectOk (expectResource 5 AnatomyK))
---             , testApplyEffect "cannot go below 0 of a resource"
---                 |> withEffects [ Effect.spendResource 1 AnatomyK ]
---                 |> runTest (expectErr (Expect.equal EffectErr.NegativeAmount))
---             , testApplyEffect "doubling chance of 50% works"
---                 |> withEffects [ Effect.gainResourceWithDoubling 1 AnatomyK (Percent.float 0.5) ]
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 45
---                           , "has 1 of resource"
---                           , hasOk (hasResource 1 AnatomyK)
---                           )
---                         , ( Test.Distribution.atLeast 45
---                           , "has 2 of resource"
---                           , hasOk (hasResource 2 AnatomyK)
---                           )
---                         , ( Test.Distribution.zero
---                           , "has something else"
---                           , hasOk
---                                 (hasNoneOf
---                                     [ hasResource 1 AnatomyK
---                                     , hasResource 2 AnatomyK
---                                     ]
---                                 )
---                           )
---                         ]
---                     )
---             , testApplyEffect "doubling chance of 50% works with count of 5"
---                 |> withEffects [ Effect.gainResourceWithDoubling 1 AnatomyK (Percent.float 0.5) ]
---                 |> withCount 5
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 45
---                           , "has 5 of resource"
---                           , hasOk (hasResource 5 AnatomyK)
---                           )
---                         , ( Test.Distribution.atLeast 45
---                           , "has 10 of resource"
---                           , hasOk (hasResource 10 AnatomyK)
---                           )
---                         , ( Test.Distribution.zero
---                           , "has something else"
---                           , hasOk
---                                 (hasNoneOf
---                                     [ hasResource 5 AnatomyK
---                                     , hasResource 10 AnatomyK
---                                     ]
---                                 )
---                           )
---                         ]
---                     )
---             ]
---         , describe "VariableSuccess"
---             [ testApplyEffect "can have a 50% chance to gain a resource"
---                 |> withEffects
---                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
---                     ]
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 45
---                           , "has 1 of resource"
---                           , hasOk (hasResource 1 AnatomyK)
---                           )
---                         , ( Test.Distribution.atLeast 45
---                           , "has 0 of resource"
---                           , hasOk (hasResource 0 AnatomyK)
---                           )
---                         , ( Test.Distribution.zero
---                           , "has more than 1 reasource"
---                           , hasOk
---                                 (hasNoneOf
---                                     [ hasResource 0 AnatomyK
---                                     , hasResource 1 AnatomyK
---                                     ]
---                                 )
---                           )
---                         ]
---                     )
---             , testApplyEffect "chance to gain a resource works correctly on count > 1"
---                 |> withEffects
---                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
---                     ]
---                 |> withCount 100
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 90
---                           , "is between 42 and 58"
---                           , hasOk (hasResourceBetween ( 42, 58 ) AnatomyK)
---                           )
---                         ]
---                     )
---             , testApplyEffect "chance to gain a resource works correctly on high count"
---                 |> withEffects
---                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
---                     ]
---                 |> withCount 1000
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 90
---                           , "is between 4200 and 5800"
---                           , hasOk (hasResourceBetween ( 420, 580 ) AnatomyK)
---                           )
---                         ]
---                     )
---             , testApplyEffect "chance to gain a resource works correctly on very high count"
---                 |> withEffects
---                     [ Effect.gainWithProbability (Percent.float 0.5) [ Effect.gainResource 1 AnatomyK ]
---                     ]
---                 |> withCount 10000
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 90
---                           , "is between 42000 and 58000"
---                           , hasOk (hasResourceBetween ( 4200, 5800 ) AnatomyK)
---                           )
---                         ]
---                     )
---             ]
---         , describe "OneOf effect"
---             [ testApplyEffect "can choose between two effects"
---                 |> withEffects
---                     [ Effect.oneOf
---                         (Effect.gainResource 1 AnatomyK)
---                         [ Effect.gainResource 1 MicrobiologyK
---                         ]
---                     ]
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 45
---                           , "has 1 AnatomyK"
---                           , hasOk
---                                 (hasResource 1 AnatomyK)
---                           )
---                         , ( Test.Distribution.atLeast 45
---                           , "has 1 MicrobiologyK"
---                           , hasOk
---                                 (hasResource 1 MicrobiologyK)
---                           )
---                         , ( Test.Distribution.zero
---                           , "has something else"
---                           , hasOk
---                                 (hasNoneOf
---                                     [ hasResource 1 AnatomyK
---                                     , hasResource 1 MicrobiologyK
---                                     ]
---                                 )
---                           )
---                         ]
---                     )
---             , testApplyEffect "can choose between two effects many times"
---                 |> withEffects
---                     [ Effect.oneOf
---                         (Effect.gainResource 1 AnatomyK)
---                         [ Effect.gainResource 1 MicrobiologyK
---                         ]
---                     ]
---                 |> withCount 100
---                 |> runTestDistribution
---                     (Test.expectDistribution
---                         [ ( Test.Distribution.atLeast 90
---                           , "has the expected number of AnatomyK"
---                           , hasOk
---                                 (hasResourceBetween ( 42, 58 ) AnatomyK)
---                           )
---                         , ( Test.Distribution.atLeast 99
---                           , "was given something each time"
---                           , hasOk
---                                 (\game ->
---                                     let
---                                         anatomyK =
---                                             getByResource AnatomyK game.resources
---                                         microbiologyK =
---                                             getByResource MicrobiologyK game.resources
---                                     in
---                                     anatomyK + microbiologyK == 100
---                                 )
---                           )
---                         ]
---                     )
---             ]
---         ]

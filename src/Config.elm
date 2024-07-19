@@ -62,8 +62,8 @@ prodFlags =
     , showFastForwardSpeed = False
     , extraFastForwardTime = Duration.hours 0
     , showTimePasses = True
-    , showDebugPanel = False -- Setting to True for now so play testers can enjoy
-    , defaultTab = Tab.SkillTab Anatomy
+    , showDebugPanel = False
+    , defaultTab = Tab.Home
     , debugTimePasses = False
     , maxOutSkillXp = False
     }

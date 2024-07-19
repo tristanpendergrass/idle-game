@@ -62,6 +62,34 @@ $ npx elm-codegen install
 
 # Todos
 
+## Bugs
+[ ] When doing lab with 50% success rate I see "+0 coin" when failure happens
+[ ] Fix that bug where there's a bunch of toasts when you come back
+
+## v0.2
+[ ] Hard to figure out what each number means in the activity. Yang says add terminology like "Gain:" so it's clear.
+[ ] Add a resource you can get for completing the Step 1
+[ ] Remember tab you were on by storing in backend model
+[ ] Testing Center 2/2: do some basic tests for all subjects plus basic shelf exam and Step 1
+[ ] XP 2/2: customized xp schedule for all activities
+[ ] Costs 2/2: customized effects for all activities
+[ ] Add changelog
+[ ] Add shop items
+[ ] Add mail system
+[ ] Listen to music for bonuses
+[ ] Better test logic
+[ ] Enable to close the debug menu
+[ ] Left side nav has horizontal scroll bar
+[ ] Refactor so that the Google sheets columns don't have format "resource:amount" but rather two columns, one for resource other for amount
+
+# Done
+[x] Remove code references to old version
+[x] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
+[x] Add anatomy topics
+[x] Add Biochemistry
+[x] Add Microchemistry and Immunology (experiments)
+[x] Add Pathology
+
 ## v0.1
 [x] Testing Center 1/2: do some basic tests for all subjects plus basic shelf exam and Step 1
 [x] Add a Welcome tab
@@ -89,31 +117,3 @@ $ npx elm-codegen install
 [x] Add masteries
   [x] Design
   [x] Implement
-
-## Bugs
-[ ] When doing lab with 50% success rate I see "+0 coin" when failure happens
-[ ] Fix that bug where there's a bunch of toasts when you come back
-
-## v0.2
-[ ] Hard to figure out what each number means in the activity. Yang says add terminology like "Gain:" so it's clear.
-[ ] Add a resource you can get for completing the Step 1
-[ ] Remember tab you were on by storing in backend model
-[ ] Testing Center 2/2: do some basic tests for all subjects plus basic shelf exam and Step 1
-[ ] XP 2/2: customized xp schedule for all activities
-[ ] Costs 2/2: customized effects for all activities
-[ ] Add changelog
-[ ] Add shop items
-[ ] Add mail system
-[ ] Listen to music for bonuses
-[ ] Better test logic
-[ ] Enable to close the debug menu
-[ ] Left side nav has horizontal scroll bar
-[ ] Refactor so that the Google sheets columns don't have format "resource:amount" but rather two columns, one for resource other for amount
-
-## Done
-[x] Remove code references to old version
-[x] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
-[x] Add anatomy topics
-[x] Add Biochemistry
-[x] Add Microchemistry and Immunology (experiments)
-[x] Add Pathology
