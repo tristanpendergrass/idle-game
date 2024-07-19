@@ -54,6 +54,7 @@ $ npx elm-codegen install
   [ ] Move current version from Todos to Changelog
   [ ] Create new section header for next version
 [ ] Update current version in `Config.elm`
+[ ] Commit all changes in Git
 [ ] Run `$ lamdera check`
   [ ] Optional: Run `$ lamdera check --destructive-migration` instead if willing to destroy all prod data
 [ ] Commit changes in git. Don't forget to use `$ git add .` instead of `$ git commit -am`! There's new migration files at this point.
