@@ -74,11 +74,9 @@ renderDrawer isDrawerOpen activeTab =
                 ]
             , div [ class "h-4" ] []
             , ul [ class "menu flex flex-col p-0 px-4" ]
-                [ li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack, underConstruction = False } ]
+                [ li [ onClick (HandleTabClick Tab.Home) ] [ renderTab { tab = Tab.Home, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack, underConstruction = False } ]
                 , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
-                , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter, underConstruction = False } ]
-                , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
-                    [ renderTab { tab = Tab.SkillTab Labs, underConstruction = False } ]
                 ]
             , ul [ class "menu flex flex-col p-0 px-4" ]
                 (List.concat
@@ -93,5 +91,12 @@ renderDrawer isDrawerOpen activeTab =
                             )
                     ]
                 )
+            , ul [ class "menu flex flex-col p-0 px-4" ]
+                [ li [] []
+                , li [ class "menu-title" ] [ text "Campus" ]
+                , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
+                    [ renderTab { tab = Tab.SkillTab Labs, underConstruction = False } ]
+                , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter, underConstruction = False } ]
+                ]
             ]
         ]

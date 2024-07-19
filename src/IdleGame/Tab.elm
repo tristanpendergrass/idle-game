@@ -6,7 +6,8 @@ import IdleGame.Views.Icon as Icon exposing (Icon)
 
 
 type Tab
-    = Backpack
+    = Home
+    | Backpack
     | Shop
     | TestingCenter
     | SkillTab Skill
@@ -21,6 +22,11 @@ type alias TabConfig =
 getConfig : Tab -> TabConfig
 getConfig tab =
     case tab of
+        Home ->
+            { title = "Home"
+            , icon = Icon.home
+            }
+
         Backpack ->
             { title = "Backpack"
             , icon = Icon.bag

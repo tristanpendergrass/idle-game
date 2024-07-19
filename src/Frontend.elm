@@ -129,7 +129,7 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
                 previewActivity : Activity
                 previewActivity =
                     case preview of
-                        Preview a ->
+                        Preview ( a, _ ) ->
                             a
             in
             if Tuple.first activity == previewActivity then
@@ -610,31 +610,36 @@ update msg model =
                 )
 
         HandlePreviewClick activity ->
-            let
-                currentActivity : Maybe ( Activity, Timer )
-                currentActivity =
-                    getActivity model
+            case model.gameState of
+                Playing snapshot cachedActivityEffects ->
+                    let
+                        currentActivity : Maybe ( Activity, Timer )
+                        currentActivity =
+                            (Snapshot.getValue snapshot).activity
 
-                clickingActiveActivity : Bool
-                clickingActiveActivity =
-                    case currentActivity of
-                        Just ( k, _ ) ->
-                            k == activity
+                        clickingActiveActivity : Bool
+                        clickingActiveActivity =
+                            case currentActivity of
+                                Just ( k, _ ) ->
+                                    k == activity
 
-                        Nothing ->
-                            False
-            in
-            ( model
-                |> setPreview (Just (Preview activity))
-                |> setActivityExpanded
-                    (if clickingActiveActivity then
-                        True
+                                Nothing ->
+                                    False
+                    in
+                    ( model
+                        |> setPreview (Just (Preview ( activity, getByActivity activity cachedActivityEffects )))
+                        |> setActivityExpanded
+                            (if clickingActiveActivity then
+                                True
 
-                     else
-                        False
+                             else
+                                False
+                            )
+                    , Cmd.none
                     )
-            , Cmd.none
-            )
+
+                _ ->
+                    noOp
 
         HandlePlayClick kind ->
             ( model
@@ -645,11 +650,16 @@ update msg model =
             )
 
         HandleStopClick kind ->
-            ( model
-                |> setActivity Nothing
-                |> setPreview (Just (Preview kind))
-            , Cmd.none
-            )
+            case model.gameState of
+                Playing _ cachedActivityEffects ->
+                    ( model
+                        |> setActivity Nothing
+                        |> setPreview (Just (Preview ( kind, getByActivity kind cachedActivityEffects )))
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noOp
 
         SetDrawerOpen newValue ->
             ( model
@@ -1237,8 +1247,8 @@ view model =
                                 False
 
                     renderActivity : ( Activity, Timer ) -> Html FrontendMsg
-                    renderActivity activity =
-                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity activity) extraBottomPadding game
+                    renderActivity ( activity, timer ) =
+                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity ( ( activity, getByActivity activity cache ), timer )) extraBottomPadding game
 
                     renderPreview : Preview -> Html FrontendMsg
                     renderPreview preview =

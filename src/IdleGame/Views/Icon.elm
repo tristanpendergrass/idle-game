@@ -578,3 +578,13 @@ workspaces =
 testingCenter : Icon
 testingCenter =
     createIconMaterial MaterialQuiz
+
+
+home : Icon
+home =
+    createIconFeather FeatherIcons.home
+
+
+arrowDown : Icon
+arrowDown =
+    createIconFeather FeatherIcons.arrowDown

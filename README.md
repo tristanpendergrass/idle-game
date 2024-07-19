@@ -63,11 +63,13 @@ $ npx elm-codegen install
 # Todos
 
 ## v0.1
+[x] Testing Center 1/2: do some basic tests for all subjects plus basic shelf exam and Step 1
+[x] Add a Welcome tab
+[x] Activity doesn't show modified effect correctly in detail view
 [x] Fix issue with probabilistic awards not being granted on large time step
 [x] New icon for PK
 [x] Disable the debug menu in prod
 [x] The status bar at bottom on mobile has wrong text color
-[ ] Add a Welcome tab
 [x] XP 1/2: basic xp schedule for all activities
 [x] Costs 1/2: basic cost effects for all activities
 [x] Show resource name in tooltip
@@ -78,9 +80,6 @@ $ npx elm-codegen install
   [x] Masteries
   [x] Costs
   [x] Rewards
-[ ] Check out the woodcutting visual design for a better example
-[ ] Hard to figure out what each number means in the activity. Yang says add terminology like "Gain:" so it's clear. And get rid of the duration, or make it a different font.
-[ ] Activity doesn't show modified effect correctly in detail view
 [x] Support Testing Center tab
 [x] Design Tests
 [x] Support Labs skill
@@ -93,9 +92,13 @@ $ npx elm-codegen install
 
 ## Bugs
 [ ] When doing lab with 50% success rate I see "+0 coin" when failure happens
+[ ] Fix that bug where there's a bunch of toasts when you come back
 
 ## v0.2
+[ ] Hard to figure out what each number means in the activity. Yang says add terminology like "Gain:" so it's clear.
+[ ] Add a resource you can get for completing the Step 1
 [ ] Remember tab you were on by storing in backend model
+[ ] Testing Center 2/2: do some basic tests for all subjects plus basic shelf exam and Step 1
 [ ] XP 2/2: customized xp schedule for all activities
 [ ] Costs 2/2: customized effects for all activities
 [ ] Add changelog

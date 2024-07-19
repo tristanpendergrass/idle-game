@@ -76,7 +76,7 @@ renderStatusBar ( activity, timer ) =
 
 
 type DetailViewObject
-    = DetailViewActivity ( Activity, Timer )
+    = DetailViewActivity ( ( Activity, List Effect ), Timer )
     | DetailViewPreview Preview
 
 
@@ -92,14 +92,13 @@ fade shouldFade =
 renderContent : DetailViewObject -> Bool -> Game -> Html FrontendMsg
 renderContent obj extraBottomPadding game =
     let
-        activity : Activity
-        activity =
+        ( activity, effects ) =
             case obj of
-                DetailViewActivity ( k, _ ) ->
-                    k
+                DetailViewActivity ( ( k, e ), _ ) ->
+                    ( k, e )
 
-                DetailViewPreview (Preview k) ->
-                    k
+                DetailViewPreview (Preview ( k, e )) ->
+                    ( k, e )
 
         stats : ActivityStats
         stats =
@@ -112,14 +111,6 @@ renderContent obj extraBottomPadding game =
         mxp : Xp
         mxp =
             getByActivity activity game.mxp
-
-        effects : List Effect
-        effects =
-            (Activity.getEffectStats activity).effects
-
-        mods : List Mod
-        mods =
-            Game.getAllMods game
 
         orderedEffects : List Effect
         orderedEffects =

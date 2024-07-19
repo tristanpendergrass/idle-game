@@ -47,10 +47,10 @@ devFlags =
     , showDebugPanel = True
 
     -- , defaultTab = Tab.SkillTab Anatomy
-    , defaultTab = Tab.SkillTab Labs
-
+    -- , defaultTab = Tab.SkillTab Labs
     -- , defaultTab = Tab.SkillTab Pathology
     -- , defaultTab = Tab.TestingCenter
+    , defaultTab = Tab.Home
     , maxOutSkillXp = True
     }
 

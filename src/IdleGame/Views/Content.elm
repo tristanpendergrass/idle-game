@@ -12,6 +12,7 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
 import IdleGame.Views.Bag
+import IdleGame.Views.Home
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
 import IdleGame.Views.SubjectViews
@@ -54,6 +55,9 @@ renderContent model game cachedActivityEffects activeTab =
                 ]
             ]
         , case activeTab of
+            Tab.Home ->
+                IdleGame.Views.Home.render model game cachedActivityEffects
+
             Tab.Shop ->
                 IdleGame.Views.UnderConstruction.render
 

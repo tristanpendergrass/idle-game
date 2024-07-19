@@ -2041,23 +2041,179 @@ type AcademicTest
     | Anatomy3
     | Anatomy4
     | Anatomy5
+    | Biochemistry1
+    | Biochemistry2
+    | Biochemistry3
+    | Biochemistry4
+    | Biochemistry5
+    | Physiology1
+    | Physiology2
+    | Physiology3
+    | Physiology4
+    | Physiology5
+    | Pharmacology1
+    | Pharmacology2
+    | Pharmacology3
+    | Pharmacology4
+    | Pharmacology5
+    | Microbiology1
+    | Microbiology2
+    | Microbiology3
+    | Microbiology4
+    | Microbiology5
+    | Pathology1
+    | Pathology2
+    | Pathology3
+    | Pathology4
+    | Pathology5
+    | MedicalEthics1
+    | MedicalEthics2
+    | MedicalEthics3
+    | ShelfExamAnatomy
+    | ShelfExamBiochemistry
+    | ShelfExamPhysiology
+    | ShelfExamPharmacology
+    | ShelfExamMicrobiology
+    | ShelfExamPathology
+    | UsmleStep1Test
 
 
 allAcademicTests : List AcademicTest
 allAcademicTests =
-    [ Anatomy1, Anatomy2, Anatomy3, Anatomy4, Anatomy5 ]
+    [ Anatomy1
+    , Anatomy2
+    , Anatomy3
+    , Anatomy4
+    , Anatomy5
+    , Biochemistry1
+    , Biochemistry2
+    , Biochemistry3
+    , Biochemistry4
+    , Biochemistry5
+    , Physiology1
+    , Physiology2
+    , Physiology3
+    , Physiology4
+    , Physiology5
+    , Pharmacology1
+    , Pharmacology2
+    , Pharmacology3
+    , Pharmacology4
+    , Pharmacology5
+    , Microbiology1
+    , Microbiology2
+    , Microbiology3
+    , Microbiology4
+    , Microbiology5
+    , Pathology1
+    , Pathology2
+    , Pathology3
+    , Pathology4
+    , Pathology5
+    , MedicalEthics1
+    , MedicalEthics2
+    , MedicalEthics3
+    , ShelfExamAnatomy
+    , ShelfExamBiochemistry
+    , ShelfExamPhysiology
+    , ShelfExamPharmacology
+    , ShelfExamMicrobiology
+    , ShelfExamPathology
+    , UsmleStep1Test
+    ]
 
 
 type alias AcademicTestRecord a =
-    { anatomy1 : a, anatomy2 : a, anatomy3 : a, anatomy4 : a, anatomy5 : a }
+    { anatomy1 : a
+    , anatomy2 : a
+    , anatomy3 : a
+    , anatomy4 : a
+    , anatomy5 : a
+    , biochemistry1 : a
+    , biochemistry2 : a
+    , biochemistry3 : a
+    , biochemistry4 : a
+    , biochemistry5 : a
+    , physiology1 : a
+    , physiology2 : a
+    , physiology3 : a
+    , physiology4 : a
+    , physiology5 : a
+    , pharmacology1 : a
+    , pharmacology2 : a
+    , pharmacology3 : a
+    , pharmacology4 : a
+    , pharmacology5 : a
+    , microbiology1 : a
+    , microbiology2 : a
+    , microbiology3 : a
+    , microbiology4 : a
+    , microbiology5 : a
+    , pathology1 : a
+    , pathology2 : a
+    , pathology3 : a
+    , pathology4 : a
+    , pathology5 : a
+    , medicalEthics1 : a
+    , medicalEthics2 : a
+    , medicalEthics3 : a
+    , shelfExamAnatomy : a
+    , shelfExamBiochemistry : a
+    , shelfExamPhysiology : a
+    , shelfExamPharmacology : a
+    , shelfExamMicrobiology : a
+    , shelfExamPathology : a
+    , usmleStep1Test : a
+    }
 
 
 academicTestRecord : a -> AcademicTestRecord a
 academicTestRecord a =
-    { anatomy1 = a, anatomy2 = a, anatomy3 = a, anatomy4 = a, anatomy5 = a }
+    { anatomy1 = a
+    , anatomy2 = a
+    , anatomy3 = a
+    , anatomy4 = a
+    , anatomy5 = a
+    , biochemistry1 = a
+    , biochemistry2 = a
+    , biochemistry3 = a
+    , biochemistry4 = a
+    , biochemistry5 = a
+    , physiology1 = a
+    , physiology2 = a
+    , physiology3 = a
+    , physiology4 = a
+    , physiology5 = a
+    , pharmacology1 = a
+    , pharmacology2 = a
+    , pharmacology3 = a
+    , pharmacology4 = a
+    , pharmacology5 = a
+    , microbiology1 = a
+    , microbiology2 = a
+    , microbiology3 = a
+    , microbiology4 = a
+    , microbiology5 = a
+    , pathology1 = a
+    , pathology2 = a
+    , pathology3 = a
+    , pathology4 = a
+    , pathology5 = a
+    , medicalEthics1 = a
+    , medicalEthics2 = a
+    , medicalEthics3 = a
+    , shelfExamAnatomy = a
+    , shelfExamBiochemistry = a
+    , shelfExamPhysiology = a
+    , shelfExamPharmacology = a
+    , shelfExamMicrobiology = a
+    , shelfExamPathology = a
+    , usmleStep1Test = a
+    }
 
 
-getByAcademicTest : AcademicTest -> AcademicTestRecord anatomy5 -> anatomy5
+getByAcademicTest :
+    AcademicTest -> AcademicTestRecord usmleStep1Test -> usmleStep1Test
 getByAcademicTest kind data =
     case kind of
         Anatomy1 ->
@@ -2074,6 +2230,111 @@ getByAcademicTest kind data =
 
         Anatomy5 ->
             data.anatomy5
+
+        Biochemistry1 ->
+            data.biochemistry1
+
+        Biochemistry2 ->
+            data.biochemistry2
+
+        Biochemistry3 ->
+            data.biochemistry3
+
+        Biochemistry4 ->
+            data.biochemistry4
+
+        Biochemistry5 ->
+            data.biochemistry5
+
+        Physiology1 ->
+            data.physiology1
+
+        Physiology2 ->
+            data.physiology2
+
+        Physiology3 ->
+            data.physiology3
+
+        Physiology4 ->
+            data.physiology4
+
+        Physiology5 ->
+            data.physiology5
+
+        Pharmacology1 ->
+            data.pharmacology1
+
+        Pharmacology2 ->
+            data.pharmacology2
+
+        Pharmacology3 ->
+            data.pharmacology3
+
+        Pharmacology4 ->
+            data.pharmacology4
+
+        Pharmacology5 ->
+            data.pharmacology5
+
+        Microbiology1 ->
+            data.microbiology1
+
+        Microbiology2 ->
+            data.microbiology2
+
+        Microbiology3 ->
+            data.microbiology3
+
+        Microbiology4 ->
+            data.microbiology4
+
+        Microbiology5 ->
+            data.microbiology5
+
+        Pathology1 ->
+            data.pathology1
+
+        Pathology2 ->
+            data.pathology2
+
+        Pathology3 ->
+            data.pathology3
+
+        Pathology4 ->
+            data.pathology4
+
+        Pathology5 ->
+            data.pathology5
+
+        MedicalEthics1 ->
+            data.medicalEthics1
+
+        MedicalEthics2 ->
+            data.medicalEthics2
+
+        MedicalEthics3 ->
+            data.medicalEthics3
+
+        ShelfExamAnatomy ->
+            data.shelfExamAnatomy
+
+        ShelfExamBiochemistry ->
+            data.shelfExamBiochemistry
+
+        ShelfExamPhysiology ->
+            data.shelfExamPhysiology
+
+        ShelfExamPharmacology ->
+            data.shelfExamPharmacology
+
+        ShelfExamMicrobiology ->
+            data.shelfExamMicrobiology
+
+        ShelfExamPathology ->
+            data.shelfExamPathology
+
+        UsmleStep1Test ->
+            data.usmleStep1Test
 
 
 setByAcademicTest :
@@ -2097,6 +2358,111 @@ setByAcademicTest kind value data =
 
         Anatomy5 ->
             { data | anatomy5 = value }
+
+        Biochemistry1 ->
+            { data | biochemistry1 = value }
+
+        Biochemistry2 ->
+            { data | biochemistry2 = value }
+
+        Biochemistry3 ->
+            { data | biochemistry3 = value }
+
+        Biochemistry4 ->
+            { data | biochemistry4 = value }
+
+        Biochemistry5 ->
+            { data | biochemistry5 = value }
+
+        Physiology1 ->
+            { data | physiology1 = value }
+
+        Physiology2 ->
+            { data | physiology2 = value }
+
+        Physiology3 ->
+            { data | physiology3 = value }
+
+        Physiology4 ->
+            { data | physiology4 = value }
+
+        Physiology5 ->
+            { data | physiology5 = value }
+
+        Pharmacology1 ->
+            { data | pharmacology1 = value }
+
+        Pharmacology2 ->
+            { data | pharmacology2 = value }
+
+        Pharmacology3 ->
+            { data | pharmacology3 = value }
+
+        Pharmacology4 ->
+            { data | pharmacology4 = value }
+
+        Pharmacology5 ->
+            { data | pharmacology5 = value }
+
+        Microbiology1 ->
+            { data | microbiology1 = value }
+
+        Microbiology2 ->
+            { data | microbiology2 = value }
+
+        Microbiology3 ->
+            { data | microbiology3 = value }
+
+        Microbiology4 ->
+            { data | microbiology4 = value }
+
+        Microbiology5 ->
+            { data | microbiology5 = value }
+
+        Pathology1 ->
+            { data | pathology1 = value }
+
+        Pathology2 ->
+            { data | pathology2 = value }
+
+        Pathology3 ->
+            { data | pathology3 = value }
+
+        Pathology4 ->
+            { data | pathology4 = value }
+
+        Pathology5 ->
+            { data | pathology5 = value }
+
+        MedicalEthics1 ->
+            { data | medicalEthics1 = value }
+
+        MedicalEthics2 ->
+            { data | medicalEthics2 = value }
+
+        MedicalEthics3 ->
+            { data | medicalEthics3 = value }
+
+        ShelfExamAnatomy ->
+            { data | shelfExamAnatomy = value }
+
+        ShelfExamBiochemistry ->
+            { data | shelfExamBiochemistry = value }
+
+        ShelfExamPhysiology ->
+            { data | shelfExamPhysiology = value }
+
+        ShelfExamPharmacology ->
+            { data | shelfExamPharmacology = value }
+
+        ShelfExamMicrobiology ->
+            { data | shelfExamMicrobiology = value }
+
+        ShelfExamPathology ->
+            { data | shelfExamPathology = value }
+
+        UsmleStep1Test ->
+            { data | usmleStep1Test = value }
 
 
 mapAcademicTests :
@@ -2128,7 +2494,7 @@ academicTestStats =
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 10)
         , rewardResource = Nothing
-        , costs = [ { resource = AnatomyK, amount = 100 } ]
+        , costs = [ { resource = AnatomyK, amount = 1000 } ]
         , lockedBy = Nothing
         }
     , anatomy2 =
@@ -2136,7 +2502,7 @@ academicTestStats =
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 50)
         , rewardResource = Nothing
-        , costs = [ { resource = AnatomyK, amount = 500 } ]
+        , costs = [ { resource = AnatomyK, amount = 5000 } ]
         , lockedBy = Just Anatomy1
         }
     , anatomy3 =
@@ -2144,7 +2510,7 @@ academicTestStats =
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 100)
         , rewardResource = Nothing
-        , costs = [ { resource = AnatomyK, amount = 1000 } ]
+        , costs = [ { resource = AnatomyK, amount = 10000 } ]
         , lockedBy = Just Anatomy2
         }
     , anatomy4 =
@@ -2152,7 +2518,7 @@ academicTestStats =
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 250)
         , rewardResource = Nothing
-        , costs = [ { resource = AnatomyK, amount = 2000 } ]
+        , costs = [ { resource = AnatomyK, amount = 20000 } ]
         , lockedBy = Just Anatomy4
         }
     , anatomy5 =
@@ -2160,8 +2526,295 @@ academicTestStats =
         , category = Quiz
         , rewardCoin = Just (IdleGame.Coin.int 500)
         , rewardResource = Nothing
-        , costs = [ { resource = AnatomyK, amount = 3000 } ]
+        , costs = [ { resource = AnatomyK, amount = 30000 } ]
         , lockedBy = Just Anatomy4
+        }
+    , biochemistry1 =
+        { title = "Biochemistry I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , biochemistry2 =
+        { title = "Biochemistry II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 5000 } ]
+        , lockedBy = Just Biochemistry1
+        }
+    , biochemistry3 =
+        { title = "Biochemistry III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 10000 } ]
+        , lockedBy = Just Biochemistry2
+        }
+    , biochemistry4 =
+        { title = "Biochemistry IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 20000 } ]
+        , lockedBy = Just Biochemistry3
+        }
+    , biochemistry5 =
+        { title = "Biochemistry V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 30000 } ]
+        , lockedBy = Just Biochemistry4
+        }
+    , physiology1 =
+        { title = "Physiology I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , physiology2 =
+        { title = "Physiology II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 5000 } ]
+        , lockedBy = Just Physiology1
+        }
+    , physiology3 =
+        { title = "Physiology III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 10000 } ]
+        , lockedBy = Just Physiology2
+        }
+    , physiology4 =
+        { title = "Physiology IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 20000 } ]
+        , lockedBy = Just Physiology3
+        }
+    , physiology5 =
+        { title = "Physiology V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 30000 } ]
+        , lockedBy = Just Physiology4
+        }
+    , pharmacology1 =
+        { title = "Pharmacology I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , pharmacology2 =
+        { title = "Pharmacology II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 5000 } ]
+        , lockedBy = Just Pharmacology1
+        }
+    , pharmacology3 =
+        { title = "Pharmacology III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 10000 } ]
+        , lockedBy = Just Pharmacology2
+        }
+    , pharmacology4 =
+        { title = "Pharmacology IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 20000 } ]
+        , lockedBy = Just Pharmacology3
+        }
+    , pharmacology5 =
+        { title = "Pharmacology V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 30000 } ]
+        , lockedBy = Just Pharmacology4
+        }
+    , microbiology1 =
+        { title = "Microbiology I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , microbiology2 =
+        { title = "Microbiology II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 5000 } ]
+        , lockedBy = Just Microbiology1
+        }
+    , microbiology3 =
+        { title = "Microbiology III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 10000 } ]
+        , lockedBy = Just Microbiology2
+        }
+    , microbiology4 =
+        { title = "Microbiology IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 20000 } ]
+        , lockedBy = Just Microbiology3
+        }
+    , microbiology5 =
+        { title = "Microbiology V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 30000 } ]
+        , lockedBy = Just Microbiology4
+        }
+    , pathology1 =
+        { title = "Pathology I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , pathology2 =
+        { title = "Pathology II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 5000 } ]
+        , lockedBy = Just Pathology1
+        }
+    , pathology3 =
+        { title = "Pathology III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 10000 } ]
+        , lockedBy = Just Pathology2
+        }
+    , pathology4 =
+        { title = "Pathology IV"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 250)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 20000 } ]
+        , lockedBy = Just Pathology3
+        }
+    , pathology5 =
+        { title = "Pathology V"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 500)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 30000 } ]
+        , lockedBy = Just Pathology4
+        }
+    , medicalEthics1 =
+        { title = "MedicalEthics I"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 10)
+        , rewardResource = Nothing
+        , costs = [ { resource = MedicalEthicsK, amount = 1000 } ]
+        , lockedBy = Nothing
+        }
+    , medicalEthics2 =
+        { title = "MedicalEthics II"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 50)
+        , rewardResource = Nothing
+        , costs = [ { resource = MedicalEthicsK, amount = 5000 } ]
+        , lockedBy = Just MedicalEthics1
+        }
+    , medicalEthics3 =
+        { title = "MedicalEthics III"
+        , category = Quiz
+        , rewardCoin = Just (IdleGame.Coin.int 100)
+        , rewardResource = Nothing
+        , costs = [ { resource = MedicalEthicsK, amount = 10000 } ]
+        , lockedBy = Just MedicalEthics2
+        }
+    , shelfExamAnatomy =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = AnatomyK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , shelfExamBiochemistry =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = BiochemistryK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , shelfExamPhysiology =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = PhysiologyK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , shelfExamPharmacology =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = PharmacologyK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , shelfExamMicrobiology =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = MicrobiologyK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , shelfExamPathology =
+        { title = ""
+        , category = ShelfExam
+        , rewardCoin = Just (IdleGame.Coin.int 1000)
+        , rewardResource = Nothing
+        , costs = [ { resource = PathologyK, amount = 50000 } ]
+        , lockedBy = Nothing
+        }
+    , usmleStep1Test =
+        { title = "Step 1"
+        , category = UsmleStep1
+        , rewardCoin = Just (IdleGame.Coin.int 10000)
+        , rewardResource = Nothing
+        , costs =
+            [ { resource = AnatomyK, amount = 100000 }
+            , { resource = BiochemistryK, amount = 100000 }
+            , { resource = AnatomyK, amount = 100000 }
+            , { resource = PharmacologyK, amount = 100000 }
+            , { resource = MicrobiologyK, amount = 100000 }
+            , { resource = PathologyK, amount = 100000 }
+            ]
+        , lockedBy = Nothing
         }
     }
 

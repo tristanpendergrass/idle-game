@@ -82,7 +82,7 @@ type FrontendGameState
 
 
 type Preview
-    = Preview Activity
+    = Preview ( Activity, List Effect )
 
 
 type alias PointerState =
