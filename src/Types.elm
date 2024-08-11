@@ -6,6 +6,8 @@ import Browser.Events
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Duration exposing (Duration)
+import EmailAddress exposing (EmailAddress)
+import Http
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
@@ -17,6 +19,7 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
 import Lamdera exposing (ClientId, SessionId)
+import Postmark
 import Random
 import Time exposing (Posix)
 import Toast
@@ -97,8 +100,20 @@ type LocationFilter
     | LocationQuests
 
 
-type alias FrontendModel =
+type FrontendModel
+    = Loading LoadingFrontend
+    | Loaded LoadedFrontend
+
+
+type alias LoadingFrontend =
+    { navigationKey : Key
+    , isVisible : Bool
+    }
+
+
+type alias LoadedFrontend =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , isVisible : Bool
     , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
@@ -106,7 +121,6 @@ type alias FrontendModel =
     , activeTab : Tab
     , preview : Maybe Preview
     , activityExpanded : Bool
-    , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , gameState : FrontendGameState
@@ -209,3 +223,11 @@ type ToFrontend
 
 type alias Cache =
     ActivityRecord (List Effect)
+
+
+
+-- Email stuff
+
+
+type Log
+    = LogLoginEmail Time.Posix (Result Http.Error Postmark.PostmarkSendResponse) EmailAddress

@@ -33,23 +33,23 @@ standardTick =
     Snapshot.createTick (Duration.milliseconds 15)
         (\duration ( oldGame, oldToasts ) ->
             let
-                ( newGame, newToasts ) =
+                tickResult =
                     Game.tick duration oldGame
             in
-            ( newGame, oldToasts ++ newToasts )
+            ( tickResult.game, oldToasts ++ tickResult.toasts )
         )
 
 
 performantTick : Snapshot.Tick Game
 performantTick =
     Snapshot.createTick (Duration.seconds 2)
-        (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
+        (\duration oldGame -> (Game.tick duration oldGame).game)
 
 
 performantPlusTick : Snapshot.Tick Game
 performantPlusTick =
     Snapshot.createTick (Duration.seconds 2)
-        (\duration oldGame -> Game.tick duration oldGame |> Tuple.first)
+        (\duration oldGame -> (Game.tick duration oldGame).game)
 
 
 testTimePasses : Test

@@ -17,7 +17,7 @@ import Result.Extra
 import Types exposing (..)
 
 
-render : FrontendModel -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
+render : LoadedFrontend -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
 render model game cachedActivityEffects =
     let
         subjectHeader : Skill -> Html FrontendMsg

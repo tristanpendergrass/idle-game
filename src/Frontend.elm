@@ -75,28 +75,27 @@ delay ms msg =
 init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
 init _ key =
     let
-        activityExpanded : Bool
-        activityExpanded =
-            -- Note: this value is overriden by HandleGetViewportResult immediately after the page loads to the value here doesn't matter so much
-            False
-
+        -- initialModel : FrontendModel
+        -- initialModel =
+        --     Loading { navigationKey = key, isVisible = True }
         initialModel : FrontendModel
         initialModel =
-            { key = key
-            , lastFastForwardDuration = Nothing
-            , showDebugPanel = False
-            , tray = Toast.tray
-            , isDrawerOpen = False
-            , activeTab = Config.flags.defaultTab
-            , preview = Nothing
-            , activityExpanded = activityExpanded
-            , isVisible = True
-            , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
-            , saveGameTimer = Timer.create
-            , gameState = Initializing
-            , pointerState = Nothing
-            , activeAcademicTestCategory = Quiz
-            }
+            Loaded
+                { key = key
+                , lastFastForwardDuration = Nothing
+                , showDebugPanel = False
+                , tray = Toast.tray
+                , isDrawerOpen = False
+                , activeTab = Config.flags.defaultTab
+                , preview = Nothing
+                , activityExpanded = False
+                , isVisible = True
+                , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
+                , saveGameTimer = Timer.create
+                , gameState = Initializing
+                , pointerState = Nothing
+                , activeAcademicTestCategory = Quiz
+                }
     in
     ( initialModel
     , Task.perform HandleGetViewportResult Browser.Dom.getViewport
@@ -146,12 +145,12 @@ getDetailViewState maybeActivity maybePreview activityExpanded =
                 IdleGame.Views.DetailViewWrapper.PreviewWithActivity preview activity
 
 
-setIsVisible : Bool -> FrontendModel -> FrontendModel
+setIsVisible : Bool -> { a | isVisible : Bool } -> { a | isVisible : Bool }
 setIsVisible isVisible model =
     { model | isVisible = isVisible }
 
 
-setActiveModal : Maybe Modal -> FrontendModel -> FrontendModel
+setActiveModal : Maybe Modal -> LoadedFrontend -> LoadedFrontend
 setActiveModal activeModal model =
     let
         -- This supports the DebugPanel's "Show Time Passes" checkbox
@@ -188,17 +187,17 @@ createTimePassesModal duration oldSnap newSnap =
         |> Maybe.map (TimePassesModal duration timePassed)
 
 
-setTab : Tab -> FrontendModel -> FrontendModel
+setTab : Tab -> LoadedFrontend -> LoadedFrontend
 setTab tab model =
     { model | activeTab = tab }
 
 
-setIsDrawerOpen : Bool -> FrontendModel -> FrontendModel
+setIsDrawerOpen : Bool -> LoadedFrontend -> LoadedFrontend
 setIsDrawerOpen isOpen model =
     { model | isDrawerOpen = isOpen }
 
 
-mapGame : (Game -> Game) -> FrontendModel -> FrontendModel
+mapGame : (Game -> Game) -> LoadedFrontend -> LoadedFrontend
 mapGame fn model =
     case model.gameState of
         Playing snapshot cachedActivityEffects ->
@@ -210,7 +209,7 @@ mapGame fn model =
             model
 
 
-setSaveGameTimer : Timer -> FrontendModel -> FrontendModel
+setSaveGameTimer : Timer -> LoadedFrontend -> LoadedFrontend
 setSaveGameTimer timer model =
     { model | saveGameTimer = timer }
 
@@ -269,22 +268,22 @@ performantTick duration =
         )
 
 
-setPreview : Maybe Preview -> FrontendModel -> FrontendModel
+setPreview : Maybe Preview -> LoadedFrontend -> LoadedFrontend
 setPreview maybePreview model =
     { model | preview = maybePreview }
 
 
-setActivityExpanded : Bool -> FrontendModel -> FrontendModel
+setActivityExpanded : Bool -> LoadedFrontend -> LoadedFrontend
 setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-setActiveAcademicTestCategory : AcademicTestCategory -> FrontendModel -> FrontendModel
+setActiveAcademicTestCategory : AcademicTestCategory -> LoadedFrontend -> LoadedFrontend
 setActiveAcademicTestCategory testCategory model =
     { model | activeAcademicTestCategory = testCategory }
 
 
-getActivity : FrontendModel -> Maybe ( Activity, Timer )
+getActivity : LoadedFrontend -> Maybe ( Activity, Timer )
 getActivity model =
     case model.gameState of
         Playing snapshot _ ->
@@ -294,7 +293,7 @@ getActivity model =
             Nothing
 
 
-setActivity : Maybe ( Activity, Timer ) -> FrontendModel -> FrontendModel
+setActivity : Maybe ( Activity, Timer ) -> LoadedFrontend -> LoadedFrontend
 setActivity newActivity =
     mapGame
         (\game ->
@@ -302,16 +301,16 @@ setActivity newActivity =
         )
 
 
-updatePointer : Float -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
-updatePointer delta model =
-    case model.pointerState of
+updatePointerLoaded : Float -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
+updatePointerLoaded delta frontendLoaded =
+    case frontendLoaded.pointerState of
         Nothing ->
-            ( model, Cmd.none )
+            ( frontendLoaded, Cmd.none )
 
         Just { click, longPress } ->
             case longPress of
                 Nothing ->
-                    ( model, Cmd.none )
+                    ( frontendLoaded, Cmd.none )
 
                 Just ( timer, floatDuration, longPressMsg ) ->
                     let
@@ -319,10 +318,10 @@ updatePointer delta model =
                             Timer.increment (Duration.milliseconds floatDuration) (Duration.milliseconds delta) timer
                     in
                     if completions > 0 then
-                        update longPressMsg { model | pointerState = Nothing }
+                        updateLoaded longPressMsg { frontendLoaded | pointerState = Nothing }
 
                     else
-                        ( { model
+                        ( { frontendLoaded
                             | pointerState =
                                 Just
                                     { click = click
@@ -333,13 +332,23 @@ updatePointer delta model =
                         )
 
 
-setGameState : FrontendGameState -> FrontendModel -> FrontendModel
+setGameState : FrontendGameState -> LoadedFrontend -> LoadedFrontend
 setGameState gameState model =
     { model | gameState = gameState }
 
 
 update : FrontendMsg -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 update msg model =
+    case model of
+        Loading _ ->
+            ( model, Cmd.none )
+
+        Loaded loaded ->
+            updateLoaded msg loaded |> Tuple.mapFirst Loaded
+
+
+updateLoaded : FrontendMsg -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
+updateLoaded msg model =
     let
         noOp =
             ( model, Cmd.none )
@@ -460,7 +469,7 @@ update msg model =
                                 newCache =
                                     getCache game
 
-                                newModel : FrontendModel
+                                newModel : LoadedFrontend
                                 newModel =
                                     model
                                         |> setGameState (Playing (Snapshot.setValue applyEffectsValue.game snapshot) newCache)
@@ -684,13 +693,13 @@ update msg model =
                             else
                                 []
 
-                        modelWithSaveTimer : FrontendModel
+                        modelWithSaveTimer : LoadedFrontend
                         modelWithSaveTimer =
                             model
                                 |> setSaveGameTimer newTimer
 
                         ( modelWithUpdatedPointer, pointerCmds ) =
-                            updatePointer delta modelWithSaveTimer
+                            updatePointerLoaded delta modelWithSaveTimer
                     in
                     ( modelWithUpdatedPointer, Cmd.batch <| saveGameCmd ++ [ pointerCmds ] )
 
@@ -865,7 +874,7 @@ update msg model =
                                         toasts =
                                             res.toasts
 
-                                        newModel : FrontendModel
+                                        newModel : LoadedFrontend
                                         newModel =
                                             { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) newCache }
                                                 |> setActiveModal Nothing
@@ -917,7 +926,7 @@ update msg model =
                     ( { model | pointerState = Nothing }, Cmd.none )
 
                 Just { click } ->
-                    update click { model | pointerState = Nothing }
+                    updateLoaded click { model | pointerState = Nothing }
 
         HandlePointerCancel ->
             ( { model | pointerState = Nothing }, Cmd.none )
@@ -1189,7 +1198,7 @@ renderModal activeModal game =
                 |> IdleGame.Views.ModalWrapper.render
 
 
-renderBottomRightItems : FrontendModel -> Html FrontendMsg
+renderBottomRightItems : LoadedFrontend -> Html FrontendMsg
 renderBottomRightItems model =
     div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", ViewUtils.zIndexes.bottomRightMenu ]
         ((if Config.flags.showDebugPanel then
@@ -1219,79 +1228,89 @@ view model =
     { title = "Med School Idle"
     , body =
         [ css
-        , DebugPanel.render model
-        , case model.gameState of
-            Initializing ->
-                nothing
+        , case model of
+            Loading _ ->
+                div [] []
 
-            FastForward _ ->
-                IdleGame.Views.FastForward.render
+            Loaded frontend ->
+                DebugPanel.render frontend
+        , case model of
+            Loading _ ->
+                div [] []
 
-            Playing snapshot cache ->
-                let
-                    game : Game
-                    game =
-                        Snapshot.getValue snapshot
+            Loaded frontend ->
+                case frontend.gameState of
+                    Initializing ->
+                        nothing
 
-                    detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
-                    detailViewState =
-                        getDetailViewState game.activity model.preview model.activityExpanded
+                    FastForward _ ->
+                        IdleGame.Views.FastForward.render
 
-                    extraBottomPadding : Bool
-                    extraBottomPadding =
-                        case detailViewState of
-                            IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
-                                True
+                    Playing snapshot cache ->
+                        let
+                            game : Game
+                            game =
+                                Snapshot.getValue snapshot
 
-                            _ ->
-                                False
+                            detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
+                            detailViewState =
+                                getDetailViewState game.activity frontend.preview frontend.activityExpanded
 
-                    renderActivity : ( Activity, Timer ) -> Html FrontendMsg
-                    renderActivity ( activity, timer ) =
-                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity ( ( activity, getByActivity activity cache ), timer )) extraBottomPadding game
+                            extraBottomPadding : Bool
+                            extraBottomPadding =
+                                case detailViewState of
+                                    IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
+                                        True
 
-                    renderPreview : Preview -> Html FrontendMsg
-                    renderPreview preview =
-                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewPreview preview) extraBottomPadding game
+                                    _ ->
+                                        False
 
-                    renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
-                    renderStatusBar activity =
-                        IdleGame.Views.DetailViewContent.renderStatusBar activity
+                            renderActivity : ( Activity, Timer ) -> Html FrontendMsg
+                            renderActivity ( activity, timer ) =
+                                IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity ( ( activity, getByActivity activity cache ), timer )) extraBottomPadding game
 
-                    activeTab : Tab
-                    activeTab =
-                        model.activeTab
+                            renderPreview : Preview -> Html FrontendMsg
+                            renderPreview preview =
+                                IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewPreview preview) extraBottomPadding game
 
-                    detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
-                    detailViewWrapperProps =
-                        { state = detailViewState
-                        , renderActivity = renderActivity
-                        , renderPreview = renderPreview
-                        , renderStatusBar = renderStatusBar
-                        , onClosePreview = ClosePreview
-                        , onExpandActivity = ExpandActivity
-                        , onCollapseActivity = CollapseActivity
-                        }
-                in
-                div [ class "flex h-full w-full relative overflow-hidden" ]
-                    [ Toast.render viewToast model.tray toastConfig
-                    , div [ class "bg-base-100 drawer lg:drawer-open" ]
-                        [ input
-                            [ id "drawer"
-                            , type_ "checkbox"
-                            , class "drawer-toggle"
-                            , checked model.isDrawerOpen
-                            , onCheck SetDrawerOpen
+                            renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
+                            renderStatusBar activity =
+                                IdleGame.Views.DetailViewContent.renderStatusBar activity
+
+                            activeTab : Tab
+                            activeTab =
+                                frontend.activeTab
+
+                            detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
+                            detailViewWrapperProps =
+                                { state = detailViewState
+                                , renderActivity = renderActivity
+                                , renderPreview = renderPreview
+                                , renderStatusBar = renderStatusBar
+                                , onClosePreview = ClosePreview
+                                , onExpandActivity = ExpandActivity
+                                , onCollapseActivity = CollapseActivity
+                                }
+                        in
+                        div [ class "flex h-full w-full relative overflow-hidden" ]
+                            [ Toast.render viewToast frontend.tray toastConfig
+                            , div [ class "bg-base-100 drawer lg:drawer-open" ]
+                                [ input
+                                    [ id "drawer"
+                                    , type_ "checkbox"
+                                    , class "drawer-toggle"
+                                    , checked frontend.isDrawerOpen
+                                    , onCheck SetDrawerOpen
+                                    ]
+                                    []
+                                , IdleGame.Views.Content.renderContent frontend game cache activeTab
+                                , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen activeTab
+                                ]
+                            , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
+                            , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
+                            , renderModal frontend.activeModal game
+                            , renderBottomRightItems frontend
                             ]
-                            []
-                        , IdleGame.Views.Content.renderContent model game cache activeTab
-                        , IdleGame.Views.Drawer.renderDrawer model.isDrawerOpen activeTab
-                        ]
-                    , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
-                    , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
-                    , renderModal model.activeModal game
-                    , renderBottomRightItems model
-                    ]
         ]
     }
 

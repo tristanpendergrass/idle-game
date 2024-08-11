@@ -31,7 +31,7 @@ import Types exposing (..)
 createTick : Duration -> Snapshot.Tick Game
 createTick duration =
     Snapshot.createTick duration
-        (\d oldGame -> Game.tick d oldGame |> Tuple.first)
+        (\d oldGame -> (Game.tick d oldGame).game)
 
 
 testTimePasses : { tick : Snapshot.Tick Game, duration : Duration } -> Test

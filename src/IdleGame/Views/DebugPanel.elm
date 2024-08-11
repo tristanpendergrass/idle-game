@@ -25,7 +25,7 @@ renderOpenButton =
         ]
 
 
-render : FrontendModel -> Html FrontendMsg
+render : LoadedFrontend -> Html FrontendMsg
 render model =
     let
         closeButton =

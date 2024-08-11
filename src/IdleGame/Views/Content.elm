@@ -22,7 +22,7 @@ import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-renderContent : FrontendModel -> Game -> ActivityRecord (List Effect) -> Tab -> Html FrontendMsg
+renderContent : LoadedFrontend -> Game -> ActivityRecord (List Effect) -> Tab -> Html FrontendMsg
 renderContent model game cachedActivityEffects activeTab =
     let
         { title, icon } =
