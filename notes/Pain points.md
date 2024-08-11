@@ -1,0 +1,4 @@
+* Cloud saving is a pain. I alternate between phone and computer all the time, and remembering to hit force save on the old device and then going through a series of button clicks to load the right cloud save on  the new device is needless friction. Cloud saving should just work and be frictionless, move heaven and earth to do it.
+* Melvor limits you to only a couple equipment sets, and more than one costs big money!
+	* This means when you switch tasks you have to go back to your inventory and equip everything with the right bonuses for the new task
+	* The reason they don't let you have more sets is probably because they also chose to have equipped items not count against your inventory slot limit, so new sets are new inventory slots and those are supposed to be hard to get. Solution: make equipped items stay in your inventory. This would also allow the same item to be equipped in 

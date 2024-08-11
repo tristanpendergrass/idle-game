@@ -1,0 +1,1 @@
+This game is inspired by [[Melvor Idle]]. I want to put my own personal spin on the formula of that game while fixing some [[Pain points]]. 

@@ -7,6 +7,11 @@ The player can select one or more potions to brew in their cauldron. Each potion
 
 There should be light decision making in terms of what is the most "efficient" combination of potions to put in the cauldron. For instance Potion A might take up two slots, and Potion B take up three slots, and your cauldron might have five slots. If Potion A is more needed by you right now you might craft 2 x A, but it would be more efficient to craft and A and a B and go for longer, building up a store of B for later.
 
+# Potion infusion
+One idea I'm exploring is making it so spells can be infused into a potion. Normally, a spellcaster has to be present to cast the spell, but with a potion they can give it to a non-spellcaster and that person can use it appropriately. Potionmaking would become the practice of creating potions that are pretty much the exact equivalent of other spells you know and which resolve with all the bonuses you have for that spell. 
+* Could then give the potions away to people who need your help
+* Could use them in battle to get a bit of a tempo lead by casting an extra spell by drinking the potion
+
 # Varieties of potion
 * There are two potions for each skill. The first is **unlocked by leveling up Potionmaking**. E.g. the Chores potion is available from Potionmaking 1, but potions for other skills must be unlocked through leveling up.
 * Each skill also has a second potion that is **unlocked by some unique method**. This could be talking to a denizen in Adventuring, dropped by a monster, etc.

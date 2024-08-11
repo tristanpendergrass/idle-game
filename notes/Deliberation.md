@@ -1,0 +1,5 @@
+The opening of the movie No Country for Old Men sees the protagonist hunting a deer in a secluded wilderness. He methodically picks a spot, assembles his equipment, sites the animal, and takes his shot. When he hits it he doesn't immediately get up and run over to grab its loot like a deranged Fortnite player. He has to take a few minutes to pack up all his gear to make the short trek over to where the beast fell. He'll also take a few minutes to survey the area and see if the sound of his gunshot drew attention from anything he has to worry about.
+
+I'm not sure if this sense of deliberation can apply in an Idle Game but I think it might inadvertently be created by some friction Melvor introduces such as with [[Equipment sets]]. It's complemented by the fact that a lot of the satisfaction to be found in Idle games is setting things in motion and then going on with your life outside the game, to be rewarded later when you check back in. 
+
+Could we encourage this through our crafting system? Through equipment sets like Melvor? Through some sort of meaningful decision we ask the player to make in the moment when playing?
