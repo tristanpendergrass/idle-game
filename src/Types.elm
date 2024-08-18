@@ -1,13 +1,16 @@
 module Types exposing (..)
 
+import AssocList as Dict exposing (Dict)
+import AssocSet as Set exposing (Set)
+import BiDict.Assoc exposing (BiDict)
 import Browser exposing (UrlRequest)
 import Browser.Dom
 import Browser.Events
 import Browser.Navigation exposing (Key)
-import Dict exposing (Dict)
 import Duration exposing (Duration)
 import EmailAddress exposing (EmailAddress)
 import Http
+import Id exposing (Id, UserId)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
@@ -19,8 +22,10 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
 import IdleGame.Xp as Xp exposing (Xp)
 import Lamdera exposing (ClientId, SessionId)
+import List.Nonempty exposing (Nonempty)
 import Postmark
 import Random
+import Route exposing (Route)
 import Time exposing (Posix)
 import Toast
 import Url exposing (Url)
@@ -79,7 +84,7 @@ type alias FastForwardState =
 
 
 type FrontendGameState
-    = Initializing
+    = NoGameSelected
     | Playing (Snapshot Game) Cache
     | FastForward FastForwardState
 
@@ -107,13 +112,35 @@ type FrontendModel
 
 type alias LoadingFrontend =
     { navigationKey : Key
+    , route : Route
+    , routeToken : Route.Token
     , isVisible : Bool
     }
 
 
+type alias FrontendUser =
+    {}
+
+
+type alias LoggedIn_ =
+    { userId : Id UserId
+    , emailAddress : EmailAddress
+    }
+
+
+type LoginStatus
+    = LoginStatusPending
+    | LoggedIn LoggedIn_
+    | NotLoggedIn { showLogin : Bool }
+
+
 type alias LoadedFrontend =
     { key : Key -- used by Browser.Navigation for things like pushUrl
+    , loginStatus : LoginStatus
+    , route : Route
+    , routeToken : Route.Token
     , isVisible : Bool
+    , maybeServerInfo : Maybe ServerInfo
     , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
     , showDebugPanel : Bool
     , tray : Toast.Tray Toast
@@ -129,14 +156,47 @@ type alias LoadedFrontend =
     }
 
 
-type alias SessionGameMap =
-    Dict SessionId (Snapshot Game)
+
+-- Backend
+
+
+type alias ServerInfo =
+    { users : Dict (Id UserId) BackendUser
+    , sessions : BiDict SessionId (Id UserId)
+    , connections : Dict SessionId (Nonempty ClientId)
+    }
 
 
 type alias BackendModel =
-    { sessionGameMap : SessionGameMap
+    { time : Time.Posix
+    , secretCounter : Int
+    , userGames : Dict (Id UserId) (Snapshot Game)
     , seed : Random.Seed
+    , sessions : BiDict SessionId (Id UserId)
+    , connections : Dict SessionId (Nonempty ClientId)
+    , users : Dict (Id UserId) BackendUser
     }
+
+
+type alias Authenticated =
+    { lastConnectionTime : Time.Posix
+    , emailAddress : EmailAddress
+    }
+
+
+type alias Unauthenticated =
+    { lastConnectionTime : Time.Posix
+    }
+
+
+type BackendUser
+    = AuthenticatedBackendUser Authenticated
+    | UnauthenticatedBackendUser Unauthenticated
+
+
+userToFrontend : BackendUser -> FrontendUser
+userToFrontend _ =
+    {}
 
 
 type
@@ -204,17 +264,22 @@ type FrontendMsg
 type ToBackend
     = NoOpToBackend
     | Save (Snapshot Game)
+    | CheckLoginRequest
 
 
 type BackendMsg
     = NoOpBackend
     | HandleConnect SessionId ClientId
     | HandleConnectWithTime SessionId ClientId Posix
+    | HandleDisconnect SessionId ClientId
+    | BackendGotTime Time.Posix
 
 
 type ToFrontend
     = NoOpToFrontend
+    | CheckLoginResponse (Maybe { userId : Id UserId, user : Authenticated })
     | InitializeGame (Snapshot Game)
+    | GiveServerInfo ServerInfo
 
 
 
@@ -223,10 +288,6 @@ type ToFrontend
 
 type alias Cache =
     ActivityRecord (List Effect)
-
-
-
--- Email stuff
 
 
 type Log

@@ -6,3 +6,8 @@ module Env exposing (..)
 
 dummyConfigItem =
     ""
+
+
+secretKey : String
+secretKey =
+    "123"

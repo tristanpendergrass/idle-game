@@ -1,9 +1,10 @@
 module Frontend exposing (app)
 
+import AssocList as Dict exposing (Dict)
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Dom
 import Browser.Events exposing (onVisibilityChange)
-import Browser.Navigation as Nav
+import Browser.Navigation
 import Config
 import Duration exposing (Duration)
 import Html exposing (..)
@@ -47,6 +48,8 @@ import Process
 import Quantity exposing (Quantity)
 import Random
 import Result.Extra
+import Route
+import ServerInfo
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -72,16 +75,20 @@ delay ms msg =
     Task.perform (always msg) (Process.sleep <| toFloat ms)
 
 
-init : Url -> Nav.Key -> ( FrontendModel, Cmd FrontendMsg )
-init _ key =
+init : Url -> Browser.Navigation.Key -> ( FrontendModel, Cmd FrontendMsg )
+init url key =
     let
-        -- initialModel : FrontendModel
-        -- initialModel =
-        --     Loading { navigationKey = key, isVisible = True }
+        ( route, token ) =
+            Route.decode url
+                |> Maybe.withDefault ( Route.RootRoute, Route.NoToken )
+
         initialModel : FrontendModel
         initialModel =
             Loaded
                 { key = key
+                , loginStatus = NotLoggedIn { showLogin = False }
+                , route = route
+                , routeToken = token
                 , lastFastForwardDuration = Nothing
                 , showDebugPanel = False
                 , tray = Toast.tray
@@ -92,13 +99,17 @@ init _ key =
                 , isVisible = True
                 , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
                 , saveGameTimer = Timer.create
-                , gameState = Initializing
+                , gameState = NoGameSelected
                 , pointerState = Nothing
                 , activeAcademicTestCategory = Quiz
+                , maybeServerInfo = Nothing
                 }
     in
     ( initialModel
-    , Task.perform HandleGetViewportResult Browser.Dom.getViewport
+    , Cmd.batch
+        [ Task.perform HandleGetViewportResult Browser.Dom.getViewport
+        , Lamdera.sendToBackend CheckLoginRequest
+        ]
     )
 
 
@@ -360,17 +371,29 @@ updateLoaded msg model =
         UrlClicked urlRequest ->
             case urlRequest of
                 Internal url ->
-                    ( model
-                    , Nav.pushUrl model.key (Url.toString url)
+                    let
+                        route =
+                            Route.decode url
+                                |> Maybe.map Tuple.first
+                                |> Maybe.withDefault Route.RootRoute
+                    in
+                    ( { model | route = route }
+                    , Browser.Navigation.pushUrl model.key (Route.encode route)
                     )
 
                 External url ->
-                    ( model
-                    , Nav.load url
-                    )
+                    ( model, Browser.Navigation.load url )
 
-        UrlChanged _ ->
-            noOp
+        UrlChanged url ->
+            let
+                route =
+                    Route.decode url
+                        |> Maybe.map Tuple.first
+                        |> Maybe.withDefault Route.RootRoute
+            in
+            ( { model | route = route }
+            , Cmd.none
+            )
 
         InitializeGameHelp serverSnapshot now ->
             let
@@ -379,7 +402,7 @@ updateLoaded msg model =
                     Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
             in
             case model.gameState of
-                Initializing ->
+                NoGameSelected ->
                     ( model
                         |> setGameState
                             (FastForward
@@ -708,8 +731,7 @@ updateLoaded msg model =
 
         HandleAnimationFrame now ->
             case model.gameState of
-                Initializing ->
-                    -- Backend has not yet sent an initialization message so no work to do.
+                NoGameSelected ->
                     noOp
 
                 FastForward _ ->
@@ -762,7 +784,7 @@ updateLoaded msg model =
         HandleVisibilityChangeHelp visibility now ->
             if visibility == Browser.Events.Visible then
                 case model.gameState of
-                    Initializing ->
+                    NoGameSelected ->
                         ( model
                             |> setIsVisible True
                         , Cmd.none
@@ -1040,14 +1062,45 @@ updateLoaded msg model =
             )
 
 
-updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
-updateFromBackend msg model =
+updateLoadedFromBackend : ToFrontend -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
+updateLoadedFromBackend msg model =
     case msg of
         NoOpToFrontend ->
             ( model, Cmd.none )
 
+        CheckLoginResponse loginStatus ->
+            case loginStatus of
+                Just { userId, user } ->
+                    ( { model
+                        | loginStatus =
+                            LoggedIn
+                                { userId = userId
+                                , emailAddress = user.emailAddress
+                                }
+                      }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    ( { model | loginStatus = NotLoggedIn { showLogin = False } }
+                    , Cmd.none
+                    )
+
         InitializeGame serverSnapshot ->
             ( model, Task.perform (InitializeGameHelp serverSnapshot) Time.now )
+
+        GiveServerInfo serverInfo ->
+            ( { model | maybeServerInfo = Just serverInfo }, Cmd.none )
+
+
+updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
+updateFromBackend msg model =
+    case model of
+        Loading _ ->
+            ( model, Cmd.none )
+
+        Loaded loaded ->
+            updateLoadedFromBackend msg loaded |> Tuple.mapFirst Loaded
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
@@ -1239,78 +1292,83 @@ view model =
                 div [] []
 
             Loaded frontend ->
-                case frontend.gameState of
-                    Initializing ->
-                        nothing
+                case frontend.route of
+                    Route.ServerInfoRoute ->
+                        ServerInfo.render frontend.maybeServerInfo
 
-                    FastForward _ ->
-                        IdleGame.Views.FastForward.render
+                    Route.RootRoute ->
+                        case frontend.gameState of
+                            NoGameSelected ->
+                                nothing
 
-                    Playing snapshot cache ->
-                        let
-                            game : Game
-                            game =
-                                Snapshot.getValue snapshot
+                            FastForward _ ->
+                                IdleGame.Views.FastForward.render
 
-                            detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
-                            detailViewState =
-                                getDetailViewState game.activity frontend.preview frontend.activityExpanded
+                            Playing snapshot cache ->
+                                let
+                                    game : Game
+                                    game =
+                                        Snapshot.getValue snapshot
 
-                            extraBottomPadding : Bool
-                            extraBottomPadding =
-                                case detailViewState of
-                                    IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
-                                        True
+                                    detailViewState : IdleGame.Views.DetailViewWrapper.State ( Activity, Timer ) Preview
+                                    detailViewState =
+                                        getDetailViewState game.activity frontend.preview frontend.activityExpanded
 
-                                    _ ->
-                                        False
+                                    extraBottomPadding : Bool
+                                    extraBottomPadding =
+                                        case detailViewState of
+                                            IdleGame.Views.DetailViewWrapper.PreviewWithActivity _ _ ->
+                                                True
 
-                            renderActivity : ( Activity, Timer ) -> Html FrontendMsg
-                            renderActivity ( activity, timer ) =
-                                IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity ( ( activity, getByActivity activity cache ), timer )) extraBottomPadding game
+                                            _ ->
+                                                False
 
-                            renderPreview : Preview -> Html FrontendMsg
-                            renderPreview preview =
-                                IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewPreview preview) extraBottomPadding game
+                                    renderActivity : ( Activity, Timer ) -> Html FrontendMsg
+                                    renderActivity ( activity, timer ) =
+                                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewActivity ( ( activity, getByActivity activity cache ), timer )) extraBottomPadding game
 
-                            renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
-                            renderStatusBar activity =
-                                IdleGame.Views.DetailViewContent.renderStatusBar activity
+                                    renderPreview : Preview -> Html FrontendMsg
+                                    renderPreview preview =
+                                        IdleGame.Views.DetailViewContent.renderContent (IdleGame.Views.DetailViewContent.DetailViewPreview preview) extraBottomPadding game
 
-                            activeTab : Tab
-                            activeTab =
-                                frontend.activeTab
+                                    renderStatusBar : ( Activity, Timer ) -> Html FrontendMsg
+                                    renderStatusBar activity =
+                                        IdleGame.Views.DetailViewContent.renderStatusBar activity
 
-                            detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
-                            detailViewWrapperProps =
-                                { state = detailViewState
-                                , renderActivity = renderActivity
-                                , renderPreview = renderPreview
-                                , renderStatusBar = renderStatusBar
-                                , onClosePreview = ClosePreview
-                                , onExpandActivity = ExpandActivity
-                                , onCollapseActivity = CollapseActivity
-                                }
-                        in
-                        div [ class "flex h-full w-full relative overflow-hidden" ]
-                            [ Toast.render viewToast frontend.tray toastConfig
-                            , div [ class "bg-base-100 drawer lg:drawer-open" ]
-                                [ input
-                                    [ id "drawer"
-                                    , type_ "checkbox"
-                                    , class "drawer-toggle"
-                                    , checked frontend.isDrawerOpen
-                                    , onCheck SetDrawerOpen
+                                    activeTab : Tab
+                                    activeTab =
+                                        frontend.activeTab
+
+                                    detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
+                                    detailViewWrapperProps =
+                                        { state = detailViewState
+                                        , renderActivity = renderActivity
+                                        , renderPreview = renderPreview
+                                        , renderStatusBar = renderStatusBar
+                                        , onClosePreview = ClosePreview
+                                        , onExpandActivity = ExpandActivity
+                                        , onCollapseActivity = CollapseActivity
+                                        }
+                                in
+                                div [ class "flex h-full w-full relative overflow-hidden" ]
+                                    [ Toast.render viewToast frontend.tray toastConfig
+                                    , div [ class "bg-base-100 drawer lg:drawer-open" ]
+                                        [ input
+                                            [ id "drawer"
+                                            , type_ "checkbox"
+                                            , class "drawer-toggle"
+                                            , checked frontend.isDrawerOpen
+                                            , onCheck SetDrawerOpen
+                                            ]
+                                            []
+                                        , IdleGame.Views.Content.renderContent frontend game cache activeTab
+                                        , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen activeTab
+                                        ]
+                                    , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
+                                    , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
+                                    , renderModal frontend.activeModal game
+                                    , renderBottomRightItems frontend
                                     ]
-                                    []
-                                , IdleGame.Views.Content.renderContent frontend game cache activeTab
-                                , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen activeTab
-                                ]
-                            , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
-                            , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
-                            , renderModal frontend.activeModal game
-                            , renderBottomRightItems frontend
-                            ]
         ]
     }
 
