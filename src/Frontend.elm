@@ -7,10 +7,12 @@ import Browser.Events exposing (onVisibilityChange)
 import Browser.Navigation
 import Config
 import Duration exposing (Duration)
+import EmailAddress exposing (EmailAddress)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
+import Id exposing (GameId, Id, UserId)
 import IdleGame.AcademicTest as Test
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
@@ -36,6 +38,7 @@ import IdleGame.Views.DetailViewWrapper
 import IdleGame.Views.Drawer
 import IdleGame.Views.FastForward
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.MainMenu as MainMenu
 import IdleGame.Views.ModalWrapper
 import IdleGame.Views.ShopResourceModal
 import IdleGame.Views.SyllabusModal
@@ -44,12 +47,15 @@ import IdleGame.Views.Utils as ViewUtils
 import Json.Decode as D
 import Json.Decode.Pipeline exposing (..)
 import Lamdera
+import List.Extra
+import List.Nonempty as Nonempty exposing (Nonempty(..))
 import Process
 import Quantity exposing (Quantity)
 import Random
 import Result.Extra
 import Route
 import ServerInfo
+import Svg.Attributes exposing (restart)
 import Task
 import Time exposing (Posix)
 import Time.Extra
@@ -82,33 +88,55 @@ init url key =
             Route.decode url
                 |> Maybe.withDefault ( Route.RootRoute, Route.NoToken )
 
+        loginCmd : Cmd FrontendMsg
+        loginCmd =
+            case token of
+                Route.NoToken ->
+                    Cmd.none
+
+                Route.LoginToken tokenVal ->
+                    Lamdera.sendToBackend (LoginWithTokenRequest tokenVal)
+
         initialModel : FrontendModel
         initialModel =
-            Loaded
+            Loading
                 { key = key
-                , loginStatus = NotLoggedIn { showLogin = False }
                 , route = route
                 , routeToken = token
-                , lastFastForwardDuration = Nothing
-                , showDebugPanel = False
-                , tray = Toast.tray
-                , isDrawerOpen = False
-                , activeTab = Config.flags.defaultTab
-                , preview = Nothing
-                , activityExpanded = False
                 , isVisible = True
-                , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
-                , saveGameTimer = Timer.create
-                , gameState = NoGameSelected
-                , pointerState = Nothing
-                , activeAcademicTestCategory = Quiz
                 , maybeServerInfo = Nothing
                 }
+
+        -- LoadedMainMenu
+        --     { key = key
+        --     , loginStatus = NotLoggedIn { showLogin = False }
+        --     , games = []
+        --     }
+        -- LoadedInGame
+        -- { key = key
+        -- , loginStatus = NotLoggedIn { showLogin = False }
+        -- , route = route
+        -- , routeToken = token
+        -- , lastFastForwardDuration = Nothing
+        -- , showDebugPanel = False
+        -- , tray = Toast.tray
+        -- , isDrawerOpen = False
+        -- , activeTab = Config.flags.defaultTab
+        -- , preview = Nothing
+        -- , activityExpanded = False
+        -- , isVisible = True
+        -- , activeModal = Nothing -- Note: editing this won't change the value of modal shown on opening because it's set in the time passes handler
+        -- , saveGameTimer = Timer.create
+        -- , gameState = NoGameSelected
+        -- , pointerState = Nothing
+        -- , activeAcademicTestCategory = Quiz
+        -- , maybeServerInfo = Nothing
+        -- }
     in
     ( initialModel
     , Cmd.batch
         [ Task.perform HandleGetViewportResult Browser.Dom.getViewport
-        , Lamdera.sendToBackend CheckLoginRequest
+        , loginCmd
         ]
     )
 
@@ -161,7 +189,7 @@ setIsVisible isVisible model =
     { model | isVisible = isVisible }
 
 
-setActiveModal : Maybe Modal -> LoadedFrontend -> LoadedFrontend
+setActiveModal : Maybe Modal -> InGameFrontend -> InGameFrontend
 setActiveModal activeModal model =
     let
         -- This supports the DebugPanel's "Show Time Passes" checkbox
@@ -198,29 +226,43 @@ createTimePassesModal duration oldSnap newSnap =
         |> Maybe.map (TimePassesModal duration timePassed)
 
 
-setTab : Tab -> LoadedFrontend -> LoadedFrontend
+setTab : Tab -> InGameFrontend -> InGameFrontend
 setTab tab model =
     { model | activeTab = tab }
 
 
-setIsDrawerOpen : Bool -> LoadedFrontend -> LoadedFrontend
+setIsDrawerOpen : Bool -> InGameFrontend -> InGameFrontend
 setIsDrawerOpen isOpen model =
     { model | isDrawerOpen = isOpen }
 
 
-mapGame : (Game -> Game) -> LoadedFrontend -> LoadedFrontend
+mapGame : (Game -> Game) -> InGameFrontend -> InGameFrontend
 mapGame fn model =
     case model.gameState of
-        Playing snapshot cachedActivityEffects ->
-            snapshot
-                |> Snapshot.map fn
-                |> (\newSnapshot -> { model | gameState = Playing newSnapshot cachedActivityEffects })
+        Playing _ ->
+            let
+                ( gameId, oldSnapshot ) =
+                    Nonempty.head model.games
+
+                newGame : Game
+                newGame =
+                    fn (Snapshot.getValue oldSnapshot)
+
+                newSnapshot : Snapshot Game
+                newSnapshot =
+                    Snapshot.map (\_ -> newGame) oldSnapshot
+
+                newGames : Nonempty ( Id GameId, Snapshot Game )
+                newGames =
+                    Nonempty.replaceHead ( gameId, newSnapshot ) model.games
+            in
+            { model | games = newGames }
 
         _ ->
             model
 
 
-setSaveGameTimer : Timer -> LoadedFrontend -> LoadedFrontend
+setSaveGameTimer : Timer -> InGameFrontend -> InGameFrontend
 setSaveGameTimer timer model =
     { model | saveGameTimer = timer }
 
@@ -279,49 +321,41 @@ performantTick duration =
         )
 
 
-setPreview : Maybe Preview -> LoadedFrontend -> LoadedFrontend
+setPreview : Maybe Preview -> InGameFrontend -> InGameFrontend
 setPreview maybePreview model =
     { model | preview = maybePreview }
 
 
-setActivityExpanded : Bool -> LoadedFrontend -> LoadedFrontend
+setActivityExpanded : Bool -> InGameFrontend -> InGameFrontend
 setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-setActiveAcademicTestCategory : AcademicTestCategory -> LoadedFrontend -> LoadedFrontend
+setActiveAcademicTestCategory : AcademicTestCategory -> InGameFrontend -> InGameFrontend
 setActiveAcademicTestCategory testCategory model =
     { model | activeAcademicTestCategory = testCategory }
 
 
-getActivity : LoadedFrontend -> Maybe ( Activity, Timer )
+getActivity : InGameFrontend -> Maybe ( Activity, Timer )
 getActivity model =
-    case model.gameState of
-        Playing snapshot _ ->
-            (Snapshot.getValue snapshot).activity
-
-        _ ->
-            Nothing
+    (Snapshot.getValue (getGame model)).activity
 
 
-setActivity : Maybe ( Activity, Timer ) -> LoadedFrontend -> LoadedFrontend
+setActivity : Maybe ( Activity, Timer ) -> InGameFrontend -> InGameFrontend
 setActivity newActivity =
-    mapGame
-        (\game ->
-            Game.setActivity newActivity game
-        )
+    mapGame (Game.setActivity newActivity)
 
 
-updatePointerLoaded : Float -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
-updatePointerLoaded delta frontendLoaded =
-    case frontendLoaded.pointerState of
+updatePointerLoaded : Float -> InGameFrontend -> ( FrontendModel, Cmd FrontendMsg )
+updatePointerLoaded delta inGameFrontend =
+    case inGameFrontend.pointerState of
         Nothing ->
-            ( frontendLoaded, Cmd.none )
+            ( InGame inGameFrontend, Cmd.none )
 
         Just { click, longPress } ->
             case longPress of
                 Nothing ->
-                    ( frontendLoaded, Cmd.none )
+                    ( InGame inGameFrontend, Cmd.none )
 
                 Just ( timer, floatDuration, longPressMsg ) ->
                     let
@@ -329,21 +363,22 @@ updatePointerLoaded delta frontendLoaded =
                             Timer.increment (Duration.milliseconds floatDuration) (Duration.milliseconds delta) timer
                     in
                     if completions > 0 then
-                        updateLoaded longPressMsg { frontendLoaded | pointerState = Nothing }
+                        updateInGame longPressMsg { inGameFrontend | pointerState = Nothing }
 
                     else
-                        ( { frontendLoaded
-                            | pointerState =
-                                Just
-                                    { click = click
-                                    , longPress = Just ( newTimer, floatDuration, longPressMsg )
-                                    }
-                          }
+                        ( InGame
+                            { inGameFrontend
+                                | pointerState =
+                                    Just
+                                        { click = click
+                                        , longPress = Just ( newTimer, floatDuration, longPressMsg )
+                                        }
+                            }
                         , Cmd.none
                         )
 
 
-setGameState : FrontendGameState -> LoadedFrontend -> LoadedFrontend
+setGameState : FrontendInGameState -> InGameFrontend -> InGameFrontend
 setGameState gameState model =
     { model | gameState = gameState }
 
@@ -354,15 +389,155 @@ update msg model =
         Loading _ ->
             ( model, Cmd.none )
 
-        Loaded loaded ->
-            updateLoaded msg loaded |> Tuple.mapFirst Loaded
+        MainMenu mainMenu ->
+            updateMainMenu msg mainMenu
+
+        InGame loaded ->
+            updateInGame msg loaded
 
 
-updateLoaded : FrontendMsg -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
-updateLoaded msg model =
+updateMainMenu : FrontendMsg -> MainMenuFrontend -> ( FrontendModel, Cmd FrontendMsg )
+updateMainMenu msg mainMenuFrontend =
+    let
+        noOp : ( FrontendModel, Cmd FrontendMsg )
+        noOp =
+            ( MainMenu mainMenuFrontend, Cmd.none )
+    in
+    case msg of
+        HandleCreateGameClick ->
+            ( MainMenu mainMenuFrontend, Lamdera.sendToBackend CreateGameRequest )
+
+        HandleCreateUserClick ->
+            case mainMenuFrontend.user.loginStatus of
+                NotLoggedIn _ ->
+                    case EmailAddress.fromString mainMenuFrontend.emailFormValue of
+                        Just emailAddress ->
+                            let
+                                newLoginStatus : LoginStatus
+                                newLoginStatus =
+                                    LoginStatusPending
+
+                                oldFrontendUser : FrontendUser
+                                oldFrontendUser =
+                                    mainMenuFrontend.user
+
+                                newFrontendUser : FrontendUser
+                                newFrontendUser =
+                                    { oldFrontendUser | loginStatus = newLoginStatus }
+                            in
+                            ( MainMenu { mainMenuFrontend | user = newFrontendUser }
+                            , Lamdera.sendToBackend (RegisterEmailRequest mainMenuFrontend.route emailAddress)
+                            )
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
+
+        HandleLogInClick ->
+            case mainMenuFrontend.user.loginStatus of
+                NotLoggedIn _ ->
+                    case EmailAddress.fromString mainMenuFrontend.emailFormValue of
+                        Just emailAddress ->
+                            let
+                                newLoginStatus : LoginStatus
+                                newLoginStatus =
+                                    LoginStatusPending
+
+                                oldFrontendUser : FrontendUser
+                                oldFrontendUser =
+                                    mainMenuFrontend.user
+
+                                newFrontendUser : FrontendUser
+                                newFrontendUser =
+                                    { oldFrontendUser | loginStatus = newLoginStatus }
+                            in
+                            ( MainMenu { mainMenuFrontend | user = newFrontendUser }
+                            , Lamdera.sendToBackend (LoginWithEmailRequest mainMenuFrontend.route emailAddress)
+                            )
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
+
+        -- | HandleStartGameClick { index : Int } -- Only relevant when MainMenuState has user games
+        -- | HandleEmailInput String
+        HandleStartGameClick args ->
+            ( MainMenu mainMenuFrontend, Task.perform (HandleStartGameClickWithTime args) Time.now )
+
+        HandleStartGameClickWithTime { index } now ->
+            case List.Extra.getAt index mainMenuFrontend.games of
+                Just activeGameAndSnapshot ->
+                    let
+                        restOfGames : List ( Id GameId, Snapshot Game )
+                        restOfGames =
+                            List.Extra.removeAt index mainMenuFrontend.games
+
+                        inGameGames : Nonempty ( Id GameId, Snapshot Game )
+                        inGameGames =
+                            Nonempty activeGameAndSnapshot restOfGames
+
+                        game : Snapshot Game
+                        game =
+                            Nonempty.head inGameGames |> Tuple.second
+
+                        isVisible : Bool
+                        isVisible =
+                            mainMenuFrontend.isVisible
+
+                        inGameFrontend : InGameFrontend
+                        inGameFrontend =
+                            { key = mainMenuFrontend.key
+                            , user = mainMenuFrontend.user
+                            , route = mainMenuFrontend.route
+                            , routeToken = mainMenuFrontend.routeToken
+                            , isVisible = isVisible
+                            , games = inGameGames
+                            , gameState = FastForward { original = game, current = game, whenItStarted = now }
+                            , maybeServerInfo = mainMenuFrontend.maybeServerInfo
+                            , lastFastForwardDuration = Nothing
+                            , showDebugPanel = False
+                            , tray = Toast.tray
+                            , isDrawerOpen = False
+                            , activeTab = Config.flags.defaultTab
+                            , preview = Nothing
+                            , activityExpanded = False
+                            , activeModal = Nothing
+                            , saveGameTimer = Timer.create
+                            , pointerState = Nothing
+                            , activeAcademicTestCategory = Quiz
+                            }
+                    in
+                    -- set game and fast forward
+                    ( InGame inGameFrontend, Task.perform HandleFastForward Time.now )
+
+                Nothing ->
+                    noOp
+
+        HandleEmailInput emailFormValue ->
+            ( MainMenu { mainMenuFrontend | emailFormValue = emailFormValue }, Cmd.none )
+
+        HandleLogoutClick ->
+            ( MainMenu mainMenuFrontend, Lamdera.sendToBackend LogoutRequest )
+
+        HandleGoToLoginRouteClick ->
+            ( MainMenu { mainMenuFrontend | mainMenuRoute = MainMenuLogin }, Cmd.none )
+
+        HandleGoToGatekeeperClick ->
+            ( MainMenu { mainMenuFrontend | mainMenuRoute = MainMenuGatekeeper }, Cmd.none )
+
+        _ ->
+            ( MainMenu mainMenuFrontend, Cmd.none )
+
+
+updateInGame : FrontendMsg -> InGameFrontend -> ( FrontendModel, Cmd FrontendMsg )
+updateInGame msg inGameFrontend =
     let
         noOp =
-            ( model, Cmd.none )
+            ( InGame inGameFrontend, Cmd.none )
     in
     case msg of
         NoOp ->
@@ -377,12 +552,12 @@ updateLoaded msg model =
                                 |> Maybe.map Tuple.first
                                 |> Maybe.withDefault Route.RootRoute
                     in
-                    ( { model | route = route }
-                    , Browser.Navigation.pushUrl model.key (Route.encode route)
+                    ( InGame { inGameFrontend | route = route }
+                    , Browser.Navigation.pushUrl inGameFrontend.key (Route.encode route)
                     )
 
                 External url ->
-                    ( model, Browser.Navigation.load url )
+                    ( InGame inGameFrontend, Browser.Navigation.load url )
 
         UrlChanged url ->
             let
@@ -391,35 +566,59 @@ updateLoaded msg model =
                         |> Maybe.map Tuple.first
                         |> Maybe.withDefault Route.RootRoute
             in
-            ( { model | route = route }
+            ( InGame { inGameFrontend | route = route }
             , Cmd.none
             )
 
-        InitializeGameHelp serverSnapshot now ->
+        -- InitializeGame serverSnapshot now ->
+        --     let
+        --         adjustedServerSnapshot : Snapshot Game
+        --         adjustedServerSnapshot =
+        --             Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
+        --     in
+        --     case model.gameState of
+        --         NoGameSelected ->
+        --             ( model
+        --                 |> setGameState
+        --                     (FastForward
+        --                         { original = adjustedServerSnapshot
+        --                         , current = adjustedServerSnapshot
+        --                         , whenItStarted = now
+        --                         }
+        --                     )
+        --             , Task.perform HandleFastForward Time.now
+        --             )
+        --         _ ->
+        HandleGoToMainMenuClick ->
             let
-                adjustedServerSnapshot : Snapshot Game
-                adjustedServerSnapshot =
-                    Snapshot.dEBUG_addTime (Quantity.negate Config.flags.extraFastForwardTime) serverSnapshot
-            in
-            case model.gameState of
-                NoGameSelected ->
-                    ( model
-                        |> setGameState
-                            (FastForward
-                                { original = adjustedServerSnapshot
-                                , current = adjustedServerSnapshot
-                                , whenItStarted = now
-                                }
-                            )
-                    , Task.perform HandleFastForward Time.now
-                    )
+                mainMenuRoute : MainMenuRoute
+                mainMenuRoute =
+                    case inGameFrontend.user.loginStatus of
+                        LoggedIn _ ->
+                            MainMenuGameList
 
-                _ ->
-                    -- If we receive an InitializeGame message from backend while already initialized we ignore it
-                    ( model, Cmd.none )
+                        _ ->
+                            MainMenuGatekeeper
+
+                mainMenuFrontend : MainMenuFrontend
+                mainMenuFrontend =
+                    { key = inGameFrontend.key
+                    , route = inGameFrontend.route
+                    , routeToken = inGameFrontend.routeToken
+                    , isVisible = inGameFrontend.isVisible
+                    , emailFormValue = ""
+                    , user = inGameFrontend.user
+                    , games = Nonempty.toList inGameFrontend.games
+                    , maybeServerInfo = inGameFrontend.maybeServerInfo
+                    , mainMenuRoute = mainMenuRoute
+                    }
+            in
+            ( MainMenu mainMenuFrontend
+            , Cmd.none
+            )
 
         OpenDebugPanel ->
-            ( { model | showDebugPanel = True }
+            ( InGame { inGameFrontend | showDebugPanel = True }
               -- We added this sleep + focus commands here to try to give focus to the debug panel after it's opened.
               -- It doesn't work for some reason but keeping it here in case I ever figure out why not.
             , Process.sleep 100
@@ -428,61 +627,81 @@ updateLoaded msg model =
             )
 
         ClosePreview ->
-            ( model
-                |> setPreview Nothing
+            ( InGame
+                (inGameFrontend
+                    |> setPreview Nothing
+                )
             , Cmd.none
             )
 
         CollapseActivity ->
-            ( model
-                |> setActivityExpanded False
+            ( InGame
+                (inGameFrontend
+                    |> setActivityExpanded False
+                )
             , Cmd.none
             )
 
         ExpandActivity ->
-            ( model
-                |> setActivityExpanded True
+            ( InGame
+                (inGameFrontend
+                    |> setActivityExpanded True
+                )
             , Cmd.none
             )
 
         CollapseDetailView ->
-            ( model
-                |> setActivityExpanded False
+            ( InGame
+                (inGameFrontend
+                    |> setActivityExpanded False
+                )
             , Cmd.none
             )
 
         ExpandDetailView ->
-            ( model
-                |> setActivityExpanded True
+            ( InGame
+                (inGameFrontend
+                    |> setActivityExpanded True
+                )
             , Cmd.none
             )
 
         CloseDebugPanel ->
-            ( { model | showDebugPanel = False }, Cmd.none )
+            ( InGame { inGameFrontend | showDebugPanel = False }, Cmd.none )
 
         AddToast content ->
-            Toast.expireIn 3000 content
-                -- Toast.persistent content -- this can be used for testing toast styles to make the toast not disappear
-                -- NOTE: Number passed to withExitTransition should match the transition duration of class "toast" in index.css
-                |> Toast.withExitTransition 900
-                |> Toast.add model.tray
-                |> Toast.tuple ToastMsg model
+            let
+                ( newInGameFrontend, cmds ) =
+                    Toast.expireIn 3000 content
+                        -- Toast.persistent content -- this can be used for testing toast styles to make the toast not disappear
+                        -- NOTE: Number passed to withExitTransition should match the transition duration of class "toast" in index.css
+                        |> Toast.withExitTransition 900
+                        |> Toast.add inGameFrontend.tray
+                        |> Toast.tuple ToastMsg inGameFrontend
+            in
+            ( InGame newInGameFrontend, cmds )
 
         HandleTestingCenterTabClick testingCenterTab ->
-            ( model
-                |> setActiveAcademicTestCategory testingCenterTab
+            ( InGame
+                (inGameFrontend
+                    |> setActiveAcademicTestCategory testingCenterTab
+                )
             , Cmd.none
             )
 
         HandleTestCompletionClick test ->
-            case model.gameState of
-                Playing snapshot _ ->
+            case inGameFrontend.gameState of
+                Playing _ ->
                     let
-                        game : Game
-                        game =
-                            Snapshot.getValue snapshot
+                        oldSnapshot : Snapshot Game
+                        oldSnapshot =
+                            getGame inGameFrontend
+
+                        oldGame : Game
+                        oldGame =
+                            Snapshot.getValue oldSnapshot
                     in
-                    case Game.attemptCompleteTest test game of
+                    case Game.attemptCompleteTest test oldGame of
                         Err _ ->
                             noOp
 
@@ -490,14 +709,17 @@ updateLoaded msg model =
                             let
                                 newCache : Cache
                                 newCache =
-                                    getCache game
+                                    getCache oldGame
 
-                                newModel : LoadedFrontend
-                                newModel =
-                                    model
-                                        |> setGameState (Playing (Snapshot.setValue applyEffectsValue.game snapshot) newCache)
+                                newSnapshot : Snapshot Game
+                                newSnapshot =
+                                    Snapshot.setValue applyEffectsValue.game oldSnapshot
                             in
-                            ( newModel
+                            ( InGame
+                                (inGameFrontend
+                                    |> setGameState (Playing newCache)
+                                    |> setGame newSnapshot
+                                )
                             , Cmd.batch (List.map (AddToast >> delay 0) applyEffectsValue.toasts)
                             )
 
@@ -507,12 +729,12 @@ updateLoaded msg model =
         ToastMsg tmsg ->
             let
                 ( tray, newTmesg ) =
-                    Toast.update tmsg model.tray
+                    Toast.update tmsg inGameFrontend.tray
             in
-            ( { model | tray = tray }, Cmd.map ToastMsg newTmesg )
+            ( InGame { inGameFrontend | tray = tray }, Cmd.map ToastMsg newTmesg )
 
         HandleFastForward now ->
-            case model.gameState of
+            case inGameFrontend.gameState of
                 FastForward { original, current, whenItStarted } ->
                     let
                         timeOfCurrent : Posix
@@ -560,21 +782,24 @@ updateLoaded msg model =
                             newSnap =
                                 Snapshot.tickUntil (performantTick timeToAdd) nextInterval current
                         in
-                        ( model
-                            |> setGameState
-                                (FastForward { original = original, current = newSnap, whenItStarted = whenItStarted })
+                        ( InGame
+                            (inGameFrontend
+                                |> setGameState
+                                    (FastForward { original = original, current = newSnap, whenItStarted = whenItStarted })
+                            )
                         , Task.perform HandleFastForward (Process.sleep sleepTime |> Task.andThen (\_ -> Time.now))
                         )
 
                     else
                         -- run calculation to completion
                         let
-                            newSnap =
+                            newSnapshot : Snapshot Game
+                            newSnapshot =
                                 Snapshot.tickUntil (performantTick (Duration.minutes 1)) now current
 
                             newGame : Game
                             newGame =
-                                Snapshot.getValue newSnap
+                                Snapshot.getValue newSnapshot
 
                             newCache : Cache
                             newCache =
@@ -585,12 +810,14 @@ updateLoaded msg model =
                                     Just IdleGame.Mocks.timePassesModal
 
                                 else
-                                    createTimePassesModal (Duration.milliseconds (toFloat (Time.posixToMillis now - Time.posixToMillis whenItStarted))) original newSnap
+                                    createTimePassesModal (Duration.milliseconds (toFloat (Time.posixToMillis now - Time.posixToMillis whenItStarted))) original newSnapshot
                         in
-                        ( model
-                            |> setGameState
-                                (Playing newSnap newCache)
-                            |> setActiveModal newModal
+                        ( InGame
+                            (inGameFrontend
+                                |> setGameState (Playing newCache)
+                                |> setGame newSnapshot
+                                |> setActiveModal newModal
+                            )
                         , Cmd.none
                         )
 
@@ -599,8 +826,10 @@ updateLoaded msg model =
                     noOp
 
         HandleSyllabusClick skill ->
-            ( model
-                |> setActiveModal (Just (SyllabusModal skill))
+            ( InGame
+                (inGameFrontend
+                    |> setActiveModal (Just (SyllabusModal skill))
+                )
             , Cmd.none
             )
 
@@ -608,7 +837,7 @@ updateLoaded msg model =
             let
                 currentActivity : Maybe ( Activity, Timer )
                 currentActivity =
-                    getActivity model
+                    getActivity inGameFrontend
 
                 clickingActiveActivity : Bool
                 clickingActiveActivity =
@@ -628,26 +857,30 @@ updateLoaded msg model =
                         Just ( kind, Timer.create )
             in
             if ViewUtils.screenSupportsRighRail screenWidth then
-                ( model
-                    |> setActivity newActivity
-                    |> setActivityExpanded (not clickingActiveActivity)
+                ( InGame
+                    (inGameFrontend
+                        |> setActivity newActivity
+                        |> setActivityExpanded (not clickingActiveActivity)
+                    )
                 , Cmd.none
                 )
 
             else
-                ( model
-                    |> setActivity newActivity
-                    |> setActivityExpanded False
+                ( InGame
+                    (inGameFrontend
+                        |> setActivity newActivity
+                        |> setActivityExpanded False
+                    )
                 , Cmd.none
                 )
 
         HandlePreviewClick activity ->
-            case model.gameState of
-                Playing snapshot cachedActivityEffects ->
+            case inGameFrontend.gameState of
+                Playing cachedActivityEffects ->
                     let
                         currentActivity : Maybe ( Activity, Timer )
                         currentActivity =
-                            (Snapshot.getValue snapshot).activity
+                            (Snapshot.getValue (getGame inGameFrontend)).activity
 
                         clickingActiveActivity : Bool
                         clickingActiveActivity =
@@ -658,15 +891,17 @@ updateLoaded msg model =
                                 Nothing ->
                                     False
                     in
-                    ( model
-                        |> setPreview (Just (Preview ( activity, getByActivity activity cachedActivityEffects )))
-                        |> setActivityExpanded
-                            (if clickingActiveActivity then
-                                True
+                    ( InGame
+                        (inGameFrontend
+                            |> setPreview (Just (Preview ( activity, getByActivity activity cachedActivityEffects )))
+                            |> setActivityExpanded
+                                (if clickingActiveActivity then
+                                    True
 
-                             else
-                                False
-                            )
+                                 else
+                                    False
+                                )
+                        )
                     , Cmd.none
                     )
 
@@ -674,19 +909,23 @@ updateLoaded msg model =
                     noOp
 
         HandlePlayClick kind ->
-            ( model
-                |> setActivity (Just ( kind, Timer.create ))
-                |> setPreview Nothing
-                |> setActivityExpanded True
+            ( InGame
+                (inGameFrontend
+                    |> setActivity (Just ( kind, Timer.create ))
+                    |> setPreview Nothing
+                    |> setActivityExpanded True
+                )
             , Cmd.none
             )
 
         HandleStopClick kind ->
-            case model.gameState of
-                Playing _ cachedActivityEffects ->
-                    ( model
-                        |> setActivity Nothing
-                        |> setPreview (Just (Preview ( kind, getByActivity kind cachedActivityEffects )))
+            case inGameFrontend.gameState of
+                Playing cachedActivityEffects ->
+                    ( InGame
+                        (inGameFrontend
+                            |> setActivity Nothing
+                            |> setPreview (Just (Preview ( kind, getByActivity kind cachedActivityEffects )))
+                        )
                     , Cmd.none
                     )
 
@@ -694,31 +933,38 @@ updateLoaded msg model =
                     noOp
 
         SetDrawerOpen newValue ->
-            ( model
-                |> setIsDrawerOpen newValue
+            ( InGame
+                (inGameFrontend
+                    |> setIsDrawerOpen newValue
+                )
             , Cmd.none
             )
 
         HandleAnimationFrameDelta delta ->
-            case model.gameState of
-                Playing snapshot _ ->
+            case inGameFrontend.gameState of
+                Playing _ ->
                     let
                         ( newTimer, saveGameTimerTriggered ) =
-                            Timer.increment (Duration.seconds 1) (Duration.milliseconds delta) model.saveGameTimer
+                            Timer.increment (Duration.seconds 1) (Duration.milliseconds delta) inGameFrontend.saveGameTimer
 
+                        shouldSaveGame : Bool
                         shouldSaveGame =
                             saveGameTimerTriggered > 0
 
+                        ( gameId, snapshot ) =
+                            Nonempty.head inGameFrontend.games
+
+                        saveGameCmd : List (Cmd FrontendMsg)
                         saveGameCmd =
                             if shouldSaveGame then
-                                [ Lamdera.sendToBackend (Save snapshot) ]
+                                [ Lamdera.sendToBackend (SaveGame gameId snapshot) ]
 
                             else
                                 []
 
-                        modelWithSaveTimer : LoadedFrontend
+                        modelWithSaveTimer : InGameFrontend
                         modelWithSaveTimer =
-                            model
+                            inGameFrontend
                                 |> setSaveGameTimer newTimer
 
                         ( modelWithUpdatedPointer, pointerCmds ) =
@@ -730,16 +976,13 @@ updateLoaded msg model =
                     noOp
 
         HandleAnimationFrame now ->
-            case model.gameState of
-                NoGameSelected ->
-                    noOp
-
+            case inGameFrontend.gameState of
                 FastForward _ ->
                     -- During FastForward there's a recursive set of Cmds updating the snapshot, no work needs to be done in animationFrame explicitly
                     noOp
 
-                Playing snapshot cache ->
-                    if not model.isVisible then
+                Playing cache ->
+                    if not inGameFrontend.isVisible then
                         -- If the app is not visible we shouldn't do any work
                         noOp
 
@@ -747,7 +990,7 @@ updateLoaded msg model =
                         let
                             oldSnapshot : Snapshot ( Game, List Toast, Bool )
                             oldSnapshot =
-                                snapshot
+                                getGame inGameFrontend
                                     |> Snapshot.map (\g -> ( g, [], False ))
 
                             updatedSnapshot : Snapshot ( Game, List Toast, Bool )
@@ -769,61 +1012,77 @@ updateLoaded msg model =
                                 else
                                     cache
 
-                            newGameState : FrontendGameState
+                            newSnapshot : Snapshot Game
+                            newSnapshot =
+                                Snapshot.map (\_ -> newGame) updatedSnapshot
+
+                            newGameState : FrontendInGameState
                             newGameState =
-                                Playing (Snapshot.map (\_ -> newGame) updatedSnapshot) newCache
+                                Playing newCache
                         in
-                        ( model
-                            |> setGameState newGameState
+                        ( InGame
+                            (inGameFrontend
+                                |> setGameState newGameState
+                                |> setGame newSnapshot
+                            )
                         , Cmd.batch notificationCmds
                         )
 
         HandleVisibilityChange visibility ->
-            ( model, Task.perform (HandleVisibilityChangeHelp visibility) Time.now )
+            ( InGame inGameFrontend, Task.perform (HandleVisibilityChangeHelp visibility) Time.now )
 
         HandleVisibilityChangeHelp visibility now ->
             if visibility == Browser.Events.Visible then
-                case model.gameState of
-                    NoGameSelected ->
-                        ( model
-                            |> setIsVisible True
-                        , Cmd.none
-                        )
-
+                case inGameFrontend.gameState of
                     FastForward _ ->
-                        ( model
-                            |> setIsVisible True
+                        ( InGame
+                            (inGameFrontend
+                                |> setIsVisible True
+                            )
                         , Cmd.none
                         )
 
-                    Playing snapshot _ ->
-                        ( model
-                            |> setIsVisible True
-                            |> setGameState (FastForward { original = snapshot, current = snapshot, whenItStarted = now })
+                    Playing _ ->
+                        let
+                            oldSnapshot : Snapshot Game
+                            oldSnapshot =
+                                getGame inGameFrontend
+                        in
+                        ( InGame
+                            (inGameFrontend
+                                |> setIsVisible True
+                                |> setGameState (FastForward { original = oldSnapshot, current = oldSnapshot, whenItStarted = now })
+                            )
                         , Task.perform HandleFastForward Time.now
                         )
 
             else
-                ( model
-                    |> setIsVisible False
+                ( InGame
+                    (inGameFrontend
+                        |> setIsVisible False
+                    )
                 , Cmd.none
                 )
 
         CloseModal ->
-            ( model
-                |> setActiveModal Nothing
+            ( InGame
+                (inGameFrontend
+                    |> setActiveModal Nothing
+                )
             , Cmd.none
             )
 
         HandleTabClick tab ->
-            ( model
-                |> setTab tab
-                |> setIsDrawerOpen False
+            ( InGame
+                (inGameFrontend
+                    |> setTab tab
+                    |> setIsDrawerOpen False
+                )
             , Cmd.none
             )
 
         HandleShopUpgradeClick kind ->
-            ( model
+            ( inGameFrontend
                 |> mapGame
                     (\game ->
                         let
@@ -852,15 +1111,17 @@ updateLoaded msg model =
                         else
                             game
                     )
+                |> InGame
             , Cmd.none
             )
 
         HandleShopResourceClick resource ->
             case (getResourceStats resource).price of
                 Just price ->
-                    ( { model
-                        | activeModal = Just (ShopResourceModal 1 resource price)
-                      }
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceModal 1 resource price)
+                        }
                     , Cmd.none
                     )
 
@@ -868,18 +1129,22 @@ updateLoaded msg model =
                     noOp
 
         HandleShopResourceBuyClick ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal quantity resource _) ->
-                    case model.gameState of
-                        Playing snapshot _ ->
+                    case inGameFrontend.gameState of
+                        Playing _ ->
                             let
-                                game : Game
-                                game =
-                                    Snapshot.getValue snapshot
+                                oldSnapshot : Snapshot Game
+                                oldSnapshot =
+                                    getGame inGameFrontend
+
+                                oldGame : Game
+                                oldGame =
+                                    Snapshot.getValue oldSnapshot
 
                                 purchaseResult : Result EffectErr Game.ApplyEffectsValue
                                 purchaseResult =
-                                    Game.attemptPurchaseResource quantity resource game
+                                    Game.attemptPurchaseResource quantity resource oldGame
                             in
                             case purchaseResult of
                                 Ok res ->
@@ -896,16 +1161,17 @@ updateLoaded msg model =
                                         toasts =
                                             res.toasts
 
-                                        newModel : LoadedFrontend
+                                        newModel : InGameFrontend
                                         newModel =
-                                            { model | gameState = Playing (Snapshot.map (\_ -> newGame) snapshot) newCache }
+                                            { inGameFrontend | gameState = Playing newCache }
                                                 |> setActiveModal Nothing
+                                                |> setGame (Snapshot.map (\_ -> newGame) oldSnapshot)
 
                                         notificationCmds : List (Cmd FrontendMsg)
                                         notificationCmds =
                                             List.map (AddToast >> delay 0) toasts
                                     in
-                                    ( newModel, Cmd.batch notificationCmds )
+                                    ( InGame newModel, Cmd.batch notificationCmds )
 
                                 Err _ ->
                                     -- We disable the buy button in this case so shouldn't normally reach this spot
@@ -918,7 +1184,7 @@ updateLoaded msg model =
                     noOp
 
         HandleShopResourceQuantityChange string ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal _ resource price) ->
                     let
                         maybeQuantity : Maybe Int
@@ -927,9 +1193,10 @@ updateLoaded msg model =
                     in
                     case maybeQuantity of
                         Just quantity ->
-                            ( { model
-                                | activeModal = Just (ShopResourceModal quantity resource price)
-                              }
+                            ( InGame
+                                { inGameFrontend
+                                    | activeModal = Just (ShopResourceModal quantity resource price)
+                                }
                             , Cmd.none
                             )
 
@@ -940,35 +1207,42 @@ updateLoaded msg model =
                     noOp
 
         HandlePointerDown pointerState ->
-            ( { model | pointerState = Just pointerState }, Cmd.none )
+            ( InGame { inGameFrontend | pointerState = Just pointerState }, Cmd.none )
 
         HandlePointerUp ->
-            case model.pointerState of
+            case inGameFrontend.pointerState of
                 Nothing ->
-                    ( { model | pointerState = Nothing }, Cmd.none )
+                    ( InGame { inGameFrontend | pointerState = Nothing }, Cmd.none )
 
                 Just { click } ->
-                    updateLoaded click { model | pointerState = Nothing }
+                    updateInGame click { inGameFrontend | pointerState = Nothing }
 
         HandlePointerCancel ->
-            ( { model | pointerState = Nothing }, Cmd.none )
+            ( InGame { inGameFrontend | pointerState = Nothing }, Cmd.none )
 
         AddTime amount ->
-            ( model, Task.perform (AddTimeHelp amount) Time.now )
+            ( InGame inGameFrontend, Task.perform (AddTimeHelp amount) Time.now )
 
         AddTimeHelp amount now ->
-            case model.gameState of
-                Playing snapshot _ ->
+            case inGameFrontend.gameState of
+                Playing _ ->
                     let
+                        oldSnapshot : Snapshot Game
+                        oldSnapshot =
+                            getGame inGameFrontend
+
+                        current : Snapshot Game
                         current =
-                            Snapshot.dEBUG_addTime (Quantity.negate amount) snapshot
+                            Snapshot.dEBUG_addTime (Quantity.negate amount) oldSnapshot
 
                         fastForwardState : FastForwardState
                         fastForwardState =
                             { original = current, current = current, whenItStarted = now }
                     in
-                    ( model
-                        |> setGameState (FastForward fastForwardState)
+                    ( InGame
+                        (inGameFrontend
+                            |> setGameState (FastForward fastForwardState)
+                        )
                     , Task.perform HandleFastForward Time.now
                     )
 
@@ -976,11 +1250,12 @@ updateLoaded msg model =
                     noOp
 
         HandleOneLessButtonClick ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal quantity resource price) ->
-                    ( { model
-                        | activeModal = Just (ShopResourceModal (Basics.max 1 (quantity - 1)) resource price)
-                      }
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceModal (Basics.max 1 (quantity - 1)) resource price)
+                        }
                     , Cmd.none
                     )
 
@@ -988,11 +1263,12 @@ updateLoaded msg model =
                     noOp
 
         HandleOneMoreButtonClick ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal quantity resource price) ->
-                    ( { model
-                        | activeModal = Just (ShopResourceModal (quantity + 1) resource price)
-                      }
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceModal (quantity + 1) resource price)
+                        }
                     , Cmd.none
                     )
 
@@ -1000,11 +1276,12 @@ updateLoaded msg model =
                     noOp
 
         HandleMinButtonClick ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal _ resource price) ->
-                    ( { model
-                        | activeModal = Just (ShopResourceModal 1 resource price)
-                      }
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceModal 1 resource price)
+                        }
                     , Cmd.none
                     )
 
@@ -1012,22 +1289,27 @@ updateLoaded msg model =
                     noOp
 
         HandleMaxButtonClick ->
-            case model.activeModal of
+            case inGameFrontend.activeModal of
                 Just (ShopResourceModal _ resource price) ->
-                    case model.gameState of
-                        Playing snapshot _ ->
+                    case inGameFrontend.gameState of
+                        Playing _ ->
                             let
+                                oldSnapshot : Snapshot Game
+                                oldSnapshot =
+                                    getGame inGameFrontend
+
                                 game : Game
                                 game =
-                                    Snapshot.getValue snapshot
+                                    Snapshot.getValue oldSnapshot
 
                                 maxPurchase : Int
                                 maxPurchase =
                                     Game.getMaxPurchase price game
                             in
-                            ( { model
-                                | activeModal = Just (ShopResourceModal maxPurchase resource price)
-                              }
+                            ( InGame
+                                { inGameFrontend
+                                    | activeModal = Just (ShopResourceModal maxPurchase resource price)
+                                }
                             , Cmd.none
                             )
 
@@ -1056,51 +1338,141 @@ updateLoaded msg model =
                     else
                         False
             in
-            ( model
-                |> setActivityExpanded expandedValue
+            ( InGame
+                (inGameFrontend
+                    |> setActivityExpanded expandedValue
+                )
             , Cmd.none
             )
 
+        _ ->
+            noOp
 
-updateLoadedFromBackend : ToFrontend -> LoadedFrontend -> ( LoadedFrontend, Cmd FrontendMsg )
-updateLoadedFromBackend msg model =
+
+toMainMenuFromInGame : { inGameFrontend : InGameFrontend, games : List ( Id GameId, Snapshot Game ) } -> FrontendModel
+toMainMenuFromInGame { inGameFrontend, games } =
+    let
+        mainMenuRoute : MainMenuRoute
+        mainMenuRoute =
+            case inGameFrontend.user.loginStatus of
+                LoggedIn _ ->
+                    MainMenuGameList
+
+                _ ->
+                    MainMenuGatekeeper
+    in
+    MainMenu
+        { key = inGameFrontend.key
+        , route = inGameFrontend.route
+        , routeToken = inGameFrontend.routeToken
+        , isVisible = inGameFrontend.isVisible
+        , emailFormValue = ""
+        , user = inGameFrontend.user
+        , games = games
+        , maybeServerInfo = inGameFrontend.maybeServerInfo
+        , mainMenuRoute = mainMenuRoute
+        }
+
+
+attemptSelectByFn : (t -> Bool) -> List t -> Maybe ( t, List t )
+attemptSelectByFn fn =
+    List.Extra.select >> List.Extra.find (\( x, _ ) -> fn x)
+
+
+updateInGameFromBackend : ToFrontend -> InGameFrontend -> ( FrontendModel, Cmd FrontendMsg )
+updateInGameFromBackend msg inGameFrontend =
+    let
+        noOp : ( FrontendModel, Cmd FrontendMsg )
+        noOp =
+            ( InGame inGameFrontend, Cmd.none )
+    in
     case msg of
         NoOpToFrontend ->
-            ( model, Cmd.none )
+            noOp
 
-        CheckLoginResponse loginStatus ->
-            case loginStatus of
-                Just { userId, user } ->
-                    ( { model
-                        | loginStatus =
-                            LoggedIn
-                                { userId = userId
-                                , emailAddress = user.emailAddress
-                                }
-                      }
-                    , Cmd.none
-                    )
+        SetUserAndGames ( frontendUser, serverGamesList ) ->
+            let
+                activeGameId : Id GameId
+                activeGameId =
+                    Nonempty.head inGameFrontend.games |> Tuple.first
+
+                isActiveGame : ( Id GameId, Snapshot Game ) -> Bool
+                isActiveGame ( gameId, _ ) =
+                    gameId == activeGameId
+            in
+            case attemptSelectByFn isActiveGame serverGamesList of
+                Just ( activeGame, restGames ) ->
+                    ( InGame { inGameFrontend | games = Nonempty activeGame restGames, user = frontendUser }, Cmd.none )
 
                 Nothing ->
-                    ( { model | loginStatus = NotLoggedIn { showLogin = False } }
-                    , Cmd.none
-                    )
-
-        InitializeGame serverSnapshot ->
-            ( model, Task.perform (InitializeGameHelp serverSnapshot) Time.now )
+                    -- In thise case the server sent back a list of games not including the active game.
+                    -- Not sure why this would happen but only sensible thing to do is return to MainMenu.
+                    ( toMainMenuFromInGame { inGameFrontend = inGameFrontend, games = serverGamesList }, Cmd.none )
 
         GiveServerInfo serverInfo ->
-            ( { model | maybeServerInfo = Just serverInfo }, Cmd.none )
+            ( InGame { inGameFrontend | maybeServerInfo = Just serverInfo }, Cmd.none )
+
+
+updateMainMenuFromBackend : ToFrontend -> MainMenuFrontend -> ( FrontendModel, Cmd FrontendMsg )
+updateMainMenuFromBackend msg mainMenuFrontend =
+    let
+        noOp : ( FrontendModel, Cmd FrontendMsg )
+        noOp =
+            ( MainMenu mainMenuFrontend, Cmd.none )
+    in
+    case msg of
+        NoOpToFrontend ->
+            noOp
+
+        SetUserAndGames ( user, games ) ->
+            ( MainMenu { mainMenuFrontend | user = user, games = games }, Cmd.none )
+
+        GiveServerInfo serverInfo ->
+            ( MainMenu { mainMenuFrontend | maybeServerInfo = Just serverInfo }, Cmd.none )
 
 
 updateFromBackend : ToFrontend -> FrontendModel -> ( FrontendModel, Cmd FrontendMsg )
 updateFromBackend msg model =
     case model of
-        Loading _ ->
-            ( model, Cmd.none )
+        Loading loadingFrontend ->
+            case msg of
+                SetUserAndGames ( user, games ) ->
+                    let
+                        mainMenuRoute : MainMenuRoute
+                        mainMenuRoute =
+                            case user.loginStatus of
+                                NotLoggedIn _ ->
+                                    MainMenuGatekeeper
 
-        Loaded loaded ->
-            updateLoadedFromBackend msg loaded |> Tuple.mapFirst Loaded
+                                _ ->
+                                    MainMenuLogin
+                    in
+                    ( MainMenu
+                        { key = loadingFrontend.key
+                        , route = loadingFrontend.route
+                        , routeToken = loadingFrontend.routeToken
+                        , isVisible = loadingFrontend.isVisible
+                        , emailFormValue = ""
+                        , user = user
+                        , games = games
+                        , maybeServerInfo = loadingFrontend.maybeServerInfo
+                        , mainMenuRoute = mainMenuRoute
+                        }
+                    , Cmd.none
+                    )
+
+                GiveServerInfo serverInfo ->
+                    ( Loading { loadingFrontend | maybeServerInfo = Just serverInfo }, Cmd.none )
+
+                _ ->
+                    -- Shouldn't happen
+                    ( model, Cmd.none )
+
+        MainMenu mainMenuFrontend ->
+            updateMainMenuFromBackend msg mainMenuFrontend
+
+        InGame inGameFrontend ->
+            updateInGameFromBackend msg inGameFrontend
 
 
 subscriptions : FrontendModel -> Sub FrontendMsg
@@ -1251,7 +1623,7 @@ renderModal activeModal game =
                 |> IdleGame.Views.ModalWrapper.render
 
 
-renderBottomRightItems : LoadedFrontend -> Html FrontendMsg
+renderBottomRightItems : InGameFrontend -> Html FrontendMsg
 renderBottomRightItems model =
     div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", ViewUtils.zIndexes.bottomRightMenu ]
         ((if Config.flags.showDebugPanel then
@@ -1270,6 +1642,52 @@ renderBottomRightItems model =
         )
 
 
+renderMainMenu : MainMenuFrontend -> Html FrontendMsg
+renderMainMenu mainMenuFrontend =
+    let
+        renderGame : Int -> ( Id GameId, Snapshot Game ) -> Html FrontendMsg
+        renderGame index _ =
+            li []
+                [ text ("Game " ++ String.fromInt index)
+                , button [ onClick (HandleStartGameClick { index = index }) ] [ text "Start" ]
+                ]
+    in
+    div [ class "t-column prose" ]
+        [ h1 [] [ text "Main Menu" ]
+        , case mainMenuFrontend.user.loginStatus of
+            LoggedIn { emailAddress } ->
+                div [ class "t-column" ]
+                    [ div [] [ text ("Logged in as " ++ EmailAddress.toString emailAddress) ]
+                    , button [ class "btn", onClick HandleLogoutClick ] [ text "Log out" ]
+                    ]
+
+            LoginStatusPending ->
+                div [] [ text "Authenticating..." ]
+
+            NotLoggedIn _ ->
+                div [] [ text "Logged in as Anonymous" ]
+        , h2 [] [ text "Games" ]
+        , ul []
+            (List.concat
+                [ [ li [] [ button [ class "btn btn-primary", onClick HandleCreateGameClick ] [ text "Create new game" ] ] ]
+                , List.indexedMap renderGame mainMenuFrontend.games
+                ]
+            )
+        , div [ class "t-column" ]
+            [ input
+                [ type_ "text"
+                , value mainMenuFrontend.emailFormValue
+                , onInput HandleEmailInput
+                , class "input input-bordered"
+                , placeholder "Email address"
+                ]
+                []
+            , button [ class "btn", onClick HandleCreateUserClick ] [ text "Create user" ]
+            , button [ class "btn", onClick HandleLogInClick ] [ text "Log in" ]
+            ]
+        ]
+
+
 view : FrontendModel -> Document FrontendMsg
 view model =
     let
@@ -1285,27 +1703,39 @@ view model =
             Loading _ ->
                 div [] []
 
-            Loaded frontend ->
+            MainMenu _ ->
+                div [] []
+
+            InGame frontend ->
                 DebugPanel.render frontend
         , case model of
             Loading _ ->
-                div [] []
+                div [] [ text "Loading" ]
 
-            Loaded frontend ->
+            MainMenu mainMenuFrontend ->
+                case mainMenuFrontend.route of
+                    Route.ServerInfoRoute ->
+                        ServerInfo.render mainMenuFrontend.maybeServerInfo
+
+                    Route.RootRoute ->
+                        MainMenu.render mainMenuFrontend
+
+            InGame frontend ->
                 case frontend.route of
                     Route.ServerInfoRoute ->
                         ServerInfo.render frontend.maybeServerInfo
 
                     Route.RootRoute ->
                         case frontend.gameState of
-                            NoGameSelected ->
-                                nothing
-
                             FastForward _ ->
                                 IdleGame.Views.FastForward.render
 
-                            Playing snapshot cache ->
+                            Playing cache ->
                                 let
+                                    snapshot : Snapshot Game
+                                    snapshot =
+                                        getGame frontend
+
                                     game : Game
                                     game =
                                         Snapshot.getValue snapshot

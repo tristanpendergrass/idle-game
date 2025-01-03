@@ -10,7 +10,7 @@ import Browser.Navigation exposing (Key)
 import Duration exposing (Duration)
 import EmailAddress exposing (EmailAddress)
 import Http
-import Id exposing (Id, UserId)
+import Id exposing (GameId, Id, LoginToken, UserId)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Effect exposing (Effect)
 import IdleGame.GameTypes exposing (..)
@@ -83,9 +83,8 @@ type alias FastForwardState =
     }
 
 
-type FrontendGameState
-    = NoGameSelected
-    | Playing (Snapshot Game) Cache
+type FrontendInGameState
+    = Playing Cache
     | FastForward FastForwardState
 
 
@@ -107,39 +106,54 @@ type LocationFilter
 
 type FrontendModel
     = Loading LoadingFrontend
-    | Loaded LoadedFrontend
+    | MainMenu MainMenuFrontend
+    | InGame InGameFrontend
 
 
 type alias LoadingFrontend =
-    { navigationKey : Key
+    { key : Key
     , route : Route
     , routeToken : Route.Token
     , isVisible : Bool
+    , maybeServerInfo : Maybe ServerInfo
     }
 
 
-type alias FrontendUser =
-    {}
-
-
-type alias LoggedIn_ =
-    { userId : Id UserId
-    , emailAddress : EmailAddress
-    }
-
-
+{-| See AuthenticationStatus comment for differences between that and LoginStatus
+-}
 type LoginStatus
-    = LoginStatusPending
-    | LoggedIn LoggedIn_
-    | NotLoggedIn { showLogin : Bool }
+    = NotLoggedIn UnauthenticatedUser
+    | LoginStatusPending -- The user is either waiting for registration email or login email flow to resolve
+    | LoggedIn AuthenticatedUser
 
 
-type alias LoadedFrontend =
+type MainMenuRoute
+    = MainMenuGatekeeper -- Asks you whether you want to log in or start an unauthenticated game
+    | MainMenuLogin -- Asks you to log in
+    | MainMenuGameList -- Lists your games lets you start a new one
+
+
+type alias MainMenuFrontend =
     { key : Key -- used by Browser.Navigation for things like pushUrl
-    , loginStatus : LoginStatus
     , route : Route
     , routeToken : Route.Token
     , isVisible : Bool
+    , emailFormValue : String -- This is only relevant when the user is unauthenticated
+    , user : FrontendUser
+    , games : List ( Id GameId, Snapshot Game )
+    , maybeServerInfo : Maybe ServerInfo
+    , mainMenuRoute : MainMenuRoute
+    }
+
+
+type alias InGameFrontend =
+    { key : Key -- used by Browser.Navigation for things like pushUrl
+    , user : FrontendUser -- n.b. could be Authenticated or Unauthenticated
+    , route : Route
+    , routeToken : Route.Token
+    , isVisible : Bool
+    , games : Nonempty ( Id GameId, Snapshot Game ) -- Since we're "In Game", there will always be at least one game and it will always be the head of the Nonempty
+    , gameState : FrontendInGameState
     , maybeServerInfo : Maybe ServerInfo
     , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
     , showDebugPanel : Bool
@@ -150,10 +164,27 @@ type alias LoadedFrontend =
     , activityExpanded : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
-    , gameState : FrontendGameState
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
     , activeAcademicTestCategory : AcademicTestCategory
     }
+
+
+getGame : InGameFrontend -> Snapshot Game
+getGame inGameFrontend =
+    let
+        ( _, game ) =
+            List.Nonempty.head inGameFrontend.games
+    in
+    game
+
+
+setGame : Snapshot Game -> InGameFrontend -> InGameFrontend
+setGame newSnapshot model =
+    let
+        ( gameId, _ ) =
+            List.Nonempty.head model.games
+    in
+    { model | games = List.Nonempty.replaceHead ( gameId, newSnapshot ) model.games }
 
 
 
@@ -168,34 +199,52 @@ type alias ServerInfo =
 
 
 type alias BackendModel =
-    { time : Time.Posix
+    -- For approximateTime, we'd like to update it every millisecond but it would generate too many backend events.
+    -- Instead we update it periodically (every 15 seconds)
+    { approximateTime : Time.Posix
     , secretCounter : Int
-    , userGames : Dict (Id UserId) (Snapshot Game)
+    , userGames : Dict (Id UserId) (List (Id GameId))
+    , games : Dict (Id GameId) (Snapshot Game)
     , seed : Random.Seed
     , sessions : BiDict SessionId (Id UserId)
     , connections : Dict SessionId (Nonempty ClientId)
     , users : Dict (Id UserId) BackendUser
+    , pendingLoginTokens : Dict (Id LoginToken) LoginTokenData
     }
 
 
-type alias Authenticated =
-    { lastConnectionTime : Time.Posix
-    , emailAddress : EmailAddress
+type alias FrontendUser =
+    { id : Id UserId
+    , loginStatus : LoginStatus
     }
 
 
-type alias Unauthenticated =
-    { lastConnectionTime : Time.Posix
+type alias BackendUser =
+    { id : Id UserId
+    , lastConnectionTime : Time.Posix
+    , authentication : AuthenticationStatus
     }
 
 
-type BackendUser
-    = AuthenticatedBackendUser Authenticated
-    | UnauthenticatedBackendUser Unauthenticated
+{-| AuthenticationStatus refers to whether the user has provided an email and confirmed it at least once.
+This is different from the LoginStatus because a single user might have a different LoginStatus for each client,
+but will always have only a single AuthenticationStatus. Therefore the BackendUser has an AuthenticationStatus
+and the FrontendUser has a LoginStatus.
+-}
+type AuthenticationStatus
+    = Authenticated AuthenticatedUser
+    | AuthenticationPending EmailAddress UnauthenticatedUser
+    | NotAuthenticated UnauthenticatedUser
 
 
-userToFrontend : BackendUser -> FrontendUser
-userToFrontend _ =
+type alias AuthenticatedUser =
+    -- Attributes only relevant to an authenticated user. Things common to this and Unauthenticated go on FrontendUser or BackendUser
+    { emailAddress : EmailAddress
+    }
+
+
+type alias UnauthenticatedUser =
+    -- Attributes only relevant to an unauthenticated user. Things common to this and Authenticated go on FrontendUser or BackendUser
     {}
 
 
@@ -214,7 +263,18 @@ type FrontendMsg
     = NoOp
     | UrlClicked UrlRequest
     | UrlChanged Url
-    | InitializeGameHelp (Snapshot Game) Posix
+      -- Main Menu
+    | HandleCreateGameClick
+    | HandleCreateUserClick
+    | HandleLogInClick
+    | HandleStartGameClick { index : Int }
+    | HandleStartGameClickWithTime { index : Int } Time.Posix -- Only relevant when MainMenuState has user games
+    | HandleEmailInput String
+    | HandleLogoutClick
+    | HandleGoToLoginRouteClick
+    | HandleGoToGatekeeperClick
+      -- InGame meta stuff
+    | HandleGoToMainMenuClick
       -- Detail View
     | ClosePreview
     | ExpandActivity
@@ -263,22 +323,31 @@ type FrontendMsg
 
 type ToBackend
     = NoOpToBackend
-    | Save (Snapshot Game)
-    | CheckLoginRequest
+      -- MainMenu
+    | RegisterEmailRequest Route EmailAddress -- Unauthenticated users sense this to cause an authenticating email to be sent
+    | LoginWithEmailRequest Route EmailAddress -- Same as RegisterEmailRequest but intended for authenticated users
+    | LoginWithTokenRequest (Id LoginToken) -- Sent by the page when it it loaded with login hash in its url
+    | LogoutRequest
+    | CreateGameRequest
+      -- InGame
+    | SaveGame (Id GameId) (Snapshot Game)
+
+
+type alias LoginTokenData =
+    { creationTime : Time.Posix, emailAddress : EmailAddress }
 
 
 type BackendMsg
     = NoOpBackend
+    | BackendGotTime Time.Posix -- Updates "approximateTime" field on backend model
     | HandleConnect SessionId ClientId
-    | HandleConnectWithTime SessionId ClientId Posix
     | HandleDisconnect SessionId ClientId
-    | BackendGotTime Time.Posix
+    | SentLoginEmail EmailAddress (Result Http.Error Postmark.PostmarkSendResponse)
 
 
 type ToFrontend
     = NoOpToFrontend
-    | CheckLoginResponse (Maybe { userId : Id UserId, user : Authenticated })
-    | InitializeGame (Snapshot Game)
+    | SetUserAndGames ( FrontendUser, List ( Id GameId, Snapshot Game ) )
     | GiveServerInfo ServerInfo
 
 

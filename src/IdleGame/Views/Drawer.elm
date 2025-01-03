@@ -20,22 +20,26 @@ renderDrawer isDrawerOpen activeTab =
                 |> Icon.withSize Icon.Small
                 |> Icon.toHtml
 
-        renderTab : { tab : Tab, underConstruction : Bool } -> Html FrontendMsg
-        renderTab { tab, underConstruction } =
+        renderTab : { tab : Tab } -> Html FrontendMsg
+        renderTab { tab } =
             let
                 config =
                     Tab.getConfig tab
             in
+            renderDrawerRow { isActive = activeTab == tab, icon = config.icon, title = config.title, underConstruction = False }
+
+        renderDrawerRow : { isActive : Bool, icon : Icon, title : String, underConstruction : Bool } -> Html FrontendMsg
+        renderDrawerRow { isActive, icon, title, underConstruction } =
             span
                 [ class "flex gap-4 items-center"
-                , classList [ ( "active", activeTab == tab ) ]
+                , classList [ ( "active", isActive ) ]
                 ]
                 [ span [ class "flex-none" ]
-                    [ config.icon
+                    [ icon
                         |> Icon.withRounded True
                         |> Icon.toHtml
                     ]
-                , span [ class "flex-1" ] [ text config.title ]
+                , span [ class "flex-1" ] [ text title ]
                 , span [ class "flex-none", classList [ ( "hidden", not underConstruction ) ] ]
                     [ underConstructionIcon ]
                 ]
@@ -74,9 +78,10 @@ renderDrawer isDrawerOpen activeTab =
                 ]
             , div [ class "h-4" ] []
             , ul [ class "menu flex flex-col p-0 px-4" ]
-                [ li [ onClick (HandleTabClick Tab.Home) ] [ renderTab { tab = Tab.Home, underConstruction = False } ]
-                , li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack, underConstruction = False } ]
-                , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop, underConstruction = False } ]
+                [ li [ onClick (HandleTabClick Tab.Home) ] [ renderTab { tab = Tab.Home } ]
+                , li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack } ]
+                , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop } ]
+                , li [ onClick HandleGoToMainMenuClick ] [ renderDrawerRow { isActive = False, icon = Icon.menu, title = "Main Menu", underConstruction = False } ]
                 ]
             , ul [ class "menu flex flex-col p-0 px-4" ]
                 (List.concat
@@ -87,7 +92,7 @@ renderDrawer isDrawerOpen activeTab =
                         |> List.map
                             (\skill ->
                                 li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
-                                    [ renderTab { tab = Tab.SkillTab skill, underConstruction = False } ]
+                                    [ renderTab { tab = Tab.SkillTab skill } ]
                             )
                     ]
                 )
@@ -95,8 +100,8 @@ renderDrawer isDrawerOpen activeTab =
                 [ li [] []
                 , li [ class "menu-title" ] [ text "Campus" ]
                 , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
-                    [ renderTab { tab = Tab.SkillTab Labs, underConstruction = False } ]
-                , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter, underConstruction = False } ]
+                    [ renderTab { tab = Tab.SkillTab Labs } ]
+                , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter } ]
                 ]
             ]
         ]

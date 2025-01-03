@@ -1,4 +1,3 @@
-
 Many games show valuable tips from their loading screen. This may seem relatively inconsequential but I think it's actually an extremely under recognized method of educating the player on game systems. Tutorials that tell the player things obviously suck. But the curse of human tendency to say "good enough" if something is mostly working means that it's hard to teach players a better way of doing something any other way. They won't necessarily seek out the quality of life or cool features you add if they're not completely in the way and necessary.
 
 One instance I'm thinking of is how to teach players that they can long-press an activity to preview it. I definitely want them to find out about this since the inability to preview things in Melvor without starting the activity was a big complaint. But it's also not worth putting a blocking notice in front of the player to tell them how to preview something (essentially nothing is). So how to enable?

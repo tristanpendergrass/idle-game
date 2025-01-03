@@ -1,3 +1,17 @@
+## Trials
+A trial sequence would be a self-contained set of trials which the player could set themselves as "trying". Once trying a trial sequence, a timer would tick for each trail in the sequence and success would be determined; if the player fails then they are sent back to the start and if they succeed they progress. Similar to how Agility works in Melvor Idle except for some key enhancements:
+* Each trial would be personalized to the zone it's found in. E.g. in the jungle biome a trial where you use vine rope swings to get somewhere.
+* Each trial would pose a different challenge from the others, not just be a fixed time to complete. For instance, we might have stats like Strength, Dex, Wis, etc. that are rolled against like in an RPG?
+* One could assign a single spell to aid you on each step. These spells could aid you by e.g.
+    * Increase success chance on this step
+    * Increase success chance on *next* step
+    * Give you a small reward on completion
+    * Cause you to gain more xp
+More ideas for trials
+* A trial that has a fixed unadjustable % chance to be passed
+* The final trial rewards you with a big reward
+* Each trial has a mastery reward system
+* Each trial has a series of tags, with each tag being associated with mastery. 
 ## Crafting ala New World
 I really like crafting in New World, where you craft an item multiple times seeking the best combination of perks, the numerical value of the perk, and the numerical value of the stats on the item. 
 
@@ -79,3 +93,32 @@ I like that in farmside you create feed for different animals using any of your 
 * Wheat lends e.g. 10 value but a coconut a full 100. If something is added to the feeder that causes it to exceed 100 it "rolls over" value to the next produced feed.
 * There are multiple different kinds of feed to produce-- chicken, cow, and sheep. If an animal likes a certain type of food it counts for more in its recipe-- e.g. maybe wheat counts for 15 in the chicken feed but only 10 in cow.
 * This idea could be implemented for any number of resource consuming skills but feels especially good for animal feed for some reason. Could be human food too. Or potions.
+# Helping people out
+For the exploration portion of the game I have some ideas
+* Each region has people with problems. Solving the problems of the region is one of your main goals in the game, and it can be restored to peace or whatever if you solve enough of them. What that means differs from region to region.
+* Solving a problem boils down to having enough "power" in a given domain, represented by icons on your spells and gear.
+* Examples of domains: livestock, cultivation, healing, repairing machines, managing ghosts
+* Examples of problems: cows have been sick -> needs 2 livestock + 1 healing, broken farm equipment -> needs 3 repairing machines
+* Knowledge of the region or something could reduce these thresholds, e.g. -1 power of any kind needed.
+* Spells are consumable and grant you the 
+
+# Only Zones
+* I like this zone idea so much I'm starting to wonder if there's any reason to have the school involved at all.
+* What if spells were discovered in the lands you wander (I like this on its own merits, but it works gameplay wise too!). They could be tagged by their type as well as their origin
+* The spells would be crafted in those regions, typically from reagents from that region but possibly adding others
+* The first thing a player would do would be start exploring an area-- very simple and obvious loop can be established right off the bat-- spend some time gathering, craft some spells, get rewarded, go back to gathering now more quickly.
+## Zone progression
+* Starter zone that's really simple
+* Zone that introduces combat
+* Zone that introduces armor crafting
+* Zone that introduces wands
+These zones would be memorable and notable for being associated with given gameplay elements-- you mainly return to Wand-landia for wand materials and crafting better ones-- but that is:
+a) not the only identity of these places (don't call it Wand-landia, call it something of its own and flavorful
+b) not the only game in town for that gameplay element. Different areas mix and match gameplay elements as they would in real life. Depending on proximity or trade routes the elements seep into each other
+
+# Gear investment
+What if gear worked this way:
+* No crafting gear with predetermined stats, or getting it as rewards. That's fun, but it's been done to death. Instead you craft e.g. base cloaks, that all have slots in them. 
+* For instance, you might craft a basic robe for ten hours and get 100 common, 10 rare, 1 quality result. The quality result has more slots available than the others so you'd invest that.
+* The quality you would invest with a bunch of spells of a certain type to give that robe a lingering association with the spell. Depending on the circumstance this would mean that wearing that clothes would give a discount on that icon (for quests), boost the icon (for fighting monsters), etc.
+

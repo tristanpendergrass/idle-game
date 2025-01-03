@@ -1,0 +1,2 @@
+* "I've always considered myself a rather unimpressive specimen with a rather impressive set of experiences."
+	* I've always considered myself to have a rather unimpressive mind fortified by a rather impressive set of experiences.

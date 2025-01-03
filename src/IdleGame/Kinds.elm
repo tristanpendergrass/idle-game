@@ -5,9 +5,8 @@ import IdleGame.Coin
 import IdleGame.Views.Icon
 
 
+
 {- !! Generated code, do not edit by hand !! -}
-
-
 {- Skills -}
 
 
@@ -153,6 +152,7 @@ skillStats =
 getSkillStats : Skill -> SkillStats
 getSkillStats kind =
     getBySkill kind skillStats
+
 
 
 {- Activities -}
@@ -641,8 +641,7 @@ getByActivity kind data =
             data.lab6
 
 
-setByActivity :
-    Activity -> value -> ActivityRecord value -> ActivityRecord value
+setByActivity : Activity -> value -> ActivityRecord value -> ActivityRecord value
 setByActivity kind value data =
     case kind of
         BackAndSpine ->
@@ -1605,6 +1604,7 @@ getActivityStats kind =
     getByActivity kind activityStats
 
 
+
 {- Resources -}
 
 
@@ -1709,8 +1709,7 @@ resourceRecord a =
     }
 
 
-getByResource :
-    Resource -> ResourceRecord medicalEthicsFlashcard -> medicalEthicsFlashcard
+getByResource : Resource -> ResourceRecord medicalEthicsFlashcard -> medicalEthicsFlashcard
 getByResource kind data =
     case kind of
         AnatomyK ->
@@ -1777,8 +1776,7 @@ getByResource kind data =
             data.medicalEthicsFlashcard
 
 
-setByResource :
-    Resource -> value -> ResourceRecord value -> ResourceRecord value
+setByResource : Resource -> value -> ResourceRecord value -> ResourceRecord value
 setByResource kind value data =
     case kind of
         AnatomyK ->
@@ -2026,6 +2024,7 @@ getResourceStats kind =
     getByResource kind resourceStats
 
 
+
 {- AcademicTests -}
 
 
@@ -2212,8 +2211,7 @@ academicTestRecord a =
     }
 
 
-getByAcademicTest :
-    AcademicTest -> AcademicTestRecord usmleStep1Test -> usmleStep1Test
+getByAcademicTest : AcademicTest -> AcademicTestRecord usmleStep1Test -> usmleStep1Test
 getByAcademicTest kind data =
     case kind of
         Anatomy1 ->
@@ -2824,6 +2822,7 @@ getAcademicTestStats kind =
     getByAcademicTest kind academicTestStats
 
 
+
 {- Shop Upgrades -}
 
 
@@ -2852,8 +2851,7 @@ getByShopUpgrade kind data =
             data.glasses
 
 
-setByShopUpgrade :
-    ShopUpgrade -> value -> ShopUpgradeRecord value -> ShopUpgradeRecord value
+setByShopUpgrade : ShopUpgrade -> value -> ShopUpgradeRecord value -> ShopUpgradeRecord value
 setByShopUpgrade kind value data =
     case kind of
         Glasses ->

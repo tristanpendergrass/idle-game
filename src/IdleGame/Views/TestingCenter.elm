@@ -59,7 +59,7 @@ renderTest game mods test =
         ]
 
 
-render : LoadedFrontend -> Game -> Html FrontendMsg
+render : InGameFrontend -> Game -> Html FrontendMsg
 render model game =
     let
         allMods : List Mod

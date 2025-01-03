@@ -1,5 +1,6 @@
 module Id exposing
     ( DeleteUserToken(..)
+    , GameId(..)
     , Id(..)
     , LoginToken(..)
     , SessionIdFirst4Chars(..)
@@ -18,6 +19,10 @@ import Time
 
 type UserId
     = UserId Never
+
+
+type GameId
+    = GameId Never
 
 
 type SessionIdFirst4Chars
@@ -41,31 +46,32 @@ type DeleteUserToken
     = DeleteUserToken Never
 
 
-getUniqueId : { a | secretCounter : Int, time : Time.Posix } -> ( { a | secretCounter : Int, time : Time.Posix }, Id b )
+getUniqueId : { a | secretCounter : Int, approximateTime : Time.Posix } -> ( { a | secretCounter : Int, approximateTime : Time.Posix }, Id b )
 getUniqueId model =
     ( { model | secretCounter = model.secretCounter + 1 }
     , Env.secretKey
         ++ ":"
         ++ String.fromInt model.secretCounter
         ++ ":"
-        ++ String.fromInt (Time.posixToMillis model.time)
+        ++ String.fromInt (Time.posixToMillis model.approximateTime)
         |> Sha256.sha256
         |> Id
     )
 
 
 getUniqueShortId :
-    (Id b -> { a | secretCounter : Int, time : Time.Posix } -> Bool)
-    -> { a | secretCounter : Int, time : Time.Posix }
-    -> ( { a | secretCounter : Int, time : Time.Posix }, Id b )
-getUniqueShortId isUnique model =
+    (Id b -> { a | secretCounter : Int } -> Bool)
+    -> Time.Posix
+    -> { a | secretCounter : Int }
+    -> ( { a | secretCounter : Int }, Id b )
+getUniqueShortId isUnique now model =
     let
         id =
             Env.secretKey
                 ++ ":"
                 ++ String.fromInt model.secretCounter
                 ++ ":"
-                ++ String.fromInt (Time.posixToMillis model.time)
+                ++ String.fromInt (Time.posixToMillis now)
                 |> Sha256.sha224
                 |> String.left 6
                 |> Id
@@ -77,7 +83,7 @@ getUniqueShortId isUnique model =
         ( newModel, id )
 
     else
-        getUniqueShortId isUnique newModel
+        getUniqueShortId isUnique now newModel
 
 
 cryptoHashToString : Id a -> String
