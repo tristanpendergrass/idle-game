@@ -7,3 +7,4 @@ dist
 temp
 .parcel-cache
 notes/.obsidian
+.nvmrc
