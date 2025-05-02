@@ -63,6 +63,11 @@ $ npx elm-codegen install
 
 # Todos
 
+## Tech stuff
+[ ] Hide authentication logic for now
+[x] Migrate to latest version of DaisyUI and Tailwind
+[ ] Migrate away from @apply blocks per tailwind creator's tweet
+
 ## Bugs
 [ ] When doing lab with 50% success rate I see "+0 coin" when failure happens
 [ ] Fix that bug where there's a bunch of toasts when you come back

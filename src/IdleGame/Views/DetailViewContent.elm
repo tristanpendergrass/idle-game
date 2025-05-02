@@ -152,7 +152,7 @@ renderContent obj extraBottomPadding game =
             [ Utils.cardImage (CardLandscape (getActivityStats activity).image)
             , fade isPreview
             ]
-        , div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
+        , div [ Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]

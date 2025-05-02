@@ -2779,8 +2779,14 @@
   .w-56 {
     width: calc(var(--spacing) * 56);
   }
+  .w-64 {
+    width: calc(var(--spacing) * 64);
+  }
   .w-80 {
     width: calc(var(--spacing) * 80);
+  }
+  .w-128 {
+    width: calc(var(--spacing) * 128);
   }
   .w-\[0\.75rem\] {
     width: 0.75rem;

@@ -126,8 +126,8 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
     in
     div [ class "relative" ]
         [ div
-            [ Utils.card.container
-            , Utils.card.containerClickable
+            [ Utils.classes.card.container
+            , Utils.classes.card.containerClickable
             , class "overflow-hidden"
 
             -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
@@ -136,18 +136,18 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             [ -- preview image
-              div [ Utils.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
+              div [ Utils.classes.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
                 [ Utils.cardImage (CardLandscape activityStats.image)
                 ]
-            , div [ Utils.card.body, Utils.zIndexes.cardBody ]
+            , div [ Utils.classes.card.body, Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
-                [ div [ Utils.card.activityTypeBadge ] [ text stats.type_ ]
-                , div [ class "t-column gap-0" ]
-                    [ h2 [ Utils.card.title ] [ text (getActivityStats activity).title ]
+                [ div [ Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
+                , div [ class "gap-0" ]
+                    [ h2 [ Utils.classes.card.title ] [ text (getActivityStats activity).title ]
 
                     -- , div [] [ activityDuration duration ]
                     -- The effects of the activity
-                    , div [ class "t-column relative" ]
+                    , div [ class "list relative" ]
                         (List.map
                             (\moddedEffect ->
                                 EffectView.render
@@ -189,7 +189,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
 renderLockedActivity : Skill -> Int -> Html FrontendMsg
 renderLockedActivity unlockSubject unlockLevel =
     div
-        [ Utils.card.container
+        [ Utils.classes.card.container
         , class "text-error"
 
         -- Bring this back when we figure out how to solve the problem where the shake happens on every page render?
