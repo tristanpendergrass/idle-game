@@ -127,10 +127,12 @@ type LoginStatus
     | LoggedIn AuthenticatedUser
 
 
-type MainMenuRoute
-    = MainMenuGatekeeper -- Asks you whether you want to log in or start an unauthenticated game
-    | MainMenuLogin -- Asks you to log in
-    | MainMenuGameList -- Lists your games lets you start a new one
+type
+    MainMenuRoute
+    -- = MainMenuGatekeeper -- Asks you whether you want to log in or start an unauthenticated game
+    -- | MainMenuLogin -- Asks you to log in
+    -- | MainMenuGameList -- Lists your games lets you start a new one
+    = MainMenuAnonymousPlay
 
 
 type alias MainMenuFrontend =
@@ -271,8 +273,6 @@ type FrontendMsg
     | HandleStartGameClickWithTime { index : Int } Time.Posix -- Only relevant when MainMenuState has user games
     | HandleEmailInput String
     | HandleLogoutClick
-    | HandleGoToLoginRouteClick
-    | HandleGoToGatekeeperClick
       -- InGame meta stuff
     | HandleGoToMainMenuClick
       -- Detail View

@@ -523,12 +523,6 @@ updateMainMenu msg mainMenuFrontend =
         HandleLogoutClick ->
             ( MainMenu mainMenuFrontend, Lamdera.sendToBackend LogoutRequest )
 
-        HandleGoToLoginRouteClick ->
-            ( MainMenu { mainMenuFrontend | mainMenuRoute = MainMenuLogin }, Cmd.none )
-
-        HandleGoToGatekeeperClick ->
-            ( MainMenu { mainMenuFrontend | mainMenuRoute = MainMenuGatekeeper }, Cmd.none )
-
         _ ->
             ( MainMenu mainMenuFrontend, Cmd.none )
 
@@ -593,12 +587,7 @@ updateInGame msg inGameFrontend =
             let
                 mainMenuRoute : MainMenuRoute
                 mainMenuRoute =
-                    case inGameFrontend.user.loginStatus of
-                        LoggedIn _ ->
-                            MainMenuGameList
-
-                        _ ->
-                            MainMenuGatekeeper
+                    MainMenuAnonymousPlay
 
                 mainMenuFrontend : MainMenuFrontend
                 mainMenuFrontend =
@@ -1351,16 +1340,6 @@ updateInGame msg inGameFrontend =
 
 toMainMenuFromInGame : { inGameFrontend : InGameFrontend, games : List ( Id GameId, Snapshot Game ) } -> FrontendModel
 toMainMenuFromInGame { inGameFrontend, games } =
-    let
-        mainMenuRoute : MainMenuRoute
-        mainMenuRoute =
-            case inGameFrontend.user.loginStatus of
-                LoggedIn _ ->
-                    MainMenuGameList
-
-                _ ->
-                    MainMenuGatekeeper
-    in
     MainMenu
         { key = inGameFrontend.key
         , route = inGameFrontend.route
@@ -1370,7 +1349,7 @@ toMainMenuFromInGame { inGameFrontend, games } =
         , user = inGameFrontend.user
         , games = games
         , maybeServerInfo = inGameFrontend.maybeServerInfo
-        , mainMenuRoute = mainMenuRoute
+        , mainMenuRoute = MainMenuAnonymousPlay
         }
 
 
@@ -1437,16 +1416,6 @@ updateFromBackend msg model =
         Loading loadingFrontend ->
             case msg of
                 SetUserAndGames ( user, games ) ->
-                    let
-                        mainMenuRoute : MainMenuRoute
-                        mainMenuRoute =
-                            case user.loginStatus of
-                                NotLoggedIn _ ->
-                                    MainMenuGatekeeper
-
-                                _ ->
-                                    MainMenuLogin
-                    in
                     ( MainMenu
                         { key = loadingFrontend.key
                         , route = loadingFrontend.route
@@ -1456,7 +1425,7 @@ updateFromBackend msg model =
                         , user = user
                         , games = games
                         , maybeServerInfo = loadingFrontend.maybeServerInfo
-                        , mainMenuRoute = mainMenuRoute
+                        , mainMenuRoute = MainMenuAnonymousPlay
                         }
                     , Cmd.none
                     )
@@ -1640,52 +1609,6 @@ renderBottomRightItems model =
                         []
                )
         )
-
-
-renderMainMenu : MainMenuFrontend -> Html FrontendMsg
-renderMainMenu mainMenuFrontend =
-    let
-        renderGame : Int -> ( Id GameId, Snapshot Game ) -> Html FrontendMsg
-        renderGame index _ =
-            li []
-                [ text ("Game " ++ String.fromInt index)
-                , button [ onClick (HandleStartGameClick { index = index }) ] [ text "Start" ]
-                ]
-    in
-    div [ class "t-column prose" ]
-        [ h1 [] [ text "Main Menu" ]
-        , case mainMenuFrontend.user.loginStatus of
-            LoggedIn { emailAddress } ->
-                div [ class "t-column" ]
-                    [ div [] [ text ("Logged in as " ++ EmailAddress.toString emailAddress) ]
-                    , button [ class "btn", onClick HandleLogoutClick ] [ text "Log out" ]
-                    ]
-
-            LoginStatusPending ->
-                div [] [ text "Authenticating..." ]
-
-            NotLoggedIn _ ->
-                div [] [ text "Logged in as Anonymous" ]
-        , h2 [] [ text "Games" ]
-        , ul []
-            (List.concat
-                [ [ li [] [ button [ class "btn btn-primary", onClick HandleCreateGameClick ] [ text "Create new game" ] ] ]
-                , List.indexedMap renderGame mainMenuFrontend.games
-                ]
-            )
-        , div [ class "t-column" ]
-            [ input
-                [ type_ "text"
-                , value mainMenuFrontend.emailFormValue
-                , onInput HandleEmailInput
-                , class "input input-bordered"
-                , placeholder "Email address"
-                ]
-                []
-            , button [ class "btn", onClick HandleCreateUserClick ] [ text "Create user" ]
-            , button [ class "btn", onClick HandleLogInClick ] [ text "Log in" ]
-            ]
-        ]
 
 
 view : FrontendModel -> Document FrontendMsg
