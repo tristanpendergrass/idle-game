@@ -191,7 +191,7 @@ classTopNav { skill, xp } =
             Xp.levelPercent Xp.defaultSchedule xp
     in
     div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
-        [ div [ class "t-column" ]
+        [ div [ classes.column ]
             [ div [ class "w-full flex items-center justify-between" ]
                 [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
                 , div [ class "text-2xs" ]
@@ -253,13 +253,6 @@ progressBar { progressText, percent, primaryOrSecondary, size } =
             ]
             []
         ]
-
-
-skills =
-    { wrapper = class "t-column gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]"
-    , grid = class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-2 2xl:gap-4"
-    , xpSection = classTopNav
-    }
 
 
 withScreenWidth : (ScreenWidth -> Html msg) -> Html msg
