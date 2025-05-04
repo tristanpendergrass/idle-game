@@ -49,7 +49,9 @@ createProd seed =
 createDev : Random.Seed -> Game
 createDev seed =
     { seed = seed
-    , xp = skillRecord (Xp.int 9999999)
+
+    -- , xp = skillRecord (Xp.int 9999999)
+    , xp = skillRecord (Xp.int 5)
     , mxp = activityRecord (Xp.int 0)
     , activity = Nothing
     , coin = Coin.int 0

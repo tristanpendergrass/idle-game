@@ -53,7 +53,7 @@ renderDrawer isDrawerOpen activeTab =
     in
     div ([ class "drawer-side", attribute "style" "scroll-behavior: smooth; scroll-padding-top:5rem" ] ++ zIndexAttributes)
         [ label [ for "drawer", class "drawer-overlay" ] []
-        , aside [ class "bg-base-200 w-80 h-full" ]
+        , aside [ class "bg-base-200 h-full" ]
             -- title row
             [ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center justify-between gap-2 px-4" ]

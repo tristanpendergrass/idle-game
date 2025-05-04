@@ -20,7 +20,7 @@ type alias Flags =
     , showTimePasses : Bool
     , showDebugPanel : Bool
     , defaultTab : Tab
-    , maxOutSkillXp : Bool
+    , suppressVisibilityChanges : Bool
     }
 
 
@@ -51,7 +51,11 @@ devFlags =
     -- , defaultTab = Tab.SkillTab Pathology
     -- , defaultTab = Tab.TestingCenter
     , defaultTab = Tab.Home
-    , maxOutSkillXp = True
+
+    -- Note we set this to True to fix a bug with hot reloading. Without suppressing visibility changes,
+    -- and with Lamdera "freeze" mode on, the app state for isVisible will stay stuck on Hidden and
+    --  animation won't happen.
+    , suppressVisibilityChanges = True
     }
 
 
@@ -65,5 +69,5 @@ prodFlags =
     , showDebugPanel = False
     , defaultTab = Tab.Home
     , debugTimePasses = False
-    , maxOutSkillXp = False
+    , suppressVisibilityChanges = False
     }

@@ -1021,7 +1021,10 @@ updateInGame msg inGameFrontend =
             ( InGame inGameFrontend, Task.perform (HandleVisibilityChangeHelp visibility) Time.now )
 
         HandleVisibilityChangeHelp visibility now ->
-            if visibility == Browser.Events.Visible then
+            if Config.flags.suppressVisibilityChanges then
+                noOp
+
+            else if visibility == Browser.Events.Visible then
                 case inGameFrontend.gameState of
                     FastForward _ ->
                         ( InGame
@@ -1465,7 +1468,7 @@ toastConfig =
     Toast.config ToastMsg
         -- attributes applied to the toast tray
         |> Toast.withTrayAttributes
-            [ class "t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto"
+            [ class "flex flex-col items-center gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto"
             , ViewUtils.zIndexes.toast
             ]
         -- attributes applied to the toasts
