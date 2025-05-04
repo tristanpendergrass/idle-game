@@ -60,10 +60,6 @@
       transform: translate3d(4px, 0, 0);
     }
   }
-
-  .t-column {
-    @apply flex flex-col items-center w-full gap-2;
-  }
 }
 
 @layer utilities {

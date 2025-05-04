@@ -139,7 +139,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
               div [ IdleGame.Views.Utils.classes.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
                 [ IdleGame.Views.Utils.cardImage (CardLandscape activityStats.image)
                 ]
-            , div [ IdleGame.Views.Utils.classes.card.body, IdleGame.Views.Utils.zIndexes.cardBody ]
+            , div [ class "relative h-full card-body gap-0 justify-between w-full", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
                 [ div [ IdleGame.Views.Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
                 , div [ class "gap-0" ]

@@ -3770,13 +3770,6 @@
       transform: translate3d(4px, 0, 0);
     }
   }
-  .t-column {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: calc(var(--spacing) * 2);
-  }
 }
 @layer utilities {
   .t-absolute-center-x {
