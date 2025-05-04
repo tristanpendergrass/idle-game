@@ -64,6 +64,7 @@ $ npx elm-codegen install
 # Todos
 
 ## v0.2
+[ ] Idea: add how much time is being fast forwarded to UI to help debug
 [ ] Rethink the top level organization and naming of files, maybe IdleGame -> IG or Game or something.
 [ ] Fix that bug where there's a bunch of toasts when you come back
 [ ] Get rid of "createDev" in favor of specialized flags

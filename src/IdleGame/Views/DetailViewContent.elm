@@ -15,7 +15,7 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Types exposing (..)
@@ -139,7 +139,8 @@ renderContent obj extraBottomPadding game =
             (getSkillStats stats.skill).title
     in
     div
-        [ class "t-column w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
+        [ IdleGame.Views.Utils.classes.column
+        , class "w-full h-full overflow-y-auto p-3 relative gap-4 bg-base-300"
         , classList [ ( "pb-20", extraBottomPadding ) ]
         ]
         [ -- category of activity
@@ -149,10 +150,10 @@ renderContent obj extraBottomPadding game =
         , div
             [ class "min-h-[12rem] h-[12rem] w-[calc(12rem*1.618)] relative max-w-full rounded-lg overflow-hidden"
             ]
-            [ Utils.cardImage (CardLandscape (getActivityStats activity).image)
+            [ IdleGame.Views.Utils.cardImage (CardLandscape (getActivityStats activity).image)
             , fade isPreview
             ]
-        , div [ Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
+        , div [ IdleGame.Views.Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
 
         -- title
         , h2 [ class "text-lg font-semibold relative" ]
@@ -172,13 +173,13 @@ renderContent obj extraBottomPadding game =
         , playStopButton playButtonState activity
 
         -- Duration
-        , div [ class "relative" ]
+        , div [ IdleGame.Views.Utils.classes.column, class "relative" ]
             [ ActivityView.activityDuration (Game.getModdedDuration game activity)
             , fade isPreview
             ]
 
         -- The effects of the activity
-        , div [ class "t-column relative" ]
+        , div [ IdleGame.Views.Utils.classes.column, class "relative" ]
             (List.map
                 (\taggedEffect ->
                     EffectView.render
@@ -209,7 +210,7 @@ intervalModLabelToString : IntervalModLabel -> String
 intervalModLabelToString modLabel =
     case modLabel of
         IntervalModLabel buff ->
-            "+" ++ Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
+            "+" ++ IdleGame.Views.Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
 
 
 masterySection : Xp -> Activity.Mastery -> Html FrontendMsg
@@ -233,7 +234,7 @@ masterySection mxp mastery =
                         "Every level gives " ++ rewardText
 
                     else
-                        "Every " ++ Utils.intToString interval ++ " levels gives " ++ rewardText
+                        "Every " ++ IdleGame.Views.Utils.intToString interval ++ " levels gives " ++ rewardText
 
                 mxpLevel : Int
                 mxpLevel =
@@ -255,12 +256,12 @@ masterySection mxp mastery =
                             , class "checkbox checkbox-secondary checkbox-xs rounded-md cursor-default inline-block"
                             , onClickPreventDefault NoOp
                             , checked atMaxMasteryLevel
-                            , Utils.indeterminate (atLeastOneBonus && not atMaxMasteryLevel)
+                            , IdleGame.Views.Utils.indeterminate (atLeastOneBonus && not atMaxMasteryLevel)
                             ]
                             []
                         ]
                     ]
-                , td [] [ text (Utils.intToString interval) ]
+                , td [] [ text (IdleGame.Views.Utils.intToString interval) ]
                 , td [ class "w-full" ] [ text rowText ]
                 ]
 
@@ -286,7 +287,7 @@ masterySection mxp mastery =
                         [ input [ type_ "checkbox", checked isAchieved, class "checkbox checkbox-secondary checkbox-xs rounded-md cursor-default" ] []
                         ]
                     ]
-                , td [] [ text (Utils.intToString level) ]
+                , td [] [ text (IdleGame.Views.Utils.intToString level) ]
                 , td [ class "w-full" ] [ text rewardText ]
                 ]
     in
@@ -318,18 +319,16 @@ mxpSection mxp =
         skillPercent =
             Xp.levelPercent Xp.defaultSchedule mxp
     in
-    div [ class "w-full" ]
-        [ div [ class "t-column" ]
-            [ div [ class "w-full flex items-center justify-between" ]
-                [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
-                ]
-            , Utils.progressBar
-                { progressText = Utils.intToString skillLevel
-                , percent = skillPercent
-                , primaryOrSecondary = Utils.Secondary
-                , size = Utils.ProgressBarSmall
-                }
+    div [ IdleGame.Views.Utils.classes.column ]
+        [ div [ IdleGame.Views.Utils.classes.column, class "flex items-center justify-between" ]
+            [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
             ]
+        , IdleGame.Views.Utils.progressBar
+            { progressText = IdleGame.Views.Utils.intToString skillLevel
+            , percent = skillPercent
+            , primaryOrSecondary = IdleGame.Views.Utils.Secondary
+            , size = IdleGame.Views.Utils.ProgressBarSmall
+            }
         ]
 
 
@@ -340,7 +339,7 @@ activityProgress timer =
             Timer.percentComplete timer
     in
     div
-        [ class "w-full h-1 bg-base-content bg-opacity-25 rounded-full" ]
+        [ IdleGame.Views.Utils.classes.column, class "w-full h-1 bg-base-content bg-opacity-25 rounded-full" ]
         [ div
             [ class "bg-base-content h-1 rounded-full"
             , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
