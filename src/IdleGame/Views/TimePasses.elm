@@ -13,7 +13,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.ModalWrapper
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Maybe.Extra
 import Quantity exposing (Quantity)
@@ -31,7 +31,7 @@ resourceIcon =
 renderCombatsWon : Int -> Html FrontendMsg
 renderCombatsWon num =
     li [ class "flex items-center gap-1" ]
-        [ span [ class "text-success" ] [ text <| Utils.intToString num ]
+        [ span [ class "text-success" ] [ text <| IdleGame.Views.Utils.intToString num ]
         , span [] [ text "combats won" ]
         ]
 
@@ -39,7 +39,7 @@ renderCombatsWon num =
 renderCombatsLost : Int -> Html FrontendMsg
 renderCombatsLost num =
     li [ class "flex items-center gap-1" ]
-        [ span [ class "text-error" ] [ text <| Utils.intToString num ]
+        [ span [ class "text-error" ] [ text <| IdleGame.Views.Utils.intToString num ]
         , span [] [ text "combats lost" ]
         ]
 
@@ -62,15 +62,15 @@ render timeToFastForward timePassed timePassesData =
         -- timeStr =
         --     Utils.intToString (floor (Duration.inMilliseconds timeToFastForward))
     in
-    div [ class "t-column gap-4" ]
+    div [ IdleGame.Views.Utils.classes.column, class "gap-4" ]
         [ h2 [ class "text-3xl font-bold" ] [ text "Time passes..." ]
-        , span [ class "text-sm italic" ] [ text <| "(" ++ Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
+        , span [ class "text-sm italic" ] [ text <| "(" ++ IdleGame.Views.Utils.getDurationString (Time.posixToMillis timePassed) ++ ")" ]
 
         -- , span [ classList [ ( "hidden", not Config.flags.showTimePasses ) ] ] [ text timeStr ]
         , div [ classList [ ( "hidden", not (hasGains timePassesData) ) ] ]
             [ h3 [ class "text-xl font-bold text-center" ] [ text "You gained" ]
             , div [ class "divider" ] []
-            , ul [ class "t-column font-semibold" ]
+            , ul [ IdleGame.Views.Utils.classes.column, class "font-semibold" ]
                 (List.concat
                     [ case coinGains of
                         Nothing ->
@@ -81,7 +81,7 @@ render timeToFastForward timePassed timePassesData =
                                 [ span [ class "text-success" ]
                                     [ amount
                                         |> Coin.toInt
-                                        |> Utils.intToString
+                                        |> IdleGame.Views.Utils.intToString
                                         |> text
                                     ]
                                 , Icon.coin
@@ -111,14 +111,14 @@ render timeToFastForward timePassed timePassesData =
                                     [ span [ class "text-success" ]
                                         [ difference
                                             |> Xp.toInt
-                                            |> Utils.intToString
+                                            |> IdleGame.Views.Utils.intToString
                                             |> text
                                         ]
 
                                     -- , span [] [ text title ]
-                                    , Utils.skillXpBadge skill
+                                    , IdleGame.Views.Utils.skillXpBadge skill
                                     , if originalLevel /= currentLevel then
-                                        span [] [ text <| "(Level " ++ Utils.intToString originalLevel ++ " -> " ++ Utils.intToString currentLevel ++ ")" ]
+                                        span [] [ text <| "(Level " ++ IdleGame.Views.Utils.intToString originalLevel ++ " -> " ++ IdleGame.Views.Utils.intToString currentLevel ++ ")" ]
 
                                       else
                                         span [] []
@@ -137,7 +137,7 @@ render timeToFastForward timePassed timePassesData =
                                                 "text-error"
                                             )
                                         ]
-                                        [ text <| Utils.intToString amount ]
+                                        [ text <| IdleGame.Views.Utils.intToString amount ]
                                     , (getResourceStats resource).icon
                                         |> Icon.toHtml
                                     , span [] [ text <| (getResourceStats resource).title ]

@@ -7,6 +7,7 @@ import IdleGame.Game
 import IdleGame.Mod exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)
+import IdleGame.Views.Utils
 import Types exposing (..)
 
 
@@ -20,7 +21,7 @@ render =
                 , span [ class "text-lg font-semibold" ] [ text quantity ]
                 ]
     in
-    div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
+    div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex gap-2" ]
                 [ Icon.underConstruction
