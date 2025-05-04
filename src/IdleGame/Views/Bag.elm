@@ -23,13 +23,13 @@ render game =
                     getResourceStats resource
             in
             li []
-                [ div [ class "t-column gap-4" ]
+                [ div [ IdleGame.Views.Utils.classes.column, class "gap-4" ]
                     [ IdleGame.Views.Utils.resourceAndQuantity { resource = resource, quantity = quantity, iconSize = Icon.Large }
                     , span [ class "inline-block truncate" ] [ text stats.title ]
                     ]
                 ]
     in
-    div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
+    div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex items-center gap-1 px-2 py-1 rounded bg-accent text-accent-content" ]
                 [ span [ class "text-lg truncate" ]
