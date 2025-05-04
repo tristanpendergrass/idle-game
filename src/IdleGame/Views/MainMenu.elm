@@ -89,11 +89,11 @@ render mainMenuFrontend =
     div [ class "w-full h-full flex justify-center p-20" ]
         [ case mainMenuFrontend.mainMenuRoute of
             -- MainMenuGatekeeper ->
-            --     div [ class "t-column w-[320px] bg-base-200 rounded-log p-4" ]
+            --     div [ IdleGame.Views.Utils.classes.column, class "w-[320px] bg-base-200 rounded-log p-4" ]
             --         [ h1 [ class "text-2xl font-bold text-center" ] [ text "Welcome to Idle Game" ]
             --         ]
             -- MainMenuLogin ->
-            --     div [ class "t-column w-[320px] bg-base-200 rounded-lg shadow-lg p-4" ]
+            --     div [ IdleGame.Views.Utils.classes.column, class "w-[320px] bg-base-200 rounded-lg shadow-lg p-4" ]
             --         [ h1 [ class "text-2xl font-bold text-center" ] [ text "Welcome to Idle Game" ]
             --         ]
             -- MainMenuGameList ->
@@ -128,11 +128,11 @@ render mainMenuFrontend =
 --                 , button [ onClick (HandleStartGameClick { index = index }) ] [ text "Start" ]
 --                 ]
 --     in
---     div [ class "t-column prose" ]
+--     div [ IdleGame.Views.Utils.classes.column, class "prose" ]
 --         [ h1 [] [ text "Main Menu" ]
 --         , case mainMenuFrontend.user.loginStatus of
 --             LoggedIn { emailAddress } ->
---                 div [ class "t-column" ]
+--                 div [ IdleGame.Views.Utils.classes.column ]
 --                     [ div [] [ text ("Logged in as " ++ EmailAddress.toString emailAddress) ]
 --                     , button [ class "btn", onClick HandleLogoutClick ] [ text "Log out" ]
 --                     ]
@@ -147,7 +147,7 @@ render mainMenuFrontend =
 --                 , List.indexedMap renderGame mainMenuFrontend.games
 --                 ]
 --             )
---         , div [ class "t-column" ]
+--         , div [ IdleGame.Views.Utils.classes.column ]
 --             [ input
 --                 [ type_ "text"
 --                 , value mainMenuFrontend.emailFormValue
