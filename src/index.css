@@ -84,7 +84,6 @@
 /* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
 
 .toast-tray {
-  /* @apply t-column gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto bg-red-500; */
   position: fixed;
   bottom: 5rem;
   left: 50%;

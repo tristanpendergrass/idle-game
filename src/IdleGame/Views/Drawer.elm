@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import Types exposing (..)
 
 
@@ -46,7 +46,7 @@ renderDrawer isDrawerOpen activeTab =
 
         zIndexAttributes =
             if isDrawerOpen then
-                [ Utils.zIndexes.drawerSide ]
+                [ IdleGame.Views.Utils.zIndexes.drawerSide ]
 
             else
                 []
@@ -59,7 +59,7 @@ renderDrawer isDrawerOpen activeTab =
                 [ div [ class "flex-1 flex items-center justify-between gap-2 px-4" ]
                     [ div [ class "flex-0 px-2 flex flex-col items-center" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl flex gap-1 items-center rounded-t-xl overflow-hidden p-1 border border-primary border-b-4" ]
-                            [ div [ class "text-primary text-sm font-bold t-column gap-0 leading-xs text-primary" ] [ span [] [ text "Med" ], span [] [ text "School" ] ]
+                            [ div [ class "text-primary text-sm font-bold", IdleGame.Views.Utils.classes.column, class "gap-0 leading-xs text-primary" ] [ span [] [ text "Med" ], span [] [ text "School" ] ]
                             , span [ class "uppercase text-base-content text-base-300 bg-primary leading-none px-1" ] [ text "idle" ]
                             ]
                         , div [ class "w-full border border-primary flex justify-center" ] [ div [ class "text-xs" ] [ text "The ", strong [ class "text-secondary" ] [ text "Preclinical" ], text " Years" ] ]

@@ -67,7 +67,7 @@ topTransitionClasses =
 
 emptyContent : Html msg
 emptyContent =
-    div [ class "t-column w-full h-full p-2" ] []
+    div [ IdleGame.Views.Utils.classes.column, class "w-full h-full p-2" ] []
 
 
 renderStatusBarWrapper : (a -> Html msg) -> a -> Html msg
@@ -116,7 +116,7 @@ renderSidebar props =
                     props.renderActivity activity
 
                 ActivityCollapsed activity ->
-                    div [ class "t-column w-full h-full p-2" ]
+                    div [ IdleGame.Views.Utils.classes.column, class "w-full h-full p-2" ]
                         [ div
                             [ class "absolute top-0 left-0 w-full"
                             ]
@@ -127,7 +127,7 @@ renderSidebar props =
                     props.renderPreview preview
 
                 PreviewWithActivity preview activity ->
-                    div [ class "t-column w-full h-full p-2" ]
+                    div [ IdleGame.Views.Utils.classes.column, class "w-full h-full p-2" ]
                         [ div
                             [ class "absolute top-0 left-0 w-full"
                             ]
@@ -248,7 +248,7 @@ renderFullScreen props =
                     props.renderActivity activity
 
                 ActivityCollapsed activity ->
-                    div [ class "t-column w-full h-full p-2" ]
+                    div [ IdleGame.Views.Utils.classes.column, class "w-full h-full p-2" ]
                         [ div
                             [ class "absolute top-0 left-0 w-full"
                             ]
@@ -259,7 +259,7 @@ renderFullScreen props =
                     props.renderPreview preview
 
                 PreviewWithActivity preview activity ->
-                    div [ class "w-full h-full relative" ]
+                    div [ IdleGame.Views.Utils.classes.column, class "w-full h-full relative" ]
                         [ props.renderPreview preview
                         , div
                             [ class "absolute bottom-0 left-0 w-full"

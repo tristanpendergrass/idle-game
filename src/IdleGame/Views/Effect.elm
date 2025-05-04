@@ -14,7 +14,7 @@ import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Quantity exposing (Quantity)
@@ -57,7 +57,7 @@ renderModdedEffect renderType game effect =
 
                     else
                         Just
-                            (div [ class "t-column gap-2" ]
+                            (div [ IdleGame.Views.Utils.classes.column, class "gap-2" ]
                                 (div [] [ text "one of" ]
                                     :: renderedEffects
                                 )
@@ -107,11 +107,11 @@ renderModdedEffect renderType game effect =
                                             (div [ class "flex rounded overflow-hidden relative" ]
                                                 [ div []
                                                     [ div [ class "h-full flex items-center bg-info text-info-content p-2 border-2 border-r-0 border-info" ]
-                                                        [ text (Utils.percentToString successProbability)
+                                                        [ text (IdleGame.Views.Utils.percentToString successProbability)
                                                         ]
                                                     ]
                                                 , div [ class "p-2 border border-content border-dashed border-l-0 border-tr-rounded border-br-rounded" ]
-                                                    [ div [ class "t-column gap-2" ] renderedEffects
+                                                    [ div [ IdleGame.Views.Utils.classes.column, class "gap-2" ] renderedEffects
                                                     ]
                                                 ]
                                             )
@@ -121,8 +121,7 @@ renderModdedEffect renderType game effect =
             |> Maybe.map
                 (\effectContent ->
                     div
-                        [ class "t-column gap-0"
-                        ]
+                        [ IdleGame.Views.Utils.classes.column, class "gap-0" ]
                         [ effectContent
                         , div [ class "text-xs font-bold", classList [ ( "hidden", not (OneTime.isOneTime effect.oneTimeStatus) ) ] ] [ text "[Unique]" ]
                         ]
@@ -147,7 +146,7 @@ renderCoin { base, percentIncrease } =
         [ span [ classList [ ( "text-error", isNegative ) ] ]
             [ coin
                 |> Coin.toInt
-                |> Utils.intToString
+                |> IdleGame.Views.Utils.intToString
                 |> text
             ]
         , Icon.coin
@@ -194,23 +193,23 @@ renderResource game resource base { showTitle, showTooltip } =
                 ]
     in
     div [ class "flex items-center gap-1" ]
-        [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (Utils.intToString base) ]
+        [ div [ classList [ ( "text-error", isNegativeAmount ) ] ] [ text (IdleGame.Views.Utils.intToString base) ]
         , div (iconWrapper ++ [ class "md:hidden" ]) [ iconSm ]
         , div (iconWrapper ++ [ class "hidden md:inline-block" ]) [ iconLg ]
         , div [ classList [ ( "hidden", not showTitle ) ] ] [ text stats.title ]
         , div [ classList [ ( "hidden", not isNegativeAmount || owned >= abs base ) ] ]
-            [ text <| "(Owned: " ++ Utils.intToString owned ++ ")" ]
+            [ text <| "(Owned: " ++ IdleGame.Views.Utils.intToString owned ++ ")" ]
         ]
 
 
 renderXp : Effect.GainXpParams -> Html msg
 renderXp params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-        [ Utils.skillXpBadge params.skill
+        [ IdleGame.Views.Utils.skillXpBadge params.skill
         , span [ class "font-bold col-span-4" ]
             [ Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) params.base
                 |> Xp.toInt
-                |> Utils.intToString
+                |> IdleGame.Views.Utils.intToString
                 |> text
             ]
         ]
@@ -224,11 +223,11 @@ renderMxp game params =
             Game.calculateActivityMxp params.activity game
     in
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
-        [ Utils.masteryXpBadge
+        [ IdleGame.Views.Utils.masteryXpBadge
         , span [ class "font-bold col-span-4" ]
             [ Quantity.multiplyBy (Percent.toMultiplier params.percentIncrease) base
                 |> Xp.toInt
-                |> Utils.intToString
+                |> IdleGame.Views.Utils.intToString
                 |> text
             ]
         ]
@@ -248,7 +247,7 @@ renderVariableResource probability kind =
 
         probabilityStr : String
         probabilityStr =
-            Utils.intToString (floor (Percent.toPercentage cappedProbability)) ++ "%"
+            IdleGame.Views.Utils.intToString (floor (Percent.toPercentage cappedProbability)) ++ "%"
     in
     div [ class "flex items-center gap-2" ]
         [ div [ class "border border-info text-info px-2 rounded-full" ] [ text probabilityStr ]
@@ -265,6 +264,6 @@ renderMonsterPower strength =
             |> Icon.withSize Icon.Large
             |> Icon.toHtml
         , span [ class "text-5xl font-bold leading-none" ]
-            [ text (Utils.intToString strength)
+            [ text (IdleGame.Views.Utils.intToString strength)
             ]
         ]
