@@ -40,7 +40,7 @@ init =
       , users = Dict.empty
       , pendingLoginTokens = Dict.empty
       }
-    , Cmd.none
+    , Task.perform BackendGotTime Time.now
     )
 
 
