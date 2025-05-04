@@ -7,6 +7,7 @@ import EmailAddress exposing (EmailAddress)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Id exposing (Id, UserId)
+import IdleGame.Views.Utils
 import Lamdera exposing (ClientId, SessionId)
 import List.Nonempty as Nonempty
 import Types exposing (..)
@@ -53,7 +54,10 @@ renderUser serverInfo ( userId, user ) =
 
 render : Maybe ServerInfo -> Html msg
 render maybeServerInfo =
-    div [ class "t-column prose prose-sm md:prose-base" ]
+    div
+        [ IdleGame.Views.Utils.classes.column
+        , class "prose prose-sm md:prose-base"
+        ]
         [ a [ href "/" ] [ text "Home" ]
         , case maybeServerInfo of
             Nothing ->

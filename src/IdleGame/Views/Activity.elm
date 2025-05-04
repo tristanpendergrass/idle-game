@@ -18,7 +18,7 @@ import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Placeholder
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import IdleGame.Xp as Xp exposing (Xp)
 import Json.Decode as D
 import Maybe.Extra
@@ -31,7 +31,7 @@ renderActivityListItem game item =
     case item of
         Game.ActivityListItem activity ->
             renderActivityCard activity game
-                |> Utils.withScreenWidth
+                |> IdleGame.Views.Utils.withScreenWidth
 
         Game.LockedActivity ( unlockSkill, unlockLevel ) ->
             renderLockedActivity unlockSkill unlockLevel
@@ -48,7 +48,7 @@ probabilityToInt x =
 
 activityDuration : Duration -> Html msg
 activityDuration duration =
-    div [ class "text-2xs" ] [ text <| Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
+    div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
 
 getTimerForActivity : Activity -> Game -> Maybe Timer
@@ -126,8 +126,8 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
     in
     div [ class "relative" ]
         [ div
-            [ Utils.classes.card.container
-            , Utils.classes.card.containerClickable
+            [ IdleGame.Views.Utils.classes.card.container
+            , IdleGame.Views.Utils.classes.card.containerClickable
             , class "overflow-hidden"
 
             -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
@@ -136,14 +136,14 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
             , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             [ -- preview image
-              div [ Utils.classes.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
-                [ Utils.cardImage (CardLandscape activityStats.image)
+              div [ IdleGame.Views.Utils.classes.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
+                [ IdleGame.Views.Utils.cardImage (CardLandscape activityStats.image)
                 ]
-            , div [ Utils.classes.card.body, Utils.zIndexes.cardBody ]
+            , div [ IdleGame.Views.Utils.classes.card.body, IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
-                [ div [ Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
+                [ div [ IdleGame.Views.Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
                 , div [ class "gap-0" ]
-                    [ h2 [ Utils.classes.card.title ] [ text (getActivityStats activity).title ]
+                    [ h2 [ IdleGame.Views.Utils.classes.card.title ] [ text (getActivityStats activity).title ]
 
                     -- , div [] [ activityDuration duration ]
                     -- The effects of the activity
@@ -160,11 +160,11 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                         )
                     ]
                 , div [ class "w-full", classList [ ( "hidden", not showMastery ) ] ]
-                    [ Utils.progressBar
-                        { progressText = Utils.intToString masteryLevel
+                    [ IdleGame.Views.Utils.progressBar
+                        { progressText = IdleGame.Views.Utils.intToString masteryLevel
                         , percent = masteryPercent
-                        , primaryOrSecondary = Utils.Secondary
-                        , size = Utils.ProgressBarSmall
+                        , primaryOrSecondary = IdleGame.Views.Utils.Secondary
+                        , size = IdleGame.Views.Utils.ProgressBarSmall
                         }
                     ]
                 ]
@@ -178,7 +178,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                     div
                         -- [ class "absolute h-full bg-base-content opacity-20 top-0 left-0 rounded-l-xl"
                         [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
-                        , Utils.zIndexes.activityProgressBar
+                        , IdleGame.Views.Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]
                         []
@@ -189,7 +189,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
 renderLockedActivity : Skill -> Int -> Html FrontendMsg
 renderLockedActivity unlockSubject unlockLevel =
     div
-        [ Utils.classes.card.container
+        [ IdleGame.Views.Utils.classes.card.container
         , class "text-error"
 
         -- Bring this back when we figure out how to solve the problem where the shake happens on every page render?
@@ -199,7 +199,7 @@ renderLockedActivity unlockSubject unlockLevel =
         [ figure []
             [ IdleGame.Views.Placeholder.placeholder [ class "w-full h-24 bg-error text-error-content" ] ]
         , div [ class "relative card-body" ]
-            [ div [ class "t-column h-full gap-4", Utils.zIndexes.cardBody ]
+            [ div [ IdleGame.Views.Utils.classes.column, class "h-full gap-4", IdleGame.Views.Utils.zIndexes.cardBody ]
                 -- Activity title
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
@@ -208,7 +208,7 @@ renderLockedActivity unlockSubject unlockLevel =
                     [ text <|
                         (getSkillStats unlockSubject).title
                             ++ " level "
-                            ++ Utils.intToString unlockLevel
+                            ++ IdleGame.Views.Utils.intToString unlockLevel
                     ]
                 ]
             ]
