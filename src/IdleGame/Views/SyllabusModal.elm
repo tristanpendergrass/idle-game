@@ -27,7 +27,7 @@ render game skill =
         activities =
             Activity.getBySkill skill
     in
-    div [ class "t-column gap-6" ]
+    div [ IdleGame.Views.Utils.classes.column, class "gap-6" ]
         [ h3 [ class "font-bold text-lg" ] [ text ("Syllabus: " ++ skillStats.title) ]
         , table [ class "table table-sm w-80" ]
             [ thead []

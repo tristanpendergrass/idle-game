@@ -9,6 +9,7 @@ import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Views.Effect as EffectView
+import IdleGame.Views.Utils
 import Random
 import Result.Extra
 import Types exposing (..)
@@ -76,7 +77,7 @@ render model game =
         tests =
             List.filter showTest allAcademicTests
     in
-    div [ class "t-column items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
+    div [ IdleGame.Views.Utils.classes.column, class "items-start p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ attribute "role" "tablist", class "tabs tabs-bordered" ]
             [ renderTestingCenterTabButton
                 { activeTab = model.activeAcademicTestCategory
