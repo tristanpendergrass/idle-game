@@ -3771,26 +3771,6 @@
     }
   }
 }
-@layer utilities {
-  .t-absolute-center-x {
-    position: absolute;
-    left: calc(1/2 * 100%);
-    --tw-translate-x: calc(calc(1/2 * 100%) * -1);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-  }
-  .t-absolute-center-y {
-    position: absolute;
-    top: calc(1/2 * 100%);
-    --tw-translate-y: calc(calc(1/2 * 100%) * -1);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-  }
-  .t-divider-tight {
-    margin-inline: calc(var(--spacing) * 0);
-    margin-block: calc(var(--spacing) * 0);
-  }
-}
 .toast-tray {
   position: fixed;
   bottom: 5rem;

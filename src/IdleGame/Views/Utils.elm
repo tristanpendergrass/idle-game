@@ -296,7 +296,7 @@ resourceAndQuantity : { resource : Resource, quantity : Int, iconSize : Icon.Siz
 resourceAndQuantity params =
     div [ class "relative" ]
         [ renderResource { resource = params.resource, iconSize = params.iconSize }
-        , div [ class "t-absolute-center-x -bottom-3" ]
+        , div [ class "absolute left-1/2 transform -translate-x-1/2 -bottom-3" ]
             [ resourceQuantity { quantity = params.quantity }
             ]
         ]

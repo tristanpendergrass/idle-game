@@ -62,20 +62,6 @@
   }
 }
 
-@layer utilities {
-  .t-absolute-center-x {
-    @apply absolute left-1/2 transform -translate-x-1/2;
-  }
-
-  .t-absolute-center-y {
-    @apply absolute top-1/2 transform -translate-y-1/2;
-  }
-
-  .t-divider-tight {
-    @apply my-0 mx-0;
-  }
-}
-
 
 /* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
 

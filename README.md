@@ -70,7 +70,7 @@ $ npx elm-codegen install
 [ ] Rethink the top level organization and naming of files, maybe IdleGame -> IG or Game or something.
 [ ] Fix that bug where there's a bunch of toasts when you come back
 [ ] Get rid of "createDev" in favor of specialized flags
-[ ] Migrate away from @apply blocks per tailwind creator's tweet
+[x] Migrate away from @apply blocks per tailwind creator's recommendation
 [x] Fix reload causing animation to pause.
 [x] Hide authentication logic for now
 [x] Migrate to latest version of DaisyUI and Tailwind
