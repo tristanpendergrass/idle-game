@@ -52,11 +52,11 @@ render game quantity ( resource, price ) =
                 Err _ ->
                     False
     in
-    div [ class "t-column gap-6" ]
+    div [ IdleGame.Views.Utils.classes.column, class "gap-6" ]
         [ h3 [ class "font-bold text-lg" ] [ text resourceStats.title ]
         , div [ class "flex w-full items-center justify-center gap-4" ]
             [ IdleGame.Views.Utils.renderResource { resource = resource, iconSize = Icon.ExtraLarge }
-            , div [ class "t-column w-auto" ]
+            , div [ IdleGame.Views.Utils.classes.column, class "w-auto" ]
                 [ span [ class "text-sm" ] [ text "Owned:" ]
                 , IdleGame.Views.Utils.resourceQuantity { quantity = owned }
                 ]

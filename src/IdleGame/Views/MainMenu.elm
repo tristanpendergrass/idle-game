@@ -9,7 +9,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Snapshot exposing (Snapshot, getTime)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Views.Icon as Icon exposing (Icon)
-import IdleGame.Views.Utils as Utils
+import IdleGame.Views.Utils
 import Time exposing (Posix, toDay, toMonth, toYear, utc)
 import Types exposing (..)
 
@@ -99,7 +99,7 @@ render mainMenuFrontend =
             -- MainMenuGameList ->
             -- Debug.todo ""
             MainMenuAnonymousPlay ->
-                div [ class "t-column w-[320px] bg-base-200 rounded-lg shadow-lg p-4" ]
+                div [ IdleGame.Views.Utils.classes.column, class "w-[320px] bg-base-200 rounded-lg shadow-lg p-4" ]
                     [ h1 [ class "text-2xl font-bold text-center mb-4" ] [ text "Games" ]
                     , button [ class "btn btn-primary w-full mb-4", onClick HandleCreateGameClick ] [ text "New Game" ]
                     , ul [ class "space-y-2" ]

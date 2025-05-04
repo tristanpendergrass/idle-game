@@ -39,7 +39,7 @@ render game =
                 [ stats.icon
                     |> Icon.withSize Icon.ExtraLarge
                     |> Icon.toHtml
-                , div [ class "flex-1 t-column" ]
+                , div [ class "flex-1", IdleGame.Views.Utils.classes.column ]
                     [ span [ class "font-bold" ] [ text stats.title ]
                     , span [ class "text-sm" ] [ text stats.description ]
                     ]
@@ -62,7 +62,7 @@ render game =
                     [ Icon.unknownItem
                         |> Icon.toHtml
                     ]
-                , div [ class "flex-1 t-column" ]
+                , div [ class "flex-1", IdleGame.Views.Utils.classes.column ]
                     [ span [ class "font-bold" ] [ text "???" ]
                     , span [ class "text-sm" ] [ text <| "Requires Chore level " ++ IdleGame.Views.Utils.intToString levelNeeded ]
                     ]
@@ -82,7 +82,7 @@ render game =
                 [ resourceStats.icon
                     |> Icon.withSize Icon.ExtraLarge
                     |> Icon.toHtml
-                , div [ class "flex-1 t-column" ]
+                , div [ class "flex-1", IdleGame.Views.Utils.classes.column ]
                     [ span [ class "font-bold" ] [ text resourceStats.title ]
                     ]
                 , IdleGame.Views.Utils.priceLabel
@@ -104,7 +104,7 @@ render game =
                                 Nothing
                     )
     in
-    div [ class "t-column p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
+    div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
             [ div [ class "flex items-center gap-1 px-2 py-1" ]
                 [ span [ class "text-lg truncate" ]
