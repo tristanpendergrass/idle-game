@@ -65,46 +65,21 @@ $ npx elm-codegen install
 
 ## Bugs
 [ ] Pausing activity the image goes away
+[ ] Way too many toasts potentially shown when coming back to activity lacking resources
 
-## v0.2
-[ ] Rethink the top level organization and naming of files, maybe IdleGame -> IG or Game or something.
-[ ] Fix that bug where there's a bunch of toasts when you come back
+## v0.1
+
+### Features
+[ ] Replace skills with Herb Gathering, Wild Magic, and Soup
+[ ] Add correct shop items
+[ ] Add inventory limits for herbs gathered
+[ ] Sell excess gathered herbs
+[ ] Remove other skills
+
+### Tech stuff
 [ ] Get rid of "createDev" in favor of specialized flags
+[ ] Rethink the top level organization and naming of files, maybe IdleGame -> IG or Game or something.
 [x] Migrate away from @apply blocks per tailwind creator's recommendation
 [x] Fix reload causing animation to pause.
 [x] Hide authentication logic for now
 [x] Migrate to latest version of DaisyUI and Tailwind
-[x] Remove code references to old version
-[x] Use https://github.com/mdgriffith/elm-codegen/blob/main/guide/UsingElmCodeGenInTypeScript.md to codegen with json object string for config
-[x] Add anatomy topics
-[x] Add Biochemistry
-[x] Add Microchemistry and Immunology (experiments)
-[x] Add Pathology
-
-## v0.1
-[x] Testing Center 1/2: do some basic tests for all subjects plus basic shelf exam and Step 1
-[x] Add a Welcome tab
-[x] Activity doesn't show modified effect correctly in detail view
-[x] Fix issue with probabilistic awards not being granted on large time step
-[x] New icon for PK
-[x] Disable the debug menu in prod
-[x] The status bar at bottom on mobile has wrong text color
-[x] XP 1/2: basic xp schedule for all activities
-[x] Costs 1/2: basic cost effects for all activities
-[x] Show resource name in tooltip
-[x] Show resource name in sidebar
-[x] Labs
-  [x] XP
-  [x] Create one art for all
-  [x] Masteries
-  [x] Costs
-  [x] Rewards
-[x] Support Testing Center tab
-[x] Design Tests
-[x] Support Labs skill
-  [x] Grant K and PK and coin with some probability
-[x] Reduce costs by 1 per PK
-[x] Support Practical Knowledge and Labs in Anatomy
-[x] Add masteries
-  [x] Design
-  [x] Implement
