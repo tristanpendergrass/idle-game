@@ -19,3 +19,8 @@ int amount =
 toInt : Coin -> Int
 toInt (Quantity amount) =
     floor amount
+
+
+zero : Coin
+zero =
+    int 0
