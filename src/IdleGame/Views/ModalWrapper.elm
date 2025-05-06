@@ -44,7 +44,7 @@ render (Modal { borderColor } children) =
                     class <| "border-t-4 " ++ color
     in
     div
-        [ class "fixed top-0 left-0 w-full h-full bg-black bg-opacity-40 flex justify-center items-center cursor-pointer"
+        [ class "fixed top-0 left-0 w-full h-full bg-black/40 flex justify-center items-center cursor-pointer"
         , IdleGame.Views.Utils.zIndexes.modalWrapper
         , onClick CloseModal
         ]

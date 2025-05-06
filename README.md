@@ -66,15 +66,16 @@ $ npx elm-codegen install
 ## Bugs
 [ ] Pausing activity the image goes away
 [ ] Way too many toasts potentially shown when coming back to activity lacking resources
+[x] Background is all black on modal
 
 ## v0.1
 
 ### Features
-[ ] Replace skills with Herb Gathering, Wild Magic, and Soup
+[x] Replace skills with Herb Gathering, Wild Magic, and Soup
+[ ] Add activities for those
 [ ] Add correct shop items
 [ ] Add inventory limits for herbs gathered
 [ ] Sell excess gathered herbs
-[ ] Remove other skills
 
 ### Tech stuff
 [ ] Get rid of "createDev" in favor of specialized flags
