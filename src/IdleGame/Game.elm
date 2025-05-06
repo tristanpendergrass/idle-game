@@ -1,7 +1,6 @@
 module IdleGame.Game exposing (..)
 
 import Duration exposing (Duration)
-import IdleGame.AcademicTest as Test
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
@@ -41,7 +40,6 @@ createProd seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , testCompletions = academicTestRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     }
 
@@ -57,7 +55,6 @@ createDev seed =
     , coin = Coin.int 0
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
-    , testCompletions = academicTestRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     }
 
@@ -295,68 +292,16 @@ tick delta game =
 
 getPurchaseEffects : Int -> Resource -> List Effect
 getPurchaseEffects amount resource =
-    case (getResourceStats resource).price of
-        Just price ->
-            let
-                cost : Coin.Coin
-                cost =
-                    Quantity.multiplyBy (toFloat amount) price
-                        |> Quantity.multiplyBy -1
-            in
-            [ Effect.gainCoin cost, Effect.gainResource amount resource ]
-
-        Nothing ->
-            []
-
-
-testIsUnlocked : AcademicTest -> Game -> Bool
-testIsUnlocked test game =
     let
-        stats : AcademicTestStats
-        stats =
-            getAcademicTestStats test
+        price =
+            (getResourceStats resource).price
+
+        cost : Coin.Coin
+        cost =
+            Quantity.multiplyBy (toFloat amount) price
+                |> Quantity.multiplyBy -1
     in
-    case stats.lockedBy of
-        Nothing ->
-            True
-
-        Just unlockTest ->
-            getByAcademicTest unlockTest game.testCompletions
-
-
-attemptCompleteTest : AcademicTest -> Game -> Result EffectErr ApplyEffectsValue
-attemptCompleteTest test game =
-    let
-        mods : List Mod
-        mods =
-            getAllMods game
-
-        ( applyEffectsResult, newSeed ) =
-            Random.step (applyEffects mods (List.map (\effect -> { effect = effect, count = 1 }) (Test.getAllEffects test)) game) game.seed
-    in
-    applyEffectsResult
-        |> Result.andThen
-            (\applyEffectsValue ->
-                let
-                    testAlreadyCompleted : Bool
-                    testAlreadyCompleted =
-                        getByAcademicTest test game.testCompletions
-
-                    newGame : Game
-                    newGame =
-                        applyEffectsValue.game
-                            |> setTestCompleted test
-                            |> setSeed newSeed
-                in
-                if testAlreadyCompleted then
-                    Err EffectErr.TestAlreadyCompleted
-
-                else if not (testIsUnlocked test game) then
-                    Err EffectErr.TestNotUnlocked
-
-                else
-                    Ok { game = newGame, toasts = applyEffectsValue.toasts }
-            )
+    [ Effect.gainCoin cost, Effect.gainResource amount resource ]
 
 
 attemptPurchaseResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
@@ -389,11 +334,6 @@ attemptPurchaseResource amount resource game =
 setSeed : Random.Seed -> Game -> Game
 setSeed seed game =
     { game | seed = seed }
-
-
-setTestCompleted : AcademicTest -> Game -> Game
-setTestCompleted test game =
-    { game | testCompletions = setByAcademicTest test True game.testCompletions }
 
 
 priceToPurchaseResource : Int -> ( Resource, Coin ) -> Game -> Coin

@@ -88,20 +88,13 @@ renderDrawer isDrawerOpen activeTab =
                     [ [ li [] []
                       , li [ class "menu-title" ] [ text "Study" ]
                       ]
-                    , List.filter ((/=) Labs) allSkills
-                        |> List.map
-                            (\skill ->
-                                li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
-                                    [ renderTab { tab = Tab.SkillTab skill } ]
-                            )
+                    , List.map
+                        (\skill ->
+                            li [ onClick (HandleTabClick (Tab.SkillTab skill)) ]
+                                [ renderTab { tab = Tab.SkillTab skill } ]
+                        )
+                        allSkills
                     ]
                 )
-            , ul [ class "menu flex flex-col p-0 px-4" ]
-                [ li [] []
-                , li [ class "menu-title" ] [ text "Campus" ]
-                , li [ onClick (HandleTabClick (Tab.SkillTab Labs)) ]
-                    [ renderTab { tab = Tab.SkillTab Labs } ]
-                , li [ onClick (HandleTabClick Tab.TestingCenter) ] [ renderTab { tab = Tab.TestingCenter } ]
-                ]
             ]
         ]

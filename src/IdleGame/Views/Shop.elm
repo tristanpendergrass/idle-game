@@ -94,14 +94,9 @@ render game =
         purchasableResources : List ( Resource, Coin )
         purchasableResources =
             allResources
-                |> List.filterMap
+                |> List.map
                     (\kind ->
-                        case (getResourceStats kind).price of
-                            Just price ->
-                                Just ( kind, price )
-
-                            Nothing ->
-                                Nothing
+                        ( kind, (getResourceStats kind).price )
                     )
     in
     div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]

@@ -65,7 +65,6 @@ type alias Game =
     , coin : Coin
     , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgradeRecord Bool
-    , testCompletions : AcademicTestRecord Bool
     , oneTimeStatuses : OneTime.OneTimeRecord Bool
     }
 
@@ -167,7 +166,6 @@ type alias InGameFrontend =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
-    , activeAcademicTestCategory : AcademicTestCategory
     }
 
 
@@ -300,9 +298,6 @@ type FrontendMsg
     | HandleMaxButtonClick
     | HandleShopResourceQuantityChange String
     | HandleShopResourceBuyClick
-      -- Testing Center
-    | HandleTestingCenterTabClick AcademicTestCategory
-    | HandleTestCompletionClick AcademicTest
       -- Other
     | ToastMsg Toast.Msg
     | AddToast Toast

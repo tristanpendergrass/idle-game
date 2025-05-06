@@ -41,7 +41,7 @@ timePassesModal =
         data : TimePassesData
         data =
             { xpGains =
-                [ { originalXp = Xp.int 0, currentXp = Xp.int 100, skill = Anatomy }
+                [ { originalXp = Xp.int 0, currentXp = Xp.int 100, skill = HerbGathering }
                 ]
             , coinGains = Nothing
             , resourcesDiff = resourceRecord 0

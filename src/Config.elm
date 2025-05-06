@@ -45,11 +45,6 @@ devFlags =
     , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True
-
-    -- , defaultTab = Tab.SkillTab Anatomy
-    -- , defaultTab = Tab.SkillTab Labs
-    -- , defaultTab = Tab.SkillTab Pathology
-    -- , defaultTab = Tab.TestingCenter
     , defaultTab = Tab.Home
 
     -- Note we set this to True to fix a bug with hot reloading. Without suppressing visibility changes,

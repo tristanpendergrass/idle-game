@@ -13,7 +13,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Extra exposing (..)
 import Id exposing (GameId, Id, UserId)
-import IdleGame.AcademicTest as Test
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
@@ -331,11 +330,6 @@ setActivityExpanded activityExpanded model =
     { model | activityExpanded = activityExpanded }
 
 
-setActiveAcademicTestCategory : AcademicTestCategory -> InGameFrontend -> InGameFrontend
-setActiveAcademicTestCategory testCategory model =
-    { model | activeAcademicTestCategory = testCategory }
-
-
 getActivity : InGameFrontend -> Maybe ( Activity, Timer )
 getActivity model =
     (Snapshot.getValue (getGame model)).activity
@@ -508,7 +502,6 @@ updateMainMenu msg mainMenuFrontend =
                             , activeModal = Nothing
                             , saveGameTimer = Timer.create
                             , pointerState = Nothing
-                            , activeAcademicTestCategory = Quiz
                             }
                     in
                     -- set game and fast forward
@@ -669,51 +662,6 @@ updateInGame msg inGameFrontend =
                         |> Toast.tuple ToastMsg inGameFrontend
             in
             ( InGame newInGameFrontend, cmds )
-
-        HandleTestingCenterTabClick testingCenterTab ->
-            ( InGame
-                (inGameFrontend
-                    |> setActiveAcademicTestCategory testingCenterTab
-                )
-            , Cmd.none
-            )
-
-        HandleTestCompletionClick test ->
-            case inGameFrontend.gameState of
-                Playing _ ->
-                    let
-                        oldSnapshot : Snapshot Game
-                        oldSnapshot =
-                            getGame inGameFrontend
-
-                        oldGame : Game
-                        oldGame =
-                            Snapshot.getValue oldSnapshot
-                    in
-                    case Game.attemptCompleteTest test oldGame of
-                        Err _ ->
-                            noOp
-
-                        Ok applyEffectsValue ->
-                            let
-                                newCache : Cache
-                                newCache =
-                                    getCache oldGame
-
-                                newSnapshot : Snapshot Game
-                                newSnapshot =
-                                    Snapshot.setValue applyEffectsValue.game oldSnapshot
-                            in
-                            ( InGame
-                                (inGameFrontend
-                                    |> setGameState (Playing newCache)
-                                    |> setGame newSnapshot
-                                )
-                            , Cmd.batch (List.map (AddToast >> delay 0) applyEffectsValue.toasts)
-                            )
-
-                _ ->
-                    noOp
 
         ToastMsg tmsg ->
             let
@@ -1108,17 +1056,16 @@ updateInGame msg inGameFrontend =
             )
 
         HandleShopResourceClick resource ->
-            case (getResourceStats resource).price of
-                Just price ->
-                    ( InGame
-                        { inGameFrontend
-                            | activeModal = Just (ShopResourceModal 1 resource price)
-                        }
-                    , Cmd.none
-                    )
-
-                Nothing ->
-                    noOp
+            let
+                price =
+                    (getResourceStats resource).price
+            in
+            ( InGame
+                { inGameFrontend
+                    | activeModal = Just (ShopResourceModal 1 resource price)
+                }
+            , Cmd.none
+            )
 
         HandleShopResourceBuyClick ->
             case inGameFrontend.activeModal of

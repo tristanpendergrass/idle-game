@@ -455,16 +455,6 @@ skillXpBuff skill amount =
         |> withLabel "Skill Xp Buff"
 
 
-anatomyXpBuff : Percent -> Mod
-anatomyXpBuff buff =
-    { tags = [ Effect.SkillTag Anatomy ]
-    , label = "Anatomy Xp Buff"
-    , transformer = xpTransformer buff
-    , source = AdminCrimes
-    , count = 1
-    }
-
-
 coinBuff : Percent -> Mod
 coinBuff buff =
     { tags = []

@@ -245,3 +245,126 @@ resourceStats =
 getResourceStats : Resource -> ResourceStats
 getResourceStats kind =
     getByResource kind resourceStats
+
+
+
+-- ACTIVITIES
+
+
+type Activity
+    = GatherSage
+
+
+allActivities : List Activity
+allActivities =
+    [ GatherSage ]
+
+
+type alias ActivityRecord a =
+    { gatherSage : a }
+
+
+activityRecord : a -> ActivityRecord a
+activityRecord a =
+    { gatherSage = a }
+
+
+getByActivity : Activity -> ActivityRecord a -> a
+getByActivity kind data =
+    case kind of
+        GatherSage ->
+            data.gatherSage
+
+
+setByActivity : Activity -> a -> ActivityRecord a -> ActivityRecord a
+setByActivity kind value data =
+    case kind of
+        GatherSage ->
+            { data | gatherSage = value }
+
+
+mapActivities : (a -> a) -> ActivityRecord a -> ActivityRecord a
+mapActivities fn record =
+    { gatherSage = fn record.gatherSage }
+
+
+type alias ActivityStats =
+    { skill : Skill
+    , title : String
+    , image : String
+    , level : Int
+    , duration : Duration.Duration
+    , knowledge : Maybe Int
+    , type_ : String
+    , coin : Maybe Int
+    , uniqueReward : Maybe Resource
+    }
+
+
+activityStats : ActivityRecord ActivityStats
+activityStats =
+    { gatherSage =
+        { skill = HerbGathering
+        , title = "Gather Sage"
+        , image = "/activities/herbGathering/gatherSage.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Sage
+        }
+    }
+
+
+getActivityStats : Activity -> ActivityStats
+getActivityStats kind =
+    getByActivity kind activityStats
+
+
+
+-- SHOP UPGRADES
+
+
+type ShopUpgrade
+    = Glasses
+
+
+allShopUpgrades : List ShopUpgrade
+allShopUpgrades =
+    [ Glasses ]
+
+
+type alias ShopUpgradeRecord a =
+    { glasses : a }
+
+
+shopUpgradeRecord : a -> ShopUpgradeRecord a
+shopUpgradeRecord a =
+    { glasses = a }
+
+
+getByShopUpgrade : ShopUpgrade -> ShopUpgradeRecord glasses -> glasses
+getByShopUpgrade kind data =
+    case kind of
+        Glasses ->
+            data.glasses
+
+
+setByShopUpgrade : ShopUpgrade -> value -> ShopUpgradeRecord value -> ShopUpgradeRecord value
+setByShopUpgrade kind value data =
+    case kind of
+        Glasses ->
+            { data | glasses = value }
+
+
+mapShopUpgrades :
+    (getByShopUpgrade -> getByShopUpgrade)
+    -> ShopUpgradeRecord getByShopUpgrade
+    -> ShopUpgradeRecord getByShopUpgrade
+mapShopUpgrades fn record =
+    let
+        foldFn el accum =
+            setByShopUpgrade el (fn (getByShopUpgrade el accum)) accum
+    in
+    List.foldl foldFn record allShopUpgrades
