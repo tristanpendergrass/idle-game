@@ -83,7 +83,7 @@ type DetailViewObject
 fade : Bool -> Html FrontendMsg
 fade shouldFade =
     div
-        [ class "absolute top-0 left-0 w-full h-full bg-base-200 bg-opacity-25 transition-opacity duration-100 ease-in-out pointer-events-none"
+        [ class "absolute top-0 left-0 w-full h-full bg-base-200/25 transition-opacity duration-100 ease-in-out pointer-events-none"
         , classList [ ( "opacity-0", not shouldFade ) ]
         ]
         []
@@ -339,7 +339,7 @@ activityProgress timer =
             Timer.percentComplete timer
     in
     div
-        [ IdleGame.Views.Utils.classes.column, class "w-full h-1 bg-base-content bg-opacity-25 rounded-full" ]
+        [ IdleGame.Views.Utils.classes.column, class "w-full h-1 bg-base-content/25 rounded-full" ]
         [ div
             [ class "bg-base-content h-1 rounded-full"
             , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")

@@ -55,7 +55,7 @@ renderDrawer isDrawerOpen activeTab =
         [ label [ for "drawer", class "drawer-overlay" ] []
         , aside [ class "bg-base-200 h-full" ]
             -- title row
-            [ div [ class "bg-base-200 sticky top-0 z-10 w-full bg-opacity-90 py-3 px-2 backdrop-blur flex" ]
+            [ div [ class "bg-base-200/90 sticky top-0 z-10 w-full py-3 px-2 backdrop-blur flex" ]
                 [ div [ class "flex-1 flex items-center justify-between gap-2 px-4" ]
                     [ div [ class "flex-0 px-2 flex flex-col items-center" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl flex gap-1 items-center rounded-t-xl overflow-hidden p-1 border border-primary border-b-4" ]
