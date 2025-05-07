@@ -9,7 +9,7 @@ import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill

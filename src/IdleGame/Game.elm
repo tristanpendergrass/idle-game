@@ -8,7 +8,7 @@ import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
@@ -266,7 +266,7 @@ tick delta game =
 
                 Just event ->
                     let
-                        mods : List Mod
+                        mods : List EffectMod
                         mods =
                             getAllMods game
 
@@ -311,7 +311,7 @@ attemptPurchaseResource amount resource game =
         effects =
             getPurchaseEffects amount resource
 
-        mods : List Mod
+        mods : List EffectMod
         mods =
             getAllMods game
 
@@ -342,7 +342,7 @@ priceToPurchaseResource amount ( resource, price ) game =
     Quantity.multiplyBy (toFloat amount) price
 
 
-applyEvent : List Mod -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent : List EffectMod -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 applyEvent mods { effects, count } =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
@@ -386,7 +386,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List Mod -> List { effect : Effect, count : Int } -> Game -> ApplyEffectsResultGenerator
+applyEffects : List EffectMod -> List { effect : Effect, count : Int } -> Game -> ApplyEffectsResultGenerator
 applyEffects mods effects game =
     case effects of
         [] ->
@@ -492,7 +492,7 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List { effect : Effect, count : Int }, additionalMods : List Mod }
+    { game : Game, toasts : List Toast, additionalEffects : List { effect : Effect, count : Int }, additionalMods : List EffectMod }
 
 
 type alias ApplyEffectResultGenerator =
@@ -849,7 +849,7 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-getShopItemMods : Game -> List Mod
+getShopItemMods : Game -> List EffectMod
 getShopItemMods game =
     game.ownedShopUpgrades
         |> ShopUpgrade.toOwnedItems
@@ -933,13 +933,13 @@ getMasteryRewards game activity =
     Activity.masteryModsAtLevel masteryLevel activityMastery
 
 
-getActivityMods : Game -> List Mod
+getActivityMods : Game -> List EffectMod
 getActivityMods game =
     let
-        getGameMod : Activity.MasteryMod -> Maybe Mod
+        getGameMod : Activity.MasteryMod -> Maybe EffectMod
         getGameMod reward =
             case reward of
-                Activity.GameMod mod ->
+                Activity.EffectMod mod ->
                     Just mod
 
                 _ ->
@@ -950,12 +950,12 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-addActivityTagToMods : Activity -> List Mod -> List Mod
+addActivityTagToMods : Activity -> List EffectMod -> List EffectMod
 addActivityTagToMods activity =
     List.map (Mod.withTags [ Effect.ActivityTag activity ])
 
 
-getAllMods : Game -> List Mod
+getAllMods : Game -> List EffectMod
 getAllMods game =
     []
         ++ getActivityMods game

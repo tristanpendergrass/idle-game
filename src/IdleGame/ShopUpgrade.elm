@@ -7,7 +7,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
@@ -45,7 +45,7 @@ type alias OwnedItems =
 
 
 type Reward
-    = ShopItemMod (List Mod)
+    = ShopItemMod (List EffectMod)
     | ShopItemIntervalMod (List IntervalMod)
 
 

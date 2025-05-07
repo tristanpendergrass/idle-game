@@ -398,10 +398,9 @@ type alias ActivityStats =
     , image : String
     , level : Int
     , duration : Duration.Duration
-    , knowledge : Maybe Int
     , type_ : String
     , coin : Maybe Int
-    , uniqueReward : Maybe Resource
+    , resourceGains : List ( Int, Resource )
     }
 
 
@@ -413,10 +412,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherSage.webp"
         , level = 1
         , duration = Duration.seconds 5
-        , knowledge = Just 1
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Sage
+        , resourceGains = [ ( 1, Sage ) ]
         }
     , gatherNettle =
         { skill = HerbGathering
@@ -424,10 +422,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherNettle.webp"
         , level = 1
         , duration = Duration.seconds 5
-        , knowledge = Just 1
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Nettle
+        , resourceGains = [ ( 1, Nettle ) ]
         }
     , gatherSorrel =
         { skill = HerbGathering
@@ -435,10 +432,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherSorrel.webp"
         , level = 2
         , duration = Duration.seconds 10
-        , knowledge = Just 2
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Sorrel
+        , resourceGains = [ ( 1, Sorrel ) ]
         }
     , gatherMugwort =
         { skill = HerbGathering
@@ -446,10 +442,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherMugwort.webp"
         , level = 3
         , duration = Duration.seconds 15
-        , knowledge = Just 3
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Mugwort
+        , resourceGains = [ ( 1, Mugwort ) ]
         }
     , gatherYarrow =
         { skill = HerbGathering
@@ -457,10 +452,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherYarrow.webp"
         , level = 4
         , duration = Duration.seconds 20
-        , knowledge = Just 4
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Yarrow
+        , resourceGains = [ ( 1, Yarrow ) ]
         }
     , gatherThyme =
         { skill = HerbGathering
@@ -468,10 +462,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherThyme.webp"
         , level = 5
         , duration = Duration.seconds 25
-        , knowledge = Just 5
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Thyme
+        , resourceGains = [ ( 1, Thyme ) ]
         }
     , gatherFennel =
         { skill = HerbGathering
@@ -479,10 +472,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherFennel.webp"
         , level = 6
         , duration = Duration.seconds 30
-        , knowledge = Just 6
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Fennel
+        , resourceGains = [ ( 1, Fennel ) ]
         }
     , gatherBelladonna =
         { skill = HerbGathering
@@ -490,10 +482,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherBelladonna.webp"
         , level = 7
         , duration = Duration.seconds 35
-        , knowledge = Just 7
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Belladonna
+        , resourceGains = [ ( 1, Belladonna ) ]
         }
     , gatherHenbane =
         { skill = HerbGathering
@@ -501,10 +492,9 @@ activityStats =
         , image = "/activities/herbGathering/gatherHenbane.webp"
         , level = 8
         , duration = Duration.seconds 40
-        , knowledge = Just 8
         , type_ = "Gather"
         , coin = Nothing
-        , uniqueReward = Just Henbane
+        , resourceGains = [ ( 1, Henbane ) ]
         }
     }
 

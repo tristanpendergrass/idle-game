@@ -11,7 +11,7 @@ import IdleGame.Effect as Effect exposing (Effect, EffectType, effect)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)

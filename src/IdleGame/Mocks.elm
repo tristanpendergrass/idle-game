@@ -10,7 +10,7 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill

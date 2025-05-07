@@ -12,7 +12,7 @@ type ModSource
     | ShopItem
 
 
-type alias Mod =
+type alias EffectMod =
     { tags : List Effect.Tag
     , label : String
     , transformer : Transformer
@@ -44,7 +44,7 @@ scopeTransformerToTags tags transformer multiplier effect =
         NoChange
 
 
-includeVariableEffects : Mod -> Mod
+includeVariableEffects : EffectMod -> EffectMod
 includeVariableEffects mod =
     -- Transforms the mod to apply to not just an effect but all the subeffects of that effect, e.g. the successEffects contained in a VariableSuccess
     let
@@ -138,7 +138,7 @@ useSimpleTransformerHelp depth transformFn count taggedEffect =
         ChangeEffect newEffect
 
 
-applyModToEffect : Mod -> ( Effect, List Effect ) -> ( Effect, List Effect )
+applyModToEffect : EffectMod -> ( Effect, List Effect ) -> ( Effect, List Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if Effect.hasTags mod.tags effectAccum then
         case mod.transformer mod.count effectAccum of
@@ -155,7 +155,7 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : List Mod -> Effect -> ( Effect, List Effect )
+applyModsToEffect : List EffectMod -> Effect -> ( Effect, List Effect )
 applyModsToEffect =
     applyModsToEffectHelp 0
 
@@ -165,7 +165,7 @@ tupleToList ( x, xs ) =
     x :: xs
 
 
-applyModsToEffectHelp : Int -> List Mod -> Effect -> ( Effect, List Effect )
+applyModsToEffectHelp : Int -> List EffectMod -> Effect -> ( Effect, List Effect )
 applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
@@ -192,22 +192,22 @@ applyModsToEffectHelp depth mods effect =
     )
 
 
-withHowManyTimesToApplyMod : Int -> Mod -> Mod
+withHowManyTimesToApplyMod : Int -> EffectMod -> EffectMod
 withHowManyTimesToApplyMod count mod =
     { mod | count = count }
 
 
-withSource : ModSource -> Mod -> Mod
+withSource : ModSource -> EffectMod -> EffectMod
 withSource source mod =
     { mod | source = source }
 
 
-withTags : List Effect.Tag -> Mod -> Mod
+withTags : List Effect.Tag -> EffectMod -> EffectMod
 withTags tags mod =
     { mod | tags = mod.tags ++ tags }
 
 
-withLabel : String -> Mod -> Mod
+withLabel : String -> EffectMod -> EffectMod
 withLabel label mod =
     { mod | label = label }
 
@@ -407,7 +407,7 @@ addEffectsTransformer effects count taggedEffect =
     ChangeAndAddEffects taggedEffect (List.concat (List.repeat count effects))
 
 
-xpAndMxpBuff : Percent -> Mod
+xpAndMxpBuff : Percent -> EffectMod
 xpAndMxpBuff buff =
     { tags = []
     , label = "Xp and Mxp Buff"
@@ -417,7 +417,7 @@ xpAndMxpBuff buff =
     }
 
 
-activityXpBuff : Activity -> Percent -> Mod
+activityXpBuff : Activity -> Percent -> EffectMod
 activityXpBuff activity amount =
     { tags = [ Effect.ActivityTag activity ]
     , label = "Activity Xp Buff"
@@ -427,7 +427,7 @@ activityXpBuff activity amount =
     }
 
 
-xpBuff : Percent -> Mod
+xpBuff : Percent -> EffectMod
 xpBuff amount =
     { tags = []
     , label = "Xp Buff"
@@ -437,7 +437,7 @@ xpBuff amount =
     }
 
 
-resourceSpendDecreaseBuff : Int -> Mod
+resourceSpendDecreaseBuff : Int -> EffectMod
 resourceSpendDecreaseBuff buff =
     -- Decrease the amount of resources spent by amount passed in
     { tags = []
@@ -448,14 +448,14 @@ resourceSpendDecreaseBuff buff =
     }
 
 
-skillXpBuff : Skill -> Percent -> Mod
+skillXpBuff : Skill -> Percent -> EffectMod
 skillXpBuff skill amount =
     xpBuff amount
         |> withTags [ Effect.SkillTag skill ]
         |> withLabel "Skill Xp Buff"
 
 
-coinBuff : Percent -> Mod
+coinBuff : Percent -> EffectMod
 coinBuff buff =
     { tags = []
     , label = "Coin Buff"
@@ -465,7 +465,7 @@ coinBuff buff =
     }
 
 
-mxpBuff : Percent -> Mod
+mxpBuff : Percent -> EffectMod
 mxpBuff buff =
     { tags = []
     , label = "Mxp Buff"
@@ -475,7 +475,7 @@ mxpBuff buff =
     }
 
 
-resourceDoublingBuff : Percent -> Mod
+resourceDoublingBuff : Percent -> EffectMod
 resourceDoublingBuff buff =
     { tags = []
     , label = "Resource Doubling Buff"
@@ -485,7 +485,7 @@ resourceDoublingBuff buff =
     }
 
 
-resourceBaseBuff : Int -> Mod
+resourceBaseBuff : Int -> EffectMod
 resourceBaseBuff buff =
     { tags = []
     , label = "Resource Base Buff"
@@ -495,7 +495,7 @@ resourceBaseBuff buff =
     }
 
 
-resourcePreservationBuff : Percent -> Mod
+resourcePreservationBuff : Percent -> EffectMod
 resourcePreservationBuff buff =
     { tags = []
     , label = "Resource Preservation Buff"
@@ -505,7 +505,7 @@ resourcePreservationBuff buff =
     }
 
 
-successBuff : Percent -> Mod
+successBuff : Percent -> EffectMod
 successBuff buff =
     { tags = []
     , label = "Success Buff"
@@ -515,7 +515,7 @@ successBuff buff =
     }
 
 
-addEffects : List Effect -> Mod
+addEffects : List Effect -> EffectMod
 addEffects effects =
     { tags = []
     , label = "Add Effects"
@@ -525,13 +525,13 @@ addEffects effects =
     }
 
 
-gainResourceWithProbability : Percent -> Resource -> Mod
+gainResourceWithProbability : Percent -> Resource -> EffectMod
 gainResourceWithProbability probability resource =
     addEffects [ Effect.gainWithProbability probability [ Effect.gainResource 1 resource ] ]
         |> withLabel "Gain Resource With Probability"
 
 
-gainResource : Int -> Resource -> Mod
+gainResource : Int -> Resource -> EffectMod
 gainResource amount resource =
     addEffects [ Effect.gainResource amount resource ]
         |> withLabel "Gain Resource"

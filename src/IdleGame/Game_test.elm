@@ -136,7 +136,7 @@ type ApplyEffectsTestConfig
         , game : Game
         , effects : List Effect
         , count : Int
-        , mods : List Mod
+        , mods : List EffectMod
         }
 
 
@@ -180,7 +180,7 @@ withEffects effects (ApplyEffectsTestConfig config) =
     ApplyEffectsTestConfig { config | effects = effects }
 
 
-withMods : List Mod -> ApplyEffectsTestConfig -> ApplyEffectsTestConfig
+withMods : List EffectMod -> ApplyEffectsTestConfig -> ApplyEffectsTestConfig
 withMods mods (ApplyEffectsTestConfig config) =
     ApplyEffectsTestConfig { config | mods = mods }
 

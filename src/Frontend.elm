@@ -22,7 +22,7 @@ import IdleGame.Game as Game
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime exposing (OneTimeStatus(..))
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
@@ -1679,7 +1679,7 @@ view model =
 getCache : Game -> Cache
 getCache game =
     let
-        mods : List Mod
+        mods : List EffectMod
         mods =
             Game.getAllMods game
     in

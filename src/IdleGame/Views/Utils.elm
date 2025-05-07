@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon)

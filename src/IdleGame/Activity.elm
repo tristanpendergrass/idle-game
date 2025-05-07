@@ -6,7 +6,7 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (Mod)
+import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -32,8 +32,8 @@ updateModCount fn mod =
         IntervalMod intervalMod ->
             IntervalMod { intervalMod | count = fn intervalMod.count }
 
-        GameMod gameMod ->
-            GameMod { gameMod | count = fn gameMod.count }
+        EffectMod gameMod ->
+            EffectMod { gameMod | count = fn gameMod.count }
 
 
 perLevelModCount : { modInterval : Int, mxpLevel : Int } -> Int
@@ -89,7 +89,7 @@ type alias Mastery =
 
 type MasteryMod
     = IntervalMod IntervalMod -- Activity interval decreased by this much
-    | GameMod Mod -- Apply mod to game
+    | EffectMod EffectMod -- Apply mod to game
 
 
 getActivityEffects : Activity -> List Effect
@@ -138,51 +138,57 @@ getActivityEffectsHelper activity =
             [ Effect.gainXp (Xp.int 5) stats.skill
                 |> Effect.withTags tagsForThisActivity
             ]
+
+        gainResourceEffects : List Effect
+        gainResourceEffects =
+            List.map (\( count, resource ) -> Effect.gainResource count resource) stats.resourceGains
     in
     List.concat
         [ costs
         , gainMxpEffects
         , gainXpEffects
+        , gainResourceEffects
         ]
 
 
 getActivityMasteriesHelper : Activity -> Mastery
 getActivityMasteriesHelper activity =
     case (getActivityStats activity).skill of
-        --         Anatomy ->
-        --             { perLevel = []
-        --             , atLevel =
-        --                 [ { level = 25
-        --                   , mod =
-        --                         GameMod
-        --                             (Mod.mxpBuff (Percent.float 0.05)
-        --                                 |> Mod.withLabel "+5% Mastery XP for this topic only"
-        --                                 |> Mod.withTags [ Effect.ActivityTag activity ]
-        --                             )
-        --                   }
-        --                 , { level = 50
-        --                   , mod =
-        --                         GameMod
-        --                             (Mod.xpBuff (Percent.float 0.0025)
-        --                                 |> Mod.withLabel "+0.25% Global XP"
-        --                             )
-        --                   }
-        --                 , { level = 75
-        --                   , mod =
-        --                         GameMod
-        --                             (Mod.mxpBuff (Percent.float 0.0025)
-        --                                 |> Mod.withLabel "+0.25% Global Mastery XP"
-        --                             )
-        --                   }
-        --                 , { level = 99
-        --                   , mod =
-        --                         GameMod
-        --                             (Mod.xpAndMxpBuff (Percent.float 0.0075)
-        --                                 |> Mod.withLabel "Global bonuses increased to 1%"
-        --                             )
-        --                   }
-        --                 ]
-        --             }
+        HerbGathering ->
+            { perLevel = []
+            , atLevel =
+                [ { level = 25
+                  , mod =
+                        EffectMod
+                            (Mod.mxpBuff (Percent.float 0.05)
+                                |> Mod.withLabel "+5% Mastery XP for this topic only"
+                                |> Mod.withTags [ Effect.ActivityTag activity ]
+                            )
+                  }
+                , { level = 50
+                  , mod =
+                        EffectMod
+                            (Mod.xpBuff (Percent.float 0.0025)
+                                |> Mod.withLabel "+0.25% Global XP"
+                            )
+                  }
+                , { level = 75
+                  , mod =
+                        EffectMod
+                            (Mod.mxpBuff (Percent.float 0.0025)
+                                |> Mod.withLabel "+0.25% Global Mastery XP"
+                            )
+                  }
+                , { level = 99
+                  , mod =
+                        EffectMod
+                            (Mod.xpAndMxpBuff (Percent.float 0.0075)
+                                |> Mod.withLabel "Global bonuses increased to 1%"
+                            )
+                  }
+                ]
+            }
+
         --         Biochemistry ->
         --             { perLevel = []
         --             , atLevel =
