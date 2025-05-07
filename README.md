@@ -71,7 +71,7 @@ $ npx elm-codegen install
 ## v0.1
 
 ### Features
-[x] Replace skills with Herb Gathering, Wild Magic, and Soup
+[x] Replace skills with Herb Gathering and Wild Magic
 [ ] Add herb gathering with progressively more xp
 [ ] Design mastery for herbs
 [ ] Design spells

@@ -8,21 +8,18 @@ import IdleGame.Views.Icon
 type Skill
     = HerbGathering
     | WildMagic
-    | Soup
 
 
 allSkills : List Skill
 allSkills =
     [ HerbGathering
     , WildMagic
-    , Soup
     ]
 
 
 type alias SkillRecord a =
     { herbGathering : a
     , wildMagic : a
-    , soup : a
     }
 
 
@@ -30,7 +27,6 @@ skillRecord : a -> SkillRecord a
 skillRecord a =
     { herbGathering = a
     , wildMagic = a
-    , soup = a
     }
 
 
@@ -43,9 +39,6 @@ getBySkill kind data =
         WildMagic ->
             data.wildMagic
 
-        Soup ->
-            data.soup
-
 
 setBySkill : Skill -> a -> SkillRecord a -> SkillRecord a
 setBySkill kind value data =
@@ -55,9 +48,6 @@ setBySkill kind value data =
 
         WildMagic ->
             { data | wildMagic = value }
-
-        Soup ->
-            { data | soup = value }
 
 
 type alias SkillStats =
@@ -71,7 +61,6 @@ mapSkills :
 mapSkills fn record =
     { herbGathering = fn record.herbGathering
     , wildMagic = fn record.wildMagic
-    , soup = fn record.soup
     }
 
 
@@ -79,7 +68,6 @@ skillStats : SkillRecord SkillStats
 skillStats =
     { herbGathering = { title = "Herb Gathering", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams }
     , wildMagic = { title = "Wild Magic", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams }
-    , soup = { title = "Soup", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialWorkspaces IdleGame.Views.Icon.defaultParams }
     }
 
 
