@@ -63,48 +63,4 @@
 }
 
 
-/* Elm Toast stuff https://package.elm-lang.org/packages/emilianobovetti/elm-toast/latest/ */
-
-.toast-tray {
-  position: fixed;
-  bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: auto; /* Without width: auto the toast tray will have 100% width and block clicking things underneath */
-}
-
-.toast {
-  box-sizing: content-box;
-  display: flex;
-  position: relative;
-  opacity: 1;
-  transition:
-    /* opacity --toast-transition-duration ease,
-    transform --toast-transition-duration ease; */
-    opacity 0.6s ease,
-    /* transform 0.6s ease; */
-}
-
-.toast--fade-out {
-  opacity: 0;
-  /* transform: translateY(20em); */
-}
-
-.toast--spaced {
-  margin-bottom: 1em;
-}
-
-.toast-frame {
-  /* min-height: 4em;
-  max-height: 4em;
-  transition:
-    min-height 0.6s linear,
-    min-height 0.6s linear; */
-}
-
-.toast-frame--fade-out {
-  /* min-height: 0;
-  max-height: 0; */
-}
-
 

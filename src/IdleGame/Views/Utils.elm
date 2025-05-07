@@ -72,7 +72,8 @@ zIndexes =
     , bottomRightMenu = class "z-30"
     , drawerSide = class "z-40"
     , modalWrapper = class "z-40"
-    , debugPanel = class "z-50"
+    , toastQueue = class "z-50"
+    , debugPanel = class "z-60"
     }
 
 

@@ -27,7 +27,6 @@ import Postmark
 import Random
 import Route exposing (Route)
 import Time exposing (Posix)
-import Toast
 import Url exposing (Url)
 
 
@@ -158,7 +157,7 @@ type alias InGameFrontend =
     , maybeServerInfo : Maybe ServerInfo
     , lastFastForwardDuration : Maybe Duration -- Used to display fast forward times for debugging and optimization
     , showDebugPanel : Bool
-    , tray : Toast.Tray Toast
+    , toastQueue : ToastQueue
     , isDrawerOpen : Bool
     , activeTab : Tab
     , preview : Maybe Preview
@@ -185,6 +184,11 @@ setGame newSnapshot model =
             List.Nonempty.head model.games
     in
     { model | games = List.Nonempty.replaceHead ( gameId, newSnapshot ) model.games }
+
+
+setToastQueue : ToastQueue -> InGameFrontend -> InGameFrontend
+setToastQueue newToastQueue model =
+    { model | toastQueue = newToastQueue }
 
 
 
@@ -299,8 +303,7 @@ type FrontendMsg
     | HandleShopResourceQuantityChange String
     | HandleShopResourceBuyClick
       -- Other
-    | ToastMsg Toast.Msg
-    | AddToast Toast
+    | AddToast Toast Posix
     | HandleFastForward Posix
     | HandleAnimationFrame Posix
     | HandleAnimationFrameDelta Float
@@ -356,3 +359,15 @@ type alias Cache =
 
 type Log
     = LogLoginEmail Time.Posix (Result Http.Error Postmark.PostmarkSendResponse) EmailAddress
+
+
+
+-- Toast Queue
+
+
+type ToastQueueItem
+    = ToastQueueItem Toast Time.Posix
+
+
+type alias ToastQueue =
+    List ToastQueueItem

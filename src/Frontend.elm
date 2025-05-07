@@ -58,7 +58,7 @@ import Svg.Attributes exposing (restart)
 import Task
 import Time exposing (Posix)
 import Time.Extra
-import Toast
+import ToastQueue
 import Types exposing (..)
 import Url exposing (Url)
 
@@ -494,7 +494,7 @@ updateMainMenu msg mainMenuFrontend =
                             , maybeServerInfo = mainMenuFrontend.maybeServerInfo
                             , lastFastForwardDuration = Nothing
                             , showDebugPanel = False
-                            , tray = Toast.tray
+                            , toastQueue = ToastQueue.create
                             , isDrawerOpen = False
                             , activeTab = Config.flags.defaultTab
                             , preview = Nothing
@@ -651,24 +651,8 @@ updateInGame msg inGameFrontend =
         CloseDebugPanel ->
             ( InGame { inGameFrontend | showDebugPanel = False }, Cmd.none )
 
-        AddToast content ->
-            let
-                ( newInGameFrontend, cmds ) =
-                    Toast.expireIn 3000 content
-                        -- Toast.persistent content -- this can be used for testing toast styles to make the toast not disappear
-                        -- NOTE: Number passed to withExitTransition should match the transition duration of class "toast" in index.css
-                        |> Toast.withExitTransition 900
-                        |> Toast.add inGameFrontend.tray
-                        |> Toast.tuple ToastMsg inGameFrontend
-            in
-            ( InGame newInGameFrontend, cmds )
-
-        ToastMsg tmsg ->
-            let
-                ( tray, newTmesg ) =
-                    Toast.update tmsg inGameFrontend.tray
-            in
-            ( InGame { inGameFrontend | tray = tray }, Cmd.map ToastMsg newTmesg )
+        AddToast toast now ->
+            ( InGame { inGameFrontend | toastQueue = ToastQueue.addToast toast now inGameFrontend.toastQueue }, Cmd.none )
 
         HandleFastForward now ->
             case inGameFrontend.gameState of
@@ -938,8 +922,9 @@ updateInGame msg inGameFrontend =
                             ( newGame, toasts, gameDidChange ) =
                                 Snapshot.getValue updatedSnapshot
 
+                            notificationCmds : List (Cmd FrontendMsg)
                             notificationCmds =
-                                List.map (AddToast >> delay 0) toasts
+                                List.map (\toast -> Task.perform (AddToast toast) Time.now) toasts
 
                             newCache : Cache
                             newCache =
@@ -961,6 +946,7 @@ updateInGame msg inGameFrontend =
                             (inGameFrontend
                                 |> setGameState newGameState
                                 |> setGame newSnapshot
+                                |> setToastQueue (ToastQueue.updateToastQueue now inGameFrontend.toastQueue)
                             )
                         , Cmd.batch notificationCmds
                         )
@@ -1108,7 +1094,7 @@ updateInGame msg inGameFrontend =
 
                                         notificationCmds : List (Cmd FrontendMsg)
                                         notificationCmds =
-                                            List.map (AddToast >> delay 0) toasts
+                                            List.map (\toast -> Task.perform (AddToast toast) Time.now) toasts
                                     in
                                     ( InGame newModel, Cmd.batch notificationCmds )
 
@@ -1403,44 +1389,24 @@ subscriptions _ =
         ]
 
 
-viewToast : List (Html.Attribute FrontendMsg) -> Toast.Info Toast -> Html FrontendMsg
-viewToast attributes toast =
-    Html.div
-        attributes
-        [ toastToHtml toast.content ]
-
-
-toastConfig : Toast.Config FrontendMsg
-toastConfig =
-    Toast.config ToastMsg
-        -- attributes applied to the toast tray
-        |> Toast.withTrayAttributes
-            [ class "flex flex-col items-center gap-2 fixed bottom-[5rem] left-1/2 -translate-x-1/2 w-auto"
-            , ViewUtils.zIndexes.toast
-            ]
-        -- attributes applied to the toasts
-        |> Toast.withAttributes [ class "toast" ]
-        |> Toast.withExitAttributes [ class "toast--fade-out" ]
-
-
-toastToHtml : Toast -> Html msg
+toastToHtml : Toast -> Html FrontendMsg
 toastToHtml notification =
     let
         baseClass : Html.Attribute msg
         baseClass =
-            class "px-2 py-1 rounded"
+            class "alert"
 
         successClass : Html.Attribute msg
         successClass =
-            class "bg-success text-success-content"
+            class "alert-success"
 
         errClass : Html.Attribute msg
         errClass =
-            class "bg-error text-error-content"
+            class "alert-error"
 
         warningClass : Html.Attribute msg
         warningClass =
-            class "bg-warning text-warning-content"
+            class "alert-warning"
     in
     case notification of
         GainedCoin amount ->
@@ -1654,7 +1620,7 @@ view model =
                                         }
                                 in
                                 div [ class "flex h-full w-full relative overflow-hidden" ]
-                                    [ Toast.render viewToast frontend.tray toastConfig
+                                    [ ToastQueue.render toastToHtml frontend.toastQueue
                                     , div [ class "bg-base-100 drawer lg:drawer-open" ]
                                         [ input
                                             [ id "drawer"
