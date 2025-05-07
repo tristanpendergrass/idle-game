@@ -2528,6 +2528,13 @@
       background-image: none;
     }
   }
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: calc(0.25rem * 2);
+    font-size: var(--cardtitle-fs, 1.125rem);
+    font-weight: 600;
+  }
   .join {
     display: inline-flex;
     align-items: stretch;
@@ -3520,6 +3527,15 @@
     --fontsize: 0.75rem;
     --btn-p: 0.75rem;
     --size: calc(var(--size-field, 0.25rem) * 8);
+  }
+  .card-xs {
+    .card-body {
+      --card-p: 0.5rem;
+      --card-fs: 0.6875rem;
+    }
+    .card-title {
+      --cardtitle-fs: 0.875rem;
+    }
   }
   .badge-neutral {
     --badge-color: var(--color-neutral);

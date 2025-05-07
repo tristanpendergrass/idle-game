@@ -343,7 +343,7 @@ priceLabel { price, isError } =
 
 classes =
     { card =
-        { container = class "card card-compact bg-base-100 shadow-xl border-b border-l border-r"
+        { container = class "card card-xs bg-base-100 shadow-xl border-b border-l border-r"
         , containerClickable = class "cursor-pointer bubble-pop select-none"
         , activityTypeBadge = class "badge badge-neutral badge-xs"
         , imageContainer = class "min-h-[6rem] h-24 relative"

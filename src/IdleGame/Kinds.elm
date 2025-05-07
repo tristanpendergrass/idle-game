@@ -265,20 +265,55 @@ getResourceStats kind =
 
 type Activity
     = GatherSage
+    | GatherNettle
+    | GatherSorrel
+    | GatherMugwort
+    | GatherYarrow
+    | GatherThyme
+    | GatherFennel
+    | GatherBelladonna
+    | GatherHenbane
 
 
 allActivities : List Activity
 allActivities =
-    [ GatherSage ]
+    [ GatherSage
+    , GatherNettle
+    , GatherSorrel
+    , GatherMugwort
+    , GatherYarrow
+    , GatherThyme
+    , GatherFennel
+    , GatherBelladonna
+    , GatherHenbane
+    ]
 
 
 type alias ActivityRecord a =
-    { gatherSage : a }
+    { gatherSage : a
+    , gatherNettle : a
+    , gatherSorrel : a
+    , gatherMugwort : a
+    , gatherYarrow : a
+    , gatherThyme : a
+    , gatherFennel : a
+    , gatherBelladonna : a
+    , gatherHenbane : a
+    }
 
 
 activityRecord : a -> ActivityRecord a
 activityRecord a =
-    { gatherSage = a }
+    { gatherSage = a
+    , gatherNettle = a
+    , gatherSorrel = a
+    , gatherMugwort = a
+    , gatherYarrow = a
+    , gatherThyme = a
+    , gatherFennel = a
+    , gatherBelladonna = a
+    , gatherHenbane = a
+    }
 
 
 getByActivity : Activity -> ActivityRecord a -> a
@@ -287,6 +322,30 @@ getByActivity kind data =
         GatherSage ->
             data.gatherSage
 
+        GatherNettle ->
+            data.gatherNettle
+
+        GatherSorrel ->
+            data.gatherSorrel
+
+        GatherMugwort ->
+            data.gatherMugwort
+
+        GatherYarrow ->
+            data.gatherYarrow
+
+        GatherThyme ->
+            data.gatherThyme
+
+        GatherFennel ->
+            data.gatherFennel
+
+        GatherBelladonna ->
+            data.gatherBelladonna
+
+        GatherHenbane ->
+            data.gatherHenbane
+
 
 setByActivity : Activity -> a -> ActivityRecord a -> ActivityRecord a
 setByActivity kind value data =
@@ -294,10 +353,43 @@ setByActivity kind value data =
         GatherSage ->
             { data | gatherSage = value }
 
+        GatherNettle ->
+            { data | gatherNettle = value }
+
+        GatherSorrel ->
+            { data | gatherSorrel = value }
+
+        GatherMugwort ->
+            { data | gatherMugwort = value }
+
+        GatherYarrow ->
+            { data | gatherYarrow = value }
+
+        GatherThyme ->
+            { data | gatherThyme = value }
+
+        GatherFennel ->
+            { data | gatherFennel = value }
+
+        GatherBelladonna ->
+            { data | gatherBelladonna = value }
+
+        GatherHenbane ->
+            { data | gatherHenbane = value }
+
 
 mapActivities : (a -> a) -> ActivityRecord a -> ActivityRecord a
 mapActivities fn record =
-    { gatherSage = fn record.gatherSage }
+    { gatherSage = fn record.gatherSage
+    , gatherNettle = fn record.gatherNettle
+    , gatherSorrel = fn record.gatherSorrel
+    , gatherMugwort = fn record.gatherMugwort
+    , gatherYarrow = fn record.gatherYarrow
+    , gatherThyme = fn record.gatherThyme
+    , gatherFennel = fn record.gatherFennel
+    , gatherBelladonna = fn record.gatherBelladonna
+    , gatherHenbane = fn record.gatherHenbane
+    }
 
 
 type alias ActivityStats =
@@ -325,6 +417,94 @@ activityStats =
         , type_ = "Gather"
         , coin = Nothing
         , uniqueReward = Just Sage
+        }
+    , gatherNettle =
+        { skill = HerbGathering
+        , title = "Gather Nettle"
+        , image = "/activities/herbGathering/gatherNettle.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , knowledge = Just 1
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Nettle
+        }
+    , gatherSorrel =
+        { skill = HerbGathering
+        , title = "Gather Sorrel"
+        , image = "/activities/herbGathering/gatherSorrel.webp"
+        , level = 2
+        , duration = Duration.seconds 10
+        , knowledge = Just 2
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Sorrel
+        }
+    , gatherMugwort =
+        { skill = HerbGathering
+        , title = "Gather Mugwort"
+        , image = "/activities/herbGathering/gatherMugwort.webp"
+        , level = 3
+        , duration = Duration.seconds 15
+        , knowledge = Just 3
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Mugwort
+        }
+    , gatherYarrow =
+        { skill = HerbGathering
+        , title = "Gather Yarrow"
+        , image = "/activities/herbGathering/gatherYarrow.webp"
+        , level = 4
+        , duration = Duration.seconds 20
+        , knowledge = Just 4
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Yarrow
+        }
+    , gatherThyme =
+        { skill = HerbGathering
+        , title = "Gather Thyme"
+        , image = "/activities/herbGathering/gatherThyme.webp"
+        , level = 5
+        , duration = Duration.seconds 25
+        , knowledge = Just 5
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Thyme
+        }
+    , gatherFennel =
+        { skill = HerbGathering
+        , title = "Gather Fennel"
+        , image = "/activities/herbGathering/gatherFennel.webp"
+        , level = 6
+        , duration = Duration.seconds 30
+        , knowledge = Just 6
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Fennel
+        }
+    , gatherBelladonna =
+        { skill = HerbGathering
+        , title = "Gather Belladonna"
+        , image = "/activities/herbGathering/gatherBelladonna.webp"
+        , level = 7
+        , duration = Duration.seconds 35
+        , knowledge = Just 7
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Belladonna
+        }
+    , gatherHenbane =
+        { skill = HerbGathering
+        , title = "Gather Henbane"
+        , image = "/activities/herbGathering/gatherHenbane.webp"
+        , level = 8
+        , duration = Duration.seconds 40
+        , knowledge = Just 8
+        , type_ = "Gather"
+        , coin = Nothing
+        , uniqueReward = Just Henbane
         }
     }
 
