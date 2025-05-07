@@ -2442,14 +2442,6 @@
       background-image: none;
     }
   }
-  .tabs {
-    display: flex;
-    flex-wrap: wrap;
-    --tabs-height: auto;
-    --tabs-direction: row;
-    height: var(--tabs-height);
-    flex-direction: var(--tabs-direction);
-  }
   .navbar {
     display: flex;
     width: 100%;
@@ -2535,13 +2527,6 @@
       box-shadow: none;
       background-image: none;
     }
-  }
-  .card-title {
-    display: flex;
-    align-items: center;
-    gap: calc(0.25rem * 2);
-    font-size: var(--cardtitle-fs, 1.125rem);
-    font-weight: 600;
   }
   .join {
     display: inline-flex;
@@ -2837,9 +2822,6 @@
   .max-w-full {
     max-width: 100%;
   }
-  .max-w-lg {
-    max-width: var(--container-lg);
-  }
   .min-w-\[2\.5rem\] {
     min-width: 2.5rem;
   }
@@ -2897,9 +2879,6 @@
     background-repeat: no-repeat;
     background-position-x: -50%;
   }
-  .animate-ping {
-    animation: var(--animate-ping);
-  }
   .link {
     cursor: pointer;
     text-decoration-line: underline;
@@ -2927,9 +2906,6 @@
   }
   .resize {
     resize: both;
-  }
-  .list-disc {
-    list-style-type: disc;
   }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -3368,9 +3344,6 @@
   .text-accent-content {
     color: var(--color-accent-content);
   }
-  .text-base-300 {
-    color: var(--color-base-300);
-  }
   .text-base-content {
     color: var(--color-base-content);
   }
@@ -3403,9 +3376,6 @@
   }
   .text-primary-content {
     color: var(--color-primary-content);
-  }
-  .text-secondary {
-    color: var(--color-secondary);
   }
   .text-secondary-content {
     color: var(--color-secondary-content);
@@ -3447,10 +3417,6 @@
   }
   .opacity-20 {
     opacity: 20%;
-  }
-  .shadow {
-    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-lg {
     --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));

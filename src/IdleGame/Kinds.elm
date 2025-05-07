@@ -102,6 +102,7 @@ type Resource
     | Fennel
     | Belladonna
     | Henbane
+    | Parchment
 
 
 allResources : List Resource
@@ -115,6 +116,7 @@ allResources =
     , Fennel
     , Belladonna
     , Henbane
+    , Parchment
     ]
 
 
@@ -128,6 +130,7 @@ type alias ResourceRecord a =
     , fennel : a
     , belladonna : a
     , henbane : a
+    , parchment : a
     }
 
 
@@ -142,6 +145,7 @@ resourceRecord a =
     , fennel = a
     , belladonna = a
     , henbane = a
+    , parchment = a
     }
 
 
@@ -175,6 +179,9 @@ getByResource kind data =
         Henbane ->
             data.henbane
 
+        Parchment ->
+            data.parchment
+
 
 setByResource : Resource -> a -> ResourceRecord a -> ResourceRecord a
 setByResource kind value data =
@@ -206,6 +213,9 @@ setByResource kind value data =
         Henbane ->
             { data | henbane = value }
 
+        Parchment ->
+            { data | parchment = value }
+
 
 mapResources : (a -> a) -> ResourceRecord a -> ResourceRecord a
 mapResources fn record =
@@ -218,6 +228,7 @@ mapResources fn record =
     , fennel = fn record.fennel
     , belladonna = fn record.belladonna
     , henbane = fn record.henbane
+    , parchment = fn record.parchment
     }
 
 
@@ -239,6 +250,7 @@ resourceStats =
     , fennel = { title = "Fennel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
+    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     }
 
 
