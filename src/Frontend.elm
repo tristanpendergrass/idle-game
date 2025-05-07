@@ -1686,13 +1686,13 @@ getCache game =
     Activity.createRecordByFn
         (\activity ->
             let
-                unmoddedEffects : List Effect
-                unmoddedEffects =
-                    (Activity.getEffectStats activity).effects
+                activityEffects : List Effect
+                activityEffects =
+                    Activity.getActivityEffects activity
             in
             List.map
                 (\effect ->
                     Tuple.first (Mod.applyModsToEffect mods effect)
                 )
-                unmoddedEffects
+                activityEffects
         )

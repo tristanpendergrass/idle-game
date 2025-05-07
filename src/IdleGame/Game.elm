@@ -234,9 +234,9 @@ tick delta game =
 
                 Just ( activityKind, timer ) ->
                     let
-                        effectStats : Activity.EffectStats
-                        effectStats =
-                            Activity.getEffectStats activityKind
+                        activityEffects : List Effect
+                        activityEffects =
+                            Activity.getActivityEffects activityKind
 
                         activityDuration : Duration
                         activityDuration =
@@ -249,7 +249,7 @@ tick delta game =
                         event : Maybe Event
                         event =
                             if completions >= 1 then
-                                Just { effects = effectStats.effects, count = completions }
+                                Just { effects = activityEffects, count = completions }
 
                             else
                                 Nothing
@@ -889,9 +889,9 @@ getMasteryIntervalMods game =
         getFromActivity : Activity -> List IntervalMod
         getFromActivity activity =
             let
-                effectStats : Activity.EffectStats
-                effectStats =
-                    Activity.getEffectStats activity
+                activityMastery : Activity.Mastery
+                activityMastery =
+                    Activity.getActivityMasteries activity
 
                 mxp : Xp
                 mxp =
@@ -901,7 +901,7 @@ getMasteryIntervalMods game =
                 masteryLevel =
                     Xp.level Xp.defaultSchedule mxp
             in
-            Activity.masteryModsAtLevel masteryLevel effectStats.mastery
+            Activity.masteryModsAtLevel masteryLevel activityMastery
                 |> List.filterMap
                     (\mod ->
                         case mod of
@@ -918,9 +918,9 @@ getMasteryIntervalMods game =
 getMasteryRewards : Game -> Activity -> List Activity.MasteryMod
 getMasteryRewards game activity =
     let
-        effectStats : Activity.EffectStats
-        effectStats =
-            Activity.getEffectStats activity
+        activityMastery : Activity.Mastery
+        activityMastery =
+            Activity.getActivityMasteries activity
 
         mxp : Xp
         mxp =
@@ -930,7 +930,7 @@ getMasteryRewards game activity =
         masteryLevel =
             Xp.level Xp.defaultSchedule mxp
     in
-    Activity.masteryModsAtLevel masteryLevel effectStats.mastery
+    Activity.masteryModsAtLevel masteryLevel activityMastery
 
 
 getActivityMods : Game -> List Mod

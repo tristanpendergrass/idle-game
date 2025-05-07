@@ -116,13 +116,13 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
         masteryPercent =
             Xp.levelPercent Xp.defaultSchedule mxp
 
+        activityMastery : Activity.Mastery
+        activityMastery =
+            Activity.getActivityMasteries activity
+
         showMastery : Bool
         showMastery =
-            Activity.hasMasteryMods (Activity.getEffectStats activity).mastery
-
-        activityStats : ActivityStats
-        activityStats =
-            getActivityStats activity
+            Activity.hasMasteryMods activityMastery
     in
     div [ class "relative" ]
         [ div

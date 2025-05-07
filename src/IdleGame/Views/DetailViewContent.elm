@@ -104,9 +104,9 @@ renderContent obj extraBottomPadding game =
         stats =
             getActivityStats activity
 
-        effectStats : Activity.EffectStats
-        effectStats =
-            Activity.getEffectStats activity
+        activityMastery : Activity.Mastery
+        activityMastery =
+            Activity.getActivityMasteries activity
 
         mxp : Xp
         mxp =
@@ -194,7 +194,7 @@ renderContent obj extraBottomPadding game =
         , div [ class "divider" ] []
 
         -- The current mastery level
-        , if Activity.hasMasteryMods effectStats.mastery then
+        , if Activity.hasMasteryMods activityMastery then
             mxpSection mxp
 
           else
@@ -202,7 +202,7 @@ renderContent obj extraBottomPadding game =
             div [] []
 
         -- The mastery rewards for this activity
-        , masterySection mxp effectStats.mastery
+        , masterySection mxp activityMastery
         ]
 
 

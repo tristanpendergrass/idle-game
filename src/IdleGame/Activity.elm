@@ -92,14 +92,28 @@ type MasteryMod
     | GameMod Mod -- Apply mod to game
 
 
-type alias EffectStats =
-    { effects : List Effect
-    , mastery : Mastery
-    }
+getActivityEffects : Activity -> List Effect
+getActivityEffects activity =
+    getByActivity activity activityEffects
 
 
-getEffectStats : Activity -> EffectStats
-getEffectStats activity =
+getActivityMasteries : Activity -> Mastery
+getActivityMasteries activity =
+    getByActivity activity activityMasteries
+
+
+activityEffects : ActivityRecord (List Effect)
+activityEffects =
+    createRecordByFn getActivityEffectsHelper
+
+
+activityMasteries : ActivityRecord Mastery
+activityMasteries =
+    createRecordByFn getActivityMasteriesHelper
+
+
+getActivityEffectsHelper : Activity -> List Effect
+getActivityEffectsHelper activity =
     let
         stats : ActivityStats
         stats =
@@ -124,208 +138,206 @@ getEffectStats activity =
             [ Effect.gainXp (Xp.int 5) stats.skill
                 |> Effect.withTags tagsForThisActivity
             ]
-
-        mastery : Mastery
-        mastery =
-            case (getActivityStats activity).skill of
-                --         Anatomy ->
-                --             { perLevel = []
-                --             , atLevel =
-                --                 [ { level = 25
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.mxpBuff (Percent.float 0.05)
-                --                                 |> Mod.withLabel "+5% Mastery XP for this topic only"
-                --                                 |> Mod.withTags [ Effect.ActivityTag activity ]
-                --                             )
-                --                   }
-                --                 , { level = 50
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.xpBuff (Percent.float 0.0025)
-                --                                 |> Mod.withLabel "+0.25% Global XP"
-                --                             )
-                --                   }
-                --                 , { level = 75
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.mxpBuff (Percent.float 0.0025)
-                --                                 |> Mod.withLabel "+0.25% Global Mastery XP"
-                --                             )
-                --                   }
-                --                 , { level = 99
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.xpAndMxpBuff (Percent.float 0.0075)
-                --                                 |> Mod.withLabel "Global bonuses increased to 1%"
-                --                             )
-                --                   }
-                --                 ]
-                --             }
-                --         Biochemistry ->
-                --             { perLevel = []
-                --             , atLevel =
-                --                 [ { level = 15
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceBaseBuff 1
-                --                                 |> Mod.withLabel "Base knowledge gain +1"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 , { level = 25
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
-                --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
-                --                             )
-                --                   }
-                --                 , { level = 35
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceBaseBuff 1
-                --                                 |> Mod.withLabel "Base knowledge gain +1"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 , { level = 45
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
-                --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
-                --                             )
-                --                   }
-                --                 , { level = 60
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceBaseBuff 1
-                --                                 |> Mod.withLabel "Base knowledge gain +1"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 , { level = 70
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
-                --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
-                --                             )
-                --                   }
-                --                 , { level = 85
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceBaseBuff 1
-                --                                 |> Mod.withLabel "Base knowledge gain +1"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 , { level = 99
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceBaseBuff 5
-                --                                 |> Mod.withLabel "Base knowledge gain +5"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 ]
-                --             }
-                --         Microbiology ->
-                --             let
-                --                 bonusResource : Resource
-                --                 bonusResource =
-                --                     getMicriobiologyActivityBonus activity
-                --                 bonusResourceTitle : String
-                --                 bonusResourceTitle =
-                --                     (getResourceStats bonusResource).title
-                --             in
-                --             { perLevel =
-                --                 [ { interval = 5
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.gainResourceWithProbability (Percent.float 0.01) (getMicriobiologyActivityBonus activity)
-                --                                 |> Mod.withLabel ("+1% chance to also gain " ++ bonusResourceTitle)
-                --                                 |> Mod.withTags [ Effect.ActivityTag activity, Effect.ActivityCompleteTag ]
-                --                             )
-                --                   }
-                --                 ]
-                --             , atLevel =
-                --                 [ { level = 50
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceDoublingBuff (Percent.float 0.1)
-                --                                 |> Mod.withLabel "+10% chance to gain double knowledge"
-                --                             )
-                --                   }
-                --                 , { level = 99
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.gainResource 1
-                --                                 (getMicriobiologyActivityBonus activity)
-                --                                 |> Mod.withLabel ("Alway receive 1 " ++ bonusResourceTitle ++ " (n.b. doubling applies)")
-                --                                 |> Mod.withTags [ Effect.ActivityTag activity, Effect.ActivityCompleteTag ]
-                --                             )
-                --                   }
-                --                 ]
-                --             }
-                --         Pathology ->
-                --             { perLevel =
-                --                 [ { interval = 1
-                --                   , mod =
-                --                         let
-                --                             ( firstResource, restResources ) =
-                --                                 ( AnatomyK, [ BiochemistryK, PhysiologyK, PharmacologyK, MicrobiologyK, MedicalEthicsK ] )
-                --                             e : Effect
-                --                             e =
-                --                                 Effect.gainWithProbability (Percent.float 0.01) [ Effect.oneOf (Effect.gainResource 1 firstResource) (List.map (Effect.gainResource 1) restResources) ]
-                --                         in
-                --                         GameMod
-                --                             (Mod.addEffects [ e ]
-                --                                 |> Mod.withLabel "+1% chance to gain an additional knowledge other than Pathology"
-                --                                 |> Mod.withTags tagsForActivityCompletion
-                --                             )
-                --                   }
-                --                 ]
-                --             , atLevel =
-                --                 [ { level = 50
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.resourceSpendDecreaseBuff 1
-                --                                 |> Mod.withLabel "-1 Knowledge cost of each type"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 , { level = 99
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.xpBuff (Percent.float 0.0025)
-                --                                 |> Mod.withLabel "+0.25% Global MXP"
-                --                             )
-                --                   }
-                --                 ]
-                --             }
-                --         Labs ->
-                --             { perLevel =
-                --                 [ { interval = 1
-                --                   , mod =
-                --                         GameMod
-                --                             (Mod.successBuff (Percent.float 0.005)
-                --                                 |> Mod.withLabel "+0.5% chance of success"
-                --                                 |> Mod.withTags tagsForThisActivity
-                --                             )
-                --                   }
-                --                 ]
-                --             , atLevel = []
-                --             }
-                _ ->
-                    { perLevel = [], atLevel = [] }
     in
-    { effects =
-        List.concat
-            [ costs
-            , gainMxpEffects
-            , gainXpEffects
-            ]
-    , mastery = mastery
-    }
+    List.concat
+        [ costs
+        , gainMxpEffects
+        , gainXpEffects
+        ]
+
+
+getActivityMasteriesHelper : Activity -> Mastery
+getActivityMasteriesHelper activity =
+    case (getActivityStats activity).skill of
+        --         Anatomy ->
+        --             { perLevel = []
+        --             , atLevel =
+        --                 [ { level = 25
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.mxpBuff (Percent.float 0.05)
+        --                                 |> Mod.withLabel "+5% Mastery XP for this topic only"
+        --                                 |> Mod.withTags [ Effect.ActivityTag activity ]
+        --                             )
+        --                   }
+        --                 , { level = 50
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.xpBuff (Percent.float 0.0025)
+        --                                 |> Mod.withLabel "+0.25% Global XP"
+        --                             )
+        --                   }
+        --                 , { level = 75
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.mxpBuff (Percent.float 0.0025)
+        --                                 |> Mod.withLabel "+0.25% Global Mastery XP"
+        --                             )
+        --                   }
+        --                 , { level = 99
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.xpAndMxpBuff (Percent.float 0.0075)
+        --                                 |> Mod.withLabel "Global bonuses increased to 1%"
+        --                             )
+        --                   }
+        --                 ]
+        --             }
+        --         Biochemistry ->
+        --             { perLevel = []
+        --             , atLevel =
+        --                 [ { level = 15
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceBaseBuff 1
+        --                                 |> Mod.withLabel "Base knowledge gain +1"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 , { level = 25
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
+        --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
+        --                             )
+        --                   }
+        --                 , { level = 35
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceBaseBuff 1
+        --                                 |> Mod.withLabel "Base knowledge gain +1"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 , { level = 45
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
+        --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
+        --                             )
+        --                   }
+        --                 , { level = 60
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceBaseBuff 1
+        --                                 |> Mod.withLabel "Base knowledge gain +1"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 , { level = 70
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceDoublingBuff (Percent.float 0.05)
+        --                                 |> Mod.withLabel "+5% chance to gain double knowledge"
+        --                             )
+        --                   }
+        --                 , { level = 85
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceBaseBuff 1
+        --                                 |> Mod.withLabel "Base knowledge gain +1"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 , { level = 99
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceBaseBuff 5
+        --                                 |> Mod.withLabel "Base knowledge gain +5"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 ]
+        --             }
+        --         Microbiology ->
+        --             let
+        --                 bonusResource : Resource
+        --                 bonusResource =
+        --                     getMicriobiologyActivityBonus activity
+        --                 bonusResourceTitle : String
+        --                 bonusResourceTitle =
+        --                     (getResourceStats bonusResource).title
+        --             in
+        --             { perLevel =
+        --                 [ { interval = 5
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.gainResourceWithProbability (Percent.float 0.01) (getMicriobiologyActivityBonus activity)
+        --                                 |> Mod.withLabel ("+1% chance to also gain " ++ bonusResourceTitle)
+        --                                 |> Mod.withTags [ Effect.ActivityTag activity, Effect.ActivityCompleteTag ]
+        --                             )
+        --                   }
+        --                 ]
+        --             , atLevel =
+        --                 [ { level = 50
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceDoublingBuff (Percent.float 0.1)
+        --                                 |> Mod.withLabel "+10% chance to gain double knowledge"
+        --                             )
+        --                   }
+        --                 , { level = 99
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.gainResource 1
+        --                                 (getMicriobiologyActivityBonus activity)
+        --                                 |> Mod.withLabel ("Alway receive 1 " ++ bonusResourceTitle ++ " (n.b. doubling applies)")
+        --                                 |> Mod.withTags [ Effect.ActivityTag activity, Effect.ActivityCompleteTag ]
+        --                             )
+        --                   }
+        --                 ]
+        --             }
+        --         Pathology ->
+        --             { perLevel =
+        --                 [ { interval = 1
+        --                   , mod =
+        --                         let
+        --                             ( firstResource, restResources ) =
+        --                                 ( AnatomyK, [ BiochemistryK, PhysiologyK, PharmacologyK, MicrobiologyK, MedicalEthicsK ] )
+        --                             e : Effect
+        --                             e =
+        --                                 Effect.gainWithProbability (Percent.float 0.01) [ Effect.oneOf (Effect.gainResource 1 firstResource) (List.map (Effect.gainResource 1) restResources) ]
+        --                         in
+        --                         GameMod
+        --                             (Mod.addEffects [ e ]
+        --                                 |> Mod.withLabel "+1% chance to gain an additional knowledge other than Pathology"
+        --                                 |> Mod.withTags tagsForActivityCompletion
+        --                             )
+        --                   }
+        --                 ]
+        --             , atLevel =
+        --                 [ { level = 50
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.resourceSpendDecreaseBuff 1
+        --                                 |> Mod.withLabel "-1 Knowledge cost of each type"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 , { level = 99
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.xpBuff (Percent.float 0.0025)
+        --                                 |> Mod.withLabel "+0.25% Global MXP"
+        --                             )
+        --                   }
+        --                 ]
+        --             }
+        --         Labs ->
+        --             { perLevel =
+        --                 [ { interval = 1
+        --                   , mod =
+        --                         GameMod
+        --                             (Mod.successBuff (Percent.float 0.005)
+        --                                 |> Mod.withLabel "+0.5% chance of success"
+        --                                 |> Mod.withTags tagsForThisActivity
+        --                             )
+        --                   }
+        --                 ]
+        --             , atLevel = []
+        --             }
+        _ ->
+            { perLevel = [], atLevel = [] }
 
 
 updateByKindActivity : Activity -> (a -> a) -> ActivityRecord a -> ActivityRecord a
