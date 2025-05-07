@@ -90,6 +90,8 @@ type Resource
     | Fennel
     | Belladonna
     | Henbane
+    | Parchment
+    | SpellSenseThePath
 
 
 allResources : List Resource
@@ -103,6 +105,8 @@ allResources =
     , Fennel
     , Belladonna
     , Henbane
+    , Parchment
+    , SpellSenseThePath
     ]
 
 
@@ -116,6 +120,8 @@ type alias ResourceRecord a =
     , fennel : a
     , belladonna : a
     , henbane : a
+    , parchment : a
+    , spellSenseThePath : a
     }
 
 
@@ -130,6 +136,8 @@ resourceRecord a =
     , fennel = a
     , belladonna = a
     , henbane = a
+    , parchment = a
+    , spellSenseThePath = a
     }
 
 
@@ -163,6 +171,12 @@ getByResource kind data =
         Henbane ->
             data.henbane
 
+        Parchment ->
+            data.parchment
+
+        SpellSenseThePath ->
+            data.spellSenseThePath
+
 
 setByResource : Resource -> a -> ResourceRecord a -> ResourceRecord a
 setByResource kind value data =
@@ -194,6 +208,12 @@ setByResource kind value data =
         Henbane ->
             { data | henbane = value }
 
+        Parchment ->
+            { data | parchment = value }
+
+        SpellSenseThePath ->
+            { data | spellSenseThePath = value }
+
 
 mapResources : (a -> a) -> ResourceRecord a -> ResourceRecord a
 mapResources fn record =
@@ -206,6 +226,8 @@ mapResources fn record =
     , fennel = fn record.fennel
     , belladonna = fn record.belladonna
     , henbane = fn record.henbane
+    , parchment = fn record.parchment
+    , spellSenseThePath = fn record.spellSenseThePath
     }
 
 
@@ -227,6 +249,8 @@ resourceStats =
     , fennel = { title = "Fennel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
+    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
+    , spellSenseThePath = { title = "Spell: Sense the Path", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
     }
 
 
@@ -387,7 +411,7 @@ activityStats =
         , title = "Gather Sage"
         , image = "/activities/herbGathering/gatherSage.webp"
         , level = 1
-        , duration = Duration.seconds 1
+        , duration = Duration.seconds 4
         , type_ = "Gather"
         , coin = Nothing
         , resourceGains = [ ( 1, Sage ) ]
