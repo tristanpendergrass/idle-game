@@ -321,7 +321,7 @@ mxpSection mxp =
     in
     div [ IdleGame.Views.Utils.classes.column ]
         [ div [ IdleGame.Views.Utils.classes.column, class "flex items-center justify-between" ]
-            [ div [ class "text-2xs font-bold" ] [ text "Mastery level" ]
+            [ div [ class "text-xs font-bold" ] [ text "Mastery level" ]
             ]
         , IdleGame.Views.Utils.progressBar
             { progressText = IdleGame.Views.Utils.intToString skillLevel

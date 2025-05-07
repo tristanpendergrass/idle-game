@@ -48,7 +48,7 @@ probabilityToInt x =
 
 activityDuration : Duration -> Html msg
 activityDuration duration =
-    div [ class "text-2xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
+    div [ class "text-xs" ] [ text <| IdleGame.Views.Utils.floatToString 1 (Duration.inSeconds duration) ++ " seconds" ]
 
 
 getTimerForActivity : Activity -> Game -> Maybe Timer

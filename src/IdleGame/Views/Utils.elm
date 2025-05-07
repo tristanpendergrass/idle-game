@@ -179,8 +179,8 @@ getDurationStringParts millis =
                     []
 
 
-classTopNav : { skill : Skill, xp : Xp } -> Html FrontendMsg
-classTopNav { skill, xp } =
+skillTopNav : { skill : Skill, xp : Xp } -> Html FrontendMsg
+skillTopNav { skill, xp } =
     let
         skillLevel : Int
         skillLevel =
@@ -193,12 +193,13 @@ classTopNav { skill, xp } =
     div [ class "w-full bg-base-200 rounded-lg p-4 border-t-4 border-orange-900" ]
         [ div [ classes.column ]
             [ div [ class "w-full flex items-center justify-between" ]
-                [ div [ class "text-2xs font-bold" ] [ text "Skill level" ]
-                , div [ class "text-2xs" ]
+                [ div [ class "text-xs font-bold" ] [ text "Skill level" ]
+                , div [ class "text-xs" ]
                     [ xp
                         |> Xp.toInt
                         |> intToString
                         |> text
+                    , span [ class "text-xs" ] [ text " Skill XP" ]
                     ]
                 ]
             , progressBar { progressText = intToString skillLevel, percent = skillPercent, primaryOrSecondary = Primary, size = ProgressBarLarge }
