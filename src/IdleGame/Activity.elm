@@ -160,30 +160,33 @@ getActivityMasteriesHelper activity =
                 [ { level = 25
                   , mod =
                         EffectMod
-                            (Mod.mxpBuff (Percent.float 0.05)
-                                |> Mod.withLabel "+5% Mastery XP for this topic only"
+                            (Mod.resourceDoublingBuff (Percent.float 0.1)
+                                |> Mod.withLabel "+10% resource doubling for this herb"
                                 |> Mod.withTags [ Effect.ActivityTag activity ]
                             )
                   }
                 , { level = 50
                   , mod =
                         EffectMod
-                            (Mod.xpBuff (Percent.float 0.0025)
-                                |> Mod.withLabel "+0.25% Global XP"
+                            (Mod.resourceDoublingBuff (Percent.float 0.1)
+                                |> Mod.withLabel "+10% resource doubling for this herb"
+                                |> Mod.withTags [ Effect.ActivityTag activity ]
                             )
                   }
                 , { level = 75
                   , mod =
                         EffectMod
-                            (Mod.mxpBuff (Percent.float 0.0025)
-                                |> Mod.withLabel "+0.25% Global Mastery XP"
+                            (Mod.resourceDoublingBuff (Percent.float 0.1)
+                                |> Mod.withLabel "+10% resource doubling for this herb"
+                                |> Mod.withTags [ Effect.ActivityTag activity ]
                             )
                   }
                 , { level = 99
                   , mod =
                         EffectMod
-                            (Mod.xpAndMxpBuff (Percent.float 0.0075)
-                                |> Mod.withLabel "Global bonuses increased to 1%"
+                            (Mod.resourceBaseBuff 1
+                                |> Mod.withLabel "+1 herb gathered"
+                                |> Mod.withTags [ Effect.ActivityTag activity ]
                             )
                   }
                 ]
