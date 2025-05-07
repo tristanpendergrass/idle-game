@@ -187,7 +187,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
 
 
 renderLockedActivity : Skill -> Int -> Html FrontendMsg
-renderLockedActivity unlockSubject unlockLevel =
+renderLockedActivity unlockSkill unlockLevel =
     div
         [ IdleGame.Views.Utils.classes.card.container
         , class "text-error"
@@ -206,7 +206,7 @@ renderLockedActivity unlockSubject unlockLevel =
                     |> FeatherIcons.toHtml []
                 , div [ class "text-lg font-semibold" ]
                     [ text <|
-                        (getSkillStats unlockSubject).title
+                        (getSkillStats unlockSkill).title
                             ++ " level "
                             ++ IdleGame.Views.Utils.intToString unlockLevel
                     ]

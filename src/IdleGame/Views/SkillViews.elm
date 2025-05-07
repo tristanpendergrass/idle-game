@@ -1,4 +1,4 @@
-module IdleGame.Views.SubjectViews exposing (..)
+module IdleGame.Views.SkillViews exposing (..)
 
 import Duration exposing (Duration)
 import FeatherIcons
@@ -24,8 +24,8 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-renderSubject : Skill -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
-renderSubject skill game cachedActivityEffects =
+renderSkill : Skill -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
+renderSkill skill game cachedActivityEffects =
     div [ IdleGame.Views.Utils.classes.column, class "gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ IdleGame.Views.Utils.classTopNav { xp = getBySkill skill game.xp, skill = skill }
         , div [ class "w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-2 2xl:gap-4" ]

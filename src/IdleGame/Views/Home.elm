@@ -19,8 +19,8 @@ import Types exposing (..)
 render : InGameFrontend -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
 render model game cachedActivityEffects =
     let
-        subjectHeader : Skill -> Html FrontendMsg
-        subjectHeader skill =
+        skillHeader : Skill -> Html FrontendMsg
+        skillHeader skill =
             let
                 stats : SkillStats
                 stats =

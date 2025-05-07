@@ -15,7 +15,7 @@ import IdleGame.Views.Bag
 import IdleGame.Views.Home
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
-import IdleGame.Views.SubjectViews
+import IdleGame.Views.SkillViews
 import IdleGame.Views.UnderConstruction
 import IdleGame.Views.Utils
 import Types exposing (..)
@@ -63,6 +63,6 @@ renderContent model game cachedActivityEffects activeTab =
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
 
-            Tab.SkillTab subject ->
-                IdleGame.Views.SubjectViews.renderSubject subject game cachedActivityEffects
+            Tab.SkillTab skill ->
+                IdleGame.Views.SkillViews.renderSkill skill game cachedActivityEffects
         ]
