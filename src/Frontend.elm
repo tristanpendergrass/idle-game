@@ -1043,21 +1043,8 @@ updateInGame msg inGameFrontend =
 
         HandleShopResourceClick resource ->
             let
-                resourceStats =
-                    getResourceStats resource
-
                 price =
-                    case resourceStats.buyPrice of
-                        Just buyPrice ->
-                            buyPrice
-
-                        Nothing ->
-                            case resourceStats.sellPrice of
-                                Just sellPrice ->
-                                    sellPrice
-
-                                Nothing ->
-                                    Coin.zero
+                    (getResourceStats resource).price
             in
             ( InGame
                 { inGameFrontend

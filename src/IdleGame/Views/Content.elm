@@ -58,7 +58,7 @@ renderContent model game cachedActivityEffects activeTab =
                 IdleGame.Views.Home.render model game cachedActivityEffects
 
             Tab.Shop ->
-                IdleGame.Views.Shop.render game
+                IdleGame.Views.UnderConstruction.render
 
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
