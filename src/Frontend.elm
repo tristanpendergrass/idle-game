@@ -1042,16 +1042,17 @@ updateInGame msg inGameFrontend =
             )
 
         HandleShopResourceClick resource ->
-            let
-                price =
-                    (getResourceStats resource).price
-            in
-            ( InGame
-                { inGameFrontend
-                    | activeModal = Just (ShopResourceModal 1 resource price)
-                }
-            , Cmd.none
-            )
+            case (getResourceStats resource).buyPrice of
+                Just price ->
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceModal 1 resource price)
+                        }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    noOp
 
         HandleShopResourceBuyClick ->
             case inGameFrontend.activeModal of

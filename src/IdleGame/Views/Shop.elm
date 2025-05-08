@@ -94,9 +94,9 @@ render game =
         purchasableResources : List ( Resource, Coin )
         purchasableResources =
             allResources
-                |> List.map
+                |> List.filterMap
                     (\kind ->
-                        ( kind, (getResourceStats kind).price )
+                        Maybe.map (\price -> ( kind, price )) (getResourceStats kind).buyPrice
                     )
     in
     div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
@@ -116,7 +116,7 @@ render game =
                 ]
             ]
         , div [ class "divider" ] []
-        , div [ class "text-xl font-bold" ] [ text "Reagents" ]
+        , div [ class "text-xl font-bold" ] [ text "Buy Items" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map renderResource purchasableResources)
         , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []

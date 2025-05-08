@@ -234,23 +234,24 @@ mapResources fn record =
 type alias ResourceStats =
     { title : String
     , icon : IdleGame.Views.Icon.Icon
-    , price : IdleGame.Coin.Coin
+    , buyPrice : Maybe IdleGame.Coin.Coin
+    , sellPrice : Maybe IdleGame.Coin.Coin
     }
 
 
 resourceStats : ResourceRecord ResourceStats
 resourceStats =
-    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , mugwort = { title = "Mugwort", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , yarrow = { title = "Yarrow", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , thyme = { title = "Thyme", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , fennel = { title = "Fennel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
-    , spellSenseThePath = { title = "Spell: Sense the Path", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, price = IdleGame.Coin.zero }
+    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , mugwort = { title = "Mugwort", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , yarrow = { title = "Yarrow", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , thyme = { title = "Thyme", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , fennel = { title = "Fennel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
+    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1) }
+    , spellSenseThePath = { title = "Spell: Sense the Path", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
     }
 
 
