@@ -94,10 +94,70 @@ render game =
         purchasableResources : List ( Resource, Coin )
         purchasableResources =
             allResources
-                |> List.map
+                |> List.filterMap
                     (\kind ->
-                        ( kind, (getResourceStats kind).price )
+                        let
+                            stats =
+                                getResourceStats kind
+                        in
+                        case stats.buyPrice of
+                            Just price ->
+                                Just ( kind, price )
+
+                            Nothing ->
+                                Nothing
                     )
+
+        sellableResources : List ( Resource, Coin, Int )
+        sellableResources =
+            allResources
+                |> List.filterMap
+                    (\kind ->
+                        let
+                            stats =
+                                getResourceStats kind
+
+                            owned =
+                                getByResource kind game.resources
+                        in
+                        if owned > 0 then
+                            case stats.sellPrice of
+                                Just price ->
+                                    Just ( kind, price, owned )
+
+                                Nothing ->
+                                    Nothing
+
+                        else
+                            Nothing
+                    )
+
+        renderSellableResource : ( Resource, Coin, Int ) -> Html FrontendMsg
+        renderSellableResource ( resource, price, owned ) =
+            let
+                resourceStats : ResourceStats
+                resourceStats =
+                    getResourceStats resource
+            in
+            div
+                [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
+                , onClick <| HandleShopResourceClick resource -- Reusing the same handler for now
+                ]
+                [ resourceStats.icon
+                    |> Icon.withSize Icon.ExtraLarge
+                    |> Icon.toHtml
+                , div [ class "flex-1", IdleGame.Views.Utils.classes.column ]
+                    [ span [ class "font-bold" ] [ text resourceStats.title ]
+                    , span [ class "text-sm" ] [ text ("Owned: " ++ IdleGame.Views.Utils.intToString owned) ]
+                    ]
+                , div [ class "flex flex-col items-end" ]
+                    [ span [ class "text-sm text-success" ] [ text "Sell for:" ]
+                    , IdleGame.Views.Utils.priceLabel
+                        { price = price
+                        , isError = False
+                        }
+                    ]
+                ]
     in
     div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ div [ class "w-full flex justify-center items-center" ]
@@ -116,10 +176,14 @@ render game =
                 ]
             ]
         , div [ class "divider" ] []
-        , div [ class "text-xl font-bold" ] [ text "Reagents" ]
+        , div [ class "text-xl font-bold" ] [ text "Buy Items" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map renderResource purchasableResources)
         , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []
+        , div [ class "text-xl font-bold" ] [ text "Sell Items" ]
+        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
+            (List.map renderSellableResource sellableResources)
+        , div [ class "divider", classList [ ( "hidden", List.isEmpty sellableResources ) ] ] []
         , div [ class "text-xl font-bold" ] [ text "Upgrades" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
             (List.map

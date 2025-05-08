@@ -293,13 +293,24 @@ tick delta game =
 getPurchaseEffects : Int -> Resource -> List Effect
 getPurchaseEffects amount resource =
     let
-        price =
-            (getResourceStats resource).price
+        resourceStats =
+            getResourceStats resource
 
         cost : Coin.Coin
         cost =
-            Quantity.multiplyBy (toFloat amount) price
-                |> Quantity.multiplyBy -1
+            case resourceStats.buyPrice of
+                Just buyPrice ->
+                    Quantity.multiplyBy (toFloat amount) buyPrice
+                        |> Quantity.multiplyBy -1
+
+                Nothing ->
+                    -- If trying to buy a resource with no buyPrice, assume it's a sell operation
+                    case resourceStats.sellPrice of
+                        Just sellPrice ->
+                            Quantity.multiplyBy (toFloat amount) sellPrice
+
+                        Nothing ->
+                            Coin.zero
     in
     [ Effect.gainCoin cost, Effect.gainResource amount resource ]
 
