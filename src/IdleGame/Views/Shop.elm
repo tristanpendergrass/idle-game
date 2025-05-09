@@ -15,6 +15,11 @@ import IdleGame.Xp as Xp exposing (Xp)
 import Types exposing (..)
 
 
+type ItemListingType
+    = ForPurchase
+    | ForSell
+
+
 render : Game -> Html FrontendMsg
 render game =
     let
@@ -68,16 +73,25 @@ render game =
                     ]
                 ]
 
-        renderResource : ( Resource, Coin ) -> Html FrontendMsg
-        renderResource ( resource, price ) =
+        renderResource : ItemListingType -> ( Resource, Coin ) -> Html FrontendMsg
+        renderResource itemListingType ( resource, price ) =
             let
                 resourceStats : ResourceStats
                 resourceStats =
                     getResourceStats resource
+
+                onClickMsg : FrontendMsg
+                onClickMsg =
+                    case itemListingType of
+                        ForPurchase ->
+                            HandleShopResourceOpenBuyClick resource
+
+                        ForSell ->
+                            HandleShopResourceOpenSellClick resource
             in
             div
                 [ class "flex gap-4 items-center bg-base-200 shadow-lg rounded-lg p-4 cursor-pointer bubble-pop"
-                , onClick <| HandleShopResourceClick resource
+                , onClick onClickMsg
                 ]
                 [ resourceStats.icon
                     |> Icon.withSize Icon.ExtraLarge
@@ -97,6 +111,18 @@ render game =
                 |> List.filterMap
                     (\kind ->
                         Maybe.map (\price -> ( kind, price )) (getResourceStats kind).buyPrice
+                    )
+
+        sellableResources : List ( Resource, Coin )
+        sellableResources =
+            allResources
+                |> List.filterMap
+                    (\kind ->
+                        if getByResource kind game.resources > 0 then
+                            Maybe.map (\price -> ( kind, price )) (getResourceStats kind).sellPrice
+
+                        else
+                            Nothing
                     )
     in
     div [ IdleGame.Views.Utils.classes.column, class "p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
@@ -118,7 +144,11 @@ render game =
         , div [ class "divider" ] []
         , div [ class "text-xl font-bold" ] [ text "Buy Items" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
-            (List.map renderResource purchasableResources)
+            (List.map (renderResource ForPurchase) purchasableResources)
+        , div [ class "divider", classList [ ( "hidden", List.isEmpty sellableResources ) ] ] []
+        , div [ class "text-xl font-bold" ] [ text "Sell Items" ]
+        , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]
+            (List.map (renderResource ForSell) sellableResources)
         , div [ class "divider", classList [ ( "hidden", List.isEmpty purchasableResources ) ] ] []
         , div [ class "text-xl font-bold" ] [ text "Upgrades" ]
         , div [ class "w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4" ]

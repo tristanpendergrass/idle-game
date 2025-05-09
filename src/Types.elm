@@ -70,7 +70,8 @@ type alias Game =
 
 type Modal
     = TimePassesModal Duration Posix TimePassesData
-    | ShopResourceModal Int Resource Coin
+    | ShopResourceBuyModal Int Resource Coin -- N.B. The coin is included here to be used as the buyPrice of the resource because resources aren't guaranteed to have a buyPrice
+    | ShopResourceSellModal Int Resource Coin -- N.B. The coin is included here to be used as the sellPrice of the resource because resources aren't guaranteed to have a sellPrice
     | SyllabusModal Skill
 
 
@@ -294,14 +295,17 @@ type FrontendMsg
     | CloseDebugPanel
     | AddTime Duration
     | AddTimeHelp Duration Posix
+    | AddCoins Int
       -- Shop Resource Purchase modal
-    | HandleShopResourceClick Resource -- Opens the modal
+    | HandleShopResourceOpenBuyClick Resource
+    | HandleShopResourceOpenSellClick Resource
     | HandleOneLessButtonClick
     | HandleOneMoreButtonClick
     | HandleMinButtonClick
     | HandleMaxButtonClick
     | HandleShopResourceQuantityChange String
-    | HandleShopResourceBuyClick
+    | HandleShopResourceBuySubmit
+    | HandleShopResourceSellSubmit
       -- Other
     | AddToast Toast Posix
     | HandleFastForward Posix

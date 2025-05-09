@@ -45,5 +45,6 @@ render model =
         , button [ onClick (AddTime (Duration.days 3)), class "btn" ] [ text "Add 3 days" ]
         , button [ onClick (AddTime (Duration.days 30)), class "btn" ] [ text "Add 30 days" ]
         , button [ onClick (AddTime (Duration.days 365)), class "btn" ] [ text "Add 1 year" ]
+        , button [ onClick (AddCoins 100), class "btn btn-accent" ] [ text "Add 100 coins" ]
         , div [ class "absolute top-0 right-0" ] [ closeButton ]
         ]

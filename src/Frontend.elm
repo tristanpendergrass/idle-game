@@ -1041,12 +1041,12 @@ updateInGame msg inGameFrontend =
             , Cmd.none
             )
 
-        HandleShopResourceClick resource ->
+        HandleShopResourceOpenBuyClick resource ->
             case (getResourceStats resource).buyPrice of
                 Just price ->
                     ( InGame
                         { inGameFrontend
-                            | activeModal = Just (ShopResourceModal 1 resource price)
+                            | activeModal = Just (ShopResourceBuyModal 1 resource price)
                         }
                     , Cmd.none
                     )
@@ -1054,9 +1054,20 @@ updateInGame msg inGameFrontend =
                 Nothing ->
                     noOp
 
-        HandleShopResourceBuyClick ->
+        HandleShopResourceOpenSellClick resource ->
+            case (getResourceStats resource).sellPrice of
+                Just price ->
+                    ( InGame
+                        { inGameFrontend | activeModal = Just (ShopResourceSellModal 1 resource price) }
+                    , Cmd.none
+                    )
+
+                Nothing ->
+                    noOp
+
+        HandleShopResourceBuySubmit ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal quantity resource _) ->
+                Just (ShopResourceBuyModal quantity resource _) ->
                     case inGameFrontend.gameState of
                         Playing _ ->
                             let
@@ -1111,7 +1122,7 @@ updateInGame msg inGameFrontend =
 
         HandleShopResourceQuantityChange string ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal _ resource price) ->
+                Just (ShopResourceBuyModal _ resource price) ->
                     let
                         maybeQuantity : Maybe Int
                         maybeQuantity =
@@ -1121,7 +1132,7 @@ updateInGame msg inGameFrontend =
                         Just quantity ->
                             ( InGame
                                 { inGameFrontend
-                                    | activeModal = Just (ShopResourceModal quantity resource price)
+                                    | activeModal = Just (ShopResourceBuyModal quantity resource price)
                                 }
                             , Cmd.none
                             )
@@ -1177,10 +1188,18 @@ updateInGame msg inGameFrontend =
 
         HandleOneLessButtonClick ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal quantity resource price) ->
+                Just (ShopResourceBuyModal quantity resource price) ->
                     ( InGame
                         { inGameFrontend
-                            | activeModal = Just (ShopResourceModal (Basics.max 1 (quantity - 1)) resource price)
+                            | activeModal = Just (ShopResourceBuyModal (Basics.max 1 (quantity - 1)) resource price)
+                        }
+                    , Cmd.none
+                    )
+
+                Just (ShopResourceSellModal quantity resource price) ->
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceSellModal (Basics.max 1 (quantity - 1)) resource price)
                         }
                     , Cmd.none
                     )
@@ -1190,10 +1209,18 @@ updateInGame msg inGameFrontend =
 
         HandleOneMoreButtonClick ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal quantity resource price) ->
+                Just (ShopResourceBuyModal quantity resource price) ->
                     ( InGame
                         { inGameFrontend
-                            | activeModal = Just (ShopResourceModal (quantity + 1) resource price)
+                            | activeModal = Just (ShopResourceBuyModal (quantity + 1) resource price)
+                        }
+                    , Cmd.none
+                    )
+
+                Just (ShopResourceSellModal quantity resource price) ->
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceSellModal (quantity + 1) resource price)
                         }
                     , Cmd.none
                     )
@@ -1203,10 +1230,18 @@ updateInGame msg inGameFrontend =
 
         HandleMinButtonClick ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal _ resource price) ->
+                Just (ShopResourceBuyModal _ resource price) ->
                     ( InGame
                         { inGameFrontend
-                            | activeModal = Just (ShopResourceModal 1 resource price)
+                            | activeModal = Just (ShopResourceBuyModal 1 resource price)
+                        }
+                    , Cmd.none
+                    )
+
+                Just (ShopResourceSellModal quantity resource price) ->
+                    ( InGame
+                        { inGameFrontend
+                            | activeModal = Just (ShopResourceSellModal 1 resource price)
                         }
                     , Cmd.none
                     )
@@ -1216,7 +1251,7 @@ updateInGame msg inGameFrontend =
 
         HandleMaxButtonClick ->
             case inGameFrontend.activeModal of
-                Just (ShopResourceModal _ resource price) ->
+                Just (ShopResourceBuyModal _ resource price) ->
                     case inGameFrontend.gameState of
                         Playing _ ->
                             let
@@ -1231,10 +1266,38 @@ updateInGame msg inGameFrontend =
                                 maxPurchase : Int
                                 maxPurchase =
                                     Game.getMaxPurchase price game
+                                        |> Basics.max 1
                             in
                             ( InGame
                                 { inGameFrontend
-                                    | activeModal = Just (ShopResourceModal maxPurchase resource price)
+                                    | activeModal = Just (ShopResourceBuyModal maxPurchase resource price)
+                                }
+                            , Cmd.none
+                            )
+
+                        _ ->
+                            noOp
+
+                Just (ShopResourceSellModal quantity resource price) ->
+                    case inGameFrontend.gameState of
+                        Playing _ ->
+                            let
+                                oldSnapshot : Snapshot Game
+                                oldSnapshot =
+                                    getGame inGameFrontend
+
+                                game : Game
+                                game =
+                                    Snapshot.getValue oldSnapshot
+
+                                maxPurchase : Int
+                                maxPurchase =
+                                    getByResource resource game.resources
+                                        |> Basics.max 1
+                            in
+                            ( InGame
+                                { inGameFrontend
+                                    | activeModal = Just (ShopResourceSellModal maxPurchase resource price)
                                 }
                             , Cmd.none
                             )
@@ -1270,6 +1333,49 @@ updateInGame msg inGameFrontend =
                 )
             , Cmd.none
             )
+
+        AddCoins amount ->
+            case inGameFrontend.gameState of
+                Playing _ ->
+                    let
+                        oldSnapshot : Snapshot Game
+                        oldSnapshot =
+                            getGame inGameFrontend
+
+                        oldGame : Game
+                        oldGame =
+                            Snapshot.getValue oldSnapshot
+
+                        newCoin : Coin
+                        newCoin =
+                            Quantity.plus oldGame.coin (Coin.int amount)
+
+                        newGame : Game
+                        newGame =
+                            { oldGame | coin = newCoin }
+
+                        newSnapshot : Snapshot Game
+                        newSnapshot =
+                            Snapshot.map (\_ -> newGame) oldSnapshot
+
+                        newCache : Cache
+                        newCache =
+                            getCache newGame
+
+                        toast : Toast
+                        toast =
+                            GainedCoin (Coin.int amount)
+                    in
+                    ( InGame
+                        (inGameFrontend
+                            |> setGameState (Playing newCache)
+                            |> setGame newSnapshot
+                        )
+                    , Task.perform (AddToast toast) Time.now
+                    )
+
+                _ ->
+                    noOp
 
         _ ->
             noOp
@@ -1490,10 +1596,19 @@ renderModal activeModal game =
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
                 |> IdleGame.Views.ModalWrapper.render
 
-        Just (ShopResourceModal amount resource price) ->
+        Just (ShopResourceBuyModal amount resource price) ->
             let
                 children =
-                    IdleGame.Views.ShopResourceModal.render game amount ( resource, price )
+                    IdleGame.Views.ShopResourceModal.renderBuyModal game amount ( resource, price )
+            in
+            IdleGame.Views.ModalWrapper.create children
+                |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"
+                |> IdleGame.Views.ModalWrapper.render
+
+        Just (ShopResourceSellModal amount resource price) ->
+            let
+                children =
+                    IdleGame.Views.ShopResourceModal.renderSellModal game amount ( resource, price )
             in
             IdleGame.Views.ModalWrapper.create children
                 |> IdleGame.Views.ModalWrapper.withBorderColor "border-primary"

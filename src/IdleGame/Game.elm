@@ -306,6 +306,16 @@ getPurchaseEffects amount resource =
             []
 
 
+getSellEffects : Int -> Resource -> List Effect
+getSellEffects amount resource =
+    case (getResourceStats resource).sellPrice of
+        Just price ->
+            [ Effect.gainCoin price, Effect.spendResource amount resource ]
+
+        Nothing ->
+            []
+
+
 attemptPurchaseResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
 attemptPurchaseResource amount resource game =
     let
@@ -333,15 +343,36 @@ attemptPurchaseResource amount resource game =
         result
 
 
+attemptSellResource : Int -> Resource -> Game -> Result EffectErr ApplyEffectsValue
+attemptSellResource amount resource game =
+    let
+        effects : List Effect
+        effects =
+            getSellEffects amount resource
+
+        mods : List EffectMod
+        mods =
+            getAllMods game
+
+        gen : ApplyEffectsResultGenerator
+        gen =
+            applyEffects mods (List.map (\effect -> { effect = effect, count = 1 }) effects) game
+
+        ( result, newSeed ) =
+            Random.step gen game.seed
+    in
+    Result.map
+        (\applyEffectsResult ->
+            { applyEffectsResult
+                | game = setSeed newSeed applyEffectsResult.game
+            }
+        )
+        result
+
+
 setSeed : Random.Seed -> Game -> Game
 setSeed seed game =
     { game | seed = seed }
-
-
-priceToPurchaseResource : Int -> ( Resource, Coin ) -> Game -> Coin
-priceToPurchaseResource amount ( resource, price ) game =
-    -- TODO: incorporate mods that might alter price
-    Quantity.multiplyBy (toFloat amount) price
 
 
 applyEvent : List EffectMod -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
