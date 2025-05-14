@@ -12,6 +12,7 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
 import IdleGame.Views.Bag
+import IdleGame.Views.Combat
 import IdleGame.Views.Home
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
@@ -62,6 +63,9 @@ renderContent model game cachedActivityEffects activeTab =
 
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
+
+            Tab.Combat ->
+                IdleGame.Views.Combat.render game
 
             Tab.SkillTab skill ->
                 IdleGame.Views.SkillViews.renderSkill skill game cachedActivityEffects

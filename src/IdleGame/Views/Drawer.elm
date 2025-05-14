@@ -81,6 +81,7 @@ renderDrawer isDrawerOpen activeTab =
                 [ li [ onClick (HandleTabClick Tab.Home) ] [ renderTab { tab = Tab.Home } ]
                 , li [ onClick (HandleTabClick Tab.Backpack) ] [ renderTab { tab = Tab.Backpack } ]
                 , li [ onClick (HandleTabClick Tab.Shop) ] [ renderTab { tab = Tab.Shop } ]
+                , li [ onClick (HandleTabClick Tab.Combat) ] [ renderTab { tab = Tab.Combat } ]
                 , li [ onClick HandleGoToMainMenuClick ] [ renderDrawerRow { isActive = False, icon = Icon.menu, title = "Main Menu", underConstruction = False } ]
                 ]
             , ul [ class "menu flex flex-col p-0 px-4" ]
