@@ -7,6 +7,7 @@ import Browser exposing (UrlRequest)
 import Browser.Dom
 import Browser.Events
 import Browser.Navigation exposing (Key)
+import CombatTypes exposing (..)
 import Duration exposing (Duration)
 import EmailAddress exposing (EmailAddress)
 import Http
@@ -166,6 +167,7 @@ type alias InGameFrontend =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
+    , combat : CombatTypes.Model
     }
 
 
@@ -321,6 +323,8 @@ type FrontendMsg
     | HandlePointerUp
     | HandlePointerCancel
     | HandleGetViewportResult Browser.Dom.Viewport
+      -- Combat
+    | CombatMsg CombatTypes.Msg
 
 
 type ToBackend

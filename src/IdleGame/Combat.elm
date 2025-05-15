@@ -1,53 +1,42 @@
 module IdleGame.Combat exposing (..)
 
+import CombatTypes exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import List
 import List.Extra
 import Random
+import Types exposing (..)
 
 
-type Player
-    = LeftPlayer
-    | RightPlayer
+init : Model
+init =
+    { state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0 } }
 
 
-type alias Move =
-    CombatParams -> CombatState -> Random.Generator (List ( Mutation, Player ))
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        StartNewCombat ->
+            { model | state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0 } }
+
+        NextStep ->
+            let
+                state : CombatState
+                state =
+                    model.state
+            in
+            { model | state = { state | moveIndex = state.moveIndex + 1 } }
+
+
+view : Model -> Html FrontendMsg
+view model =
+    div [] [ text "Combat" ]
 
 
 emptyMove : Move
 emptyMove _ _ =
     Random.constant []
-
-
-type Mutation
-    = Damage Int
-    | Block Int
-
-
-type alias CombatParams =
-    { leftMaxHealth : Int
-    , rightMaxHealth : Int
-    }
-
-
-type alias PlayerState =
-    { health : Int
-    , block : Int
-    }
-
-
-type alias CombatState =
-    { leftState : PlayerState
-    , rightState : PlayerState
-    , moveIndex : Int
-    }
-
-
-type CombatResult
-    = Continue
-    | LeftWins
-    | RightWins
-    | Draw
 
 
 result : CombatParams -> CombatState -> CombatResult

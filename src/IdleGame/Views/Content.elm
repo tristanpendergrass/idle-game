@@ -5,6 +5,7 @@ module IdleGame.Views.Content exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import IdleGame.Combat
 import IdleGame.Effect exposing (Effect)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
@@ -12,7 +13,6 @@ import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer
 import IdleGame.Views.Activity
 import IdleGame.Views.Bag
-import IdleGame.Views.Combat
 import IdleGame.Views.Home
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Views.Shop
@@ -65,7 +65,7 @@ renderContent model game cachedActivityEffects activeTab =
                 IdleGame.Views.Bag.render game
 
             Tab.Combat ->
-                IdleGame.Views.Combat.render game
+                IdleGame.Combat.view model.combat
 
             Tab.SkillTab skill ->
                 IdleGame.Views.SkillViews.renderSkill skill game cachedActivityEffects
