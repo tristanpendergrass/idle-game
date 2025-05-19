@@ -48,4 +48,41 @@ suite =
                     , moveIndex = 0
                     , log = []
                     }
+        , test "step with left Block 10 and right Damage 10 means left health unchanged, block reduced by 10" <|
+            \_ ->
+                let
+                    block10 : Move
+                    block10 _ =
+                        Random.constant [ ( Block 10, Self ) ]
+
+                    damage10 : Move
+                    damage10 _ =
+                        Random.constant [ ( Damage 10, Opponent ) ]
+
+                    params =
+                        { leftMaxHealth = 100
+                        , rightMaxHealth = 100
+                        , leftMoves = [ block10 ]
+                        , rightMoves = [ damage10 ]
+                        }
+
+                    state =
+                        { leftState = { health = 100, block = 0 }
+                        , rightState = { health = 100, block = 0 }
+                        , moveIndex = 0
+                        , log = []
+                        }
+
+                    gen =
+                        step params state
+
+                    ( resultState, _ ) =
+                        Random.step gen (Random.initialSeed 42)
+                in
+                Expect.equal resultState
+                    { leftState = { health = 100, block = 0 }
+                    , rightState = { health = 100, block = 0 }
+                    , moveIndex = 0
+                    , log = []
+                    }
         ]

@@ -138,15 +138,12 @@ stepMove leftMove rightMove params state =
 
 sortMutations : ( Mutation, EntityAbsolute ) -> ( Mutation, EntityAbsolute ) -> Order
 sortMutations ( leftMutation, _ ) ( rightMutation, _ ) =
-    -- Return GT if leftMutation is Block and rightMutation is Damage
-    -- Return LT if leftMutation is Damage and rightMutation is Block
-    -- Return EQ if both are Block or both are Damage
     case ( leftMutation, rightMutation ) of
         ( Block _, Damage _ ) ->
-            GT
+            LT
 
         ( Damage _, Block _ ) ->
-            LT
+            GT
 
         _ ->
             EQ
