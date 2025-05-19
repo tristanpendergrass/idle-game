@@ -11,18 +11,24 @@ import Types exposing (..)
 
 init : Model
 init =
-    { state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0 } }
+    { state =
+        { leftState = { health = 100, block = 0 }
+        , rightState = { health = 100, block = 0 }
+        , moveIndex = 0
+        , log = []
+        }
+    }
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         StartNewCombat ->
-            { model | state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0 } }
+            { model | state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0, log = [] } }
 
         NextStep ->
             let
-                state : CombatState
+                state : State
                 state =
                     model.state
             in
@@ -31,15 +37,42 @@ update msg model =
 
 view : Model -> Html FrontendMsg
 view model =
-    div [] [ text "Combat" ]
+    ul [ class "list" ]
+        [ li [ class "list-row flex items-center" ]
+            [ h1 [ class "text-xl" ] [ text "Player" ]
+            , div [] [ text <| "Health: " ++ String.fromInt model.state.leftState.health ]
+            , div [] [ text <| "Block: " ++ String.fromInt model.state.leftState.block ]
+            ]
+        , li [ class "list-row flex items-center" ]
+            [ h1 [ class "text-xl" ] [ text "Enemy" ]
+            , div [] [ text <| "Health: " ++ String.fromInt model.state.rightState.health ]
+            , div [] [ text <| "Block: " ++ String.fromInt model.state.rightState.block ]
+            ]
+
+        -- Display the moves
+        ]
+
+
+renderState : EntityState -> Html FrontendMsg
+renderState state =
+    ul []
+        [ li []
+            [ text "Health: "
+            , text (String.fromInt state.health)
+            ]
+        , li []
+            [ text "Block: "
+            , text (String.fromInt state.block)
+            ]
+        ]
 
 
 emptyMove : Move
-emptyMove _ _ =
+emptyMove _ =
     Random.constant []
 
 
-result : CombatParams -> CombatState -> CombatResult
+result : Params -> State -> CombatResult
 result _ state =
     if state.leftState.health <= 0 && state.rightState.health <= 0 then
         Draw
@@ -54,51 +87,99 @@ result _ state =
         Continue
 
 
-step : List Move -> List Move -> CombatParams -> CombatState -> Random.Generator CombatState
-step leftMoves rightMoves params state =
+step : Params -> State -> Random.Generator State
+step params state =
     let
-        leftMove : Move
         leftMove =
-            List.Extra.getAt state.moveIndex leftMoves
+            List.Extra.getAt state.moveIndex params.leftMoves
                 |> Maybe.withDefault emptyMove
 
-        rightMove : Move
         rightMove =
-            List.Extra.getAt state.moveIndex rightMoves
+            List.Extra.getAt state.moveIndex params.rightMoves
                 |> Maybe.withDefault emptyMove
-
-        applyMutations : List ( Mutation, Player ) -> List ( Mutation, Player ) -> CombatState
-        applyMutations leftMutations rightMutations =
-            List.concat [ leftMutations, rightMutations ]
-                -- TODO: sort mutations e.g. gain block should happen before damage
-                |> List.foldl applyMutation state
     in
-    Random.map2
-        applyMutations
-        (leftMove params state)
-        (rightMove params state)
+    stepMove leftMove rightMove params state
 
 
-applyMutation : ( Mutation, Player ) -> CombatState -> CombatState
-applyMutation ( mutation, player ) state =
+stepMove : Move -> Move -> Params -> State -> Random.Generator State
+stepMove leftMove rightMove params state =
+    -- Run generators for left and right moves to generate the List (Mutation, EntityRelative)
+    -- Map the EntityRelative to EntityAbsolute according to whether it was a left or right move
+    -- Sort the mutations accordingly-- Block before Damage
+    -- Apply all mutation to state using foldl
     let
-        applyDamage : Int -> PlayerState -> PlayerState
-        applyDamage amount playerState =
-            { playerState | health = playerState.health - Basics.min 0 (amount - playerState.block), block = Basics.min 0 (playerState.block - amount) }
+        leftMutations : Random.Generator (List ( Mutation, EntityAbsolute ))
+        leftMutations =
+            leftMove state
+                |> Random.map (List.map (\( mutation, relative ) -> ( mutation, mapRelativeToAbsolute relative Left )))
 
-        applyBlock : Int -> PlayerState -> PlayerState
-        applyBlock amount playerState =
-            { playerState | block = playerState.block + amount }
+        rightMutations : Random.Generator (List ( Mutation, EntityAbsolute ))
+        rightMutations =
+            rightMove state
+                |> Random.map (List.map (\( mutation, relative ) -> ( mutation, mapRelativeToAbsolute relative Right )))
+
+        allMutations : Random.Generator (List ( Mutation, EntityAbsolute ))
+        allMutations =
+            Random.map2 (++) leftMutations rightMutations
+                |> Random.map (List.sortWith sortMutations)
+
+        applyMutationToAbsolute : ( Mutation, EntityAbsolute ) -> State -> State
+        applyMutationToAbsolute ( mutation, absolute ) s =
+            case absolute of
+                Left ->
+                    { s | leftState = applyMutation mutation s.leftState }
+
+                Right ->
+                    { s | rightState = applyMutation mutation s.rightState }
     in
-    case ( mutation, player ) of
-        ( Damage amount, LeftPlayer ) ->
-            { state | leftState = applyDamage amount state.leftState }
+    allMutations
+        |> Random.map (List.foldl applyMutationToAbsolute state)
 
-        ( Damage amount, RightPlayer ) ->
-            { state | rightState = applyDamage amount state.rightState }
 
-        ( Block amount, LeftPlayer ) ->
-            { state | leftState = applyBlock amount state.leftState }
+sortMutations : ( Mutation, EntityAbsolute ) -> ( Mutation, EntityAbsolute ) -> Order
+sortMutations ( leftMutation, _ ) ( rightMutation, _ ) =
+    -- Return GT if leftMutation is Block and rightMutation is Damage
+    -- Return LT if leftMutation is Damage and rightMutation is Block
+    -- Return EQ if both are Block or both are Damage
+    case ( leftMutation, rightMutation ) of
+        ( Block _, Damage _ ) ->
+            GT
 
-        ( Block amount, RightPlayer ) ->
-            { state | rightState = applyBlock amount state.rightState }
+        ( Damage _, Block _ ) ->
+            LT
+
+        _ ->
+            EQ
+
+
+mapRelativeToAbsolute : EntityRelative -> EntityAbsolute -> EntityAbsolute
+mapRelativeToAbsolute relative self =
+    case ( relative, self ) of
+        ( Self, Left ) ->
+            Left
+
+        ( Opponent, Left ) ->
+            Right
+
+        ( Self, Right ) ->
+            Right
+
+        ( Opponent, Right ) ->
+            Left
+
+
+applyMutation : Mutation -> EntityState -> EntityState
+applyMutation mutation state =
+    case mutation of
+        Damage amount ->
+            let
+                blockRemoved =
+                    Basics.min amount state.block
+
+                healthRemoved =
+                    amount - blockRemoved
+            in
+            { state | health = state.health - healthRemoved, block = state.block - blockRemoved }
+
+        Block amount ->
+            { state | block = state.block + amount }
