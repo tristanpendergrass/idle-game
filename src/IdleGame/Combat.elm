@@ -1,70 +1,9 @@
 module IdleGame.Combat exposing (..)
 
 import CombatTypes exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
 import List
 import List.Extra
 import Random
-import Types exposing (..)
-
-
-init : Model
-init =
-    { state =
-        { leftState = { health = 100, block = 0 }
-        , rightState = { health = 100, block = 0 }
-        , moveIndex = 0
-        , log = []
-        }
-    }
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        StartNewCombat ->
-            { model | state = { leftState = { health = 100, block = 0 }, rightState = { health = 100, block = 0 }, moveIndex = 0, log = [] } }
-
-        NextStep ->
-            let
-                state : State
-                state =
-                    model.state
-            in
-            { model | state = { state | moveIndex = state.moveIndex + 1 } }
-
-
-view : Model -> Html FrontendMsg
-view model =
-    ul [ class "list" ]
-        [ li [ class "list-row flex items-center" ]
-            [ h1 [ class "text-xl" ] [ text "Player" ]
-            , div [] [ text <| "Health: " ++ String.fromInt model.state.leftState.health ]
-            , div [] [ text <| "Block: " ++ String.fromInt model.state.leftState.block ]
-            ]
-        , li [ class "list-row flex items-center" ]
-            [ h1 [ class "text-xl" ] [ text "Enemy" ]
-            , div [] [ text <| "Health: " ++ String.fromInt model.state.rightState.health ]
-            , div [] [ text <| "Block: " ++ String.fromInt model.state.rightState.block ]
-            ]
-
-        -- Display the moves
-        ]
-
-
-renderState : EntityState -> Html FrontendMsg
-renderState state =
-    ul []
-        [ li []
-            [ text "Health: "
-            , text (String.fromInt state.health)
-            ]
-        , li []
-            [ text "Block: "
-            , text (String.fromInt state.block)
-            ]
-        ]
 
 
 emptyMove : Move
@@ -72,8 +11,8 @@ emptyMove _ =
     Random.constant []
 
 
-result : Params -> State -> CombatResult
-result _ state =
+result : State -> CombatResult
+result state =
     if state.leftState.health <= 0 && state.rightState.health <= 0 then
         Draw
 
@@ -87,21 +26,41 @@ result _ state =
         Continue
 
 
-step : Params -> State -> Random.Generator State
-step params state =
+step : Config -> State -> Random.Generator State
+step config state =
     let
         leftMove =
-            List.Extra.getAt state.moveIndex params.leftMoves
+            List.Extra.getAt state.moveIndex config.leftMoves
                 |> Maybe.withDefault emptyMove
 
         rightMove =
-            List.Extra.getAt state.moveIndex params.rightMoves
+            List.Extra.getAt state.moveIndex config.rightMoves
                 |> Maybe.withDefault emptyMove
     in
-    stepMove leftMove rightMove params state
+    state
+        |> incrementIndex config
+        |> stepMove leftMove rightMove config
 
 
-stepMove : Move -> Move -> Params -> State -> Random.Generator State
+incrementIndex : Config -> State -> State
+incrementIndex config state =
+    let
+        lastMoveIndex : Int
+        lastMoveIndex =
+            Basics.max (List.length config.leftMoves) (List.length config.rightMoves)
+                - 1
+    in
+    { state
+        | moveIndex =
+            if state.moveIndex >= lastMoveIndex then
+                0
+
+            else
+                state.moveIndex + 1
+    }
+
+
+stepMove : Move -> Move -> Config -> State -> Random.Generator State
 stepMove leftMove rightMove params state =
     -- Run generators for left and right moves to generate the List (Mutation, EntityRelative)
     -- Map the EntityRelative to EntityAbsolute according to whether it was a left or right move

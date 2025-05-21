@@ -15,7 +15,7 @@ import Html.Extra exposing (..)
 import Id exposing (GameId, Id, UserId)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Combat
+import IdleGame.CombatWrapper
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
@@ -503,7 +503,7 @@ updateMainMenu msg mainMenuFrontend =
                             , activeModal = Nothing
                             , saveGameTimer = Timer.create
                             , pointerState = Nothing
-                            , combat = IdleGame.Combat.init
+                            , combat = IdleGame.CombatWrapper.init
                             }
                     in
                     -- set game and fast forward
@@ -1380,7 +1380,11 @@ updateInGame msg inGameFrontend =
                     noOp
 
         CombatMsg combatMsg ->
-            ( InGame { inGameFrontend | combat = IdleGame.Combat.update combatMsg inGameFrontend.combat }, Cmd.none )
+            let
+                ( newCombat, cmd ) =
+                    IdleGame.CombatWrapper.update combatMsg inGameFrontend.combat
+            in
+            ( InGame { inGameFrontend | combat = newCombat }, cmd )
 
         _ ->
             noOp

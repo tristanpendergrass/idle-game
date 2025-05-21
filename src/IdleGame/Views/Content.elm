@@ -5,7 +5,7 @@ module IdleGame.Views.Content exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Combat
+import IdleGame.CombatWrapper
 import IdleGame.Effect exposing (Effect)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
@@ -65,7 +65,7 @@ renderContent model game cachedActivityEffects activeTab =
                 IdleGame.Views.Bag.render game
 
             Tab.Combat ->
-                IdleGame.Combat.view model.combat
+                IdleGame.CombatWrapper.view model.combat
 
             Tab.SkillTab skill ->
                 IdleGame.Views.SkillViews.renderSkill skill game cachedActivityEffects

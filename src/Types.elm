@@ -167,7 +167,7 @@ type alias InGameFrontend =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
-    , combat : CombatTypes.Model
+    , combat : CombatModel
     }
 
 
@@ -324,7 +324,7 @@ type FrontendMsg
     | HandlePointerCancel
     | HandleGetViewportResult Browser.Dom.Viewport
       -- Combat
-    | CombatMsg CombatTypes.Msg
+    | CombatMsg CombatMsg
 
 
 type ToBackend
@@ -379,3 +379,32 @@ type ToastQueueItem
 
 type alias ToastQueue =
     List ToastQueueItem
+
+
+
+-- Combat
+
+
+type alias CombatConfigUi =
+    { leftMoves : List MoveUi
+    , rightMoves : List MoveUi
+    }
+
+
+type alias CombatModel =
+    { state : State
+    , configUi : CombatConfigUi
+    }
+
+
+type CombatMsg
+    = StartNewCombat
+    | HandleNextStepClick
+    | HandleNextStepResult State
+    | HandleSelectCombatMove EntityAbsolute Int MoveUi
+
+
+type alias MoveUi =
+    { name : String
+    , move : Move
+    }

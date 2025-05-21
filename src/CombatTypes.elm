@@ -17,14 +17,6 @@ type Mutation
     | Block Int
 
 
-type alias Params =
-    { leftMaxHealth : Int
-    , rightMaxHealth : Int
-    , leftMoves : List Move
-    , rightMoves : List Move
-    }
-
-
 type alias EntityState =
     { health : Int
     , block : Int
@@ -60,11 +52,7 @@ type alias Move =
     State -> Random.Generator (List ( Mutation, EntityRelative ))
 
 
-type Msg
-    = StartNewCombat
-    | NextStep
-
-
-type alias Model =
-    { state : State
+type alias Config =
+    { leftMoves : List Move
+    , rightMoves : List Move
     }
