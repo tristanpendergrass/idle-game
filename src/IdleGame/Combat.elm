@@ -139,3 +139,17 @@ applyMutation mutation state =
 
         Block amount ->
             { state | block = state.block + amount }
+
+
+stepUntilEnd : Config -> State -> Random.Generator State
+stepUntilEnd config state =
+    let
+        isOver : Bool
+        isOver =
+            result state /= Continue
+    in
+    if isOver then
+        Random.constant state
+
+    else
+        Random.andThen (stepUntilEnd config) (step config state)

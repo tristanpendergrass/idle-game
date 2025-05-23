@@ -391,9 +391,17 @@ type alias CombatConfigUi =
     }
 
 
+type alias CombatSimulationResults =
+    { leftWins : Int
+    , rightWins : Int
+    , draw : Int
+    }
+
+
 type alias CombatModel =
     { state : State
     , configUi : CombatConfigUi
+    , maybeSimulationResults : Maybe CombatSimulationResults
     }
 
 
@@ -402,6 +410,8 @@ type CombatMsg
     | HandleNextStepClick
     | HandleNextStepResult State
     | HandleSelectCombatMove EntityAbsolute Int MoveUi
+    | HandleSimulateClick
+    | HandleSimulateResult CombatSimulationResults
 
 
 type alias MoveUi =
