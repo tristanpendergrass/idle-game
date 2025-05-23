@@ -483,8 +483,8 @@ updateMainMenu msg mainMenuFrontend =
                         isVisible =
                             mainMenuFrontend.isVisible
 
-                        inGameFrontend : InGameFrontend
-                        inGameFrontend =
+                        newInGameFrontend : InGameFrontend
+                        newInGameFrontend =
                             { key = mainMenuFrontend.key
                             , user = mainMenuFrontend.user
                             , route = mainMenuFrontend.route
@@ -507,7 +507,7 @@ updateMainMenu msg mainMenuFrontend =
                             }
                     in
                     -- set game and fast forward
-                    ( InGame inGameFrontend, Task.perform HandleFastForward Time.now )
+                    ( InGame newInGameFrontend, Task.perform HandleFastForward Time.now )
 
                 Nothing ->
                     noOp
@@ -1468,19 +1468,58 @@ updateFromBackend msg model =
         Loading loadingFrontend ->
             case msg of
                 SetUserAndGames ( user, games ) ->
-                    ( MainMenu
-                        { key = loadingFrontend.key
-                        , route = loadingFrontend.route
-                        , routeToken = loadingFrontend.routeToken
-                        , isVisible = loadingFrontend.isVisible
-                        , emailFormValue = ""
-                        , user = user
-                        , games = games
-                        , maybeServerInfo = loadingFrontend.maybeServerInfo
-                        , mainMenuRoute = MainMenuAnonymousPlay
-                        }
-                    , Cmd.none
-                    )
+                    case games of
+                        firstGame :: restGames ->
+                            -- Auto-load the player into their first game
+                            let
+                                inGameGames : Nonempty ( Id GameId, Snapshot Game )
+                                inGameGames =
+                                    Nonempty firstGame restGames
+
+                                game : Snapshot Game
+                                game =
+                                    Tuple.second firstGame
+
+                                newInGameFrontend : InGameFrontend
+                                newInGameFrontend =
+                                    { key = loadingFrontend.key
+                                    , user = user
+                                    , route = loadingFrontend.route
+                                    , routeToken = loadingFrontend.routeToken
+                                    , isVisible = loadingFrontend.isVisible
+                                    , games = inGameGames
+                                    , gameState = FastForward { original = game, current = game, whenItStarted = Time.millisToPosix 0 }
+                                    , maybeServerInfo = loadingFrontend.maybeServerInfo
+                                    , lastFastForwardDuration = Nothing
+                                    , showDebugPanel = False
+                                    , toastQueue = ToastQueue.create
+                                    , isDrawerOpen = False
+                                    , activeTab = Config.flags.defaultTab
+                                    , preview = Nothing
+                                    , activityExpanded = False
+                                    , activeModal = Nothing
+                                    , saveGameTimer = Timer.create
+                                    , pointerState = Nothing
+                                    , combat = IdleGame.CombatWrapper.init
+                                    }
+                            in
+                            ( InGame newInGameFrontend, Task.perform HandleFastForward Time.now )
+
+                        [] ->
+                            -- No games, so go to MainMenu as usual
+                            ( MainMenu
+                                { key = loadingFrontend.key
+                                , route = loadingFrontend.route
+                                , routeToken = loadingFrontend.routeToken
+                                , isVisible = loadingFrontend.isVisible
+                                , emailFormValue = ""
+                                , user = user
+                                , games = games
+                                , maybeServerInfo = loadingFrontend.maybeServerInfo
+                                , mainMenuRoute = MainMenuAnonymousPlay
+                                }
+                            , Cmd.none
+                            )
 
                 GiveServerInfo serverInfo ->
                     ( Loading { loadingFrontend | maybeServerInfo = Just serverInfo }, Cmd.none )
@@ -1755,8 +1794,8 @@ view model =
                                             , onCheck SetDrawerOpen
                                             ]
                                             []
-                                        , IdleGame.Views.Content.renderContent frontend game cache activeTab
-                                        , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen activeTab
+                                        , IdleGame.Views.Content.renderContent frontend game cache frontend.activeTab
+                                        , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen frontend.activeTab
                                         ]
                                     , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
                                     , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
