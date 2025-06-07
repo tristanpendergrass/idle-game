@@ -204,11 +204,15 @@ renderLockedActivity unlockSkill unlockLevel =
                 [ FeatherIcons.lock
                     |> FeatherIcons.withSize 24
                     |> FeatherIcons.toHtml []
-                , div [ class "text-lg font-semibold" ]
-                    [ text <|
-                        (getSkillStats unlockSkill).title
-                            ++ " level "
-                            ++ IdleGame.Views.Utils.intToString unlockLevel
+                , div [ class "text-lg" ]
+                    [ text "Requires "
+                    , strong []
+                        [ text <|
+                            ((getSkillStats unlockSkill).title
+                                ++ " level "
+                                ++ IdleGame.Views.Utils.intToString unlockLevel
+                            )
+                        ]
                     ]
                 ]
             ]
