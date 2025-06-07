@@ -38,3 +38,4 @@ I really like Melvor Idle, and I think a lot about why I like it more than the m
 		* It also has direct ties to every other profession since it usually requires mats such as daggers which you craft in other places
 	* **Astrology**:
 	* **Alt. Magic**:
+* 

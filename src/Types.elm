@@ -210,7 +210,7 @@ type alias BackendModel =
     -- Instead we update it periodically (every 15 seconds)
     { approximateTime : Time.Posix
     , secretCounter : Int
-    , userGames : Dict (Id UserId) (List (Id GameId))
+    , userGames : Dict (Id UserId) (List (Id GameId)) -- Dict showing which games belong to which users
     , games : Dict (Id GameId) (Snapshot Game)
     , seed : Random.Seed
     , sessions : BiDict SessionId (Id UserId)
