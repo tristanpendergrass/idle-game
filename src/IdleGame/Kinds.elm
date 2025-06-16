@@ -91,7 +91,8 @@ type Resource
     | Belladonna
     | Henbane
     | Parchment
-    | SpellSenseThePath
+    | SpellHerbSense
+    | SpellBloom
 
 
 allResources : List Resource
@@ -106,7 +107,8 @@ allResources =
     , Belladonna
     , Henbane
     , Parchment
-    , SpellSenseThePath
+    , SpellHerbSense
+    , SpellBloom
     ]
 
 
@@ -121,7 +123,8 @@ type alias ResourceRecord a =
     , belladonna : a
     , henbane : a
     , parchment : a
-    , spellSenseThePath : a
+    , spellHerbSense : a
+    , spellBloom : a
     }
 
 
@@ -137,7 +140,8 @@ resourceRecord a =
     , belladonna = a
     , henbane = a
     , parchment = a
-    , spellSenseThePath = a
+    , spellHerbSense = a
+    , spellBloom = a
     }
 
 
@@ -174,8 +178,11 @@ getByResource kind data =
         Parchment ->
             data.parchment
 
-        SpellSenseThePath ->
-            data.spellSenseThePath
+        SpellHerbSense ->
+            data.spellHerbSense
+
+        SpellBloom ->
+            data.spellBloom
 
 
 setByResource : Resource -> a -> ResourceRecord a -> ResourceRecord a
@@ -211,8 +218,11 @@ setByResource kind value data =
         Parchment ->
             { data | parchment = value }
 
-        SpellSenseThePath ->
-            { data | spellSenseThePath = value }
+        SpellHerbSense ->
+            { data | spellHerbSense = value }
+
+        SpellBloom ->
+            { data | spellBloom = value }
 
 
 mapResources : (a -> a) -> ResourceRecord a -> ResourceRecord a
@@ -227,7 +237,8 @@ mapResources fn record =
     , belladonna = fn record.belladonna
     , henbane = fn record.henbane
     , parchment = fn record.parchment
-    , spellSenseThePath = fn record.spellSenseThePath
+    , spellHerbSense = fn record.spellHerbSense
+    , spellBloom = fn record.spellBloom
     }
 
 
@@ -251,7 +262,8 @@ resourceStats =
     , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
     , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
     , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1) }
-    , spellSenseThePath = { title = "Spell: Sense the Path", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
+    , spellHerbSense = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
+    , spellBloom = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
     }
 
 
@@ -274,6 +286,8 @@ type Activity
     | GatherFennel
     | GatherBelladonna
     | GatherHenbane
+    | CraftSpellHerbSense
+    | CraftSpellBloom
 
 
 allActivities : List Activity
@@ -287,6 +301,8 @@ allActivities =
     , GatherFennel
     , GatherBelladonna
     , GatherHenbane
+    , CraftSpellHerbSense
+    , CraftSpellBloom
     ]
 
 
@@ -300,6 +316,8 @@ type alias ActivityRecord a =
     , gatherFennel : a
     , gatherBelladonna : a
     , gatherHenbane : a
+    , craftSpellHerbSense : a
+    , craftSpellBloom : a
     }
 
 
@@ -314,6 +332,8 @@ activityRecord a =
     , gatherFennel = a
     , gatherBelladonna = a
     , gatherHenbane = a
+    , craftSpellHerbSense = a
+    , craftSpellBloom = a
     }
 
 
@@ -347,6 +367,12 @@ getByActivity kind data =
         GatherHenbane ->
             data.gatherHenbane
 
+        CraftSpellHerbSense ->
+            data.craftSpellHerbSense
+
+        CraftSpellBloom ->
+            data.craftSpellBloom
+
 
 setByActivity : Activity -> a -> ActivityRecord a -> ActivityRecord a
 setByActivity kind value data =
@@ -378,6 +404,12 @@ setByActivity kind value data =
         GatherHenbane ->
             { data | gatherHenbane = value }
 
+        CraftSpellHerbSense ->
+            { data | craftSpellHerbSense = value }
+
+        CraftSpellBloom ->
+            { data | craftSpellBloom = value }
+
 
 mapActivities : (a -> a) -> ActivityRecord a -> ActivityRecord a
 mapActivities fn record =
@@ -390,6 +422,8 @@ mapActivities fn record =
     , gatherFennel = fn record.gatherFennel
     , gatherBelladonna = fn record.gatherBelladonna
     , gatherHenbane = fn record.gatherHenbane
+    , craftSpellHerbSense = fn record.craftSpellHerbSense
+    , craftSpellBloom = fn record.craftSpellBloom
     }
 
 
@@ -496,6 +530,26 @@ activityStats =
         , type_ = "Gather"
         , coin = Nothing
         , resourceGains = [ ( 1, Henbane ) ]
+        }
+    , craftSpellHerbSense =
+        { skill = WildMagic
+        , title = "Herb Sense"
+        , image = "/activities/wildMagic/craftSpellHerbSense.webp"
+        , level = 1
+        , duration = Duration.seconds 5
+        , type_ = "Craft Spell"
+        , coin = Nothing
+        , resourceGains = [ ( 1, SpellHerbSense ) ]
+        }
+    , craftSpellBloom =
+        { skill = WildMagic
+        , title = "Bloom"
+        , image = "/activities/wildMagic/craftSpellBloom.webp"
+        , level = 2
+        , duration = Duration.seconds 10
+        , type_ = "Craft Spell"
+        , coin = Nothing
+        , resourceGains = [ ( 1, SpellBloom ) ]
         }
     }
 
