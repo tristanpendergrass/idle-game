@@ -4,7 +4,6 @@ import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime as OneTime
@@ -15,6 +14,7 @@ import IdleGame.Views.Utils exposing (cardImage)
 import IdleGame.Xp as Xp exposing (Xp)
 import List.Extra
 import Percent exposing (Percent)
+import Types exposing (..)
 
 
 getBySkill : Skill -> List Activity
@@ -26,7 +26,7 @@ getBySkill skill =
             )
 
 
-updateModCount : (Int -> Int) -> MasteryMod -> MasteryMod
+updateModCount : (Int -> Int) -> Mod -> Mod
 updateModCount fn mod =
     case mod of
         IntervalMod intervalMod ->
@@ -41,10 +41,10 @@ perLevelModCount { modInterval, mxpLevel } =
     mxpLevel // modInterval
 
 
-masteryModsAtLevel : Int -> Mastery -> List MasteryMod
+masteryModsAtLevel : Int -> Mastery -> List Mod
 masteryModsAtLevel playerLevel mastery =
     let
-        perLevelMods : List MasteryMod
+        perLevelMods : List Mod
         perLevelMods =
             mastery.perLevel
                 |> List.filterMap
@@ -61,7 +61,7 @@ masteryModsAtLevel playerLevel mastery =
                             Nothing
                     )
 
-        atLevelMods : List MasteryMod
+        atLevelMods : List Mod
         atLevelMods =
             mastery.atLevel
                 |> List.filterMap
@@ -82,12 +82,12 @@ hasMasteryMods mastery =
 
 
 type alias Mastery =
-    { perLevel : List { interval : Int, mod : MasteryMod } -- The Int is the number of levels you gain to get an instance of the mod
-    , atLevel : List { level : Int, mod : MasteryMod }
+    { perLevel : List { interval : Int, mod : Mod } -- The Int is the number of levels you gain to get an instance of the mod
+    , atLevel : List { level : Int, mod : Mod }
     }
 
 
-type MasteryMod
+type Mod
     = IntervalMod IntervalMod -- Activity interval decreased by this much
     | EffectMod EffectMod -- Apply mod to game
 

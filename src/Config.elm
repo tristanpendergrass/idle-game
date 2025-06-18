@@ -41,7 +41,7 @@ devFlags =
     -- c(")(")
     { isDev = True
     , showFastForwardSpeed = True
-    , extraFastForwardTime = Duration.hours 0
+    , extraFastForwardTime = Duration.hours 1
     , debugTimePasses = False
     , showTimePasses = True
     , showDebugPanel = True

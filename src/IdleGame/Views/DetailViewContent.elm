@@ -7,7 +7,6 @@ import Html.Events.Extra exposing (onClickPreventDefault)
 import IdleGame.Activity as Activity
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Skill as Skill
@@ -216,7 +215,7 @@ intervalModLabelToString modLabel =
 masterySection : Xp -> Activity.Mastery -> Html FrontendMsg
 masterySection mxp mastery =
     let
-        renderPerLevelMastery : { interval : Int, mod : Activity.MasteryMod } -> Html FrontendMsg
+        renderPerLevelMastery : { interval : Int, mod : Activity.Mod } -> Html FrontendMsg
         renderPerLevelMastery { interval, mod } =
             let
                 rewardText : String
@@ -265,7 +264,7 @@ masterySection mxp mastery =
                 , td [ class "w-full" ] [ text rowText ]
                 ]
 
-        renderAtLevelMastery : { level : Int, mod : Activity.MasteryMod } -> Html FrontendMsg
+        renderAtLevelMastery : { level : Int, mod : Activity.Mod } -> Html FrontendMsg
         renderAtLevelMastery { level, mod } =
             let
                 rewardText : String

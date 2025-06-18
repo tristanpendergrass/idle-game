@@ -5,7 +5,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Views.Icon as Icon exposing (Icon)

@@ -1,7 +1,6 @@
 module IdleGame.Mod exposing (..)
 
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import Percent exposing (Percent)
 import Quantity

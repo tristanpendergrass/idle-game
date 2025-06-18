@@ -2,7 +2,6 @@ module IdleGame.Effect exposing (..)
 
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
 import IdleGame.Resource as Resource

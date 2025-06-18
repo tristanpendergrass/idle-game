@@ -20,7 +20,6 @@ import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
 import IdleGame.Mod as Mod exposing (EffectMod)
@@ -1811,7 +1810,7 @@ getCache game =
     let
         mods : List EffectMod
         mods =
-            Game.getAllMods game
+            Game.getAllEffectMods game
     in
     Activity.createRecordByFn
         (\activity ->

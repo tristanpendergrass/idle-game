@@ -14,16 +14,17 @@ import Http
 import Id exposing (GameId, Id, LoginToken, UserId)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Effect exposing (Effect)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
+import IdleGame.Views.Icon as Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
 import Lamdera exposing (ClientId, SessionId)
 import List.Nonempty exposing (Nonempty)
+import Percent exposing (Percent)
 import Postmark
 import Random
 import Route exposing (Route)
@@ -66,6 +67,7 @@ type alias Game =
     , resources : ResourceRecord Int
     , ownedShopUpgrades : ShopUpgradeRecord Bool
     , oneTimeStatuses : OneTime.OneTimeRecord Bool
+    , spellAssignments : ActivityRecord (Maybe Resource)
     }
 
 
@@ -418,3 +420,28 @@ type alias MoveUi =
     { name : String
     , move : Move
     }
+
+
+type IntervalModLabel
+    = IntervalModLabel Percent
+
+
+type alias IntervalMod =
+    { kind : Activity
+    , percentChange : Percent -- e.g. 0.25 -> 25% faster
+    , label : IntervalModLabel
+    , count : Int -- How many times to apply this mod
+    }
+
+
+type Toast
+    = GainedCoin Coin
+    | GainedResource Int Resource
+    | NegativeAmountErr
+    | TestAlreadyCompleted
+    | TestNotUnlocked
+
+
+type CardImage
+    = CardLandscape String
+    | CardIcon Icon

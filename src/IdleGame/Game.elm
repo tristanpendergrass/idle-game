@@ -6,7 +6,6 @@ import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
@@ -41,6 +40,7 @@ createProd seed =
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
+    , spellAssignments = activityRecord Nothing
     }
 
 
@@ -56,6 +56,7 @@ createDev seed =
     , resources = resourceRecord 0
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
+    , spellAssignments = activityRecord Nothing
     }
 
 
@@ -268,7 +269,7 @@ tick delta game =
                     let
                         mods : List EffectMod
                         mods =
-                            getAllMods game
+                            getAllEffectMods game
 
                         gameGenerator : Generator ( Game, List Toast )
                         gameGenerator =
@@ -325,7 +326,7 @@ attemptPurchaseResource amount resource game =
 
         mods : List EffectMod
         mods =
-            getAllMods game
+            getAllEffectMods game
 
         gen : ApplyEffectsResultGenerator
         gen =
@@ -352,7 +353,7 @@ attemptSellResource amount resource game =
 
         mods : List EffectMod
         mods =
-            getAllMods game
+            getAllEffectMods game
 
         gen : ApplyEffectsResultGenerator
         gen =
@@ -948,7 +949,7 @@ getMasteryIntervalMods game =
     List.concatMap getFromActivity allActivities
 
 
-getMasteryRewards : Game -> Activity -> List Activity.MasteryMod
+getMasteryRewards : Game -> Activity -> List Activity.Mod
 getMasteryRewards game activity =
     let
         activityMastery : Activity.Mastery
@@ -969,7 +970,7 @@ getMasteryRewards game activity =
 getActivityMods : Game -> List EffectMod
 getActivityMods game =
     let
-        getGameMod : Activity.MasteryMod -> Maybe EffectMod
+        getGameMod : Activity.Mod -> Maybe EffectMod
         getGameMod reward =
             case reward of
                 Activity.EffectMod mod ->
@@ -988,9 +989,21 @@ addActivityTagToMods activity =
     List.map (Mod.withTags [ Effect.ActivityTag activity ])
 
 
-getAllMods : Game -> List EffectMod
-getAllMods game =
+
+-- getSpellAssignmentsMods : Game -> List Mod
+-- getSpellAssignmentsMods game =
+--     case game.activity of
+--         Nothing ->
+--             []
+--         Just ( activity, _ ) ->
+--             game.spellAssignments
+--                 |> getByActivity activity
+
+
+getAllEffectMods : Game -> List EffectMod
+getAllEffectMods game =
     []
+        -- ++ getSpellAssignmentsMods game
         ++ getActivityMods game
         ++ getShopItemMods game
 

@@ -9,7 +9,6 @@ import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect exposing (Effect)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill

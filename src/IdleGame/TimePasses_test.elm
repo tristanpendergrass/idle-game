@@ -10,7 +10,6 @@ import IdleGame.Counter as Counter
 import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Event exposing (..)
 import IdleGame.Resource as Resource

@@ -2,7 +2,6 @@ module ToastQueue exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import IdleGame.GameTypes exposing (Toast)
 import IdleGame.Views.Utils
 import Time
 import Types exposing (..)

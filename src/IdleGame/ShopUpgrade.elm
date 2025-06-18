@@ -5,13 +5,13 @@ import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Effect as Effect exposing (EffectType)
-import IdleGame.GameTypes exposing (..)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
 import Percent exposing (Percent)
+import Types exposing (..)
 
 
 allShopUpgrades : List ShopUpgrade
