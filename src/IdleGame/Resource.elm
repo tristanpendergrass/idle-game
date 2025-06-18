@@ -6,11 +6,7 @@ import IdleGame.Kinds exposing (..)
 import IdleGame.Views.Icon as Icon exposing (Icon)
 import List
 import Quantity exposing (Quantity(..))
-
-
-type alias Diff =
-    -- I don't know if it will always make sense for this type alias and Amounts to be the same shape but for now it is and saves us work
-    ResourceRecord Int
+import Types exposing (..)
 
 
 add : Resource -> Int -> ResourceRecord Int -> Result EffectErr (ResourceRecord Int)
@@ -31,7 +27,7 @@ add resource amount resources =
         Err EffectErr.NegativeAmount
 
 
-getDiff : { original : ResourceRecord Int, current : ResourceRecord Int } -> Diff
+getDiff : { original : ResourceRecord Int, current : ResourceRecord Int } -> ResourceDiff
 getDiff { original, current } =
     let
         foldFn : Resource -> ResourceRecord Int -> ResourceRecord Int
@@ -55,7 +51,7 @@ mapDiff fn diff =
             )
 
 
-isEmptyDiff : Diff -> Bool
+isEmptyDiff : ResourceDiff -> Bool
 isEmptyDiff resourcesDiff =
     allResources
         |> List.map (\resource -> getByResource resource resourcesDiff)
@@ -93,3 +89,8 @@ toList resources =
 getLabel : Resource -> String
 getLabel resource =
     (getResourceStats resource).title
+
+
+getMods : Activity -> Resource -> List Mod
+getMods activity resource =
+    []

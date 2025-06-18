@@ -15,7 +15,6 @@ import Id exposing (GameId, Id, LoginToken, UserId)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Kinds exposing (..)
 import IdleGame.OneTime as OneTime exposing (OneTimeStatus)
-import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
 import IdleGame.Timer exposing (Timer)
@@ -53,8 +52,13 @@ type alias TimePassesXpGain =
 type alias TimePassesData =
     { xpGains : List TimePassesXpGain
     , coinGains : Maybe Coin
-    , resourcesDiff : Resource.Diff
+    , resourcesDiff : ResourceDiff
     }
+
+
+type alias ResourceDiff =
+    -- I don't know if it will always make sense for this type alias and Amounts to be the same shape but for now it is and saves us work
+    ResourceRecord Int
 
 
 type alias Game =

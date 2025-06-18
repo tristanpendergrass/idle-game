@@ -989,23 +989,34 @@ addActivityTagToMods activity =
     List.map (Mod.withTags [ ActivityTag activity ])
 
 
+getSpellAssignmentsMods : Game -> List EffectModParams
+getSpellAssignmentsMods game =
+    case game.activity of
+        Nothing ->
+            []
 
--- getSpellAssignmentsMods : Game -> List Mod
--- getSpellAssignmentsMods game =
---     case game.activity of
---         Nothing ->
---             []
---         Just ( activity, _ ) ->
---             game.spellAssignments
---                 |> getByActivity activity
+        Just ( activity, _ ) ->
+            game.spellAssignments
+                |> getByActivity activity
+                |> Maybe.map (Resource.getMods activity)
+                |> Maybe.withDefault []
+                |> List.filterMap
+                    (\mod ->
+                        case mod of
+                            EffectMod m ->
+                                Just m
+
+                            _ ->
+                                Nothing
+                    )
 
 
 getAllEffectMods : Game -> List EffectModParams
 getAllEffectMods game =
     []
-        -- ++ getSpellAssignmentsMods game
         ++ getActivityMods game
         ++ getShopItemMods game
+        ++ getSpellAssignmentsMods game
 
 
 

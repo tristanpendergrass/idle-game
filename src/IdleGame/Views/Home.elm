@@ -3,16 +3,8 @@ module IdleGame.Views.Home exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Effect as Effect
-import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod exposing (..)
-import IdleGame.Views.Activity as ActivityView
-import IdleGame.Views.Effect as EffectView
 import IdleGame.Views.Icon as Icon
-import IdleGame.Views.Utils as Utils
-import Random
-import Result.Extra
 import Types exposing (..)
 
 
