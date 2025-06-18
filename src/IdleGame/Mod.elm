@@ -1,40 +1,13 @@
 module IdleGame.Mod exposing (..)
 
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.Kinds exposing (..)
 import Percent exposing (Percent)
 import Quantity
+import Types exposing (..)
 
 
-type ModSource
-    = AdminCrimes
-    | ShopItem
-
-
-type alias EffectMod =
-    { tags : List Effect.Tag
-    , label : String
-    , transformer : Transformer
-    , count : Int -- How many times to apply this mod
-    , source : ModSource
-    }
-
-
-type alias Transformer =
-    Int -> Effect -> TransformerResult
-
-
-type TransformerResult
-    = NoChange
-    | ChangeEffect Effect
-    | ChangeAndAddEffects Effect (List Effect)
-
-
-type alias SimpleTransformer =
-    EffectType -> EffectType
-
-
-scopeTransformerToTags : List Effect.Tag -> Transformer -> Transformer
+scopeTransformerToTags : List Tag -> Transformer -> Transformer
 scopeTransformerToTags tags transformer multiplier effect =
     if Effect.hasTags tags effect then
         transformer multiplier effect
@@ -43,7 +16,7 @@ scopeTransformerToTags tags transformer multiplier effect =
         NoChange
 
 
-includeVariableEffects : EffectMod -> EffectMod
+includeVariableEffects : EffectModParams -> EffectModParams
 includeVariableEffects mod =
     -- Transforms the mod to apply to not just an effect but all the subeffects of that effect, e.g. the successEffects contained in a VariableSuccess
     let
@@ -53,7 +26,7 @@ includeVariableEffects mod =
         newTransformer : Int -> Effect -> TransformerResult
         newTransformer multiplier taggedEffect =
             case taggedEffect.effect of
-                Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+                VariableSuccess { successProbability, successEffects, failureEffects } ->
                     let
                         ( successEffectsDidChange, newSuccessEffects ) =
                             let
@@ -94,7 +67,7 @@ includeVariableEffects mod =
                     if effectDidChange then
                         taggedEffect
                             |> Effect.setEffect
-                                (Effect.VariableSuccess
+                                (VariableSuccess
                                     { successProbability = successProbability
                                     , successEffects = newSuccessEffects
                                     , failureEffects = newFailureEffects
@@ -137,7 +110,7 @@ useSimpleTransformerHelp depth transformFn count taggedEffect =
         ChangeEffect newEffect
 
 
-applyModToEffect : EffectMod -> ( Effect, List Effect ) -> ( Effect, List Effect )
+applyModToEffect : EffectModParams -> ( Effect, List Effect ) -> ( Effect, List Effect )
 applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
     if Effect.hasTags mod.tags effectAccum then
         case mod.transformer mod.count effectAccum of
@@ -154,7 +127,7 @@ applyModToEffect mod ( effectAccum, furtherEffectsAccum ) =
         ( effectAccum, furtherEffectsAccum )
 
 
-applyModsToEffect : List EffectMod -> Effect -> ( Effect, List Effect )
+applyModsToEffect : List EffectModParams -> Effect -> ( Effect, List Effect )
 applyModsToEffect =
     applyModsToEffectHelp 0
 
@@ -164,7 +137,7 @@ tupleToList ( x, xs ) =
     x :: xs
 
 
-applyModsToEffectHelp : Int -> List EffectMod -> Effect -> ( Effect, List Effect )
+applyModsToEffectHelp : Int -> List EffectModParams -> Effect -> ( Effect, List Effect )
 applyModsToEffectHelp depth mods effect =
     let
         ( newEffect, furtherEffects ) =
@@ -191,22 +164,22 @@ applyModsToEffectHelp depth mods effect =
     )
 
 
-withHowManyTimesToApplyMod : Int -> EffectMod -> EffectMod
+withHowManyTimesToApplyMod : Int -> EffectModParams -> EffectModParams
 withHowManyTimesToApplyMod count mod =
     { mod | count = count }
 
 
-withSource : ModSource -> EffectMod -> EffectMod
+withSource : ModSource -> EffectModParams -> EffectModParams
 withSource source mod =
     { mod | source = source }
 
 
-withTags : List Effect.Tag -> EffectMod -> EffectMod
+withTags : List Tag -> EffectModParams -> EffectModParams
 withTags tags mod =
     { mod | tags = mod.tags ++ tags }
 
 
-withLabel : String -> EffectMod -> EffectMod
+withLabel : String -> EffectModParams -> EffectModParams
 withLabel label mod =
     { mod | label = label }
 
@@ -248,18 +221,18 @@ composeTransformer transformers count originalEffect =
 xpTransformer : Percent -> Transformer
 xpTransformer buff count effect =
     case Effect.getEffectType effect of
-        Effect.GainXp params ->
+        GainXp params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
                     Quantity.multiplyBy (toFloat count) buff
 
-                newParams : Effect.GainXpParams
+                newParams : GainXpParams
                 newParams =
                     { params | percentIncrease = Quantity.plus params.percentIncrease adjustedBuff }
             in
             effect
-                |> Effect.setEffect (Effect.GainXp newParams)
+                |> Effect.setEffect (GainXp newParams)
                 |> ChangeEffect
 
         _ ->
@@ -269,14 +242,14 @@ xpTransformer buff count effect =
 coinTransformer : Percent -> Transformer
 coinTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.GainCoin quantity ->
+        GainCoin quantity ->
             let
-                adjustedMultiplicable : Effect.GainCoinParams
+                adjustedMultiplicable : GainCoinParams
                 adjustedMultiplicable =
                     { quantity | percentIncrease = Quantity.plus quantity.percentIncrease (Quantity.multiplyBy (toFloat count) buff) }
             in
             taggedEffect
-                |> Effect.setEffect (Effect.GainCoin adjustedMultiplicable)
+                |> Effect.setEffect (GainCoin adjustedMultiplicable)
                 |> ChangeEffect
 
         _ ->
@@ -286,18 +259,18 @@ coinTransformer buff count taggedEffect =
 mxpTransformer : Percent -> Transformer
 mxpTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.GainMxp params ->
+        GainMxp params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
                     Quantity.multiplyBy (toFloat count) buff
 
-                newParams : Effect.GainMxpParams
+                newParams : GainMxpParams
                 newParams =
                     { params | percentIncrease = Quantity.plus params.percentIncrease adjustedBuff }
             in
             taggedEffect
-                |> Effect.setEffect (Effect.GainMxp newParams)
+                |> Effect.setEffect (GainMxp newParams)
                 |> ChangeEffect
 
         _ ->
@@ -307,10 +280,10 @@ mxpTransformer buff count taggedEffect =
 resourceDoublingTransformer : Percent -> Transformer
 resourceDoublingTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.GainResource { base, doublingChance, resource } ->
+        GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
-                    (Effect.GainResource
+                    (GainResource
                         { base = base
                         , doublingChance = Quantity.plus doublingChance (Quantity.multiplyBy (toFloat count) buff)
                         , resource = resource
@@ -325,10 +298,10 @@ resourceDoublingTransformer buff count taggedEffect =
 resourceBaseTransformer : Int -> Transformer
 resourceBaseTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.GainResource { base, doublingChance, resource } ->
+        GainResource { base, doublingChance, resource } ->
             taggedEffect
                 |> Effect.setEffect
-                    (Effect.GainResource
+                    (GainResource
                         { base = base + (buff * count)
                         , doublingChance = doublingChance
                         , resource = resource
@@ -343,7 +316,7 @@ resourceBaseTransformer buff count taggedEffect =
 resourcePreservationTransformer : Percent -> Transformer
 resourcePreservationTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.SpendResource params ->
+        SpendResource params ->
             let
                 adjustedBuff : Percent
                 adjustedBuff =
@@ -355,7 +328,7 @@ resourcePreservationTransformer buff count taggedEffect =
             in
             taggedEffect
                 |> Effect.setEffect
-                    (Effect.SpendResource
+                    (SpendResource
                         { params
                             | preservationChance = buffedChance
                         }
@@ -369,10 +342,10 @@ resourcePreservationTransformer buff count taggedEffect =
 resourceSpendTransformer : Int -> Transformer
 resourceSpendTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.SpendResource params ->
+        SpendResource params ->
             taggedEffect
                 |> Effect.setEffect
-                    (Effect.SpendResource
+                    (SpendResource
                         { params
                             | base = Basics.max 0 (params.base + (buff * count))
                         }
@@ -386,14 +359,14 @@ resourceSpendTransformer buff count taggedEffect =
 increaseSuccessTransformer : Percent -> Transformer
 increaseSuccessTransformer buff count taggedEffect =
     case Effect.getEffectType taggedEffect of
-        Effect.VariableSuccess params ->
+        VariableSuccess params ->
             let
                 newSuccessProbability =
                     Quantity.plus params.successProbability (Quantity.multiplyBy (toFloat count) buff)
                         |> Quantity.min (Percent.float 1.0)
 
                 newEffect =
-                    Effect.VariableSuccess { params | successProbability = newSuccessProbability }
+                    VariableSuccess { params | successProbability = newSuccessProbability }
             in
             ChangeEffect (Debug.log "newEffect" (Effect.setEffect newEffect taggedEffect))
 
@@ -406,7 +379,7 @@ addEffectsTransformer effects count taggedEffect =
     ChangeAndAddEffects taggedEffect (List.concat (List.repeat count effects))
 
 
-xpAndMxpBuff : Percent -> EffectMod
+xpAndMxpBuff : Percent -> EffectModParams
 xpAndMxpBuff buff =
     { tags = []
     , label = "Xp and Mxp Buff"
@@ -416,9 +389,9 @@ xpAndMxpBuff buff =
     }
 
 
-activityXpBuff : Activity -> Percent -> EffectMod
+activityXpBuff : Activity -> Percent -> EffectModParams
 activityXpBuff activity amount =
-    { tags = [ Effect.ActivityTag activity ]
+    { tags = [ ActivityTag activity ]
     , label = "Activity Xp Buff"
     , transformer = xpTransformer amount
     , source = AdminCrimes
@@ -426,7 +399,7 @@ activityXpBuff activity amount =
     }
 
 
-xpBuff : Percent -> EffectMod
+xpBuff : Percent -> EffectModParams
 xpBuff amount =
     { tags = []
     , label = "Xp Buff"
@@ -436,7 +409,7 @@ xpBuff amount =
     }
 
 
-resourceSpendDecreaseBuff : Int -> EffectMod
+resourceSpendDecreaseBuff : Int -> EffectModParams
 resourceSpendDecreaseBuff buff =
     -- Decrease the amount of resources spent by amount passed in
     { tags = []
@@ -447,14 +420,14 @@ resourceSpendDecreaseBuff buff =
     }
 
 
-skillXpBuff : Skill -> Percent -> EffectMod
+skillXpBuff : Skill -> Percent -> EffectModParams
 skillXpBuff skill amount =
     xpBuff amount
-        |> withTags [ Effect.SkillTag skill ]
+        |> withTags [ SkillTag skill ]
         |> withLabel "Skill Xp Buff"
 
 
-coinBuff : Percent -> EffectMod
+coinBuff : Percent -> EffectModParams
 coinBuff buff =
     { tags = []
     , label = "Coin Buff"
@@ -464,7 +437,7 @@ coinBuff buff =
     }
 
 
-mxpBuff : Percent -> EffectMod
+mxpBuff : Percent -> EffectModParams
 mxpBuff buff =
     { tags = []
     , label = "Mxp Buff"
@@ -474,7 +447,7 @@ mxpBuff buff =
     }
 
 
-resourceDoublingBuff : Percent -> EffectMod
+resourceDoublingBuff : Percent -> EffectModParams
 resourceDoublingBuff buff =
     { tags = []
     , label = "Resource Doubling Buff"
@@ -484,7 +457,7 @@ resourceDoublingBuff buff =
     }
 
 
-resourceBaseBuff : Int -> EffectMod
+resourceBaseBuff : Int -> EffectModParams
 resourceBaseBuff buff =
     { tags = []
     , label = "Resource Base Buff"
@@ -494,7 +467,7 @@ resourceBaseBuff buff =
     }
 
 
-resourcePreservationBuff : Percent -> EffectMod
+resourcePreservationBuff : Percent -> EffectModParams
 resourcePreservationBuff buff =
     { tags = []
     , label = "Resource Preservation Buff"
@@ -504,7 +477,7 @@ resourcePreservationBuff buff =
     }
 
 
-successBuff : Percent -> EffectMod
+successBuff : Percent -> EffectModParams
 successBuff buff =
     { tags = []
     , label = "Success Buff"
@@ -514,7 +487,7 @@ successBuff buff =
     }
 
 
-addEffects : List Effect -> EffectMod
+addEffects : List Effect -> EffectModParams
 addEffects effects =
     { tags = []
     , label = "Add Effects"
@@ -524,13 +497,13 @@ addEffects effects =
     }
 
 
-gainResourceWithProbability : Percent -> Resource -> EffectMod
+gainResourceWithProbability : Percent -> Resource -> EffectModParams
 gainResourceWithProbability probability resource =
     addEffects [ Effect.gainWithProbability probability [ Effect.gainResource 1 resource ] ]
         |> withLabel "Gain Resource With Probability"
 
 
-gainResource : Int -> Resource -> EffectMod
+gainResource : Int -> Resource -> EffectModParams
 gainResource amount resource =
     addEffects [ Effect.gainResource amount resource ]
         |> withLabel "Gain Resource"

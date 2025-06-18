@@ -7,10 +7,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType, effect)
+import IdleGame.Effect as Effect
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
+import IdleGame.Mod as Mod
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
@@ -67,7 +67,7 @@ getTimerForActivity activity game =
 notMasteryXpEffect : Effect -> Bool
 notMasteryXpEffect taggedEffect =
     case taggedEffect.effect of
-        Effect.GainMxp _ ->
+        GainMxp _ ->
             False
 
         _ ->
@@ -115,7 +115,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
         masteryPercent =
             Xp.levelPercent Xp.defaultSchedule mxp
 
-        activityMastery : Activity.Mastery
+        activityMastery : Mastery
         activityMastery =
             Activity.getActivityMasteries activity
 

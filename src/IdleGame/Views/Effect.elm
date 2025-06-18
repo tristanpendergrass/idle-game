@@ -5,10 +5,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
+import IdleGame.Mod as Mod
 import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -38,10 +38,10 @@ renderModdedEffect renderType game effect =
         maybeEffectContent : Maybe (Html msg)
         maybeEffectContent =
             case Effect.getEffectType effect of
-                Effect.NoOp ->
+                EffectNoOp ->
                     Nothing
 
-                Effect.OneOf firstEffect restEffects ->
+                OneOf firstEffect restEffects ->
                     let
                         effects : List Effect
                         effects =
@@ -62,22 +62,22 @@ renderModdedEffect renderType game effect =
                                 )
                             )
 
-                Effect.GainCoin coin ->
+                GainCoin coin ->
                     Just (renderCoin coin)
 
-                Effect.GainResource params ->
+                GainResource params ->
                     Just (renderResource game params.resource params.base { showTitle = renderType == DetailView, showTooltip = renderType == Card })
 
-                Effect.SpendResource params ->
+                SpendResource params ->
                     Just (renderResource game params.resource (-1 * params.base) { showTitle = renderType == DetailView, showTooltip = renderType == Card })
 
-                Effect.GainXp params ->
+                GainXp params ->
                     Just (renderXp params)
 
-                Effect.GainMxp params ->
+                GainMxp params ->
                     Just (renderMxp game params)
 
-                Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+                VariableSuccess { successProbability, successEffects, failureEffects } ->
                     case successEffects of
                         [] ->
                             Nothing
@@ -201,7 +201,7 @@ renderResource game resource base { showTitle, showTooltip } =
         ]
 
 
-renderXp : Effect.GainXpParams -> Html msg
+renderXp : GainXpParams -> Html msg
 renderXp params =
     div [ class "grid grid-cols-12 justify-items-center items-center gap-1" ]
         [ IdleGame.Views.Utils.skillXpBadge params.skill
@@ -214,7 +214,7 @@ renderXp params =
         ]
 
 
-renderMxp : Game -> Effect.GainMxpParams -> Html msg
+renderMxp : Game -> GainMxpParams -> Html msg
 renderMxp game params =
     let
         base : Xp

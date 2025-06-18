@@ -3,9 +3,9 @@ module IdleGame.Activity exposing (..)
 import Duration exposing (Duration)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
+import IdleGame.Mod as Mod
 import IdleGame.OneTime as OneTime
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
@@ -81,17 +81,6 @@ hasMasteryMods mastery =
     not (List.isEmpty mastery.atLevel && List.isEmpty mastery.perLevel)
 
 
-type alias Mastery =
-    { perLevel : List { interval : Int, mod : Mod } -- The Int is the number of levels you gain to get an instance of the mod
-    , atLevel : List { level : Int, mod : Mod }
-    }
-
-
-type Mod
-    = IntervalMod IntervalMod -- Activity interval decreased by this much
-    | EffectMod EffectMod -- Apply mod to game
-
-
 getActivityEffects : Activity -> List Effect
 getActivityEffects activity =
     getByActivity activity activityEffects
@@ -119,9 +108,9 @@ getActivityEffectsHelper activity =
         stats =
             getActivityStats activity
 
-        tagsForThisActivity : List Effect.Tag
+        tagsForThisActivity : List Tag
         tagsForThisActivity =
-            [ Effect.ActivityTag activity, Effect.SkillTag stats.skill ]
+            [ ActivityTag activity, SkillTag stats.skill ]
 
         costs : List Effect
         costs =
@@ -162,7 +151,7 @@ getActivityMasteriesHelper activity =
                         EffectMod
                             (Mod.resourceDoublingBuff (Percent.float 0.1)
                                 |> Mod.withLabel "+10% resource doubling for this herb"
-                                |> Mod.withTags [ Effect.ActivityTag activity ]
+                                |> Mod.withTags [ ActivityTag activity ]
                             )
                   }
                 , { level = 50
@@ -170,7 +159,7 @@ getActivityMasteriesHelper activity =
                         EffectMod
                             (Mod.resourceDoublingBuff (Percent.float 0.1)
                                 |> Mod.withLabel "+10% resource doubling for this herb"
-                                |> Mod.withTags [ Effect.ActivityTag activity ]
+                                |> Mod.withTags [ ActivityTag activity ]
                             )
                   }
                 , { level = 75
@@ -178,7 +167,7 @@ getActivityMasteriesHelper activity =
                         EffectMod
                             (Mod.resourceDoublingBuff (Percent.float 0.1)
                                 |> Mod.withLabel "+10% resource doubling for this herb"
-                                |> Mod.withTags [ Effect.ActivityTag activity ]
+                                |> Mod.withTags [ ActivityTag activity ]
                             )
                   }
                 , { level = 99
@@ -186,7 +175,7 @@ getActivityMasteriesHelper activity =
                         EffectMod
                             (Mod.resourceBaseBuff 1
                                 |> Mod.withLabel "+1 herb gathered"
-                                |> Mod.withTags [ Effect.ActivityTag activity ]
+                                |> Mod.withTags [ ActivityTag activity ]
                             )
                   }
                 ]

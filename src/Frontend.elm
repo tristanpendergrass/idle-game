@@ -17,12 +17,11 @@ import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.CombatWrapper
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mocks
-import IdleGame.Mod as Mod exposing (EffectMod)
+import IdleGame.Mod as Mod
 import IdleGame.OneTime exposing (OneTimeStatus(..))
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
@@ -1808,7 +1807,7 @@ view model =
 getCache : Game -> Cache
 getCache game =
     let
-        mods : List EffectMod
+        mods : List EffectModParams
         mods =
             Game.getAllEffectMods game
     in

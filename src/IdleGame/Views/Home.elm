@@ -3,7 +3,7 @@ module IdleGame.Views.Home exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.Effect as Effect exposing (Effect)
+import IdleGame.Effect as Effect
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)

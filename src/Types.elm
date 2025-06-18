@@ -13,9 +13,8 @@ import EmailAddress exposing (EmailAddress)
 import Http
 import Id exposing (GameId, Id, LoginToken, UserId)
 import IdleGame.Coin as Coin exposing (Coin)
-import IdleGame.Effect exposing (Effect)
 import IdleGame.Kinds exposing (..)
-import IdleGame.OneTime as OneTime
+import IdleGame.OneTime as OneTime exposing (OneTimeStatus)
 import IdleGame.Resource as Resource
 import IdleGame.Snapshot as Snapshot exposing (Snapshot)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -422,18 +421,6 @@ type alias MoveUi =
     }
 
 
-type IntervalModLabel
-    = IntervalModLabel Percent
-
-
-type alias IntervalMod =
-    { kind : Activity
-    , percentChange : Percent -- e.g. 0.25 -> 25% faster
-    , label : IntervalModLabel
-    , count : Int -- How many times to apply this mod
-    }
-
-
 type Toast
     = GainedCoin Coin
     | GainedResource Int Resource
@@ -445,3 +432,118 @@ type Toast
 type CardImage
     = CardLandscape String
     | CardIcon Icon
+
+
+
+-- Mod types
+
+
+type alias Mastery =
+    { perLevel : List { interval : Int, mod : Mod }
+    , atLevel : List { level : Int, mod : Mod }
+    }
+
+
+type Mod
+    = EffectMod EffectModParams
+    | IntervalMod IntervalModParams
+
+
+type ModSource
+    = AdminCrimes
+    | ShopItem
+
+
+type alias EffectModParams =
+    { tags : List Tag
+    , label : String
+    , transformer : Transformer
+    , count : Int -- How many times to apply this mod
+    , source : ModSource
+    }
+
+
+type alias Transformer =
+    Int -> Effect -> TransformerResult
+
+
+type TransformerResult
+    = NoChange
+    | ChangeEffect Effect
+    | ChangeAndAddEffects Effect (List Effect)
+
+
+type alias SimpleTransformer =
+    EffectType -> EffectType
+
+
+type IntervalModLabel
+    = IntervalModLabel Percent
+
+
+type alias IntervalModParams =
+    { activity : Activity
+    , percentChange : Percent -- e.g. 0.25 -> 25% faster
+    , label : IntervalModLabel
+    , count : Int -- How many times to apply this mod
+    }
+
+
+
+-- Effect types
+
+
+type Tag
+    = SkillTag Skill -- This effect is associated with the given skill
+    | ActivityTag Activity -- This effect is associated with the given activity
+    | ActivityCompleteTag -- This effect represents the completion of an activity
+
+
+type alias Effect =
+    { effect : EffectType
+    , tags : List Tag
+    , oneTimeStatus : OneTimeStatus
+    }
+
+
+type alias GainXpParams =
+    { base : Xp
+    , percentIncrease : Percent
+    , skill : Skill
+    }
+
+
+type alias GainMxpParams =
+    { percentIncrease : Percent
+    , activity : Activity
+    }
+
+
+type alias GainCoinParams =
+    { base : Coin
+    , percentIncrease : Percent
+    }
+
+
+type alias GainResourceParams =
+    { base : Int, doublingChance : Percent, resource : Resource }
+
+
+type alias SpendResourceParams =
+    { base : Int, resource : Resource, preservationChance : Percent, reducedBy : Maybe ReducedBy }
+
+
+type ReducedBy
+    = ReducedByFlat Resource
+    | ReducedByPercent Resource Percent -- The Percent is the % per resource. E.g. if you have 2 resources * 5 Percent = 10% reduction
+
+
+type EffectType
+    = EffectNoOp -- Something happened that's not going to affect anything on its own. But tags may be attached to the NoOp effect and mods may change it.
+    | VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
+    | OneOf Effect (List Effect) -- One of the effects in the list will be chosen at random
+    | GainResource GainResourceParams
+    | SpendResource SpendResourceParams
+    | GainXp GainXpParams
+    | GainMxp GainMxpParams
+    | GainCoin GainCoinParams

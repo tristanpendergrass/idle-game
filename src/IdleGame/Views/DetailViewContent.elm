@@ -5,11 +5,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Events.Extra exposing (onClickPreventDefault)
 import IdleGame.Activity as Activity
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.Game as Game
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
-import IdleGame.Skill as Skill
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Activity as ActivityView
 import IdleGame.Views.Effect as EffectView
@@ -103,7 +101,7 @@ renderContent obj extraBottomPadding game =
         stats =
             getActivityStats activity
 
-        activityMastery : Activity.Mastery
+        activityMastery : Mastery
         activityMastery =
             Activity.getActivityMasteries activity
 
@@ -212,19 +210,19 @@ intervalModLabelToString modLabel =
             "+" ++ IdleGame.Views.Utils.floatToString 2 (Percent.toPercentage buff) ++ "% faster"
 
 
-masterySection : Xp -> Activity.Mastery -> Html FrontendMsg
+masterySection : Xp -> Mastery -> Html FrontendMsg
 masterySection mxp mastery =
     let
-        renderPerLevelMastery : { interval : Int, mod : Activity.Mod } -> Html FrontendMsg
+        renderPerLevelMastery : { interval : Int, mod : Mod } -> Html FrontendMsg
         renderPerLevelMastery { interval, mod } =
             let
                 rewardText : String
                 rewardText =
                     case mod of
-                        Activity.EffectMod gameMod ->
+                        EffectMod gameMod ->
                             gameMod.label
 
-                        Activity.IntervalMod intervalMod ->
+                        IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
 
                 rowText : String
@@ -264,16 +262,16 @@ masterySection mxp mastery =
                 , td [ class "w-full" ] [ text rowText ]
                 ]
 
-        renderAtLevelMastery : { level : Int, mod : Activity.Mod } -> Html FrontendMsg
+        renderAtLevelMastery : { level : Int, mod : Mod } -> Html FrontendMsg
         renderAtLevelMastery { level, mod } =
             let
                 rewardText : String
                 rewardText =
                     case mod of
-                        Activity.EffectMod gameMod ->
+                        EffectMod gameMod ->
                             gameMod.label
 
-                        Activity.IntervalMod intervalMod ->
+                        IntervalMod intervalMod ->
                             intervalModLabelToString intervalMod.label
 
                 isAchieved : Bool

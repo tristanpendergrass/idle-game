@@ -4,9 +4,8 @@ import Html exposing (..)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
 import IdleGame.Skill as Skill
 import IdleGame.Views.Icon as Icon exposing (Icon, book, readingGlasses)
 import List.Extra
@@ -28,9 +27,9 @@ type alias Stats =
     }
 
 
-intervalMod : Activity -> Percent -> IntervalMod
+intervalMod : Activity -> Percent -> IntervalModParams
 intervalMod kind percentChange =
-    { kind = kind, percentChange = percentChange, label = IntervalModLabel percentChange, count = 1 }
+    { activity = kind, percentChange = percentChange, label = IntervalModLabel percentChange, count = 1 }
 
 
 getStats : ShopUpgrade -> Stats
@@ -45,8 +44,8 @@ type alias OwnedItems =
 
 
 type Reward
-    = ShopItemMod (List EffectMod)
-    | ShopItemIntervalMod (List IntervalMod)
+    = ShopItemMod (List EffectModParams)
+    | ShopItemIntervalMod (List IntervalModParams)
 
 
 toOwnedItems : ShopUpgradeRecord Bool -> List ShopUpgrade

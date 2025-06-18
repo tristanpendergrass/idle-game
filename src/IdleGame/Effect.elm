@@ -3,68 +3,13 @@ module IdleGame.Effect exposing (..)
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
 import IdleGame.Kinds exposing (..)
-import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
+import IdleGame.OneTime as OneTimeStatus
 import IdleGame.Resource as Resource
 import IdleGame.Skill as Skill
 import IdleGame.Xp as Xp exposing (Xp)
 import Percent exposing (Percent)
 import Task exposing (fail)
-
-
-type Tag
-    = SkillTag Skill -- This effect is associated with the given skill
-    | ActivityTag Activity -- This effect is associated with the given activity
-    | ActivityCompleteTag -- This effect represents the completion of an activity
-
-
-type alias Effect =
-    { effect : EffectType
-    , tags : List Tag
-    , oneTimeStatus : OneTimeStatus
-    }
-
-
-type alias GainXpParams =
-    { base : Xp
-    , percentIncrease : Percent
-    , skill : Skill
-    }
-
-
-type alias GainMxpParams =
-    { percentIncrease : Percent
-    , activity : Activity
-    }
-
-
-type alias GainCoinParams =
-    { base : Coin
-    , percentIncrease : Percent
-    }
-
-
-type alias GainResourceParams =
-    { base : Int, doublingChance : Percent, resource : Resource }
-
-
-type alias SpendResourceParams =
-    { base : Int, resource : Resource, preservationChance : Percent, reducedBy : Maybe ReducedBy }
-
-
-type ReducedBy
-    = ReducedByFlat Resource
-    | ReducedByPercent Resource Percent -- The Percent is the % per resource. E.g. if you have 2 resources * 5 Percent = 10% reduction
-
-
-type EffectType
-    = NoOp -- Something happened that's not going to affect anything on its own. But tags may be attached to the NoOp effect and mods may change it.
-    | VariableSuccess { successProbability : Percent, successEffects : List Effect, failureEffects : List Effect }
-    | OneOf Effect (List Effect) -- One of the effects in the list will be chosen at random
-    | GainResource GainResourceParams
-    | SpendResource SpendResourceParams
-    | GainXp GainXpParams
-    | GainMxp GainMxpParams
-    | GainCoin GainCoinParams
+import Types exposing (..)
 
 
 getEffectType : Effect -> EffectType
@@ -87,7 +32,7 @@ effect type_ =
 
 noOp : Effect
 noOp =
-    effect NoOp
+    effect EffectNoOp
 
 
 gainCoin : Coin -> Effect

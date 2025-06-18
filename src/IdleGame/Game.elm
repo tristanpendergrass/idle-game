@@ -4,11 +4,11 @@ import Duration exposing (Duration)
 import IdleGame.Activity as Activity
 import IdleGame.Coin as Coin exposing (Coin)
 import IdleGame.Counter as Counter exposing (Counter)
-import IdleGame.Effect as Effect exposing (Effect, EffectType)
+import IdleGame.Effect as Effect
 import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Kinds exposing (..)
-import IdleGame.Mod as Mod exposing (EffectMod)
-import IdleGame.OneTime as OneTimeStatus exposing (OneTimeStatus)
+import IdleGame.Mod as Mod
+import IdleGame.OneTime as OneTimeStatus
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
@@ -22,7 +22,6 @@ import Quantity
 import Random exposing (Generator)
 import Random.Extra
 import Svg.Attributes exposing (preserveAlpha)
-import Tuple
 import Types exposing (..)
 
 
@@ -180,7 +179,7 @@ setActivity activity g =
     { g | activity = activity }
 
 
-applyIntervalMods : List IntervalMod -> Duration -> Duration
+applyIntervalMods : List IntervalModParams -> Duration -> Duration
 applyIntervalMods mods duration =
     let
         multiplier =
@@ -201,11 +200,12 @@ getModdedDuration game kind =
         stats =
             getActivityStats kind
 
+        mods : List IntervalModParams
         mods =
             getAllIntervalMods game
                 |> List.filter
                     (\mod ->
-                        mod.kind == kind
+                        mod.activity == kind
                     )
     in
     stats.duration
@@ -267,7 +267,7 @@ tick delta game =
 
                 Just event ->
                     let
-                        mods : List EffectMod
+                        mods : List EffectModParams
                         mods =
                             getAllEffectMods game
 
@@ -324,7 +324,7 @@ attemptPurchaseResource amount resource game =
         effects =
             getPurchaseEffects amount resource
 
-        mods : List EffectMod
+        mods : List EffectModParams
         mods =
             getAllEffectMods game
 
@@ -351,7 +351,7 @@ attemptSellResource amount resource game =
         effects =
             getSellEffects amount resource
 
-        mods : List EffectMod
+        mods : List EffectModParams
         mods =
             getAllEffectMods game
 
@@ -376,7 +376,7 @@ setSeed seed game =
     { game | seed = seed }
 
 
-applyEvent : List EffectMod -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
+applyEvent : List EffectModParams -> Event -> Generator ( Game, List Toast ) -> Generator ( Game, List Toast )
 applyEvent mods { effects, count } =
     -- TODO: revisit this function's name. Why we need this and applyEffects?
     Random.andThen
@@ -420,7 +420,7 @@ type alias ApplyEffectsResultGenerator =
     Generator (Result EffectErr ApplyEffectsValue)
 
 
-applyEffects : List EffectMod -> List { effect : Effect, count : Int } -> Game -> ApplyEffectsResultGenerator
+applyEffects : List EffectModParams -> List { effect : Effect, count : Int } -> Game -> ApplyEffectsResultGenerator
 applyEffects mods effects game =
     case effects of
         [] ->
@@ -526,7 +526,7 @@ calculateActivityMxp kind game =
 
 type alias ApplyEffectValue =
     -- When applying an effect a toast is generated to inform the player what happened
-    { game : Game, toasts : List Toast, additionalEffects : List { effect : Effect, count : Int }, additionalMods : List EffectMod }
+    { game : Game, toasts : List Toast, additionalEffects : List { effect : Effect, count : Int }, additionalMods : List EffectModParams }
 
 
 type alias ApplyEffectResultGenerator =
@@ -613,10 +613,10 @@ effectReducer effect count game =
 
     else
         case Effect.getEffectType effect of
-            Effect.NoOp ->
+            EffectNoOp ->
                 Random.constant (Ok { game = game, toasts = [], additionalEffects = [], additionalMods = [] })
 
-            Effect.VariableSuccess { successProbability, successEffects, failureEffects } ->
+            VariableSuccess { successProbability, successEffects, failureEffects } ->
                 combineLarge (List.repeat count (probabilityGenerator successProbability))
                     |> Random.map
                         (\results ->
@@ -647,7 +647,7 @@ effectReducer effect count game =
                             Ok (ApplyEffectValue game [] effects [])
                         )
 
-            Effect.OneOf firstEffect restEffects ->
+            OneOf firstEffect restEffects ->
                 combine (List.repeat count (Random.uniform firstEffect restEffects))
                     |> Random.map
                         (\results ->
@@ -661,7 +661,7 @@ effectReducer effect count game =
                             Ok (ApplyEffectValue game [] effectCounts [])
                         )
 
-            Effect.GainCoin { base, percentIncrease } ->
+            GainCoin { base, percentIncrease } ->
                 let
                     product : Coin
                     product =
@@ -672,7 +672,7 @@ effectReducer effect count game =
                 addCoin product game
                     |> Random.constant
 
-            Effect.GainResource { base, resource, doublingChance } ->
+            GainResource { base, resource, doublingChance } ->
                 probabilityGenerator doublingChance
                     |> Random.map
                         (\doubled ->
@@ -688,7 +688,7 @@ effectReducer effect count game =
                             adjustResource resource result game
                         )
 
-            Effect.SpendResource { base, resource, preservationChance, reducedBy } ->
+            SpendResource { base, resource, preservationChance, reducedBy } ->
                 probabilityGenerator preservationChance
                     |> Random.map
                         (\preserved ->
@@ -699,10 +699,10 @@ effectReducer effect count game =
                                         Nothing ->
                                             amount
 
-                                        Just (Effect.ReducedByFlat reductionResource) ->
+                                        Just (ReducedByFlat reductionResource) ->
                                             amount - getByResource reductionResource game.resources
 
-                                        Just (Effect.ReducedByPercent reductionResource percentReduction) ->
+                                        Just (ReducedByPercent reductionResource percentReduction) ->
                                             let
                                                 reductionResourceAmount : Float
                                                 reductionResourceAmount =
@@ -724,7 +724,7 @@ effectReducer effect count game =
                                 adjustResource resource (-1 * adjustedAmount * count) game
                         )
 
-            Effect.GainXp { base, percentIncrease, skill } ->
+            GainXp { base, percentIncrease, skill } ->
                 let
                     xp : Xp
                     xp =
@@ -740,7 +740,7 @@ effectReducer effect count game =
                     |> Random.constant
                     |> Random.map Ok
 
-            Effect.GainMxp params ->
+            GainMxp params ->
                 let
                     base : Xp
                     base =
@@ -883,7 +883,7 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-getShopItemMods : Game -> List EffectMod
+getShopItemMods : Game -> List EffectModParams
 getShopItemMods game =
     game.ownedShopUpgrades
         |> ShopUpgrade.toOwnedItems
@@ -900,7 +900,7 @@ getShopItemMods game =
         |> List.concat
 
 
-getShopItemIntervalMods : Game -> List IntervalMod
+getShopItemIntervalMods : Game -> List IntervalModParams
 getShopItemIntervalMods game =
     game.ownedShopUpgrades
         |> ShopUpgrade.toOwnedItems
@@ -917,13 +917,13 @@ getShopItemIntervalMods game =
         |> List.concat
 
 
-getMasteryIntervalMods : Game -> List IntervalMod
+getMasteryIntervalMods : Game -> List IntervalModParams
 getMasteryIntervalMods game =
     let
-        getFromActivity : Activity -> List IntervalMod
+        getFromActivity : Activity -> List IntervalModParams
         getFromActivity activity =
             let
-                activityMastery : Activity.Mastery
+                activityMastery : Mastery
                 activityMastery =
                     Activity.getActivityMasteries activity
 
@@ -939,7 +939,7 @@ getMasteryIntervalMods game =
                 |> List.filterMap
                     (\mod ->
                         case mod of
-                            Activity.IntervalMod intervalMod ->
+                            IntervalMod intervalMod ->
                                 Just intervalMod
 
                             _ ->
@@ -949,10 +949,10 @@ getMasteryIntervalMods game =
     List.concatMap getFromActivity allActivities
 
 
-getMasteryRewards : Game -> Activity -> List Activity.Mod
+getMasteryRewards : Game -> Activity -> List Mod
 getMasteryRewards game activity =
     let
-        activityMastery : Activity.Mastery
+        activityMastery : Mastery
         activityMastery =
             Activity.getActivityMasteries activity
 
@@ -967,13 +967,13 @@ getMasteryRewards game activity =
     Activity.masteryModsAtLevel masteryLevel activityMastery
 
 
-getActivityMods : Game -> List EffectMod
+getActivityMods : Game -> List EffectModParams
 getActivityMods game =
     let
-        getGameMod : Activity.Mod -> Maybe EffectMod
+        getGameMod : Mod -> Maybe EffectModParams
         getGameMod reward =
             case reward of
-                Activity.EffectMod mod ->
+                EffectMod mod ->
                     Just mod
 
                 _ ->
@@ -984,9 +984,9 @@ getActivityMods game =
         |> List.filterMap getGameMod
 
 
-addActivityTagToMods : Activity -> List EffectMod -> List EffectMod
+addActivityTagToMods : Activity -> List EffectModParams -> List EffectModParams
 addActivityTagToMods activity =
-    List.map (Mod.withTags [ Effect.ActivityTag activity ])
+    List.map (Mod.withTags [ ActivityTag activity ])
 
 
 
@@ -1000,7 +1000,7 @@ addActivityTagToMods activity =
 --                 |> getByActivity activity
 
 
-getAllEffectMods : Game -> List EffectMod
+getAllEffectMods : Game -> List EffectModParams
 getAllEffectMods game =
     []
         -- ++ getSpellAssignmentsMods game
@@ -1014,7 +1014,7 @@ getAllEffectMods game =
 -- Interval Mods
 
 
-getAllIntervalMods : Game -> List IntervalMod
+getAllIntervalMods : Game -> List IntervalModParams
 getAllIntervalMods game =
     let
         shopItemIntervalMods =
