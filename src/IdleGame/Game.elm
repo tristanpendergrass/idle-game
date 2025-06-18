@@ -883,37 +883,11 @@ getTimePassesData originalGame currentGame =
 -- Events
 
 
-getShopItemMods : Game -> List EffectModParams
+getShopItemMods : Game -> List Mod
 getShopItemMods game =
     game.ownedShopUpgrades
         |> ShopUpgrade.toOwnedItems
-        |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).reward)
-        |> List.filterMap
-            (\reward ->
-                case reward of
-                    ShopUpgrade.ShopItemMod mods ->
-                        Just mods
-
-                    _ ->
-                        Nothing
-            )
-        |> List.concat
-
-
-getShopItemIntervalMods : Game -> List IntervalModParams
-getShopItemIntervalMods game =
-    game.ownedShopUpgrades
-        |> ShopUpgrade.toOwnedItems
-        |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).reward)
-        |> List.filterMap
-            (\reward ->
-                case reward of
-                    ShopUpgrade.ShopItemIntervalMod mods ->
-                        Just mods
-
-                    _ ->
-                        Nothing
-            )
+        |> List.map (\shopItem -> (ShopUpgrade.getStats shopItem).mods)
         |> List.concat
 
 
@@ -967,21 +941,9 @@ getMasteryRewards game activity =
     Activity.masteryModsAtLevel masteryLevel activityMastery
 
 
-getActivityMods : Game -> List EffectModParams
+getActivityMods : Game -> List Mod
 getActivityMods game =
-    let
-        getGameMod : Mod -> Maybe EffectModParams
-        getGameMod reward =
-            case reward of
-                EffectMod mod ->
-                    Just mod
-
-                _ ->
-                    Nothing
-    in
-    allActivities
-        |> List.concatMap (getMasteryRewards game)
-        |> List.filterMap getGameMod
+    List.concatMap (getMasteryRewards game) allActivities
 
 
 addActivityTagToMods : Activity -> List EffectModParams -> List EffectModParams
@@ -989,7 +951,7 @@ addActivityTagToMods activity =
     List.map (Mod.withTags [ ActivityTag activity ])
 
 
-getSpellAssignmentsMods : Game -> List EffectModParams
+getSpellAssignmentsMods : Game -> List Mod
 getSpellAssignmentsMods game =
     case game.activity of
         Nothing ->
@@ -1000,19 +962,10 @@ getSpellAssignmentsMods game =
                 |> getByActivity activity
                 |> Maybe.map (Resource.getMods activity)
                 |> Maybe.withDefault []
-                |> List.filterMap
-                    (\mod ->
-                        case mod of
-                            EffectMod m ->
-                                Just m
-
-                            _ ->
-                                Nothing
-                    )
 
 
-getAllEffectMods : Game -> List EffectModParams
-getAllEffectMods game =
+getAllMods : Game -> List Mod
+getAllMods game =
     []
         ++ getActivityMods game
         ++ getShopItemMods game
@@ -1020,24 +973,55 @@ getAllEffectMods game =
 
 
 
--- |> List.map Mod.includeVariableEffects
--- Originally thought we might want only some mods to have this, now I think all should?
--- Interval Mods
+-- getAllEffectMods : Game -> List EffectModParams
+-- getAllEffectMods game =
+--     []
+--         ++ getActivityMods game
+--         ++ getShopItemMods game
+--         ++ getSpellAssignmentsMods game
+
+
+getAllEffectMods : Game -> List EffectModParams
+getAllEffectMods game =
+    getAllMods game
+        |> List.filterMap
+            (\mod ->
+                case mod of
+                    EffectMod m ->
+                        Just m
+
+                    _ ->
+                        Nothing
+            )
 
 
 getAllIntervalMods : Game -> List IntervalModParams
 getAllIntervalMods game =
-    let
-        shopItemIntervalMods =
-            getShopItemIntervalMods game
+    getAllMods game
+        |> List.filterMap
+            (\mod ->
+                case mod of
+                    IntervalMod m ->
+                        Just m
 
-        choreUnlockIntervalMods =
-            getMasteryIntervalMods game
-    in
-    shopItemIntervalMods ++ choreUnlockIntervalMods
+                    _ ->
+                        Nothing
+            )
 
 
 
+-- |> List.map Mod.includeVariableEffects
+-- Originally thought we might want only some mods to have this, now I think all should?
+-- Interval Mods
+-- getAllIntervalMods : Game -> List IntervalModParams
+-- getAllIntervalMods game =
+--     let
+--         shopItemIntervalMods =
+--             getShopItemIntervalMods game
+--         choreUnlockIntervalMods =
+--             getMasteryIntervalMods game
+--     in
+--     shopItemIntervalMods ++ choreUnlockIntervalMods
 --
 
 

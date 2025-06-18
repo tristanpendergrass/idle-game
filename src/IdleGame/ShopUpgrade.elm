@@ -22,7 +22,7 @@ type alias Stats =
     { title : String
     , icon : Icon
     , price : Coin
-    , reward : Reward
+    , mods : List Mod
     , description : String
     }
 
@@ -43,11 +43,6 @@ type alias OwnedItems =
     ShopUpgradeRecord Bool
 
 
-type Reward
-    = ShopItemMod (List EffectModParams)
-    | ShopItemIntervalMod (List IntervalModParams)
-
-
 toOwnedItems : ShopUpgradeRecord Bool -> List ShopUpgrade
 toOwnedItems shopItems =
     allShopUpgrades
@@ -59,8 +54,6 @@ glassesStats =
     { title = "Glasses"
     , icon = Icon.readingGlasses
     , price = Coin.int 50
-    , reward =
-        ShopItemMod
-            []
+    , mods = []
     , description = "+10% coin from all sources"
     }
