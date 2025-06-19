@@ -126,44 +126,6 @@ type alias ActivityStatus =
     Maybe Timer
 
 
-toggleActivity : Activity -> Game -> Game
-toggleActivity kind game =
-    let
-        stats : ActivityStats
-        stats =
-            getActivityStats kind
-
-        canToggle : Bool
-        canToggle =
-            let
-                currentLevel : Int
-                currentLevel =
-                    getBySkill stats.skill game.xp
-                        |> Xp.level Xp.defaultSchedule
-            in
-            currentLevel >= stats.level
-    in
-    if canToggle then
-        game
-
-    else
-        let
-            newActivity : Maybe ( Activity, Timer )
-            newActivity =
-                case game.activity of
-                    Just ( k, _ ) ->
-                        if kind == k then
-                            Nothing
-
-                        else
-                            Just ( kind, Timer.create )
-
-                    Nothing ->
-                        Just ( kind, Timer.create )
-        in
-        setActivity newActivity game
-
-
 activityIsActive : Activity -> Game -> Bool
 activityIsActive kind game =
     case game.activity of
