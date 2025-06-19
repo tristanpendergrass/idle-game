@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@parcel/transformer-elm": "^2.7.0",
+    "@playwright/test": "^1.53.1",
     "@tailwindcss/typography": "^0.5.13",
     "axios": "^1.7.2",
     "daisyui": "^5.0.35",
