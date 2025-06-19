@@ -89,8 +89,3 @@ toList resources =
 getLabel : Resource -> String
 getLabel resource =
     (getResourceStats resource).title
-
-
-getMods : Activity -> Resource -> List Mod
-getMods activity resource =
-    []

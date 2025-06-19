@@ -960,8 +960,38 @@ getSpellAssignmentsMods game =
         Just ( activity, _ ) ->
             game.spellAssignments
                 |> getByActivity activity
-                |> Maybe.map (Resource.getMods activity)
+                |> Maybe.map (getSpellAssignmentModsHelp activity)
                 |> Maybe.withDefault []
+
+
+getSpellAssignmentModsHelp : Activity -> Resource -> List Mod
+getSpellAssignmentModsHelp activity resource =
+    let
+        activityStats : ActivityStats
+        activityStats =
+            getActivityStats activity
+
+        resourceStats : ResourceStats
+        resourceStats =
+            getResourceStats resource
+    in
+    case resource of
+        SpellHerbSense ->
+            if activityStats.skill == HerbGathering then
+                [ EffectMod (Mod.resourceDoublingBuff (Percent.float 0.1)) ]
+
+            else
+                []
+
+        SpellBloom ->
+            if activityStats.skill == HerbGathering then
+                [ IntervalMod { activity = activity, percentChange = Percent.float 0.25, label = IntervalModLabel (Percent.float 0.25), count = 1 } ]
+
+            else
+                []
+
+        _ ->
+            []
 
 
 getAllMods : Game -> List Mod
