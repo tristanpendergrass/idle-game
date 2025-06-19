@@ -1,6 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { test } from '@playwright/test';
+import { createAndEnterGame, navigateToTab, startActivity } from './utils';
 
-test("shows Games text", async ({ page }) => {
-  await page.goto("http://localhost:8000");
-  await expect(page.getByText("Games")).toBeVisible();
+test('start Gather Sage', async ({ page }) => {
+  await createAndEnterGame(page);
+  await navigateToTab(page, 'Herb Gathering');
+  await startActivity(page, 'Gather Sage');
 });
