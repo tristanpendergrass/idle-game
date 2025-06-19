@@ -1,0 +1,1 @@
+After changes to source code, check it compiles with `lamdera make src/Frontend.elm src/Backend.elm`.
