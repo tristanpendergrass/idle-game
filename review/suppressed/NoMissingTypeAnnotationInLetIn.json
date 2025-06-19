@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 14, "filePath": "src/Frontend.elm" },
+    { "count": 9, "filePath": "src/IdleGame/Views/Utils.elm" },
+    { "count": 8, "filePath": "src/IdleGame/Timer.elm" },
+    { "count": 8, "filePath": "src/IdleGame/Views/MainMenu.elm" },
+    { "count": 7, "filePath": "src/IdleGame/Game.elm" },
+    { "count": 6, "filePath": "send-grid/SendGrid.elm" },
+    { "count": 6, "filePath": "src/IdleGame/Combat_test.elm" },
+    { "count": 5, "filePath": "src/IdleGame/Mod.elm" },
+    { "count": 4, "filePath": "src/IdleGame/Combat.elm" },
+    { "count": 4, "filePath": "src/IdleGame/Snapshot.elm" },
+    { "count": 3, "filePath": "src/Backend.elm" },
+    { "count": 3, "filePath": "src/Id.elm" },
+    { "count": 3, "filePath": "src/IdleGame/Views/Drawer.elm" },
+    { "count": 3, "filePath": "src/IdleGame/Views/Shop.elm" },
+    { "count": 2, "filePath": "send-grid/EmailAddress.elm" },
+    { "count": 2, "filePath": "send-grid/Internal.elm" },
+    { "count": 2, "filePath": "src/IdleGame/CombatWrapper.elm" },
+    { "count": 2, "filePath": "src/IdleGame/Game_test.elm" },
+    { "count": 2, "filePath": "src/Postmark.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Kinds.elm" },
+    { "count": 1, "filePath": "src/IdleGame/TimePasses_test.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/Bag.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/DebugPanel.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/DetailViewContent.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/ModalWrapper.elm" }
+  ]
+}

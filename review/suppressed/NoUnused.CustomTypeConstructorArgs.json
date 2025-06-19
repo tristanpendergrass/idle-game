@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 48, "filePath": "src/Evergreen/V1/Types.elm" },
+    { "count": 48, "filePath": "src/Evergreen/V2/Types.elm" },
+    { "count": 13, "filePath": "src/Evergreen/V1/IdleGame/Effect.elm" },
+    { "count": 13, "filePath": "src/Evergreen/V2/IdleGame/Effect.elm" },
+    { "count": 8, "filePath": "src/Types.elm" },
+    { "count": 6, "filePath": "send-grid/SendGrid.elm" },
+    { "count": 3, "filePath": "src/Evergreen/V1/IdleGame/GameTypes.elm" },
+    { "count": 3, "filePath": "src/Evergreen/V2/IdleGame/GameTypes.elm" },
+    { "count": 1, "filePath": "src/Cache.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V1/IdleGame/OneTime.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V1/IdleGame/Snapshot.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V1/IdleGame/Tab.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V1/IdleGame/Timer.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V2/IdleGame/OneTime.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V2/IdleGame/Snapshot.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V2/IdleGame/Tab.elm" },
+    { "count": 1, "filePath": "src/Evergreen/V2/IdleGame/Timer.elm" }
+  ]
+}

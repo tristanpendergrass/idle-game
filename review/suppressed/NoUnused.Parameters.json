@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 6, "filePath": "src/Evergreen/Migrate/V2.elm" },
+    { "count": 3, "filePath": "src/IdleGame/Views/Home.elm" },
+    { "count": 2, "filePath": "src/Backend.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Combat.elm" },
+    { "count": 1, "filePath": "src/IdleGame/CombatWrapper.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/MainMenu.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/SyllabusModal.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Views/TimePasses.elm" }
+  ]
+}

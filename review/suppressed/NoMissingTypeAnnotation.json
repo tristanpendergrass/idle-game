@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "automatically created by": "elm-review suppress",
+  "learn more": "elm-review suppress --help",
+  "suppressions": [
+    { "count": 3, "filePath": "src/Postmark.elm" },
+    { "count": 2, "filePath": "src/IdleGame/Views/Utils.elm" },
+    { "count": 1, "filePath": "send-grid/SendGrid.elm" },
+    { "count": 1, "filePath": "src/Backend.elm" },
+    { "count": 1, "filePath": "src/Env.elm" },
+    { "count": 1, "filePath": "src/Frontend.elm" },
+    { "count": 1, "filePath": "src/IdleGame/Game_test.elm" }
+  ]
+}
