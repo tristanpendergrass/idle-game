@@ -25,7 +25,15 @@ $ npx elm-test "src/**/*Tests.elm" // runs all tests in glob
 I created some quick performance tests in IdleGame/PerfTesting/. They were created to demonstrate how long calculating Time Passes would take after the player returned after various lengths of time. Each test varies the length of time and the "tick duration" to see what can be satisfactory. The tests all pass automatically, the true test is how long the test takes to run. Of course, this isn't necessarily reproducible across different machines, or representative of user hardware and results, but it's close enough to make some rough comparisons.
 
 ```
-npx elm-test src/IdleGame/PerfTesting/Test60Days.elm
+$ npx elm-test src/IdleGame/PerfTesting/Test60Days.elm
+```
+
+## E2E testing
+Playwright tests are in `/e2e` directory, run them like so:
+
+```
+npx playwright install -- Only have to run once
+npx playwright test
 ```
 
 # Codegen
