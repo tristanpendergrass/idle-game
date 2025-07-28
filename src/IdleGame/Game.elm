@@ -9,6 +9,7 @@ import IdleGame.EffectErr as EffectErr exposing (EffectErr)
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod as Mod
 import IdleGame.OneTime as OneTimeStatus
+import IdleGame.Quest as Quest
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
@@ -40,6 +41,8 @@ createProd seed =
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     , spellAssignments = activityRecord Nothing
+    , questProgress = Quest.initQuestProgress
+    , questStatus = Quest.initQuestStatus
     }
 
 
@@ -56,6 +59,8 @@ createDev seed =
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     , spellAssignments = activityRecord Nothing
+    , questProgress = Quest.initQuestProgress
+    , questStatus = Quest.initQuestStatus
     }
 
 
