@@ -560,6 +560,245 @@ getActivityStats kind =
 
 
 
+-- QUESTS
+
+
+type Quest
+    = GatherSupplies
+    | StudyAncientTexts  
+    | PrepareHerbalRemedies
+    | ResearchAnatomy
+    | CraftMedicalInstruments
+    | CollectBotanicalSpecimens
+
+
+allQuests : List Quest
+allQuests =
+    [ GatherSupplies
+    , StudyAncientTexts
+    , PrepareHerbalRemedies
+    , ResearchAnatomy
+    , CraftMedicalInstruments
+    , CollectBotanicalSpecimens
+    ]
+
+
+type alias QuestRecord a =
+    { gatherSupplies : a
+    , studyAncientTexts : a
+    , prepareHerbalRemedies : a
+    , researchAnatomy : a
+    , craftMedicalInstruments : a
+    , collectBotanicalSpecimens : a
+    }
+
+
+questRecord : a -> QuestRecord a
+questRecord a =
+    { gatherSupplies = a
+    , studyAncientTexts = a
+    , prepareHerbalRemedies = a
+    , researchAnatomy = a
+    , craftMedicalInstruments = a
+    , collectBotanicalSpecimens = a
+    }
+
+
+getByQuest : Quest -> QuestRecord a -> a
+getByQuest kind data =
+    case kind of
+        GatherSupplies ->
+            data.gatherSupplies
+
+        StudyAncientTexts ->
+            data.studyAncientTexts
+
+        PrepareHerbalRemedies ->
+            data.prepareHerbalRemedies
+
+        ResearchAnatomy ->
+            data.researchAnatomy
+
+        CraftMedicalInstruments ->
+            data.craftMedicalInstruments
+
+        CollectBotanicalSpecimens ->
+            data.collectBotanicalSpecimens
+
+
+setByQuest : Quest -> a -> QuestRecord a -> QuestRecord a
+setByQuest kind value data =
+    case kind of
+        GatherSupplies ->
+            { data | gatherSupplies = value }
+
+        StudyAncientTexts ->
+            { data | studyAncientTexts = value }
+
+        PrepareHerbalRemedies ->
+            { data | prepareHerbalRemedies = value }
+
+        ResearchAnatomy ->
+            { data | researchAnatomy = value }
+
+        CraftMedicalInstruments ->
+            { data | craftMedicalInstruments = value }
+
+        CollectBotanicalSpecimens ->
+            { data | collectBotanicalSpecimens = value }
+
+
+mapQuests : (a -> a) -> QuestRecord a -> QuestRecord a
+mapQuests fn record =
+    { gatherSupplies = fn record.gatherSupplies
+    , studyAncientTexts = fn record.studyAncientTexts
+    , prepareHerbalRemedies = fn record.prepareHerbalRemedies
+    , researchAnatomy = fn record.researchAnatomy
+    , craftMedicalInstruments = fn record.craftMedicalInstruments
+    , collectBotanicalSpecimens = fn record.collectBotanicalSpecimens
+    }
+
+
+type alias QuestStats =
+    { name : String
+    , description : String
+    , resourceRequirements : ResourceRecord Int
+    , coinReward : IdleGame.Coin.Coin
+    , icon : IdleGame.Views.Icon.Icon
+    }
+
+
+questStats : QuestRecord QuestStats
+questStats =
+    { gatherSupplies = 
+        { name = "Gather Medical Supplies"
+        , description = "Collect essential herbs and materials needed for your medical studies"
+        , resourceRequirements = 
+            { sage = 10
+            , nettle = 5
+            , sorrel = 0
+            , mugwort = 0
+            , yarrow = 0
+            , thyme = 0
+            , fennel = 0
+            , belladonna = 0
+            , henbane = 0
+            , parchment = 3
+            , spellHerbSense = 0
+            , spellBloom = 0
+            }
+        , coinReward = IdleGame.Coin.int 50
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams
+        }
+    , studyAncientTexts = 
+        { name = "Study Ancient Medical Texts"
+        , description = "Research historical medical knowledge from old parchments"
+        , resourceRequirements = 
+            { sage = 0
+            , nettle = 0
+            , sorrel = 0
+            , mugwort = 0
+            , yarrow = 0
+            , thyme = 0
+            , fennel = 0
+            , belladonna = 0
+            , henbane = 0
+            , parchment = 15
+            , spellHerbSense = 0
+            , spellBloom = 0
+            }
+        , coinReward = IdleGame.Coin.int 75
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams
+        }
+    , prepareHerbalRemedies = 
+        { name = "Prepare Herbal Remedies"
+        , description = "Craft healing potions using various herbs and magical enhancements"
+        , resourceRequirements = 
+            { sage = 5
+            , nettle = 3
+            , sorrel = 3
+            , mugwort = 2
+            , yarrow = 4
+            , thyme = 2
+            , fennel = 0
+            , belladonna = 0
+            , henbane = 0
+            , parchment = 0
+            , spellHerbSense = 1
+            , spellBloom = 1
+            }
+        , coinReward = IdleGame.Coin.int 100
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams
+        }
+    , researchAnatomy = 
+        { name = "Research Human Anatomy"
+        , description = "Study the human body using preserved specimens and detailed documentation"
+        , resourceRequirements = 
+            { sage = 8
+            , nettle = 0
+            , sorrel = 0
+            , mugwort = 0
+            , yarrow = 0
+            , thyme = 0
+            , fennel = 0
+            , belladonna = 3
+            , henbane = 2
+            , parchment = 20
+            , spellHerbSense = 0
+            , spellBloom = 0
+            }
+        , coinReward = IdleGame.Coin.int 125
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams
+        }
+    , craftMedicalInstruments = 
+        { name = "Craft Medical Instruments"
+        , description = "Create precise tools for medical examination and treatment"
+        , resourceRequirements = 
+            { sage = 0
+            , nettle = 0
+            , sorrel = 2
+            , mugwort = 5
+            , yarrow = 3
+            , thyme = 4
+            , fennel = 6
+            , belladonna = 0
+            , henbane = 0
+            , parchment = 5
+            , spellHerbSense = 2
+            , spellBloom = 0
+            }
+        , coinReward = IdleGame.Coin.int 150
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams
+        }
+    , collectBotanicalSpecimens = 
+        { name = "Collect Botanical Specimens"
+        , description = "Gather rare plants and document their medicinal properties"
+        , resourceRequirements = 
+            { sage = 2
+            , nettle = 2
+            , sorrel = 4
+            , mugwort = 3
+            , yarrow = 2
+            , thyme = 3
+            , fennel = 4
+            , belladonna = 5
+            , henbane = 3
+            , parchment = 8
+            , spellHerbSense = 1
+            , spellBloom = 2
+            }
+        , coinReward = IdleGame.Coin.int 200
+        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams
+        }
+    }
+
+
+getQuestStats : Quest -> QuestStats
+getQuestStats kind =
+    getByQuest kind questStats
+
+
+
 -- SHOP UPGRADES
 
 
