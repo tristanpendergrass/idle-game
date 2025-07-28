@@ -63,3 +63,7 @@ Uses elm-codegen to generate boilerplate. The generated code appears in both `co
 - **Mastery system** - Progressive unlocking of content through skill advancement
 
 The game uses Tailwind CSS with DaisyUI for styling and includes a comprehensive deployment checklist in the README.
+
+## Type System Conventions
+
+- We don't tend to have "id" fields on our types in this codebase. Instead there's a union type for e.g. ResourceKind = Wood | Stone where the type Wood signifies wood, rather than resource of id resource_1 or something.
