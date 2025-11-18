@@ -745,31 +745,41 @@ adjustResource resource amount game =
         currentAmount =
             getByResource resource game.resources
 
-        limit : Int
-        limit =
-            case (getResourceStats resource).inventoryLimit of
-                InventoryUnlimited ->
-                    currentAmount + amount
+        -- Only apply inventory limits when gaining resources (positive amount)
+        ( amountToAdd, additionalEffects ) =
+            if amount > 0 then
+                let
+                    limit : Int
+                    limit =
+                        case (getResourceStats resource).inventoryLimit of
+                            InventoryUnlimited ->
+                                currentAmount + amount
 
-                InventoryLimited maxAmount ->
-                    maxAmount
+                            InventoryLimited maxAmount ->
+                                maxAmount
 
-        availableSpace : Int
-        availableSpace =
-            limit - currentAmount
+                    availableSpace : Int
+                    availableSpace =
+                        limit - currentAmount
 
-        amountToAdd : Int
-        amountToAdd =
-            max 0 (min amount availableSpace)
+                    cappedAmount : Int
+                    cappedAmount =
+                        max 0 (min amount availableSpace)
 
-        excess : Int
-        excess =
-            max 0 (amount - amountToAdd)
+                    excess : Int
+                    excess =
+                        max 0 (amount - cappedAmount)
 
-        additionalEffects : List { effect : Effect, count : Int }
-        additionalEffects =
-            getSellEffects excess resource
-                |> List.map (\effect -> { effect = effect, count = 1 })
+                    sellEffects : List { effect : Effect, count : Int }
+                    sellEffects =
+                        getSellEffects excess resource
+                            |> List.map (\effect -> { effect = effect, count = 1 })
+                in
+                ( cappedAmount, sellEffects )
+
+            else
+                -- When spending (negative amount), don't apply limits or generate sell effects
+                ( amount, [] )
 
         newResources : Result EffectErr (ResourceRecord Int)
         newResources =

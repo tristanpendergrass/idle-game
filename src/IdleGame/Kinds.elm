@@ -192,7 +192,7 @@ type InventoryLimit
 
 resourceStats : ResourceRecord ResourceStats
 resourceStats =
-    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
+    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 9 }
     , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
     , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
     , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryUnlimited }
