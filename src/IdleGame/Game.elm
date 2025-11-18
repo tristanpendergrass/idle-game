@@ -749,33 +749,37 @@ adjustResource resource amount game =
         ( amountToAdd, additionalEffects ) =
             if amount > 0 then
                 let
+                    -- Add the full amount first
+                    newAmount : Int
+                    newAmount =
+                        currentAmount + amount
+
+                    -- Check if we're over the limit
                     limit : Int
                     limit =
                         case (getResourceStats resource).inventoryLimit of
                             InventoryUnlimited ->
-                                currentAmount + amount
+                                newAmount
 
                             InventoryLimited maxAmount ->
                                 maxAmount
 
-                    availableSpace : Int
-                    availableSpace =
-                        limit - currentAmount
+                    -- Calculate how much we're over the limit
+                    excessOverLimit : Int
+                    excessOverLimit =
+                        max 0 (newAmount - limit)
 
-                    cappedAmount : Int
-                    cappedAmount =
-                        max 0 (min amount availableSpace)
-
-                    excess : Int
-                    excess =
-                        max 0 (amount - cappedAmount)
+                    -- Sell only what we just gained (up to the excess)
+                    amountToSell : Int
+                    amountToSell =
+                        min excessOverLimit amount
 
                     sellEffects : List { effect : Effect, count : Int }
                     sellEffects =
-                        getSellEffects excess resource
+                        getSellEffects amountToSell resource
                             |> List.map (\effect -> { effect = effect, count = 1 })
                 in
-                ( cappedAmount, sellEffects )
+                ( amount, sellEffects )
 
             else
                 -- When spending (negative amount), don't apply limits or generate sell effects
