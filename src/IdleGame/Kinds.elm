@@ -84,12 +84,6 @@ type Resource
     = Sage
     | Nettle
     | Sorrel
-    | Mugwort
-    | Yarrow
-    | Thyme
-    | Fennel
-    | Belladonna
-    | Henbane
     | Parchment
     | SpellHerbSense
     | SpellBloom
@@ -100,12 +94,6 @@ allResources =
     [ Sage
     , Nettle
     , Sorrel
-    , Mugwort
-    , Yarrow
-    , Thyme
-    , Fennel
-    , Belladonna
-    , Henbane
     , Parchment
     , SpellHerbSense
     , SpellBloom
@@ -116,12 +104,6 @@ type alias ResourceRecord a =
     { sage : a
     , nettle : a
     , sorrel : a
-    , mugwort : a
-    , yarrow : a
-    , thyme : a
-    , fennel : a
-    , belladonna : a
-    , henbane : a
     , parchment : a
     , spellHerbSense : a
     , spellBloom : a
@@ -133,12 +115,6 @@ resourceRecord a =
     { sage = a
     , nettle = a
     , sorrel = a
-    , mugwort = a
-    , yarrow = a
-    , thyme = a
-    , fennel = a
-    , belladonna = a
-    , henbane = a
     , parchment = a
     , spellHerbSense = a
     , spellBloom = a
@@ -156,24 +132,6 @@ getByResource kind data =
 
         Sorrel ->
             data.sorrel
-
-        Mugwort ->
-            data.mugwort
-
-        Yarrow ->
-            data.yarrow
-
-        Thyme ->
-            data.thyme
-
-        Fennel ->
-            data.fennel
-
-        Belladonna ->
-            data.belladonna
-
-        Henbane ->
-            data.henbane
 
         Parchment ->
             data.parchment
@@ -197,24 +155,6 @@ setByResource kind value data =
         Sorrel ->
             { data | sorrel = value }
 
-        Mugwort ->
-            { data | mugwort = value }
-
-        Yarrow ->
-            { data | yarrow = value }
-
-        Thyme ->
-            { data | thyme = value }
-
-        Fennel ->
-            { data | fennel = value }
-
-        Belladonna ->
-            { data | belladonna = value }
-
-        Henbane ->
-            { data | henbane = value }
-
         Parchment ->
             { data | parchment = value }
 
@@ -230,12 +170,6 @@ mapResources fn record =
     { sage = fn record.sage
     , nettle = fn record.nettle
     , sorrel = fn record.sorrel
-    , mugwort = fn record.mugwort
-    , yarrow = fn record.yarrow
-    , thyme = fn record.thyme
-    , fennel = fn record.fennel
-    , belladonna = fn record.belladonna
-    , henbane = fn record.henbane
     , parchment = fn record.parchment
     , spellHerbSense = fn record.spellHerbSense
     , spellBloom = fn record.spellBloom
@@ -255,12 +189,6 @@ resourceStats =
     { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
     , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
     , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , mugwort = { title = "Mugwort", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , yarrow = { title = "Yarrow", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , thyme = { title = "Thyme", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , fennel = { title = "Fennel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , belladonna = { title = "Belladonna", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , henbane = { title = "Henbane", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
     , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1) }
     , spellHerbSense = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
     , spellBloom = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
@@ -280,12 +208,6 @@ type Activity
     = GatherSage
     | GatherNettle
     | GatherSorrel
-    | GatherMugwort
-    | GatherYarrow
-    | GatherThyme
-    | GatherFennel
-    | GatherBelladonna
-    | GatherHenbane
     | CraftSpellHerbSense
     | CraftSpellBloom
 
@@ -295,12 +217,6 @@ allActivities =
     [ GatherSage
     , GatherNettle
     , GatherSorrel
-    , GatherMugwort
-    , GatherYarrow
-    , GatherThyme
-    , GatherFennel
-    , GatherBelladonna
-    , GatherHenbane
     , CraftSpellHerbSense
     , CraftSpellBloom
     ]
@@ -310,12 +226,6 @@ type alias ActivityRecord a =
     { gatherSage : a
     , gatherNettle : a
     , gatherSorrel : a
-    , gatherMugwort : a
-    , gatherYarrow : a
-    , gatherThyme : a
-    , gatherFennel : a
-    , gatherBelladonna : a
-    , gatherHenbane : a
     , craftSpellHerbSense : a
     , craftSpellBloom : a
     }
@@ -326,12 +236,6 @@ activityRecord a =
     { gatherSage = a
     , gatherNettle = a
     , gatherSorrel = a
-    , gatherMugwort = a
-    , gatherYarrow = a
-    , gatherThyme = a
-    , gatherFennel = a
-    , gatherBelladonna = a
-    , gatherHenbane = a
     , craftSpellHerbSense = a
     , craftSpellBloom = a
     }
@@ -348,24 +252,6 @@ getByActivity kind data =
 
         GatherSorrel ->
             data.gatherSorrel
-
-        GatherMugwort ->
-            data.gatherMugwort
-
-        GatherYarrow ->
-            data.gatherYarrow
-
-        GatherThyme ->
-            data.gatherThyme
-
-        GatherFennel ->
-            data.gatherFennel
-
-        GatherBelladonna ->
-            data.gatherBelladonna
-
-        GatherHenbane ->
-            data.gatherHenbane
 
         CraftSpellHerbSense ->
             data.craftSpellHerbSense
@@ -386,24 +272,6 @@ setByActivity kind value data =
         GatherSorrel ->
             { data | gatherSorrel = value }
 
-        GatherMugwort ->
-            { data | gatherMugwort = value }
-
-        GatherYarrow ->
-            { data | gatherYarrow = value }
-
-        GatherThyme ->
-            { data | gatherThyme = value }
-
-        GatherFennel ->
-            { data | gatherFennel = value }
-
-        GatherBelladonna ->
-            { data | gatherBelladonna = value }
-
-        GatherHenbane ->
-            { data | gatherHenbane = value }
-
         CraftSpellHerbSense ->
             { data | craftSpellHerbSense = value }
 
@@ -416,12 +284,6 @@ mapActivities fn record =
     { gatherSage = fn record.gatherSage
     , gatherNettle = fn record.gatherNettle
     , gatherSorrel = fn record.gatherSorrel
-    , gatherMugwort = fn record.gatherMugwort
-    , gatherYarrow = fn record.gatherYarrow
-    , gatherThyme = fn record.gatherThyme
-    , gatherFennel = fn record.gatherFennel
-    , gatherBelladonna = fn record.gatherBelladonna
-    , gatherHenbane = fn record.gatherHenbane
     , craftSpellHerbSense = fn record.craftSpellHerbSense
     , craftSpellBloom = fn record.craftSpellBloom
     }
@@ -471,66 +333,6 @@ activityStats =
         , coin = Nothing
         , resourceGains = [ ( 1, Sorrel ) ]
         }
-    , gatherMugwort =
-        { skill = HerbGathering
-        , title = "Gather Mugwort"
-        , image = "/activities/herbGathering/gatherMugwort.webp"
-        , level = 3
-        , duration = Duration.seconds 15
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Mugwort ) ]
-        }
-    , gatherYarrow =
-        { skill = HerbGathering
-        , title = "Gather Yarrow"
-        , image = "/activities/herbGathering/gatherYarrow.webp"
-        , level = 4
-        , duration = Duration.seconds 20
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Yarrow ) ]
-        }
-    , gatherThyme =
-        { skill = HerbGathering
-        , title = "Gather Thyme"
-        , image = "/activities/herbGathering/gatherThyme.webp"
-        , level = 5
-        , duration = Duration.seconds 25
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Thyme ) ]
-        }
-    , gatherFennel =
-        { skill = HerbGathering
-        , title = "Gather Fennel"
-        , image = "/activities/herbGathering/gatherFennel.webp"
-        , level = 6
-        , duration = Duration.seconds 30
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Fennel ) ]
-        }
-    , gatherBelladonna =
-        { skill = HerbGathering
-        , title = "Gather Belladonna"
-        , image = "/activities/herbGathering/gatherBelladonna.webp"
-        , level = 7
-        , duration = Duration.seconds 35
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Belladonna ) ]
-        }
-    , gatherHenbane =
-        { skill = HerbGathering
-        , title = "Gather Henbane"
-        , image = "/activities/herbGathering/gatherHenbane.webp"
-        , level = 8
-        , duration = Duration.seconds 40
-        , type_ = "Gather"
-        , coin = Nothing
-        , resourceGains = [ ( 1, Henbane ) ]
-        }
     , craftSpellHerbSense =
         { skill = WildMagic
         , title = "Herb Sense"
@@ -557,245 +359,6 @@ activityStats =
 getActivityStats : Activity -> ActivityStats
 getActivityStats kind =
     getByActivity kind activityStats
-
-
-
--- QUESTS
-
-
-type Quest
-    = GatherSupplies
-    | StudyAncientTexts  
-    | PrepareHerbalRemedies
-    | ResearchAnatomy
-    | CraftMedicalInstruments
-    | CollectBotanicalSpecimens
-
-
-allQuests : List Quest
-allQuests =
-    [ GatherSupplies
-    , StudyAncientTexts
-    , PrepareHerbalRemedies
-    , ResearchAnatomy
-    , CraftMedicalInstruments
-    , CollectBotanicalSpecimens
-    ]
-
-
-type alias QuestRecord a =
-    { gatherSupplies : a
-    , studyAncientTexts : a
-    , prepareHerbalRemedies : a
-    , researchAnatomy : a
-    , craftMedicalInstruments : a
-    , collectBotanicalSpecimens : a
-    }
-
-
-questRecord : a -> QuestRecord a
-questRecord a =
-    { gatherSupplies = a
-    , studyAncientTexts = a
-    , prepareHerbalRemedies = a
-    , researchAnatomy = a
-    , craftMedicalInstruments = a
-    , collectBotanicalSpecimens = a
-    }
-
-
-getByQuest : Quest -> QuestRecord a -> a
-getByQuest kind data =
-    case kind of
-        GatherSupplies ->
-            data.gatherSupplies
-
-        StudyAncientTexts ->
-            data.studyAncientTexts
-
-        PrepareHerbalRemedies ->
-            data.prepareHerbalRemedies
-
-        ResearchAnatomy ->
-            data.researchAnatomy
-
-        CraftMedicalInstruments ->
-            data.craftMedicalInstruments
-
-        CollectBotanicalSpecimens ->
-            data.collectBotanicalSpecimens
-
-
-setByQuest : Quest -> a -> QuestRecord a -> QuestRecord a
-setByQuest kind value data =
-    case kind of
-        GatherSupplies ->
-            { data | gatherSupplies = value }
-
-        StudyAncientTexts ->
-            { data | studyAncientTexts = value }
-
-        PrepareHerbalRemedies ->
-            { data | prepareHerbalRemedies = value }
-
-        ResearchAnatomy ->
-            { data | researchAnatomy = value }
-
-        CraftMedicalInstruments ->
-            { data | craftMedicalInstruments = value }
-
-        CollectBotanicalSpecimens ->
-            { data | collectBotanicalSpecimens = value }
-
-
-mapQuests : (a -> a) -> QuestRecord a -> QuestRecord a
-mapQuests fn record =
-    { gatherSupplies = fn record.gatherSupplies
-    , studyAncientTexts = fn record.studyAncientTexts
-    , prepareHerbalRemedies = fn record.prepareHerbalRemedies
-    , researchAnatomy = fn record.researchAnatomy
-    , craftMedicalInstruments = fn record.craftMedicalInstruments
-    , collectBotanicalSpecimens = fn record.collectBotanicalSpecimens
-    }
-
-
-type alias QuestStats =
-    { name : String
-    , description : String
-    , resourceRequirements : ResourceRecord Int
-    , coinReward : IdleGame.Coin.Coin
-    , icon : IdleGame.Views.Icon.Icon
-    }
-
-
-questStats : QuestRecord QuestStats
-questStats =
-    { gatherSupplies = 
-        { name = "Gather Medical Supplies"
-        , description = "Collect essential herbs and materials needed for your medical studies"
-        , resourceRequirements = 
-            { sage = 10
-            , nettle = 5
-            , sorrel = 0
-            , mugwort = 0
-            , yarrow = 0
-            , thyme = 0
-            , fennel = 0
-            , belladonna = 0
-            , henbane = 0
-            , parchment = 3
-            , spellHerbSense = 0
-            , spellBloom = 0
-            }
-        , coinReward = IdleGame.Coin.int 50
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams
-        }
-    , studyAncientTexts = 
-        { name = "Study Ancient Medical Texts"
-        , description = "Research historical medical knowledge from old parchments"
-        , resourceRequirements = 
-            { sage = 0
-            , nettle = 0
-            , sorrel = 0
-            , mugwort = 0
-            , yarrow = 0
-            , thyme = 0
-            , fennel = 0
-            , belladonna = 0
-            , henbane = 0
-            , parchment = 15
-            , spellHerbSense = 0
-            , spellBloom = 0
-            }
-        , coinReward = IdleGame.Coin.int 75
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams
-        }
-    , prepareHerbalRemedies = 
-        { name = "Prepare Herbal Remedies"
-        , description = "Craft healing potions using various herbs and magical enhancements"
-        , resourceRequirements = 
-            { sage = 5
-            , nettle = 3
-            , sorrel = 3
-            , mugwort = 2
-            , yarrow = 4
-            , thyme = 2
-            , fennel = 0
-            , belladonna = 0
-            , henbane = 0
-            , parchment = 0
-            , spellHerbSense = 1
-            , spellBloom = 1
-            }
-        , coinReward = IdleGame.Coin.int 100
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams
-        }
-    , researchAnatomy = 
-        { name = "Research Human Anatomy"
-        , description = "Study the human body using preserved specimens and detailed documentation"
-        , resourceRequirements = 
-            { sage = 8
-            , nettle = 0
-            , sorrel = 0
-            , mugwort = 0
-            , yarrow = 0
-            , thyme = 0
-            , fennel = 0
-            , belladonna = 3
-            , henbane = 2
-            , parchment = 20
-            , spellHerbSense = 0
-            , spellBloom = 0
-            }
-        , coinReward = IdleGame.Coin.int 125
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams
-        }
-    , craftMedicalInstruments = 
-        { name = "Craft Medical Instruments"
-        , description = "Create precise tools for medical examination and treatment"
-        , resourceRequirements = 
-            { sage = 0
-            , nettle = 0
-            , sorrel = 2
-            , mugwort = 5
-            , yarrow = 3
-            , thyme = 4
-            , fennel = 6
-            , belladonna = 0
-            , henbane = 0
-            , parchment = 5
-            , spellHerbSense = 2
-            , spellBloom = 0
-            }
-        , coinReward = IdleGame.Coin.int 150
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams
-        }
-    , collectBotanicalSpecimens = 
-        { name = "Collect Botanical Specimens"
-        , description = "Gather rare plants and document their medicinal properties"
-        , resourceRequirements = 
-            { sage = 2
-            , nettle = 2
-            , sorrel = 4
-            , mugwort = 3
-            , yarrow = 2
-            , thyme = 3
-            , fennel = 4
-            , belladonna = 5
-            , henbane = 3
-            , parchment = 8
-            , spellHerbSense = 1
-            , spellBloom = 2
-            }
-        , coinReward = IdleGame.Coin.int 200
-        , icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams
-        }
-    }
-
-
-getQuestStats : Quest -> QuestStats
-getQuestStats kind =
-    getByQuest kind questStats
 
 
 

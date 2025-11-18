@@ -61,20 +61,6 @@ type alias ResourceDiff =
     ResourceRecord Int
 
 
--- QUEST SYSTEM
-
-
-type QuestStatus
-    = Available
-    | InProgress
-    | Completed
-
-
-type alias QuestProgress =
-    { depositedResources : ResourceRecord Int
-    }
-
-
 type alias Game =
     { seed : Random.Seed
     , xp : SkillRecord Xp
@@ -85,8 +71,6 @@ type alias Game =
     , ownedShopUpgrades : ShopUpgradeRecord Bool
     , oneTimeStatuses : OneTime.OneTimeRecord Bool
     , spellAssignments : ActivityRecord (Maybe Resource)
-    , questProgress : QuestRecord QuestProgress
-    , questStatus : QuestRecord QuestStatus
     }
 
 
