@@ -741,16 +741,46 @@ addMxp kind amount game =
 adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
 adjustResource resource amount game =
     let
+        currentAmount : Int
+        currentAmount =
+            getByResource resource game.resources
+
+        limit : Int
+        limit =
+            case (getResourceStats resource).inventoryLimit of
+                InventoryUnlimited ->
+                    currentAmount + amount
+
+                InventoryLimited maxAmount ->
+                    maxAmount
+
+        availableSpace : Int
+        availableSpace =
+            limit - currentAmount
+
+        amountToAdd : Int
+        amountToAdd =
+            max 0 (min amount availableSpace)
+
+        excess : Int
+        excess =
+            max 0 (amount - amountToAdd)
+
+        additionalEffects : List { effect : Effect, count : Int }
+        additionalEffects =
+            getSellEffects excess resource
+                |> List.map (\effect -> { effect = effect, count = 1 })
+
         newResources : Result EffectErr (ResourceRecord Int)
         newResources =
-            Resource.add resource amount game.resources
+            Resource.add resource amountToAdd game.resources
     in
     newResources
         |> Result.map
             (\val ->
                 { game = { game | resources = val }
-                , toasts = [ GainedResource amount resource ]
-                , additionalEffects = []
+                , toasts = [ GainedResource amountToAdd resource ]
+                , additionalEffects = additionalEffects
                 , additionalMods = []
                 }
             )

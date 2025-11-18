@@ -181,17 +181,23 @@ type alias ResourceStats =
     , icon : IdleGame.Views.Icon.Icon
     , buyPrice : Maybe IdleGame.Coin.Coin
     , sellPrice : Maybe IdleGame.Coin.Coin
+    , inventoryLimit : InventoryLimit
     }
+
+
+type InventoryLimit
+    = InventoryUnlimited -- Not marked as limited in the UI, and intended to be effectively unlimited; may actually be limited for technical reasons
+    | InventoryLimited Int
 
 
 resourceStats : ResourceRecord ResourceStats
 resourceStats =
-    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1) }
-    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1) }
-    , spellHerbSense = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
-    , spellBloom = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing }
+    { sage = { title = "Sage", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
+    , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
+    , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
+    , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryUnlimited }
+    , spellHerbSense = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
+    , spellBloom = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
     }
 
 
