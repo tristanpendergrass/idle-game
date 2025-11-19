@@ -1120,6 +1120,61 @@ updateInGame msg inGameFrontend =
                 _ ->
                     noOp
 
+        HandleShopResourceSellSubmit ->
+            case inGameFrontend.activeModal of
+                Just (ShopResourceSellModal quantity resource _) ->
+                    case inGameFrontend.gameState of
+                        Playing _ ->
+                            let
+                                oldSnapshot : Snapshot Game
+                                oldSnapshot =
+                                    getGame inGameFrontend
+
+                                oldGame : Game
+                                oldGame =
+                                    Snapshot.getValue oldSnapshot
+
+                                sellResult : Result EffectErr Game.ApplyEffectsValue
+                                sellResult =
+                                    Game.attemptSellResource quantity resource oldGame
+                            in
+                            case sellResult of
+                                Ok res ->
+                                    let
+                                        newGame : Game
+                                        newGame =
+                                            res.game
+
+                                        newCache : Cache
+                                        newCache =
+                                            getCache newGame
+
+                                        toasts : List Toast
+                                        toasts =
+                                            res.toasts
+
+                                        newModel : InGameFrontend
+                                        newModel =
+                                            { inGameFrontend | gameState = Playing newCache }
+                                                |> setActiveModal Nothing
+                                                |> setGame (Snapshot.map (\_ -> newGame) oldSnapshot)
+
+                                        notificationCmds : List (Cmd FrontendMsg)
+                                        notificationCmds =
+                                            List.map (\toast -> Task.perform (AddToast toast) Time.now) toasts
+                                    in
+                                    ( InGame newModel, Cmd.batch notificationCmds )
+
+                                Err _ ->
+                                    -- We disable the sell button in this case so shouldn't normally reach this spot
+                                    noOp
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
+
         HandleShopResourceQuantityChange string ->
             case inGameFrontend.activeModal of
                 Just (ShopResourceBuyModal _ resource price) ->
