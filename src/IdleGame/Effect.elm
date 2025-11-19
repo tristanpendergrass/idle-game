@@ -67,6 +67,16 @@ spendResource quantity kind =
         )
 
 
+sellResource : Int -> Resource -> Effect
+sellResource quantity kind =
+    effect
+        (SellResource
+            { base = quantity
+            , resource = kind
+            }
+        )
+
+
 withOneTime : OneTimeStatus.OneTimeId -> Effect -> Effect
 withOneTime oneTimeId taggedEffect =
     { taggedEffect | oneTimeStatus = OneTimeStatus.OneTime oneTimeId }

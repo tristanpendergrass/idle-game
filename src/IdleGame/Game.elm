@@ -273,7 +273,7 @@ getSellEffects : Int -> Resource -> List Effect
 getSellEffects amount resource =
     case (getResourceStats resource).sellPrice of
         Just price ->
-            [ Effect.gainCoin price, Effect.spendResource amount resource ]
+            [ Effect.sellResource amount resource ]
 
         Nothing ->
             []
@@ -686,6 +686,45 @@ effectReducer effect count game =
                                 adjustResource resource (-1 * adjustedAmount * count) game
                         )
 
+            SellResource { base, resource } ->
+                let
+                    totalAmount : Int
+                    totalAmount =
+                        base * count
+
+                    maybeSellPrice : Maybe Coin
+                    maybeSellPrice =
+                        (getResourceStats resource).sellPrice
+
+                    totalCoinGained : Coin
+                    totalCoinGained =
+                        case maybeSellPrice of
+                            Just price ->
+                                price
+                                    |> Quantity.multiplyBy (toFloat totalAmount)
+
+                            Nothing ->
+                                Coin.int 0
+
+                    newCoin : Coin
+                    newCoin =
+                        Quantity.plus game.coin totalCoinGained
+
+                    newResources : Result EffectErr (ResourceRecord Int)
+                    newResources =
+                        Resource.add resource (-1 * totalAmount) game.resources
+                in
+                newResources
+                    |> Result.map
+                        (\resources ->
+                            { game = { game | coin = newCoin, resources = resources }
+                            , toasts = [ SoldResource totalAmount resource totalCoinGained ]
+                            , additionalEffects = []
+                            , additionalMods = []
+                            }
+                        )
+                    |> Random.constant
+
             GainXp { base, percentIncrease, skill } ->
                 let
                     xp : Xp
@@ -738,6 +777,20 @@ addMxp kind amount game =
     }
 
 
+containsSellEffectsForResource : Resource -> List { effect : Effect, count : Int } -> Bool
+containsSellEffectsForResource resource effects =
+    List.any
+        (\{ effect } ->
+            case Effect.getEffectType effect of
+                SellResource params ->
+                    params.resource == resource
+
+                _ ->
+                    False
+        )
+        effects
+
+
 adjustResource : Resource -> Int -> Game -> Result EffectErr ApplyEffectValue
 adjustResource resource amount game =
     let
@@ -776,8 +829,12 @@ adjustResource resource amount game =
 
                     sellEffects : List { effect : Effect, count : Int }
                     sellEffects =
-                        getSellEffects amountToSell resource
-                            |> List.map (\effect -> { effect = effect, count = 1 })
+                        if amountToSell > 0 then
+                            getSellEffects amountToSell resource
+                                |> List.map (\effect -> { effect = effect, count = 1 })
+
+                        else
+                            []
                 in
                 ( amount, sellEffects )
 
@@ -793,7 +850,12 @@ adjustResource resource amount game =
         |> Result.map
             (\val ->
                 { game = { game | resources = val }
-                , toasts = [ GainedResource amountToAdd resource ]
+                , toasts =
+                    if containsSellEffectsForResource resource additionalEffects then
+                        []
+
+                    else
+                        [ GainedResource amountToAdd resource ]
                 , additionalEffects = additionalEffects
                 , additionalMods = []
                 }

@@ -71,6 +71,9 @@ renderModdedEffect renderType game effect =
                 SpendResource params ->
                     Just (renderResource game params.resource (-1 * params.base) { showTitle = renderType == DetailView, showTooltip = renderType == Card })
 
+                SellResource params ->
+                    Just (renderResource game params.resource (-1 * params.base) { showTitle = renderType == DetailView, showTooltip = renderType == Card })
+
                 GainXp params ->
                     Just (renderXp params)
 

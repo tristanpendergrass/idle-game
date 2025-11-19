@@ -428,6 +428,7 @@ type alias MoveUi =
 type Toast
     = GainedCoin Coin
     | GainedResource Int Resource
+    | SoldResource Int Resource Coin
     | NegativeAmountErr
     | TestAlreadyCompleted
     | TestNotUnlocked
@@ -537,6 +538,10 @@ type alias SpendResourceParams =
     { base : Int, resource : Resource, preservationChance : Percent, reducedBy : Maybe ReducedBy }
 
 
+type alias SellResourceParams =
+    { base : Int, resource : Resource }
+
+
 type ReducedBy
     = ReducedByFlat Resource
     | ReducedByPercent Resource Percent -- The Percent is the % per resource. E.g. if you have 2 resources * 5 Percent = 10% reduction
@@ -548,6 +553,7 @@ type EffectType
     | OneOf Effect (List Effect) -- One of the effects in the list will be chosen at random
     | GainResource GainResourceParams
     | SpendResource SpendResourceParams
+    | SellResource SellResourceParams
     | GainXp GainXpParams
     | GainMxp GainMxpParams
     | GainCoin GainCoinParams

@@ -1614,6 +1614,23 @@ toastToHtml notification =
                     |> Icon.toHtml
                 ]
 
+        SoldResource amount resource coinGained ->
+            let
+                stats : ResourceStats
+                stats =
+                    getResourceStats resource
+            in
+            div [ baseClass, successClass, class "flex gap-1 items-center" ]
+                [ text "Sold "
+                , span [] [ text <| ViewUtils.intToString amount ]
+                , stats.icon
+                    |> Icon.toHtml
+                , text " for "
+                , span [] [ text <| ViewUtils.intToString (Coin.toInt coinGained) ]
+                , Icon.coin
+                    |> Icon.toHtml
+                ]
+
         NegativeAmountErr ->
             div [ baseClass, warningClass ]
                 [ text "Missing resources" ]
