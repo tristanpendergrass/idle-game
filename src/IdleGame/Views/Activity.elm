@@ -126,13 +126,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
     div [ class "relative" ]
         [ div
             [ IdleGame.Views.Utils.classes.card.container
-            , IdleGame.Views.Utils.classes.card.containerClickable
             , class "overflow-hidden"
-
-            -- , onClick (HandleActivityClick { screenWidth = screenWidth } activity)
-            , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
-            , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
-            , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
             ]
             -- [ preview image
             --   div [ IdleGame.Views.Utils.classes.card.imageContainer, class "relative rounded-t-lg overflow-hidden" ]
@@ -142,7 +136,23 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                 -- [ div [ class "text-xs bg-neutral text-neutral-content rounded py-[0.125rem] px-1" ] [ text "Study" ]
                 -- [ div [ IdleGame.Views.Utils.classes.card.activityTypeBadge ] [ text stats.type_ ]
                 [ div [ class "gap-0" ]
-                    [ h2 [ IdleGame.Views.Utils.classes.card.title ] [ text (getActivityStats activity).title ]
+                    [ div [ class "flex items-center gap-2" ]
+                        [ h2 [ IdleGame.Views.Utils.classes.card.title ] [ text (getActivityStats activity).title ]
+                        , button
+                            [ class "btn btn-xs"
+                            , preventDefaultOn "pointerdown" (D.succeed ( HandlePointerDown pointerDownState, True ))
+                            , preventDefaultOn "pointerup" (D.succeed ( HandlePointerUp, True ))
+                            , preventDefaultOn "pointerleave" (D.succeed ( HandlePointerCancel, True ))
+                            ]
+                            [ text
+                                (if maybeTimer == Nothing then
+                                    "go"
+
+                                 else
+                                    "stop"
+                                )
+                            ]
+                        ]
 
                     -- , div [] [ activityDuration duration ]
                     -- The effects of the activity
@@ -176,7 +186,7 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                 Just percentComplete ->
                     div
                         -- [ class "absolute h-full bg-base-content opacity-20 top-0 left-0 rounded-l-xl"
-                        [ class "absolute h-full bg-base-content opacity-20 top-0 left-0"
+                        [ class "absolute h-[10%] bg-base-content opacity-20 top-0 left-0"
                         , IdleGame.Views.Utils.zIndexes.activityProgressBar
                         , attribute "style" ("width:" ++ String.fromFloat (Percent.toPercentage percentComplete) ++ "%")
                         ]
