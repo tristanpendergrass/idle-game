@@ -71,6 +71,7 @@ type alias Game =
     , ownedShopUpgrades : ShopUpgradeRecord Bool
     , oneTimeStatuses : OneTime.OneTimeRecord Bool
     , spellAssignments : ActivityRecord (Maybe Resource)
+    , activeTab : Tab
     }
 
 
@@ -166,7 +167,6 @@ type alias InGameFrontend =
     , showDebugPanel : Bool
     , toastQueue : ToastQueue
     , isDrawerOpen : Bool
-    , activeTab : Tab
     , preview : Maybe Preview
     , activityExpanded : Bool
     , activeModal : Maybe Modal

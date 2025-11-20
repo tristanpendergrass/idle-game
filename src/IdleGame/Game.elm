@@ -12,6 +12,7 @@ import IdleGame.OneTime as OneTimeStatus
 import IdleGame.Resource as Resource
 import IdleGame.ShopUpgrade as ShopUpgrade
 import IdleGame.Skill as Skill
+import IdleGame.Tab as Tab
 import IdleGame.Timer as Timer exposing (Timer)
 import IdleGame.Views.Icon exposing (Icon)
 import IdleGame.Xp as Xp exposing (Xp)
@@ -40,6 +41,7 @@ createProd seed =
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     , spellAssignments = activityRecord Nothing
+    , activeTab = Tab.Home
     }
 
 
@@ -56,6 +58,7 @@ createDev seed =
     , ownedShopUpgrades = shopUpgradeRecord False
     , oneTimeStatuses = OneTimeStatus.oneTimeRecord False
     , spellAssignments = activityRecord Nothing
+    , activeTab = Tab.Home
     }
 
 

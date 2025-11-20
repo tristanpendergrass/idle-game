@@ -224,11 +224,6 @@ createTimePassesModal duration oldSnap newSnap =
         |> Maybe.map (TimePassesModal duration timePassed)
 
 
-setTab : Tab -> InGameFrontend -> InGameFrontend
-setTab tab model =
-    { model | activeTab = tab }
-
-
 setIsDrawerOpen : Bool -> InGameFrontend -> InGameFrontend
 setIsDrawerOpen isOpen model =
     { model | isDrawerOpen = isOpen }
@@ -236,28 +231,23 @@ setIsDrawerOpen isOpen model =
 
 mapGame : (Game -> Game) -> InGameFrontend -> InGameFrontend
 mapGame fn model =
-    case model.gameState of
-        Playing _ ->
-            let
-                ( gameId, oldSnapshot ) =
-                    Nonempty.head model.games
+    let
+        ( gameId, oldSnapshot ) =
+            Nonempty.head model.games
 
-                newGame : Game
-                newGame =
-                    fn (Snapshot.getValue oldSnapshot)
+        newGame : Game
+        newGame =
+            fn (Snapshot.getValue oldSnapshot)
 
-                newSnapshot : Snapshot Game
-                newSnapshot =
-                    Snapshot.map (\_ -> newGame) oldSnapshot
+        newSnapshot : Snapshot Game
+        newSnapshot =
+            Snapshot.map (\_ -> newGame) oldSnapshot
 
-                newGames : Nonempty ( Id GameId, Snapshot Game )
-                newGames =
-                    Nonempty.replaceHead ( gameId, newSnapshot ) model.games
-            in
-            { model | games = newGames }
-
-        _ ->
-            model
+        newGames : Nonempty ( Id GameId, Snapshot Game )
+        newGames =
+            Nonempty.replaceHead ( gameId, newSnapshot ) model.games
+    in
+    { model | games = newGames }
 
 
 setSaveGameTimer : Timer -> InGameFrontend -> InGameFrontend
@@ -495,7 +485,6 @@ updateMainMenu msg mainMenuFrontend =
                             , showDebugPanel = False
                             , toastQueue = ToastQueue.create
                             , isDrawerOpen = False
-                            , activeTab = Config.flags.defaultTab
                             , preview = Nothing
                             , activityExpanded = False
                             , activeModal = Nothing
@@ -999,11 +988,10 @@ updateInGame msg inGameFrontend =
             )
 
         HandleTabClick tab ->
-            ( InGame
-                (inGameFrontend
-                    |> setTab tab
-                    |> setIsDrawerOpen False
-                )
+            ( inGameFrontend
+                |> mapGame (\game -> { game | activeTab = tab })
+                |> setIsDrawerOpen False
+                |> InGame
             , Cmd.none
             )
 
@@ -1547,7 +1535,6 @@ updateFromBackend msg model =
                                     , showDebugPanel = False
                                     , toastQueue = ToastQueue.create
                                     , isDrawerOpen = False
-                                    , activeTab = Config.flags.defaultTab
                                     , preview = Nothing
                                     , activityExpanded = False
                                     , activeModal = Nothing
@@ -1744,6 +1731,11 @@ renderModal activeModal game =
 
 renderBottomRightItems : InGameFrontend -> Html FrontendMsg
 renderBottomRightItems model =
+    let
+        game : Game
+        game =
+            Snapshot.getValue (getGame model)
+    in
     div [ class "absolute bottom-[2rem] right-[2rem] flex items-center gap-2", ViewUtils.zIndexes.bottomRightMenu ]
         ((if Config.flags.showDebugPanel then
             [ DebugPanel.renderOpenButton ]
@@ -1751,7 +1743,7 @@ renderBottomRightItems model =
           else
             []
          )
-            ++ (case model.activeTab of
+            ++ (case game.activeTab of
                     Tab.SkillTab _ ->
                         [ IdleGame.Views.Activity.renderBottomRight ]
 
@@ -1840,7 +1832,7 @@ view model =
 
                                     activeTab : Tab
                                     activeTab =
-                                        frontend.activeTab
+                                        game.activeTab
 
                                     detailViewWrapperProps : IdleGame.Views.DetailViewWrapper.Props ( Activity, Timer ) Preview FrontendMsg
                                     detailViewWrapperProps =
@@ -1864,8 +1856,8 @@ view model =
                                             , onCheck SetDrawerOpen
                                             ]
                                             []
-                                        , IdleGame.Views.Content.renderContent frontend game cache frontend.activeTab
-                                        , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen frontend.activeTab
+                                        , IdleGame.Views.Content.renderContent frontend game cache game.activeTab
+                                        , IdleGame.Views.Drawer.renderDrawer frontend.isDrawerOpen game.activeTab
                                         ]
                                     , IdleGame.Views.DetailViewWrapper.renderFullScreen detailViewWrapperProps
                                     , IdleGame.Views.DetailViewWrapper.renderSidebar detailViewWrapperProps
