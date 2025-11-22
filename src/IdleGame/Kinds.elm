@@ -105,8 +105,8 @@ type alias ResourceRecord a =
     , nettle : a
     , sorrel : a
     , parchment : a
-    , spellHerbSense : a
-    , spellBloom : a
+    , herbSenseScroll : a
+    , bloomScroll : a
     }
 
 
@@ -116,8 +116,8 @@ resourceRecord a =
     , nettle = a
     , sorrel = a
     , parchment = a
-    , spellHerbSense = a
-    , spellBloom = a
+    , herbSenseScroll = a
+    , bloomScroll = a
     }
 
 
@@ -137,10 +137,10 @@ getByResource kind data =
             data.parchment
 
         SpellHerbSense ->
-            data.spellHerbSense
+            data.herbSenseScroll
 
         SpellBloom ->
-            data.spellBloom
+            data.bloomScroll
 
 
 setByResource : Resource -> a -> ResourceRecord a -> ResourceRecord a
@@ -159,10 +159,10 @@ setByResource kind value data =
             { data | parchment = value }
 
         SpellHerbSense ->
-            { data | spellHerbSense = value }
+            { data | herbSenseScroll = value }
 
         SpellBloom ->
-            { data | spellBloom = value }
+            { data | bloomScroll = value }
 
 
 mapResources : (a -> a) -> ResourceRecord a -> ResourceRecord a
@@ -171,8 +171,8 @@ mapResources fn record =
     , nettle = fn record.nettle
     , sorrel = fn record.sorrel
     , parchment = fn record.parchment
-    , spellHerbSense = fn record.spellHerbSense
-    , spellBloom = fn record.spellBloom
+    , herbSenseScroll = fn record.herbSenseScroll
+    , bloomScroll = fn record.bloomScroll
     }
 
 
@@ -196,8 +196,8 @@ resourceStats =
     , nettle = { title = "Nettle", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
     , sorrel = { title = "Sorrel", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryLimited 99 }
     , parchment = { title = "Parchment", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Just (IdleGame.Coin.int 2), sellPrice = Just (IdleGame.Coin.int 1), inventoryLimit = InventoryUnlimited }
-    , spellHerbSense = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
-    , spellBloom = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
+    , herbSenseScroll = { title = "Herb Sense", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialSummarize IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
+    , bloomScroll = { title = "Bloom", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialBiotech IdleGame.Views.Icon.defaultParams, buyPrice = Nothing, sellPrice = Nothing, inventoryLimit = InventoryLimited 99 }
     }
 
 
