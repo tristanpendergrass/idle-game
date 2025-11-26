@@ -232,6 +232,10 @@ renderActivityPopover activity =
         popoverTargetId : String
         popoverTargetId =
             "popover-" ++ stats.idLabel
+
+        availableSpells : List Resource
+        availableSpells =
+            [ SpellHerbSense, SpellBloom ]
     in
     ul
         [ Html.Attributes.attribute "popover" ""
@@ -239,9 +243,22 @@ renderActivityPopover activity =
         , id popoverTargetId
         , class "dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
         ]
-        [ li [] [ a [] [ text "Option 1" ] ]
-        , li [] [ a [] [ text "Option 2" ] ]
-        ]
+        (List.map
+            (\spell ->
+                let
+                    spellStats =
+                        getResourceStats spell
+                in
+                li []
+                    [ a
+                        [ href "#"
+                        , onClick (HandleSpellAssignmentClick activity spell)
+                        ]
+                        [ text spellStats.title ]
+                    ]
+            )
+            availableSpells
+        )
 
 
 renderLockedActivity : Skill -> Int -> Html FrontendMsg

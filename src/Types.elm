@@ -297,6 +297,7 @@ type FrontendMsg
     | HandlePreviewClick Activity
     | HandlePlayClick Activity
     | HandleStopClick Activity
+    | HandleSpellAssignmentClick Activity Resource
       -- Debug Panel
     | OpenDebugPanel
     | CloseDebugPanel
