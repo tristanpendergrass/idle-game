@@ -210,3 +210,20 @@ createRecordByFn fn =
         )
         emptyRecord
         allActivities
+
+
+mapActivityRecordWithKey : (Activity -> a -> a) -> ActivityRecord a -> ActivityRecord a
+mapActivityRecordWithKey fn record =
+    List.foldl
+        (\activity acc ->
+            let
+                currentValue =
+                    getByActivity activity acc
+
+                newValue =
+                    fn activity currentValue
+            in
+            setByActivity activity newValue acc
+        )
+        record
+        allActivities

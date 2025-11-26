@@ -1,5 +1,6 @@
 module IdleGame.Views.DetailViewContent exposing (..)
 
+import Duration exposing (Duration)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -73,7 +74,7 @@ renderStatusBar ( activity, timer ) =
 
 
 type DetailViewObject
-    = DetailViewActivity ( ( Activity, List Effect ), Timer )
+    = DetailViewActivity ( ( Activity, List Effect, Duration ), Timer )
     | DetailViewPreview Preview
 
 
@@ -89,13 +90,13 @@ fade shouldFade =
 renderContent : DetailViewObject -> Bool -> Game -> Html FrontendMsg
 renderContent obj extraBottomPadding game =
     let
-        ( activity, effects ) =
+        ( activity, effects, duration ) =
             case obj of
-                DetailViewActivity ( ( k, e ), _ ) ->
-                    ( k, e )
+                DetailViewActivity ( ( k, e, d ), _ ) ->
+                    ( k, e, d )
 
-                DetailViewPreview (Preview ( k, e )) ->
-                    ( k, e )
+                DetailViewPreview (Preview ( k, e, d )) ->
+                    ( k, e, d )
 
         stats : ActivityStats
         stats =
@@ -171,7 +172,7 @@ renderContent obj extraBottomPadding game =
 
         -- Duration
         , div [ IdleGame.Views.Utils.classes.column, class "relative" ]
-            [ ActivityView.activityDuration (Game.getModdedDuration game activity)
+            [ ActivityView.activityDuration duration
             , fade isPreview
             ]
 

@@ -22,12 +22,12 @@ import Percent exposing (Percent)
 import Types exposing (..)
 
 
-renderSkill : Skill -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
-renderSkill skill game cachedActivityEffects =
+renderSkill : Skill -> Game -> Cache -> Html FrontendMsg
+renderSkill skill game cache =
     let
         activityListItems : List Game.ActivityListItem
         activityListItems =
-            Game.getActivityListItems skill game cachedActivityEffects
+            Game.getActivityListItems skill game cache
     in
     div [ IdleGame.Views.Utils.classes.column, class "gap-4 p-6 pb-16 max-w-[1920px] min-w-[375px]" ]
         [ IdleGame.Views.Utils.skillTopNav { xp = getBySkill skill game.xp, skill = skill }

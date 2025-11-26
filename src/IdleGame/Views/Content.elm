@@ -21,8 +21,8 @@ import IdleGame.Views.Utils
 import Types exposing (..)
 
 
-renderContent : InGameFrontend -> Game -> ActivityRecord (List Effect) -> Tab -> Html FrontendMsg
-renderContent model game cachedActivityEffects activeTab =
+renderContent : InGameFrontend -> Game -> Cache -> Tab -> Html FrontendMsg
+renderContent model game cache activeTab =
     let
         { title, icon } =
             Tab.getConfig activeTab
@@ -55,7 +55,7 @@ renderContent model game cachedActivityEffects activeTab =
             ]
         , case activeTab of
             Tab.Home ->
-                IdleGame.Views.Home.render model game cachedActivityEffects
+                IdleGame.Views.Home.render model game cache
 
             Tab.Shop ->
                 IdleGame.Views.Shop.render game
@@ -67,5 +67,5 @@ renderContent model game cachedActivityEffects activeTab =
                 IdleGame.CombatWrapper.view model.combat
 
             Tab.SkillTab skill ->
-                IdleGame.Views.SkillViews.renderSkill skill game cachedActivityEffects
+                IdleGame.Views.SkillViews.renderSkill skill game cache
         ]

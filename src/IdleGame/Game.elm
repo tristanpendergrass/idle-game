@@ -64,11 +64,11 @@ createDev seed =
 
 type ActivityListItem
     = LockedActivity ( Skill, Int )
-    | ActivityListItem ( Activity, List Effect )
+    | ActivityListItem ( Activity, { effects : List Effect, duration : Duration } )
 
 
-getActivityListItems : Skill -> Game -> ActivityRecord (List Effect) -> List ActivityListItem
-getActivityListItems skill game cachedActivityEffects =
+getActivityListItems : Skill -> Game -> Cache -> List ActivityListItem
+getActivityListItems skill game cache =
     let
         convertToListItem : Activity -> ActivityListItem
         convertToListItem kind =
@@ -83,7 +83,7 @@ getActivityListItems skill game cachedActivityEffects =
                         |> Xp.level Xp.defaultSchedule
             in
             if currentLevel >= stats.level then
-                ActivityListItem ( kind, getByActivity kind cachedActivityEffects )
+                ActivityListItem ( kind, getByActivity kind cache )
 
             else
                 LockedActivity ( stats.skill, stats.level )
@@ -190,8 +190,8 @@ type alias TickResolution =
     { game : Game, toasts : List Toast, bustCache : Bool }
 
 
-tick : Duration -> Game -> TickResolution
-tick delta game =
+tick : Duration -> Cache -> Game -> TickResolution
+tick delta cache game =
     let
         ( newActivity, maybeEvent ) =
             case game.activity of
@@ -206,7 +206,7 @@ tick delta game =
 
                         activityDuration : Duration
                         activityDuration =
-                            getModdedDuration game activityKind
+                            (getByActivity activityKind cache).duration
 
                         ( newTimer, completions ) =
                             timer

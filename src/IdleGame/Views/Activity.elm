@@ -82,8 +82,8 @@ getSpellAssignmentButtonText activity game =
         |> Maybe.withDefault "No spell assigned"
 
 
-renderActivityCard : ( Activity, List Effect ) -> Game -> ScreenWidth -> Html FrontendMsg
-renderActivityCard ( activity, moddedEffects ) game screenWidth =
+renderActivityCard : ( Activity, { effects : List Effect, duration : Duration } ) -> Game -> ScreenWidth -> Html FrontendMsg
+renderActivityCard ( activity, cached ) game screenWidth =
     let
         maybeTimer : Maybe Timer
         maybeTimer =
@@ -95,13 +95,13 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
 
         orderedAndFilteredEffects : List Effect
         orderedAndFilteredEffects =
-            moddedEffects
+            cached.effects
                 |> List.sortWith Effect.order
                 |> List.filter notMasteryXpEffect
 
         duration : Duration
         duration =
-            Game.getModdedDuration game activity
+            cached.duration
 
         pointerDownState : PointerState
         pointerDownState =
@@ -169,8 +169,8 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                                 )
                             ]
                         ]
+                    , div [] [ activityDuration duration ]
 
-                    -- , div [] [ activityDuration duration ]
                     -- The effects of the activity
                     , div [ class "list relative" ]
                         (List.map

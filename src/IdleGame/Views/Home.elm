@@ -8,8 +8,8 @@ import IdleGame.Views.Icon as Icon
 import Types exposing (..)
 
 
-render : InGameFrontend -> Game -> ActivityRecord (List Effect) -> Html FrontendMsg
-render model game cachedActivityEffects =
+render : InGameFrontend -> Game -> Cache -> Html FrontendMsg
+render model game cache =
     let
         skillHeader : Skill -> Html FrontendMsg
         skillHeader skill =

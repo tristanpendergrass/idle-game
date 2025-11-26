@@ -83,19 +83,19 @@ type Modal
 
 
 type alias FastForwardState =
-    { original : Snapshot Game
-    , current : Snapshot Game
+    { original : Snapshot ( Game, Cache )
+    , current : Snapshot ( Game, Cache )
     , whenItStarted : Posix -- the time when fast forward began, to calculate how long it takes
     }
 
 
 type FrontendInGameState
-    = Playing Cache
+    = Playing { gameplayCache : Cache, viewCache : Cache }
     | FastForward FastForwardState
 
 
 type Preview
-    = Preview ( Activity, List Effect )
+    = Preview ( Activity, List Effect, Duration )
 
 
 type alias PointerState =
@@ -369,7 +369,7 @@ type ToFrontend
 
 
 type alias Cache =
-    ActivityRecord (List Effect)
+    ActivityRecord { effects : List Effect, duration : Duration }
 
 
 type Log
