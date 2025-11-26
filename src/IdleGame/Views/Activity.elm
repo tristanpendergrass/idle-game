@@ -74,6 +74,14 @@ notMasteryXpEffect taggedEffect =
             True
 
 
+getSpellAssignmentButtonText : Activity -> Game -> String
+getSpellAssignmentButtonText activity game =
+    game.spellAssignments
+        |> getByActivity activity
+        |> Maybe.map (\spellResource -> (getResourceStats spellResource).title)
+        |> Maybe.withDefault "No spell assigned"
+
+
 renderActivityCard : ( Activity, List Effect ) -> Game -> ScreenWidth -> Html FrontendMsg
 renderActivityCard ( activity, moddedEffects ) game screenWidth =
     let
@@ -190,7 +198,8 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                 , Html.Attributes.attribute "popovertarget" popoverTargetId
                 , class "btn"
                 ]
-                [ text "Assign" ]
+                [ text (getSpellAssignmentButtonText activity game)
+                ]
 
             -- Progress bar
             , case Maybe.map Timer.percentComplete maybeTimer of
