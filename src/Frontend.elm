@@ -864,6 +864,28 @@ updateInGame msg inGameFrontend =
             , Cmd.none
             )
 
+        HandleSpellUnassignClick activity ->
+            let
+                oldSnapshot : Snapshot Game
+                oldSnapshot =
+                    getGame inGameFrontend
+
+                newSnapshot : Snapshot Game
+                newSnapshot =
+                    Snapshot.map
+                        (\game ->
+                            let
+                                updatedSpellAssignments =
+                                    setByActivity activity Nothing game.spellAssignments
+                            in
+                            { game | spellAssignments = updatedSpellAssignments }
+                        )
+                        oldSnapshot
+            in
+            ( InGame (inGameFrontend |> setGame newSnapshot)
+            , Cmd.none
+            )
+
         SetDrawerOpen newValue ->
             ( InGame
                 (inGameFrontend

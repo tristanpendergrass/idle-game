@@ -243,21 +243,28 @@ renderActivityPopover activity =
         , id popoverTargetId
         , class "dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
         ]
-        (List.map
-            (\spell ->
-                let
-                    spellStats =
-                        getResourceStats spell
-                in
-                li []
-                    [ a
-                        [ href "#"
-                        , onClick (HandleSpellAssignmentClick activity spell)
+        (li []
+            [ a
+                [ href "#"
+                , onClick (HandleSpellUnassignClick activity)
+                ]
+                [ text "None" ]
+            ]
+            :: List.map
+                (\spell ->
+                    let
+                        spellStats =
+                            getResourceStats spell
+                    in
+                    li []
+                        [ a
+                            [ href "#"
+                            , onClick (HandleSpellAssignmentClick activity spell)
+                            ]
+                            [ text spellStats.title ]
                         ]
-                        [ text spellStats.title ]
-                    ]
-            )
-            availableSpells
+                )
+                availableSpells
         )
 
 
