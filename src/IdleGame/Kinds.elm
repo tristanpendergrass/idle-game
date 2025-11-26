@@ -298,12 +298,14 @@ mapActivities fn record =
 type alias ActivityStats =
     { skill : Skill
     , title : String
+    , idLabel : String -- used for things like Dom elements that need to refer to the activity
     , image : String
     , level : Int
     , duration : Duration.Duration
     , type_ : String
     , coin : Maybe Int
     , resourceGains : List ( Int, Resource )
+    , spellAssignmentSlots : Int
     }
 
 
@@ -312,52 +314,62 @@ activityStats =
     { gatherSage =
         { skill = HerbGathering
         , title = "Gather Sage"
+        , idLabel = "gather-sage"
         , image = "/activities/herbGathering/gatherSage.webp"
         , level = 1
         , duration = Duration.seconds 4
         , type_ = "Gather"
         , coin = Nothing
         , resourceGains = [ ( 1, Sage ) ]
+        , spellAssignmentSlots = 1
         }
     , gatherNettle =
         { skill = HerbGathering
         , title = "Gather Nettle"
+        , idLabel = "gather-nettle"
         , image = "/activities/herbGathering/gatherNettle.webp"
         , level = 1
         , duration = Duration.seconds 5
         , type_ = "Gather"
         , coin = Nothing
         , resourceGains = [ ( 1, Nettle ) ]
+        , spellAssignmentSlots = 1
         }
     , gatherSorrel =
         { skill = HerbGathering
         , title = "Gather Sorrel"
+        , idLabel = "gather-sorrel"
         , image = "/activities/herbGathering/gatherSorrel.webp"
         , level = 2
         , duration = Duration.seconds 10
         , type_ = "Gather"
         , coin = Nothing
         , resourceGains = [ ( 1, Sorrel ) ]
+        , spellAssignmentSlots = 1
         }
     , craftSpellHerbSense =
         { skill = WildMagic
         , title = "Herb Sense"
+        , idLabel = "craft-spell-herb-sense"
         , image = "/activities/wildMagic/craftSpellHerbSense.webp"
         , level = 1
         , duration = Duration.seconds 5
         , type_ = "Craft Spell"
         , coin = Nothing
         , resourceGains = [ ( 1, SpellHerbSense ) ]
+        , spellAssignmentSlots = 1
         }
     , craftSpellBloom =
         { skill = WildMagic
         , title = "Bloom"
+        , idLabel = "craft-spell-bloom"
         , image = "/activities/wildMagic/craftSpellBloom.webp"
         , level = 2
         , duration = Duration.seconds 10
         , type_ = "Craft Spell"
         , coin = Nothing
         , resourceGains = [ ( 1, SpellBloom ) ]
+        , spellAssignmentSlots = 1
         }
     }
 

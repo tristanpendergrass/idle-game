@@ -122,6 +122,14 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
         showMastery : Bool
         showMastery =
             Activity.hasMasteryMods activityMastery
+
+        anchorName : String
+        anchorName =
+            "--anchor-" ++ stats.idLabel
+
+        popoverTargetId : String
+        popoverTargetId =
+            "popover-" ++ stats.idLabel
     in
     div [ class "relative" ]
         [ div
@@ -177,6 +185,12 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                         }
                     ]
                 ]
+            , button
+                [ Html.Attributes.attribute "style" ("anchor-name: " ++ anchorName)
+                , Html.Attributes.attribute "popovertarget" popoverTargetId
+                , class "btn"
+                ]
+                [ text "Assign" ]
 
             -- Progress bar
             , case Maybe.map Timer.percentComplete maybeTimer of
@@ -192,6 +206,32 @@ renderActivityCard ( activity, moddedEffects ) game screenWidth =
                         ]
                         []
             ]
+        ]
+
+
+renderActivityPopover : Activity -> Html FrontendMsg
+renderActivityPopover activity =
+    let
+        stats : ActivityStats
+        stats =
+            getActivityStats activity
+
+        anchorName : String
+        anchorName =
+            "--anchor-" ++ stats.idLabel
+
+        popoverTargetId : String
+        popoverTargetId =
+            "popover-" ++ stats.idLabel
+    in
+    ul
+        [ Html.Attributes.attribute "popover" ""
+        , Html.Attributes.attribute "style" ("position-anchor: " ++ anchorName)
+        , id popoverTargetId
+        , class "dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+        ]
+        [ li [] [ a [] [ text "Option 1" ] ]
+        , li [] [ a [] [ text "Option 2" ] ]
         ]
 
 
