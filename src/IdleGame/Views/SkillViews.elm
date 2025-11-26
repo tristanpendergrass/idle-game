@@ -38,7 +38,7 @@ renderSkill skill game cache =
                 (\item ->
                     case item of
                         Game.ActivityListItem ( activity, _ ) ->
-                            Just (ActivityView.renderActivityPopover activity)
+                            Just (ActivityView.renderActivityPopover activity game)
 
                         Game.LockedActivity _ ->
                             Nothing

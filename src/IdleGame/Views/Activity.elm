@@ -78,7 +78,17 @@ getSpellAssignmentButtonText : Activity -> Game -> String
 getSpellAssignmentButtonText activity game =
     game.spellAssignments
         |> getByActivity activity
-        |> Maybe.map (\spellResource -> (getResourceStats spellResource).title)
+        |> Maybe.map
+            (\spellResource ->
+                let
+                    spellStats =
+                        getResourceStats spellResource
+
+                    quantity =
+                        getByResource spellResource game.resources
+                in
+                spellStats.title ++ " (" ++ String.fromInt quantity ++ ")"
+            )
         |> Maybe.withDefault "No spell assigned"
 
 
@@ -218,8 +228,8 @@ renderActivityCard ( activity, cached ) game screenWidth =
         ]
 
 
-renderActivityPopover : Activity -> Html FrontendMsg
-renderActivityPopover activity =
+renderActivityPopover : Activity -> Game -> Html FrontendMsg
+renderActivityPopover activity game =
     let
         stats : ActivityStats
         stats =
@@ -255,13 +265,16 @@ renderActivityPopover activity =
                     let
                         spellStats =
                             getResourceStats spell
+
+                        quantity =
+                            getByResource spell game.resources
                     in
                     li []
                         [ a
                             [ href "#"
                             , onClick (HandleSpellAssignmentClick activity spell)
                             ]
-                            [ text spellStats.title ]
+                            [ text (spellStats.title ++ " (" ++ String.fromInt quantity ++ ")") ]
                         ]
                 )
                 availableSpells
