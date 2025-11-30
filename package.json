@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build:css": "npx @tailwindcss/cli -i ./src/index.css -o ./public/output.css",
-    "generate-elm": "ts-node ./scripts/generate.ts"
+    "generate-elm": "ts-node ./scripts/generate.ts",
+    "generate-icons": "node scripts/generate-custom-icons.js"
   }
 }

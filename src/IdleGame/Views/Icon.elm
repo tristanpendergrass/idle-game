@@ -5,7 +5,21 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Material.Icons
 import Material.Icons.Types
-import Svg exposing (Svg)
+import Svg
+import Svg.Attributes
+
+
+{-| A type with no constructors - used for SVG icons that don't produce messages
+-}
+type Never
+    = Never Never
+
+
+{-| Convert a Never to any type - this is safe because Never can never be constructed
+-}
+never : Never -> a
+never (Never n) =
+    never n
 
 
 type Size
@@ -73,6 +87,7 @@ type Icon
     | IconString String Params -- Icons sourced from the alphabet. Should just be one or two characters
       -- Note the MyMaterialIcon instead of Material.Icons.Types.Icon msg. Because we want to avoid having `msg` on all Icons in the app
     | IconMaterial MyMaterialIcon Params -- Icons sourced from the Material Icons library
+    | IconSvg (Svg.Svg Never) Params -- Custom inline SVG icons with currentColor support
 
 
 defaultParams : Params
@@ -97,6 +112,9 @@ mapParams fn icon =
 
         IconMaterial i params ->
             IconMaterial i (fn params)
+
+        IconSvg svg params ->
+            IconSvg svg (fn params)
 
 
 withSize : Size -> Icon -> Icon
@@ -177,6 +195,9 @@ getParams icon =
         IconMaterial _ p ->
             p
 
+        IconSvg _ p ->
+            p
+
 
 toHtml : Icon -> Html msg
 toHtml icon =
@@ -224,6 +245,13 @@ toHtml icon =
 
         IconMaterial materialIcon params ->
             myMaterialIconToHtml materialIcon (sizeToPixel params.size) Material.Icons.Types.Inherit
+
+        IconSvg svgContent params ->
+            div
+                [ class (sizeToTailwindClass params.size)
+                , class visibilityClass
+                ]
+                [ Html.map never svgContent ]
 
 
 
