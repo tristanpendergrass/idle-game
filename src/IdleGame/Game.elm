@@ -202,7 +202,22 @@ tick delta cache game =
                     let
                         activityEffects : List Effect
                         activityEffects =
-                            Activity.getActivityEffects activityKind
+                            let
+                                baseEffects : List Effect
+                                baseEffects =
+                                    Activity.getActivityEffects activityKind
+
+                                scrollConsumptionEffects : List Effect
+                                scrollConsumptionEffects =
+                                    game.spellAssignments
+                                        |> getByActivity activityKind
+                                        |> Maybe.map
+                                            (\spellResource ->
+                                                [ Effect.spendResource 1 spellResource ]
+                                            )
+                                        |> Maybe.withDefault []
+                            in
+                            List.concat [ scrollConsumptionEffects, baseEffects ]
 
                         activityDuration : Duration
                         activityDuration =
@@ -1031,13 +1046,17 @@ getSpellAssignmentsMods game =
         Just ( activity, _ ) ->
             game.spellAssignments
                 |> getByActivity activity
-                |> Maybe.map (getSpellAssignmentModsHelp activity)
+                |> Maybe.map (getSpellAssignmentModsHelp activity game)
                 |> Maybe.withDefault []
 
 
-getSpellAssignmentModsHelp : Activity -> Resource -> List Mod
-getSpellAssignmentModsHelp activity resource =
+getSpellAssignmentModsHelp : Activity -> Game -> Resource -> List Mod
+getSpellAssignmentModsHelp activity game resource =
     let
+        quantity : Int
+        quantity =
+            getByResource resource game.resources
+
         activityStats : ActivityStats
         activityStats =
             getActivityStats activity
@@ -1046,23 +1065,27 @@ getSpellAssignmentModsHelp activity resource =
         resourceStats =
             getResourceStats resource
     in
-    case resource of
-        SpellHerbSense ->
-            if activityStats.skill == HerbGathering then
-                [ EffectMod (Mod.resourceDoublingBuff (Percent.float 0.1)) ]
+    if quantity > 0 then
+        case resource of
+            SpellHerbSense ->
+                if activityStats.skill == HerbGathering then
+                    [ EffectMod (Mod.resourceDoublingBuff (Percent.float 0.1)) ]
 
-            else
+                else
+                    []
+
+            SpellBloom ->
+                if activityStats.skill == HerbGathering then
+                    [ IntervalMod { activity = activity, percentChange = Percent.float 0.25, label = IntervalModLabel (Percent.float 0.25), count = 1 } ]
+
+                else
+                    []
+
+            _ ->
                 []
 
-        SpellBloom ->
-            if activityStats.skill == HerbGathering then
-                [ IntervalMod { activity = activity, percentChange = Percent.float 0.25, label = IntervalModLabel (Percent.float 0.25), count = 1 } ]
-
-            else
-                []
-
-        _ ->
-            []
+    else
+        []
 
 
 getAllMods : Game -> List Mod
