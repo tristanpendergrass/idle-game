@@ -22,10 +22,8 @@ wildMagic1 =
         svgContent =
             Svg.svg
                 [ Svg.Attributes.viewBox "0 0 32 32"
-                , attribute "fill" "currentColor"
-                , attribute "stroke" "currentColor"
                 , attribute "xmlns" "http://www.w3.org/2000/svg"
-                ]
+                , attribute "shape-rendering" "crispEdges" ]
                 [ Svg.rect
                     [ Svg.Attributes.x "14"
                     , Svg.Attributes.y "2"

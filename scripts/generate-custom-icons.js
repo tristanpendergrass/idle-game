@@ -124,6 +124,7 @@ function parseChildren(content) {
 
 /**
  * Convert SVG element to Elm Svg code
+ * Now also returns width, height, and shapeRendering from the root <svg>.
  */
 function svgToElm(svgContent) {
   // Extract the SVG opening tag
@@ -134,8 +135,9 @@ function svgToElm(svgContent) {
 
   const attrs = parseSvgAttributes(svgTagMatch[0]);
 
-  // Extract viewBox for the wrapper
+  // Extract attributes for the wrapper
   const viewBox = attrs.viewBox || '0 0 32 32';
+  const shapeRendering = attrs.shapeRendering || null;
 
   // Extract the SVG content (everything between <svg> and </svg>)
   const contentMatch = svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
@@ -148,7 +150,8 @@ function svgToElm(svgContent) {
   // Parse child elements
   const children = parseChildren(innerContent);
 
-  return { viewBox, children };
+  // NOTE: we intentionally ignore width/height now
+  return { viewBox, shapeRendering, children };
 }
 
 /**
@@ -172,15 +175,35 @@ function generateChildrenCode(children) {
 
 /**
  * Generate Elm code for a single icon
+ * Root <svg> now:
+ *   - uses viewBox + width/height (if present)
+ *   - preserves shape-rendering
+ *   - does NOT set fill/stroke="currentColor" on the root
  */
 function generateIconFunction(filename, svgContent) {
   const functionName = toFunctionName(filename);
   const processedSvg = replaceColorsWithCurrent(svgContent);
 
   try {
-    const { viewBox, children } = svgToElm(processedSvg);
+    const { viewBox, shapeRendering, children } = svgToElm(processedSvg);
 
     const childrenCode = generateChildrenCode(children);
+
+    // Build the attribute list for the root <svg> in Elm
+    const rootAttrs = [];
+
+    // Only viewBox, xmlns, and (optionally) shape-rendering
+    rootAttrs.push(`Svg.Attributes.viewBox "${viewBox}"`);
+    rootAttrs.push(`attribute "xmlns" "http://www.w3.org/2000/svg"`);
+
+    if (shapeRendering) {
+      rootAttrs.push(`attribute "shape-rendering" "${shapeRendering}"`);
+    }
+
+    const rootAttrsCode =
+      rootAttrs.length > 0
+        ? `[ ${rootAttrs.join('\n                , ')} ]`
+        : '[]';
 
     return `
 {-| ${functionName} icon -}
@@ -189,11 +212,7 @@ ${functionName} =
     let
         svgContent =
             Svg.svg
-                [ Svg.Attributes.viewBox "${viewBox}"
-                , attribute "fill" "currentColor"
-                , attribute "stroke" "currentColor"
-                , attribute "xmlns" "http://www.w3.org/2000/svg"
-                ]
+                ${rootAttrsCode}
                 ${childrenCode}
     in
     IconSvg svgContent defaultParams
