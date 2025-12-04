@@ -3,6 +3,7 @@ module IdleGame.Kinds exposing (..)
 import Duration
 import Icons.Chores1
 import Icons.HerbGathering
+import Icons.WildMagic1
 import IdleGame.Coin
 import IdleGame.Views.Icon
 
@@ -10,18 +11,21 @@ import IdleGame.Views.Icon
 type Skill
     = HerbGathering
     | WildMagic
+    | Chores
 
 
 allSkills : List Skill
 allSkills =
     [ HerbGathering
     , WildMagic
+    , Chores
     ]
 
 
 type alias SkillRecord a =
     { herbGathering : a
     , wildMagic : a
+    , chores : a
     }
 
 
@@ -29,6 +33,7 @@ skillRecord : a -> SkillRecord a
 skillRecord a =
     { herbGathering = a
     , wildMagic = a
+    , chores = a
     }
 
 
@@ -41,6 +46,9 @@ getBySkill kind data =
         WildMagic ->
             data.wildMagic
 
+        Chores ->
+            data.chores
+
 
 setBySkill : Skill -> a -> SkillRecord a -> SkillRecord a
 setBySkill kind value data =
@@ -50,6 +58,9 @@ setBySkill kind value data =
 
         WildMagic ->
             { data | wildMagic = value }
+
+        Chores ->
+            { data | chores = value }
 
 
 type alias SkillStats =
@@ -63,13 +74,15 @@ mapSkills :
 mapSkills fn record =
     { herbGathering = fn record.herbGathering
     , wildMagic = fn record.wildMagic
+    , chores = fn record.chores
     }
 
 
 skillStats : SkillRecord SkillStats
 skillStats =
     { herbGathering = { title = "Herb Gathering", icon = Icons.HerbGathering.icon }
-    , wildMagic = { title = "Wild Magic", icon = Icons.Chores1.icon }
+    , wildMagic = { title = "Wild Magic", icon = Icons.WildMagic1.icon }
+    , chores = { title = "Chores", icon = Icons.Chores1.icon }
     }
 
 

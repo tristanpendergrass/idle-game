@@ -184,6 +184,9 @@ getActivityMasteriesHelper activity =
         WildMagic ->
             { perLevel = [], atLevel = [] }
 
+        Chores ->
+            { perLevel = [], atLevel = [] }
+
 
 
 {- All the commented out cases can be removed since we only have
