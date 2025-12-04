@@ -140,7 +140,8 @@ update msg model =
             , Lamdera.broadcast (GiveServerInfo (getServerInfo model2))
             )
 
-        SentLoginEmail email result ->
+        -- EMAIL AUTH DISABLED: See comment in email functions section below
+        SentLoginEmail _ _ ->
             noOp
 
 
@@ -251,6 +252,14 @@ frontendUserFromBackendUser backendUser =
     }
 
 
+{- EMAIL AUTH DISABLED
+
+   Email authentication is not currently in use. The app uses anonymous session-based
+   authentication instead. These functions are preserved for potential future use.
+
+   To re-enable, uncomment this section and the email sending functions below.
+
+
 {-| Note this function works with logging in existing user and creating new user
 -}
 loginWithToken :
@@ -323,6 +332,17 @@ getAndRemoveLoginToken updateFunc loginToken model =
         (Dict.get loginToken model.pendingLoginTokens)
         { model | pendingLoginTokens = Dict.remove loginToken model.pendingLoginTokens }
 
+-}
+
+
+{- EMAIL SENDING FUNCTIONS DISABLED
+
+   Email authentication is not currently in use. The app uses anonymous session-based
+   authentication instead. These functions are preserved for potential future use.
+
+   To re-enable, uncomment this section and set Env.domain and Env.postmarkServerToken
+   in the Lamdera dashboard.
+
 
 noReplyEmailAddress : Maybe EmailAddress
 noReplyEmailAddress =
@@ -375,6 +395,8 @@ sendLoginEmail msg emailAddress route loginToken =
         Nothing ->
             Cmd.none
 
+-}
+
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> BackendModel -> ( BackendModel, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
@@ -387,58 +409,18 @@ updateFromFrontend sessionId clientId msg model =
         NoOpToBackend ->
             ( model, Cmd.none )
 
-        RegisterEmailRequest route email ->
-            let
-                ( model2, loginToken ) =
-                    Id.getUniqueId model
-            in
-            ( { model2
-                | pendingLoginTokens =
-                    Dict.insert
-                        loginToken
-                        { creationTime = model2.approximateTime, emailAddress = email }
-                        model2.pendingLoginTokens
-              }
-            , sendLoginEmail (SentLoginEmail email) email route loginToken
-            )
+        -- EMAIL AUTH DISABLED: These handlers are preserved but do nothing
+        RegisterEmailRequest _ _ ->
+            noOp
 
-        LoginWithEmailRequest route email ->
-            let
-                ( model2, loginToken ) =
-                    Id.getUniqueId model
-            in
-            ( { model2
-                | pendingLoginTokens =
-                    Dict.insert
-                        loginToken
-                        { creationTime = model2.approximateTime, emailAddress = email }
-                        model2.pendingLoginTokens
-              }
-            , sendLoginEmail (SentLoginEmail email) email route loginToken
-            )
+        LoginWithEmailRequest _ _ ->
+            noOp
 
-        LoginWithTokenRequest loginToken ->
-            getAndRemoveLoginToken (loginWithToken sessionId clientId) loginToken model
+        LoginWithTokenRequest _ ->
+            noOp
 
         LogoutRequest ->
-            let
-                model2 : BackendModel
-                model2 =
-                    { model | sessions = BiDict.remove sessionId model.sessions }
-
-                ( backendUser, model3 ) =
-                    getOrCreateUser model.approximateTime sessionId model2
-
-                model4 : BackendModel
-                model4 =
-                    addSession sessionId backendUser.id model3
-            in
-            ( model4
-            , Cmd.batch
-                [ Lamdera.sendToFrontend clientId (SetUserAndGames ( backendUserToFrontendUser backendUser, getGames backendUser.id model4 ))
-                , Lamdera.broadcast (GiveServerInfo (getServerInfo model4))
-                ]
-            )
+            noOp
 
         CreateGameRequest ->
             case getUser sessionId model of
