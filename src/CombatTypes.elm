@@ -1,5 +1,25 @@
 module CombatTypes exposing (..)
 
+{-| TECHNICAL EXPLORATION - NOT CURRENTLY IN USE
+
+This combat system was a technical exploration but is not currently integrated
+into the game. It was removed from the active codebase because the Move type
+(a function: State -> Random.Generator ...) cannot be serialized by Lamdera's
+wire protocol.
+
+Related files preserved for future reference:
+
+  - src/CombatTypes.elm (this file) - Type definitions
+  - src/IdleGame/Combat.elm - Core combat logic
+  - src/IdleGame/CombatWrapper.elm - UI wrapper and Elm Architecture integration
+  - src/IdleGame/Combat\_test.elm - Tests
+
+To reintegrate, the function-based Move type would need to be replaced with a
+data-based representation (e.g., a union type like `type MoveKind = SwingMove Int | BlockMove Int`)
+that can be serialized, with an interpreter function that generates the Random.Generator at runtime.
+
+-}
+
 import Random
 
 

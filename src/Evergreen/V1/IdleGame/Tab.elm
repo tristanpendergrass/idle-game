@@ -4,7 +4,7 @@ import Evergreen.V1.IdleGame.Kinds
 
 
 type Tab
-    = Backpack
+    = Home
+    | Backpack
     | Shop
-    | TestingCenter
     | SkillTab Evergreen.V1.IdleGame.Kinds.Skill

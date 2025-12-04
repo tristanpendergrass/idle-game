@@ -7,7 +7,6 @@ import Browser exposing (UrlRequest)
 import Browser.Dom
 import Browser.Events
 import Browser.Navigation exposing (Key)
-import CombatTypes exposing (..)
 import Duration exposing (Duration)
 import EmailAddress exposing (EmailAddress)
 import Http
@@ -172,7 +171,6 @@ type alias InGameFrontend =
     , activeModal : Maybe Modal
     , saveGameTimer : Timer
     , pointerState : Maybe PointerState -- Tracks the state of the pointer (mouse or touch) for long press detection
-    , combat : CombatModel
     }
 
 
@@ -330,8 +328,6 @@ type FrontendMsg
     | HandlePointerUp
     | HandlePointerCancel
     | HandleGetViewportResult Browser.Dom.Viewport
-      -- Combat
-    | CombatMsg CombatMsg
 
 
 type ToBackend
@@ -387,44 +383,6 @@ type ToastQueueItem
 type alias ToastQueue =
     List ToastQueueItem
 
-
-
--- Combat
-
-
-type alias CombatConfigUi =
-    { leftMoves : List MoveUi
-    , rightMoves : List MoveUi
-    }
-
-
-type alias CombatSimulationResults =
-    { leftWins : Int
-    , rightWins : Int
-    , draw : Int
-    }
-
-
-type alias CombatModel =
-    { state : State
-    , configUi : CombatConfigUi
-    , maybeSimulationResults : Maybe CombatSimulationResults
-    }
-
-
-type CombatMsg
-    = StartNewCombat
-    | HandleNextStepClick
-    | HandleNextStepResult State
-    | HandleSelectCombatMove EntityAbsolute Int MoveUi
-    | HandleSimulateClick
-    | HandleSimulateResult CombatSimulationResults
-
-
-type alias MoveUi =
-    { name : String
-    , move : Move
-    }
 
 
 type Toast

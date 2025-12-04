@@ -1,50 +1,80 @@
 module Evergreen.V1.Types exposing (..)
 
+import AssocList
+import BiDict.Assoc
 import Browser
 import Browser.Dom
 import Browser.Events
 import Browser.Navigation
-import Dict
 import Duration
+import Evergreen.V1.EmailAddress
+import Evergreen.V1.Id
 import Evergreen.V1.IdleGame.Coin
-import Evergreen.V1.IdleGame.Effect
-import Evergreen.V1.IdleGame.GameTypes
 import Evergreen.V1.IdleGame.Kinds
 import Evergreen.V1.IdleGame.OneTime
-import Evergreen.V1.IdleGame.Resource
 import Evergreen.V1.IdleGame.Snapshot
 import Evergreen.V1.IdleGame.Tab
 import Evergreen.V1.IdleGame.Timer
 import Evergreen.V1.IdleGame.Xp
+import Evergreen.V1.Percent
+import Evergreen.V1.Postmark
+import Evergreen.V1.Route
+import Http
 import Lamdera
+import List.Nonempty
 import Random
 import Time
-import Toast
 import Url
 
 
-type Preview
-    = Preview Evergreen.V1.IdleGame.Kinds.Activity
-
-
-type alias TimePassesXpGain =
-    { originalXp : Evergreen.V1.IdleGame.Xp.Xp
-    , currentXp : Evergreen.V1.IdleGame.Xp.Xp
-    , skill : Evergreen.V1.IdleGame.Kinds.Skill
+type alias AuthenticatedUser =
+    { emailAddress : Evergreen.V1.EmailAddress.EmailAddress
     }
 
 
-type alias TimePassesData =
-    { xpGains : List TimePassesXpGain
-    , coinGains : Maybe Evergreen.V1.IdleGame.Coin.Coin
-    , resourcesDiff : Evergreen.V1.IdleGame.Resource.Diff
+type alias UnauthenticatedUser =
+    {}
+
+
+type AuthenticationStatus
+    = Authenticated AuthenticatedUser
+    | AuthenticationPending Evergreen.V1.EmailAddress.EmailAddress UnauthenticatedUser
+    | NotAuthenticated UnauthenticatedUser
+
+
+type alias BackendUser =
+    { id : Evergreen.V1.Id.Id Evergreen.V1.Id.UserId
+    , lastConnectionTime : Time.Posix
+    , authentication : AuthenticationStatus
     }
 
 
-type Modal
-    = TimePassesModal Duration.Duration Time.Posix TimePassesData
-    | ShopResourceModal Int Evergreen.V1.IdleGame.Kinds.Resource Evergreen.V1.IdleGame.Coin.Coin
-    | SyllabusModal Evergreen.V1.IdleGame.Kinds.Skill
+type alias ServerInfo =
+    { users : AssocList.Dict (Evergreen.V1.Id.Id Evergreen.V1.Id.UserId) BackendUser
+    , sessions : BiDict.Assoc.BiDict Lamdera.SessionId (Evergreen.V1.Id.Id Evergreen.V1.Id.UserId)
+    , connections : AssocList.Dict Lamdera.SessionId (List.Nonempty.Nonempty Lamdera.ClientId)
+    }
+
+
+type alias LoadingFrontend =
+    { key : Browser.Navigation.Key
+    , route : Evergreen.V1.Route.Route
+    , routeToken : Evergreen.V1.Route.Token
+    , isVisible : Bool
+    , maybeServerInfo : Maybe ServerInfo
+    }
+
+
+type LoginStatus
+    = NotLoggedIn UnauthenticatedUser
+    | LoginStatusPending
+    | LoggedIn AuthenticatedUser
+
+
+type alias FrontendUser =
+    { id : Evergreen.V1.Id.Id Evergreen.V1.Id.UserId
+    , loginStatus : LoginStatus
+    }
 
 
 type alias Game =
@@ -55,26 +85,169 @@ type alias Game =
     , coin : Evergreen.V1.IdleGame.Coin.Coin
     , resources : Evergreen.V1.IdleGame.Kinds.ResourceRecord Int
     , ownedShopUpgrades : Evergreen.V1.IdleGame.Kinds.ShopUpgradeRecord Bool
-    , testCompletions : Evergreen.V1.IdleGame.Kinds.AcademicTestRecord Bool
     , oneTimeStatuses : Evergreen.V1.IdleGame.OneTime.OneTimeRecord Bool
+    , spellAssignments : Evergreen.V1.IdleGame.Kinds.ActivityRecord (Maybe Evergreen.V1.IdleGame.Kinds.Resource)
+    , activeTab : Evergreen.V1.IdleGame.Tab.Tab
     }
 
 
+type MainMenuRoute
+    = MainMenuAnonymousPlay
+
+
+type alias MainMenuFrontend =
+    { key : Browser.Navigation.Key
+    , route : Evergreen.V1.Route.Route
+    , routeToken : Evergreen.V1.Route.Token
+    , isVisible : Bool
+    , emailFormValue : String
+    , user : FrontendUser
+    , games : List ( Evergreen.V1.Id.Id Evergreen.V1.Id.GameId, Evergreen.V1.IdleGame.Snapshot.Snapshot Game )
+    , maybeServerInfo : Maybe ServerInfo
+    , mainMenuRoute : MainMenuRoute
+    }
+
+
+type Tag
+    = SkillTag Evergreen.V1.IdleGame.Kinds.Skill
+    | ActivityTag Evergreen.V1.IdleGame.Kinds.Activity
+    | ActivityCompleteTag
+
+
+type alias Effect =
+    { effect : EffectType
+    , tags : List Tag
+    , oneTimeStatus : Evergreen.V1.IdleGame.OneTime.OneTimeStatus
+    }
+
+
+type alias GainResourceParams =
+    { base : Int
+    , doublingChance : Evergreen.V1.Percent.Percent
+    , resource : Evergreen.V1.IdleGame.Kinds.Resource
+    }
+
+
+type ReducedBy
+    = ReducedByFlat Evergreen.V1.IdleGame.Kinds.Resource
+    | ReducedByPercent Evergreen.V1.IdleGame.Kinds.Resource Evergreen.V1.Percent.Percent
+
+
+type alias SpendResourceParams =
+    { base : Int
+    , resource : Evergreen.V1.IdleGame.Kinds.Resource
+    , preservationChance : Evergreen.V1.Percent.Percent
+    , reducedBy : Maybe ReducedBy
+    }
+
+
+type alias SellResourceParams =
+    { base : Int
+    , resource : Evergreen.V1.IdleGame.Kinds.Resource
+    }
+
+
+type alias GainXpParams =
+    { base : Evergreen.V1.IdleGame.Xp.Xp
+    , percentIncrease : Evergreen.V1.Percent.Percent
+    , skill : Evergreen.V1.IdleGame.Kinds.Skill
+    }
+
+
+type alias GainMxpParams =
+    { percentIncrease : Evergreen.V1.Percent.Percent
+    , activity : Evergreen.V1.IdleGame.Kinds.Activity
+    }
+
+
+type alias GainCoinParams =
+    { base : Evergreen.V1.IdleGame.Coin.Coin
+    , percentIncrease : Evergreen.V1.Percent.Percent
+    }
+
+
+type EffectType
+    = EffectNoOp
+    | VariableSuccess
+        { successProbability : Evergreen.V1.Percent.Percent
+        , successEffects : List Effect
+        , failureEffects : List Effect
+        }
+    | OneOf Effect (List Effect)
+    | GainResource GainResourceParams
+    | SpendResource SpendResourceParams
+    | SellResource SellResourceParams
+    | GainXp GainXpParams
+    | GainMxp GainMxpParams
+    | GainCoin GainCoinParams
+
+
 type alias Cache =
-    Evergreen.V1.IdleGame.Kinds.ActivityRecord (List Evergreen.V1.IdleGame.Effect.Effect)
+    Evergreen.V1.IdleGame.Kinds.ActivityRecord
+        { effects : List Effect
+        , duration : Duration.Duration
+        }
 
 
 type alias FastForwardState =
-    { original : Evergreen.V1.IdleGame.Snapshot.Snapshot Game
-    , current : Evergreen.V1.IdleGame.Snapshot.Snapshot Game
+    { original : Evergreen.V1.IdleGame.Snapshot.Snapshot ( Game, Cache )
+    , current : Evergreen.V1.IdleGame.Snapshot.Snapshot ( Game, Cache )
     , whenItStarted : Time.Posix
     }
 
 
-type FrontendGameState
-    = Initializing
-    | Playing (Evergreen.V1.IdleGame.Snapshot.Snapshot Game) Cache
+type FrontendInGameState
+    = Playing
+        { gameplayCache : Cache
+        , viewCache : Cache
+        }
     | FastForward FastForwardState
+
+
+type Toast
+    = GainedCoin Evergreen.V1.IdleGame.Coin.Coin
+    | GainedResource Int Evergreen.V1.IdleGame.Kinds.Resource
+    | SoldResource Int Evergreen.V1.IdleGame.Kinds.Resource Evergreen.V1.IdleGame.Coin.Coin
+    | NegativeAmountErr
+    | TestAlreadyCompleted
+    | TestNotUnlocked
+
+
+type ToastQueueItem
+    = ToastQueueItem Toast Time.Posix
+
+
+type alias ToastQueue =
+    List ToastQueueItem
+
+
+type Preview
+    = Preview ( Evergreen.V1.IdleGame.Kinds.Activity, List Effect, Duration.Duration )
+
+
+type alias TimePassesXpGain =
+    { originalXp : Evergreen.V1.IdleGame.Xp.Xp
+    , currentXp : Evergreen.V1.IdleGame.Xp.Xp
+    , skill : Evergreen.V1.IdleGame.Kinds.Skill
+    }
+
+
+type alias ResourceDiff =
+    Evergreen.V1.IdleGame.Kinds.ResourceRecord Int
+
+
+type alias TimePassesData =
+    { xpGains : List TimePassesXpGain
+    , coinGains : Maybe Evergreen.V1.IdleGame.Coin.Coin
+    , resourcesDiff : ResourceDiff
+    }
+
+
+type Modal
+    = TimePassesModal Duration.Duration Time.Posix TimePassesData
+    | ShopResourceBuyModal Int Evergreen.V1.IdleGame.Kinds.Resource Evergreen.V1.IdleGame.Coin.Coin
+    | ShopResourceSellModal Int Evergreen.V1.IdleGame.Kinds.Resource Evergreen.V1.IdleGame.Coin.Coin
+    | SyllabusModal Evergreen.V1.IdleGame.Kinds.Skill
 
 
 type ScreenWidth
@@ -96,7 +269,19 @@ type FrontendMsg
     = NoOp
     | UrlClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | InitializeGameHelp (Evergreen.V1.IdleGame.Snapshot.Snapshot Game) Time.Posix
+    | HandleCreateGameClick
+    | HandleCreateUserClick
+    | HandleLogInClick
+    | HandleStartGameClick
+        { index : Int
+        }
+    | HandleStartGameClickWithTime
+        { index : Int
+        }
+        Time.Posix
+    | HandleEmailInput String
+    | HandleLogoutClick
+    | HandleGoToMainMenuClick
     | ClosePreview
     | ExpandActivity
     | CollapseActivity
@@ -110,21 +295,23 @@ type FrontendMsg
     | HandlePreviewClick Evergreen.V1.IdleGame.Kinds.Activity
     | HandlePlayClick Evergreen.V1.IdleGame.Kinds.Activity
     | HandleStopClick Evergreen.V1.IdleGame.Kinds.Activity
+    | HandleSpellAssignmentClick Evergreen.V1.IdleGame.Kinds.Activity Evergreen.V1.IdleGame.Kinds.Resource
+    | HandleSpellUnassignClick Evergreen.V1.IdleGame.Kinds.Activity
     | OpenDebugPanel
     | CloseDebugPanel
     | AddTime Duration.Duration
     | AddTimeHelp Duration.Duration Time.Posix
-    | HandleShopResourceClick Evergreen.V1.IdleGame.Kinds.Resource
+    | AddCoins Int
+    | HandleShopResourceOpenBuyClick Evergreen.V1.IdleGame.Kinds.Resource
+    | HandleShopResourceOpenSellClick Evergreen.V1.IdleGame.Kinds.Resource
     | HandleOneLessButtonClick
     | HandleOneMoreButtonClick
     | HandleMinButtonClick
     | HandleMaxButtonClick
     | HandleShopResourceQuantityChange String
-    | HandleShopResourceBuyClick
-    | HandleTestingCenterTabClick Evergreen.V1.IdleGame.Kinds.AcademicTestCategory
-    | HandleTestCompletionClick Evergreen.V1.IdleGame.Kinds.AcademicTest
-    | ToastMsg Toast.Msg
-    | AddToast Evergreen.V1.IdleGame.GameTypes.Toast
+    | HandleShopResourceBuySubmit
+    | HandleShopResourceSellSubmit
+    | AddToast Toast Time.Posix
     | HandleFastForward Time.Posix
     | HandleAnimationFrame Time.Posix
     | HandleAnimationFrameDelta Float
@@ -140,45 +327,71 @@ type FrontendMsg
     | HandleGetViewportResult Browser.Dom.Viewport
 
 
-type alias FrontendModel =
+type alias InGameFrontend =
     { key : Browser.Navigation.Key
+    , user : FrontendUser
+    , route : Evergreen.V1.Route.Route
+    , routeToken : Evergreen.V1.Route.Token
+    , isVisible : Bool
+    , games : List.Nonempty.Nonempty ( Evergreen.V1.Id.Id Evergreen.V1.Id.GameId, Evergreen.V1.IdleGame.Snapshot.Snapshot Game )
+    , gameState : FrontendInGameState
+    , maybeServerInfo : Maybe ServerInfo
     , lastFastForwardDuration : Maybe Duration.Duration
     , showDebugPanel : Bool
-    , tray : Toast.Tray Evergreen.V1.IdleGame.GameTypes.Toast
+    , toastQueue : ToastQueue
     , isDrawerOpen : Bool
-    , activeTab : Evergreen.V1.IdleGame.Tab.Tab
     , preview : Maybe Preview
     , activityExpanded : Bool
-    , isVisible : Bool
     , activeModal : Maybe Modal
     , saveGameTimer : Evergreen.V1.IdleGame.Timer.Timer
-    , gameState : FrontendGameState
     , pointerState : Maybe PointerState
-    , activeAcademicTestCategory : Evergreen.V1.IdleGame.Kinds.AcademicTestCategory
     }
 
 
-type alias SessionGameMap =
-    Dict.Dict Lamdera.SessionId (Evergreen.V1.IdleGame.Snapshot.Snapshot Game)
+type FrontendModel
+    = Loading LoadingFrontend
+    | MainMenu MainMenuFrontend
+    | InGame InGameFrontend
+
+
+type alias LoginTokenData =
+    { creationTime : Time.Posix
+    , emailAddress : Evergreen.V1.EmailAddress.EmailAddress
+    }
 
 
 type alias BackendModel =
-    { sessionGameMap : SessionGameMap
+    { approximateTime : Time.Posix
+    , secretCounter : Int
+    , userGames : AssocList.Dict (Evergreen.V1.Id.Id Evergreen.V1.Id.UserId) (List (Evergreen.V1.Id.Id Evergreen.V1.Id.GameId))
+    , games : AssocList.Dict (Evergreen.V1.Id.Id Evergreen.V1.Id.GameId) (Evergreen.V1.IdleGame.Snapshot.Snapshot Game)
     , seed : Random.Seed
+    , sessions : BiDict.Assoc.BiDict Lamdera.SessionId (Evergreen.V1.Id.Id Evergreen.V1.Id.UserId)
+    , connections : AssocList.Dict Lamdera.SessionId (List.Nonempty.Nonempty Lamdera.ClientId)
+    , users : AssocList.Dict (Evergreen.V1.Id.Id Evergreen.V1.Id.UserId) BackendUser
+    , pendingLoginTokens : AssocList.Dict (Evergreen.V1.Id.Id Evergreen.V1.Id.LoginToken) LoginTokenData
     }
 
 
 type ToBackend
     = NoOpToBackend
-    | Save (Evergreen.V1.IdleGame.Snapshot.Snapshot Game)
+    | RegisterEmailRequest Evergreen.V1.Route.Route Evergreen.V1.EmailAddress.EmailAddress
+    | LoginWithEmailRequest Evergreen.V1.Route.Route Evergreen.V1.EmailAddress.EmailAddress
+    | LoginWithTokenRequest (Evergreen.V1.Id.Id Evergreen.V1.Id.LoginToken)
+    | LogoutRequest
+    | CreateGameRequest
+    | SaveGame (Evergreen.V1.Id.Id Evergreen.V1.Id.GameId) (Evergreen.V1.IdleGame.Snapshot.Snapshot Game)
 
 
 type BackendMsg
     = NoOpBackend
+    | BackendGotTime Time.Posix
     | HandleConnect Lamdera.SessionId Lamdera.ClientId
-    | HandleConnectWithTime Lamdera.SessionId Lamdera.ClientId Time.Posix
+    | HandleDisconnect Lamdera.SessionId Lamdera.ClientId
+    | SentLoginEmail Evergreen.V1.EmailAddress.EmailAddress (Result Http.Error Evergreen.V1.Postmark.PostmarkSendResponse)
 
 
 type ToFrontend
     = NoOpToFrontend
-    | InitializeGame (Evergreen.V1.IdleGame.Snapshot.Snapshot Game)
+    | SetUserAndGames ( FrontendUser, List ( Evergreen.V1.Id.Id Evergreen.V1.Id.GameId, Evergreen.V1.IdleGame.Snapshot.Snapshot Game ) )
+    | GiveServerInfo ServerInfo

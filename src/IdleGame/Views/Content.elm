@@ -5,7 +5,6 @@ module IdleGame.Views.Content exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import IdleGame.CombatWrapper
 import IdleGame.Kinds exposing (..)
 import IdleGame.Mod exposing (..)
 import IdleGame.Tab as Tab exposing (Tab)
@@ -62,9 +61,6 @@ renderContent model game cache activeTab =
 
             Tab.Backpack ->
                 IdleGame.Views.Bag.render game
-
-            Tab.Combat ->
-                IdleGame.CombatWrapper.view model.combat
 
             Tab.SkillTab skill ->
                 IdleGame.Views.SkillViews.renderSkill skill game cache

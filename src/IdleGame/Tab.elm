@@ -9,7 +9,6 @@ type Tab
     = Home
     | Backpack
     | Shop
-    | Combat
     | SkillTab Skill
 
 
@@ -35,11 +34,6 @@ getConfig tab =
         Shop ->
             { title = "Shop"
             , icon = Icon.shop
-            }
-
-        Combat ->
-            { title = "Combat"
-            , icon = Icon.adventuring
             }
 
         SkillTab skill ->
