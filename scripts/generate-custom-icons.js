@@ -3,48 +3,55 @@
 /**
  * Custom Icon Generator
  *
- * Converts SVG files to Elm code with currentColor support for theme-aware coloring.
+ * Converts SVG files to individual Elm modules with currentColor support
+ * for theme-aware coloring.
  *
- * Usage: node scripts/generate-custom-icons.js
+ * OPTIMIZATION: Merges adjacent rectangles horizontally and converts to
+ * a single SVG path for much smaller output files.
+ *
+ * Usage: npm run generate-icons
+ *
+ * Input:  src/icons/svgs/*.svg
+ * Output: src/icons/IconName.elm (one per SVG file)
  */
 
 const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const SOURCE_DIR = path.join(__dirname, '..', 'public', 'skills');
-const OUTPUT_FILE = path.join(__dirname, '..', 'src', 'IdleGame', 'Views', 'CustomIcons.elm');
-const MODULE_NAME = 'IdleGame.Views.CustomIcons';
+const SOURCE_DIR = path.join(__dirname, '..', 'src', 'icons', 'svgs');
+const OUTPUT_DIR = path.join(__dirname, '..', 'src', 'icons');
 
 /**
  * Replace black colors with currentColor in SVG content
  */
 function replaceColorsWithCurrent(svgContent) {
   return svgContent
-    // Replace hex colors: #000000, #000
     .replace(/#000000/gi, 'currentColor')
     .replace(/="#000"/gi, '="currentColor"')
-    // Replace rgb colors
     .replace(/rgb\s*\(\s*0\s*,\s*0\s*,\s*0\s*\)/gi, 'currentColor')
-    // Replace named color
     .replace(/="black"/gi, '="currentColor"')
     .replace(/='black'/gi, "='currentColor'");
 }
 
 /**
- * Convert kebab-case to camelCase
+ * Convert kebab-case to PascalCase for module name
  */
-function toCamelCase(str) {
-  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+function toPascalCase(str) {
+  return str
+    .split('-')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
 }
 
 /**
- * Convert filename to valid Elm function name
+ * Convert filename to module name
  */
-function toFunctionName(filename) {
+function getNames(filename) {
   const name = path.basename(filename, '.svg');
-  // Convert kebab-case to camelCase
-  return name.replace(/-(\w)/g, (_, letter) => letter.toUpperCase());
+  return {
+    moduleName: toPascalCase(name)
+  };
 }
 
 /**
@@ -58,88 +65,113 @@ function parseSvgAttributes(svgTag) {
   while ((match = attrRegex.exec(svgTag)) !== null) {
     const key = match[1];
     const value = match[2];
-    attrs[toCamelCase(key)] = value;
+    attrs[key.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = value;
   }
 
   return attrs;
 }
 
 /**
- * Parse attributes and convert to Elm Svg.Attributes
+ * Parse rectangle elements from SVG content
+ * Returns array of { x, y, width, height, fill }
  */
-function parseAttributesForElm(attrString) {
-  const attrs = [];
-  const attrRegex = /(\w+(?:-\w+)*)="([^"]*)"/g;
+function parseRectangles(content) {
+  const rects = [];
+  const rectRegex = /<rect([^>]*?)\/>/g;
   let match;
 
-  while ((match = attrRegex.exec(attrString)) !== null) {
-    const key = match[1];
-    const value = match[2];
-    const camelKey = toCamelCase(key);
+  while ((match = rectRegex.exec(content)) !== null) {
+    const attrString = match[1];
+    const rect = {};
 
-    // Use appropriate Elm attribute function
-    if (['width', 'height', 'x', 'y', 'rx', 'ry', 'viewBox'].includes(camelKey)) {
-      attrs.push(`Svg.Attributes.${camelKey} "${value}"`);
-    } else {
-      // For other attributes, use Html.Attributes.attribute
-      attrs.push(`attribute "${key}" "${value}"`);
-    }
+    // Parse x, y, width, height
+    const xMatch = attrString.match(/\bx="([^"]*)"/);
+    const yMatch = attrString.match(/\by="([^"]*)"/);
+    const wMatch = attrString.match(/\bwidth="([^"]*)"/);
+    const hMatch = attrString.match(/\bheight="([^"]*)"/);
+    const fillMatch = attrString.match(/\bfill="([^"]*)"/);
+
+    rect.x = xMatch ? parseFloat(xMatch[1]) : 0;
+    rect.y = yMatch ? parseFloat(yMatch[1]) : 0;
+    rect.width = wMatch ? parseFloat(wMatch[1]) : 1;
+    rect.height = hMatch ? parseFloat(hMatch[1]) : 1;
+    rect.fill = fillMatch ? fillMatch[1] : 'currentColor';
+
+    rects.push(rect);
   }
 
-  return attrs;
+  return rects;
 }
 
 /**
- * Parse SVG child elements
+ * Merge adjacent rectangles horizontally
+ * Combines rects that are on the same row (same y, same height) and adjacent (x + width = next x)
  */
-function parseChildren(content) {
-  const children = [];
+function mergeRectanglesHorizontally(rects) {
+  if (rects.length === 0) return [];
 
-  // Match self-closing tags like <rect .../> or <path .../>
-  const selfClosingRegex = /<(\w+)([^>]*?)\/>/g;
-  let match;
-
-  while ((match = selfClosingRegex.exec(content)) !== null) {
-    const tagName = match[1];
-    const attrs = match[2].trim();
-
-    // Parse attributes
-    const attrList = parseAttributesForElm(attrs);
-
-    if (attrList.length > 0) {
-      children.push({
-        tag: tagName,
-        attrs: attrList
-      });
-    } else {
-      children.push({
-        tag: tagName,
-        attrs: []
-      });
+  // Group by y position and height and fill
+  const groups = new Map();
+  for (const rect of rects) {
+    const key = `${rect.y}-${rect.height}-${rect.fill}`;
+    if (!groups.has(key)) {
+      groups.set(key, []);
     }
+    groups.get(key).push(rect);
   }
 
-  return children;
+  const merged = [];
+
+  for (const [, group] of groups) {
+    // Sort by x position
+    group.sort((a, b) => a.x - b.x);
+
+    let current = { ...group[0] };
+
+    for (let i = 1; i < group.length; i++) {
+      const next = group[i];
+      // Check if adjacent (allowing small floating point tolerance)
+      if (Math.abs((current.x + current.width) - next.x) < 0.001) {
+        // Merge: extend current width
+        current.width += next.width;
+      } else {
+        // Not adjacent, push current and start new
+        merged.push(current);
+        current = { ...next };
+      }
+    }
+    merged.push(current);
+  }
+
+  return merged;
 }
 
 /**
- * Convert SVG element to Elm Svg code
- * Now also returns width, height, and shapeRendering from the root <svg>.
+ * Convert rectangles to an SVG path d attribute
+ * Each rectangle becomes: M x y h width v height h -width Z
+ */
+function rectsToPathD(rects) {
+  const commands = rects.map(r => {
+    // M = moveto, h = horizontal line (relative), v = vertical line (relative), Z = close
+    return `M${r.x} ${r.y}h${r.width}v${r.height}h${-r.width}Z`;
+  });
+  return commands.join('');
+}
+
+/**
+ * Convert SVG element to optimized Elm Svg code
  */
 function svgToElm(svgContent) {
-  // Extract the SVG opening tag
   const svgTagMatch = svgContent.match(/<svg[^>]*>/);
   if (!svgTagMatch) {
     throw new Error('Invalid SVG: no <svg> tag found');
   }
 
   const attrs = parseSvgAttributes(svgTagMatch[0]);
-
-  // Extract attributes for the wrapper
-  const viewBox = attrs.viewBox || '0 0 32 32';
+  // Use viewBox if present, otherwise construct from width/height
+  const viewBox = attrs.viewBox || `0 0 ${attrs.width || 32} ${attrs.height || 32}`;
   const shapeRendering = attrs.shapeRendering || null;
 
-  // Extract the SVG content (everything between <svg> and </svg>)
   const contentMatch = svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
   if (!contentMatch) {
     throw new Error('Invalid SVG: could not extract content');
@@ -147,106 +179,89 @@ function svgToElm(svgContent) {
 
   const innerContent = contentMatch[1].trim();
 
-  // Parse child elements
-  const children = parseChildren(innerContent);
+  // Parse rectangles
+  const rects = parseRectangles(innerContent);
 
-  // NOTE: we intentionally ignore width/height now
-  return { viewBox, shapeRendering, children };
-}
-
-/**
- * Generate Elm code for SVG children
- */
-function generateChildrenCode(children) {
-  if (children.length === 0) {
-    return '[]';
+  if (rects.length === 0) {
+    return { viewBox, shapeRendering, pathD: '', originalCount: 0, optimizedCount: 0 };
   }
 
-  const childCode = children.map(child => {
-    const attrsCode = child.attrs.length > 0
-      ? `[ ${child.attrs.join('\n                    , ')} ]`
-      : '[]';
+  // Merge adjacent rectangles
+  const merged = mergeRectanglesHorizontally(rects);
 
-    return `Svg.${child.tag}\n                    ${attrsCode}\n                    []`;
-  }).join('\n                , ');
+  // Convert to path
+  const pathD = rectsToPathD(merged);
 
-  return `[ ${childCode}\n                ]`;
+  return {
+    viewBox,
+    shapeRendering,
+    pathD,
+    originalCount: rects.length,
+    optimizedCount: merged.length
+  };
 }
 
 /**
- * Generate Elm code for a single icon
- * Root <svg> now:
- *   - uses viewBox + width/height (if present)
- *   - preserves shape-rendering
- *   - does NOT set fill/stroke="currentColor" on the root
+ * Generate a complete Elm module for a single icon
  */
-function generateIconFunction(filename, svgContent) {
-  const functionName = toFunctionName(filename);
+function generateElmModule(filename, svgContent) {
+  const { moduleName } = getNames(filename);
   const processedSvg = replaceColorsWithCurrent(svgContent);
 
-  try {
-    const { viewBox, shapeRendering, children } = svgToElm(processedSvg);
+  const { viewBox, shapeRendering, pathD, originalCount, optimizedCount } = svgToElm(processedSvg);
 
-    const childrenCode = generateChildrenCode(children);
+  // Build the attribute list for the root <svg>
+  const rootAttrs = [];
+  rootAttrs.push(`Svg.Attributes.viewBox "${viewBox}"`);
+  rootAttrs.push(`Svg.Attributes.width "100%"`);
+  rootAttrs.push(`Svg.Attributes.height "100%"`);
+  rootAttrs.push(`attribute "xmlns" "http://www.w3.org/2000/svg"`);
 
-    // Build the attribute list for the root <svg> in Elm
-    const rootAttrs = [];
-
-    // Only viewBox, xmlns, and (optionally) shape-rendering
-    rootAttrs.push(`Svg.Attributes.viewBox "${viewBox}"`);
-    rootAttrs.push(`attribute "xmlns" "http://www.w3.org/2000/svg"`);
-
-    if (shapeRendering) {
-      rootAttrs.push(`attribute "shape-rendering" "${shapeRendering}"`);
-    }
-
-    const rootAttrsCode =
-      rootAttrs.length > 0
-        ? `[ ${rootAttrs.join('\n                , ')} ]`
-        : '[]';
-
-    return `
-{-| ${functionName} icon -}
-${functionName} : Icon
-${functionName} =
-    let
-        svgContent =
-            Svg.svg
-                ${rootAttrsCode}
-                ${childrenCode}
-    in
-    IconSvg svgContent defaultParams
-`;
-  } catch (error) {
-    console.error(`Error processing ${filename}:`, error.message);
-    return null;
+  if (shapeRendering) {
+    rootAttrs.push(`attribute "shape-rendering" "${shapeRendering}"`);
   }
-}
 
-/**
- * Generate the complete Elm module
- */
-function generateElmModule(icons) {
-  const iconFunctions = icons.filter(Boolean).join('\n');
+  const rootAttrsCode = `[ ${rootAttrs.join('\n                , ')} ]`;
 
-  return `module ${MODULE_NAME} exposing (..)
+  // Generate the path element
+  const pathCode = pathD
+    ? `[ Svg.path\n                    [ Svg.Attributes.d "${pathD}"\n                    , Svg.Attributes.fill "currentColor"\n                    ]\n                    []\n                ]`
+    : '[]';
 
-{-| Custom SVG icons generated from public/skills/
+  return {
+    code: `module Icons.${moduleName} exposing (icon)
+
+{-| ${moduleName} icon
 
 This file is AUTO-GENERATED by scripts/generate-custom-icons.js
 DO NOT EDIT MANUALLY
 
+Source: src/icons/svgs/${filename}
+Optimization: ${originalCount} rects → ${optimizedCount} merged → 1 path
+
 -}
 
-import Html exposing (Html)
 import Html.Attributes exposing (attribute)
-import IdleGame.Views.Icon exposing (Icon(..), Params, defaultParams)
+import IdleGame.Views.Icon exposing (Icon(..), defaultParams)
 import Svg
 import Svg.Attributes
 
 
-${iconFunctions}
-`;
+{-| The icon with currentColor support for theme-aware coloring
+-}
+icon : Icon
+icon =
+    let
+        svgContent =
+            Svg.svg
+                ${rootAttrsCode}
+                ${pathCode}
+    in
+    IconSvg svgContent defaultParams
+`,
+    originalCount,
+    optimizedCount
+  };
 }
 
 /**
@@ -258,6 +273,7 @@ function main() {
   // Check if source directory exists
   if (!fs.existsSync(SOURCE_DIR)) {
     console.error(`❌ Source directory not found: ${SOURCE_DIR}`);
+    console.log('   Create src/icons/svgs/ and add your SVG files there.');
     process.exit(1);
   }
 
@@ -271,21 +287,39 @@ function main() {
 
   console.log(`📁 Found ${files.length} SVG file(s):\n`);
 
+  let totalOriginal = 0;
+  let totalOptimized = 0;
+
   // Process each SVG file
-  const icons = files.map(filename => {
-    console.log(`   - ${filename} → ${toFunctionName(filename)}`);
+  files.forEach(filename => {
+    const { moduleName } = getNames(filename);
     const svgContent = fs.readFileSync(path.join(SOURCE_DIR, filename), 'utf8');
-    return generateIconFunction(filename, svgContent);
+
+    try {
+      const { code, originalCount, optimizedCount } = generateElmModule(filename, svgContent);
+      const outputPath = path.join(OUTPUT_DIR, `${moduleName}.elm`);
+
+      fs.writeFileSync(outputPath, code, 'utf8');
+
+      totalOriginal += originalCount;
+      totalOptimized += optimizedCount;
+
+      const reduction = originalCount > 0
+        ? Math.round((1 - optimizedCount / originalCount) * 100)
+        : 0;
+
+      console.log(`   ✓ ${filename} → Icons.${moduleName} (${originalCount} → ${optimizedCount} rects, ${reduction}% reduction)`);
+    } catch (error) {
+      console.error(`   ✗ ${filename}: ${error.message}`);
+    }
   });
 
-  // Generate Elm module
-  const elmCode = generateElmModule(icons);
+  const totalReduction = totalOriginal > 0
+    ? Math.round((1 - totalOptimized / totalOriginal) * 100)
+    : 0;
 
-  // Write output file
-  fs.writeFileSync(OUTPUT_FILE, elmCode, 'utf8');
-
-  console.log(`\n✅ Generated ${OUTPUT_FILE}`);
-  console.log(`\n💡 To use these icons, import ${MODULE_NAME} in your Elm files`);
+  console.log(`\n✅ Done! Total: ${totalOriginal} → ${totalOptimized} rectangles (${totalReduction}% reduction)`);
+  console.log(`\n💡 Usage: import Icons.ModuleName exposing (icon)`);
 }
 
 // Run the script

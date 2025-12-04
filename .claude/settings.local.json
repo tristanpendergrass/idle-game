@@ -6,7 +6,8 @@
       "Bash(lamdera make:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run generate-icons:*)"
     ],
     "deny": []
   }

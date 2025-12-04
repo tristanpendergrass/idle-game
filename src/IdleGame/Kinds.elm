@@ -1,8 +1,9 @@
 module IdleGame.Kinds exposing (..)
 
 import Duration
+import Icons.Chores1
+import Icons.HerbGathering
 import IdleGame.Coin
-import IdleGame.Views.CustomIcons
 import IdleGame.Views.Icon
 
 
@@ -67,8 +68,8 @@ mapSkills fn record =
 
 skillStats : SkillRecord SkillStats
 skillStats =
-    { herbGathering = { title = "Herb Gathering", icon = IdleGame.Views.Icon.IconMaterial IdleGame.Views.Icon.MaterialScience IdleGame.Views.Icon.defaultParams }
-    , wildMagic = { title = "Wild Magic", icon = IdleGame.Views.CustomIcons.wildMagic1 }
+    { herbGathering = { title = "Herb Gathering", icon = Icons.HerbGathering.icon }
+    , wildMagic = { title = "Wild Magic", icon = Icons.Chores1.icon }
     }
 
 
