@@ -9,7 +9,7 @@ import Types exposing (..)
 
 version : String
 version =
-    "0.1"
+    "0.2"
 
 
 type alias Flags =
