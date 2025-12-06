@@ -60,7 +60,7 @@ renderDrawer isDrawerOpen activeTab =
                     [ div [ class "flex-0 px-2 flex flex-col items-center" ]
                         [ div [ class "font-title text-primary inline-flex text-lg transition-all duration-200 md:text-3xl flex gap-1 items-center rounded-t-xl overflow-hidden p-1 border border-primary border-b-4" ]
                             [ div [ class "text-primary text-sm font-bold", IdleGame.Views.Utils.classes.column, class "gap-0 leading-xs text-primary" ] [ span [] [ text "idle" ] ]
-                            , span [ class "uppercase leading-none px-1" ] [ text "sage" ]
+                            , span [ class "uppercase leading-none px-1" ] [ text "magic" ]
                             ]
                         , div [ class "w-full border border-primary flex justify-center" ] [ div [ class "text-xs" ] [ text "Prologue" ] ]
                         ]

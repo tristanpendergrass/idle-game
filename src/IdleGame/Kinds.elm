@@ -16,9 +16,9 @@ type Skill
 
 allSkills : List Skill
 allSkills =
-    [ HerbGathering
+    [ Chores
+    , HerbGathering
     , WildMagic
-    , Chores
     ]
 
 
