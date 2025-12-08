@@ -231,6 +231,7 @@ type Activity
     | GatherSorrel
     | CraftSpellHerbSense
     | CraftSpellBloom
+    | CleaningTheStables
 
 
 allActivities : List Activity
@@ -240,6 +241,7 @@ allActivities =
     , GatherSorrel
     , CraftSpellHerbSense
     , CraftSpellBloom
+    , CleaningTheStables
     ]
 
 
@@ -249,6 +251,7 @@ type alias ActivityRecord a =
     , gatherSorrel : a
     , craftSpellHerbSense : a
     , craftSpellBloom : a
+    , cleaningTheStables : a
     }
 
 
@@ -259,6 +262,7 @@ activityRecord a =
     , gatherSorrel = a
     , craftSpellHerbSense = a
     , craftSpellBloom = a
+    , cleaningTheStables = a
     }
 
 
@@ -280,6 +284,9 @@ getByActivity kind data =
         CraftSpellBloom ->
             data.craftSpellBloom
 
+        CleaningTheStables ->
+            data.cleaningTheStables
+
 
 setByActivity : Activity -> a -> ActivityRecord a -> ActivityRecord a
 setByActivity kind value data =
@@ -299,6 +306,9 @@ setByActivity kind value data =
         CraftSpellBloom ->
             { data | craftSpellBloom = value }
 
+        CleaningTheStables ->
+            { data | cleaningTheStables = value }
+
 
 mapActivities : (a -> a) -> ActivityRecord a -> ActivityRecord a
 mapActivities fn record =
@@ -307,6 +317,7 @@ mapActivities fn record =
     , gatherSorrel = fn record.gatherSorrel
     , craftSpellHerbSense = fn record.craftSpellHerbSense
     , craftSpellBloom = fn record.craftSpellBloom
+    , cleaningTheStables = fn record.cleaningTheStables
     }
 
 
@@ -384,6 +395,18 @@ activityStats =
         , type_ = "Craft Spell"
         , coin = Nothing
         , resourceGains = [ ( 1, SpellBloom ) ]
+        , spellAssignmentSlots = 1
+        }
+    , cleaningTheStables =
+        { skill = Chores
+        , title = "Cleaning the Stables"
+        , idLabel = "cleaning-the-stables"
+        , image = "/activities/Cleaning_The_Stables.png"
+        , level = 1
+        , duration = Duration.seconds 5
+        , type_ = "Chore"
+        , coin = Just 1
+        , resourceGains = []
         , spellAssignmentSlots = 1
         }
     }

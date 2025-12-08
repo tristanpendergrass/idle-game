@@ -128,6 +128,15 @@ getActivityEffectsHelper activity =
                 |> Effect.withTags tagsForThisActivity
             ]
 
+        gainCoinEffects : List Effect
+        gainCoinEffects =
+            case stats.coin of
+                Just coinAmount ->
+                    [ Effect.gainCoin (Coin.int coinAmount) ]
+
+                Nothing ->
+                    []
+
         gainResourceEffects : List Effect
         gainResourceEffects =
             List.map (\( count, resource ) -> Effect.gainResource count resource) stats.resourceGains
@@ -136,6 +145,7 @@ getActivityEffectsHelper activity =
         [ costs
         , gainMxpEffects
         , gainXpEffects
+        , gainCoinEffects
         , gainResourceEffects
         ]
 
