@@ -7,7 +7,9 @@
       "Bash(git checkout:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(npm run generate-icons:*)"
+      "Bash(npm run generate-icons:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git log:*)"
     ],
     "deny": []
   }

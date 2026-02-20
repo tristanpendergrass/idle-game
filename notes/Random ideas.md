@@ -1,3 +1,8 @@
+## Spells that are interesting
+- Make them hear the hoofbeat of horses wherever they go
+    - Core spell: make them hear -- insert here -- always
+- Teleport to soup
+- 
 ## Trials
 A trial sequence would be a self-contained set of trials which the player could set themselves as "trying". Once trying a trial sequence, a timer would tick for each trail in the sequence and success would be determined; if the player fails then they are sent back to the start and if they succeed they progress. Similar to how Agility works in Melvor Idle except for some key enhancements:
 * Each trial would be personalized to the zone it's found in. E.g. in the jungle biome a trial where you use vine rope swings to get somewhere.

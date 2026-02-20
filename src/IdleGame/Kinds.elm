@@ -232,6 +232,8 @@ type Activity
     | CraftSpellHerbSense
     | CraftSpellBloom
     | CleaningTheStables
+    | CleaningBigBubbasStall
+    | SweepingTheChimney
 
 
 allActivities : List Activity
@@ -242,6 +244,8 @@ allActivities =
     , CraftSpellHerbSense
     , CraftSpellBloom
     , CleaningTheStables
+    , CleaningBigBubbasStall
+    , SweepingTheChimney
     ]
 
 
@@ -252,6 +256,8 @@ type alias ActivityRecord a =
     , craftSpellHerbSense : a
     , craftSpellBloom : a
     , cleaningTheStables : a
+    , cleaningBigBubbasStall : a
+    , sweepingTheChimney : a
     }
 
 
@@ -263,6 +269,8 @@ activityRecord a =
     , craftSpellHerbSense = a
     , craftSpellBloom = a
     , cleaningTheStables = a
+    , cleaningBigBubbasStall = a
+    , sweepingTheChimney = a
     }
 
 
@@ -287,6 +295,12 @@ getByActivity kind data =
         CleaningTheStables ->
             data.cleaningTheStables
 
+        CleaningBigBubbasStall ->
+            data.cleaningBigBubbasStall
+
+        SweepingTheChimney ->
+            data.sweepingTheChimney
+
 
 setByActivity : Activity -> a -> ActivityRecord a -> ActivityRecord a
 setByActivity kind value data =
@@ -309,6 +323,12 @@ setByActivity kind value data =
         CleaningTheStables ->
             { data | cleaningTheStables = value }
 
+        CleaningBigBubbasStall ->
+            { data | cleaningBigBubbasStall = value }
+
+        SweepingTheChimney ->
+            { data | sweepingTheChimney = value }
+
 
 mapActivities : (a -> a) -> ActivityRecord a -> ActivityRecord a
 mapActivities fn record =
@@ -318,6 +338,8 @@ mapActivities fn record =
     , craftSpellHerbSense = fn record.craftSpellHerbSense
     , craftSpellBloom = fn record.craftSpellBloom
     , cleaningTheStables = fn record.cleaningTheStables
+    , cleaningBigBubbasStall = fn record.cleaningBigBubbasStall
+    , sweepingTheChimney = fn record.sweepingTheChimney
     }
 
 
@@ -377,7 +399,7 @@ activityStats =
         { skill = WildMagic
         , title = "Herb Sense"
         , idLabel = "craft-spell-herb-sense"
-        , image = "/activities/wildMagic/craftSpellHerbSense.webp"
+        , image = "/activities/herb_sense.png"
         , level = 1
         , duration = Duration.seconds 5
         , type_ = "Craft Spell"
@@ -389,7 +411,7 @@ activityStats =
         { skill = WildMagic
         , title = "Bloom"
         , idLabel = "craft-spell-bloom"
-        , image = "/activities/wildMagic/craftSpellBloom.webp"
+        , image = "/activities/bloom.png"
         , level = 2
         , duration = Duration.seconds 10
         , type_ = "Craft Spell"
@@ -406,6 +428,30 @@ activityStats =
         , duration = Duration.seconds 5
         , type_ = "Chore"
         , coin = Just 1
+        , resourceGains = []
+        , spellAssignmentSlots = 1
+        }
+    , cleaningBigBubbasStall =
+        { skill = Chores
+        , title = "Cleaning Big Bubba's Stall"
+        , idLabel = "cleaning-big-bubbas-stall"
+        , image = "/activities/cleaning_big_bubbas_stall.png"
+        , level = 1
+        , duration = Duration.seconds 8
+        , type_ = "Chore"
+        , coin = Just 2
+        , resourceGains = []
+        , spellAssignmentSlots = 1
+        }
+    , sweepingTheChimney =
+        { skill = Chores
+        , title = "Sweeping the Chimney"
+        , idLabel = "sweeping-the-chimney"
+        , image = "/activities/sweeping_the_chimney.png"
+        , level = 2
+        , duration = Duration.seconds 10
+        , type_ = "Chore"
+        , coin = Just 3
         , resourceGains = []
         , spellAssignmentSlots = 1
         }
